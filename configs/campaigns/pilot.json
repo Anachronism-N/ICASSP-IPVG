@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "campaign_id": "cpu_pilot",
+  "experiments": ["configs/experiments/synthetic_smoke.json"],
+  "max_trials": 1,
+  "max_gpu_hours": 0,
+  "stop_on_failure": true,
+  "report": "runs/campaign_cpu_pilot.json"
+}

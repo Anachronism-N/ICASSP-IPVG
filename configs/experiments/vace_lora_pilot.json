@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "run_id": "vace_1p3b_lora_train_v001",
+  "task": "training",
+  "hypothesis": "少量授权训练片段能完成VACE条件模块LoRA训练、保存与后续回载",
+  "manifest": "data/manifests/pilot.jsonl",
+  "split": "train",
+  "backend": {
+    "kind": "command",
+    "command": [
+      "{python}",
+      "scripts/adapters/diffsynth_train.py",
+      "--request",
+      "{request}"
+    ]
+  },
+  "resources": {
+    "gpus": 8,
+    "timeout_s": 7200,
+    "max_gpu_hours": 16
+  },
+  "expected_artifacts": [
+    "*.safetensors"
+  ],
+  "model_revisions": {
+    "Wan-AI/Wan2.1-VACE-1.3B": "574e6a744642ce3bee319afc31496b88bde8aac4",
+    "Wan-AI/Wan2.1-T2V-1.3B:tokenizer": "37ec512624d61f7aa208f7ea8140a131f93afc9a"
+  },
+  "parameters": {
+    "upstream_dir": "upstream/DiffSynth-Studio",
+    "model_files": [
+      "models/vace1p3b/diffusion_pytorch_model.safetensors",
+      "models/vace1p3b/models_t5_umt5-xxl-enc-bf16.pth",
+      "models/vace1p3b/Wan2.1_VAE.pth"
+    ],
+    "tokenizer_dir": "models/umt5/google/umt5-xxl",
+    "mode": "lora",
+    "num_processes": 8,
+    "num_epochs": 1,
+    "dataset_repeat": 1,
+    "learning_rate": 5e-05,
+    "lora_rank": 16,
+    "save_steps": 50,
+    "gradient_accumulation_steps": 1,
+    "width": 832,
+    "height": 480,
+    "num_frames": 49,
+    "seed": 42,
+    "reference_index": 0
+  }
+}

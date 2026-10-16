@@ -1,0 +1,3 @@
+{"sample_id":"demo_001","identity_id":"synthetic_person_a","source_video_id":"synthetic_source_a","reference_images":["data/example_only/person_a.png"],"prompt":"Synthetic engineering fixture, not a model benchmark.","track":1,"split":"dev","timeline":[]}
+{"sample_id":"demo_002","identity_id":"synthetic_person_b","source_video_id":"synthetic_source_b","reference_images":["data/example_only/person_b.png"],"prompt":"Synthetic engineering fixture, not a model benchmark.","track":1,"split":"dev","timeline":[]}
+{"sample_id":"demo_003","identity_id":"synthetic_person_c","source_video_id":"synthetic_source_c","reference_images":["data/example_only/person_c.png"],"prompt":"Synthetic engineering fixture, not a model benchmark.","track":1,"split":"dev","timeline":[]}

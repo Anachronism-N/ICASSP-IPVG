@@ -1,0 +1,1110 @@
+{
+  "as_of": "2026-10-17 Asia/Shanghai",
+  "user_hardware": {
+    "gpu_vram_gb": 40,
+    "gpus_per_node": 8,
+    "nodes": [
+      2,
+      4
+    ],
+    "gpu_model": null,
+    "network": null,
+    "available_hours": null
+  },
+  "status": "Research and planning only; no GPU training/inference validated on user server",
+  "rules": {
+    "as_of": "2026-10-17 Asia/Shanghai",
+    "scope": "只读核查IPVG 2027官方页面、会议GC-14目录、公开代码仓库和HF数据卡/API元数据；未申请、登录、注册、提交，未下载大数据或模型。",
+    "source_urls": {
+      "challenge": "https://hidream-ai.github.io/ipvg-challenge-2027.github.io/",
+      "conference": "https://2027.ieeeicassp.org/sp-grand-challenges/#gc-14",
+      "website_repo": "https://github.com/HiDream-ai/ipvg-challenge-2027.github.io",
+      "agreement": "https://github.com/HiDream-ai/ipvg-challenge-2027.github.io/blob/main/Agreement-VIP-200K.pdf",
+      "vip": "https://huggingface.co/datasets/HiDream-ai/VIP-200K",
+      "vip_video": "https://huggingface.co/datasets/HiDream-ai/VIP-200K-Video",
+      "reactid": "https://huggingface.co/datasets/HiDream-ai/ReactID-Data"
+    },
+    "confirmed": {
+      "tracks": [
+        {
+          "name": "Track 1 Facial Identity-Preserving Text-to-Video Generation",
+          "input": "人脸参考图像与文本prompt；需学习身份保持的视频生成系统",
+          "train_description": "赛事页写500,000视频；数据卡另按200,005条身份记录、701,470 captions计数，口径不同不能混为视频总数",
+          "test": "200个未见身份，每身份5条prompt，共1000输入对，每对至少1视频",
+          "source": "https://hidream-ai.github.io/ipvg-challenge-2027.github.io/"
+        },
+        {
+          "name": "Track 2 Sequential Action Identity-Preserving Video Generation",
+          "input": "参考主体图像+含多个动作及时间戳的结构化prompt；主体可为人、动物或物体",
+          "train_description": "ReactID-Data：4.1M subject-text-video triples；数据含主体标注与分段事件时间轴",
+          "test": "未见身份+多动作时间轴prompt；测试样本数量未公布",
+          "source": "https://hidream-ai.github.io/ipvg-challenge-2027.github.io/"
+        }
+      ],
+      "submission": "每track每队最多3个run，必须指定1个primary；第二/第三run不保证被评测。这里的run指完整提交结果，不能擅自等同内部随机种子次数。",
+      "evaluation": "官方仅给身份相似度、视频质量/动态/文本一致性、Track2动作时间轴对齐三类维度；最终混合客观评分与人工研究。",
+      "timeline": [
+        {
+          "event": "测试集",
+          "date": "2026-12-09",
+          "timezone": null
+        },
+        {
+          "event": "结果提交",
+          "date": "2026-12-16",
+          "timezone": null
+        },
+        {
+          "event": "客观评测",
+          "date": "2026-12-17—2026-12-21",
+          "timezone": null
+        },
+        {
+          "event": "结果公布",
+          "date": "2026-12-22",
+          "timezone": null
+        },
+        {
+          "event": "论文",
+          "date": "2027-01-07",
+          "timezone": null
+        },
+        {
+          "event": "录用通知",
+          "date": "2027-01-21",
+          "timezone": null
+        },
+        {
+          "event": "终稿",
+          "date": "2027-01-28",
+          "timezone": null
+        }
+      ],
+      "data_use": "赛事页限制research purposes。HF门禁要求academic research and non-commercial；VIP协议另明确不能向第三方提供数据。HF apache-2.0标签不能据此覆盖单独申请条件。",
+      "official_resources": "未在已核2027官网、会议GC-14说明或网站仓库找到可申请的API积分、GPU训练额度、现金奖金或保证报销。",
+      "registration_url": "https://docs.google.com/forms/d/e/1FAIpQLSfdQO4gRnPkGBCXL94ziiN59E0RBWC2Qro7U-p4SPsZ5bpLOg/viewform?usp=publish-editor",
+      "registration_check": "匿名访问返回401并要求Google账号；未核到登录后表内附加规则，也未发现独立报名关闭日。",
+      "contact": "panyw.ustc@gmail.com"
+    },
+    "not_publicly_confirmed": [
+      "额外训练数据、公开预训练模型、闭源生成API及外部评测API的允许范围与申报要求。",
+      "测试参考图是否允许test-time fine-tuning/LoRA；是否可以best-of-N再选样、prompt改写、后处理或插帧。",
+      "完整官方可执行评测代码、特征骨干、权重、normalization、人体/动物/物体身份特征的差别。",
+      "客观指标与人工评分的具体权重；人评样本数、比较方式与置信区间。",
+      "官方reference model、baseline训练/推理脚本、已训练baseline权重；2027网站代码仓库只有静态页面、图片、样式及VIP协议。",
+      "可供反复查询的官方public leaderboard或dev scoring API；当前官网没有链接，因此不能设计靠频繁官方反馈的无限自动优化。",
+      "独立validation split的下载入口；官网时间表写9/1可用，但VIP仓库当前文件名均为train，ReactID的Eval-SEQ是论文相关公开benchmark，不自动等于本届validation。",
+      "成片分辨率、fps、视频长度、编码、文件命名、打包格式、传输位置、是否须提交权重/源码、单次生成计算上限。",
+      "结果提交具体时刻与时区；不能按AoE或北京时间自行补齐。",
+      "论文资格、篇幅、审稿标准、出版类别以及是否所有参赛队可投；1/7节点本身不保证ICASSP主会Regular/Full论文。"
+    ],
+    "data_access": {
+      "annotation": "VIP-200K API当前gated=false，20个JSON；其余两个数据仓库为gated=manual。",
+      "request_form": "https://forms.gle/j4Nwq38W9TjtPNgq9",
+      "card_claimed_turnaround": "数据卡说使用HF注册邮箱填写表单、48小时处理；是主办宣称，不保证本次审批速度。",
+      "stale_text": "VIP视频与ReactID门禁文案仍指ACM Multimedia 2026及旧2026比赛。2027比赛自己的注册表与数据授权表不同，需要分别确认。",
+      "agreement": "公开VIP协议要求研究者姓名、日期和法律有效签名；此次未代签或提交。",
+      "reference_frames_gap": "VIP卡片文字提到face frames，但API当前文件清单只有README/.gitattributes和20个JSON，没有webp/脸帧压缩包；应在授权后向主办确认参考图的实际获取方法，不宣称开箱即有所有图像。",
+      "restricted_data_api": "VIP协议禁止向第三方提供数据；在未获明确允许前，本地处理原始素材，给外部coding控制器只传代码、日志和聚合指标。"
+    },
+    "engineering_inferences": [
+      "可以自动化下载已授权的指定分片、预处理、独立身份划分、训练/推理、代理指标、失败分类、超参数搜索和结果打包；这不是已验证能完全自动夺冠。",
+      "无公开官方完整评分器且有人评，因此本地proxy提高不保证最终排名提高；开发保留人工抽检与固定holdout。",
+      "先选一个track，优先Track1或少量Track2子集；不建议为初期实验直接搬8.86TB。",
+      "保留按身份/源视频隔离的train/dev/locked-test，以免近重复视频使自动搜索产生虚假收益；锁定test不用于agent选模型。",
+      "先估单条生成t分钟，再估最终工作量：Track1一个run至少1000条，K候选、R配置时GPU小时约1000*K*R*t/60，再加失败重跑与评价。t须用目标硬件实测，不能凭模型参数数给出确切时长。",
+      "测试集至提交只有约7个日历日，模型与pipeline应在12/9前冻结主要结构，预留大批量推理和上传窗口。"
+    ],
+    "recommended_questions_for_organizer": [
+      "是否允许公开预训练视频模型、外部训练集和生成/评测API？需要何时申报？",
+      "是否允许测试参考图的test-time适配、候选重采样/自动rerank、分段生成拼接和后处理？",
+      "何时提供baseline、可执行scorer和独立validation？具体评分权重/模型是什么？",
+      "请确认output格式、fps、分辨率、长度、提交路径与12/16时刻/时区。",
+      "VIP当前HF注释仓库没有face frame文件，请问参考图在哪？ReactID-Eval-SEQ可否用作本届开发集？",
+      "1/7论文的资格、页数和具体出版track是什么？是否有算力/API支持？"
+    ],
+    "datasets": [
+      {
+        "id": "HiDream-ai/VIP-200K",
+        "revision": "acbcbbeddd4f192f933928d1d8a13537cda98c42",
+        "gated": false,
+        "lastModified": "2026-03-19T11:18:32.000Z",
+        "files": 22,
+        "bytes": 1900127672,
+        "decimal_GB": 1.9,
+        "GiB": 1.77,
+        "groups": {
+          "(root)": {
+            "files": 2,
+            "bytes": 19127
+          },
+          "data": {
+            "files": 20,
+            "bytes": 1900108545
+          }
+        },
+        "api_url": "https://huggingface.co/api/datasets/HiDream-ai/VIP-200K?blobs=true",
+        "selected_files": []
+      },
+      {
+        "id": "HiDream-ai/VIP-200K-Video",
+        "revision": "e5909911c901960e8907919a3f27f789a9620380",
+        "gated": "manual",
+        "lastModified": "2026-03-19T10:11:48.000Z",
+        "files": 102,
+        "bytes": 327714718666,
+        "decimal_GB": 327.715,
+        "GiB": 305.208,
+        "groups": {
+          "(root)": {
+            "files": 2,
+            "bytes": 5066
+          },
+          "video": {
+            "files": 100,
+            "bytes": 327714713600
+          }
+        },
+        "api_url": "https://huggingface.co/api/datasets/HiDream-ai/VIP-200K-Video?blobs=true",
+        "selected_files": []
+      },
+      {
+        "id": "HiDream-ai/ReactID-Data",
+        "revision": "ea51455678b58038f416d2f44dc2031295706172",
+        "gated": "manual",
+        "lastModified": "2026-09-15T12:00:23.000Z",
+        "files": 4103,
+        "bytes": 8860159868052,
+        "decimal_GB": 8860.16,
+        "GiB": 8251.667,
+        "groups": {
+          "(root)": {
+            "files": 2,
+            "bytes": 14516
+          },
+          "Jsons": {
+            "files": 3,
+            "bytes": 58711459660
+          },
+          "ReactID-Eval-SEQ": {
+            "files": 2,
+            "bytes": 114150694
+          },
+          "Videos": {
+            "files": 4096,
+            "bytes": 8801334243182
+          }
+        },
+        "api_url": "https://huggingface.co/api/datasets/HiDream-ai/ReactID-Data?blobs=true",
+        "selected_files": [
+          {
+            "rfilename": "Jsons/annotations.tar.zst",
+            "blobId": "0066ee715a263de563b48ab1f0357d2da9ef34dc",
+            "size": 56628117878,
+            "lfs": {
+              "sha256": "225ff34d74e2377a43bc7add607fee7bfd99d6a9d17aa11398a1e271a3a95150",
+              "size": 56628117878,
+              "pointerSize": 136
+            }
+          },
+          {
+            "rfilename": "Jsons/metadata.tar.zst",
+            "blobId": "8c3ccfc4c2c65aa578afbc39f287b8f48c969537",
+            "size": 1628836978,
+            "lfs": {
+              "sha256": "ed9a11c1b49814e95b015e5eec3f8238279e89507868017dddf84cec976eb9b3",
+              "size": 1628836978,
+              "pointerSize": 135
+            }
+          },
+          {
+            "rfilename": "Jsons/timeline_annotations.tar.zst",
+            "blobId": "3947cfb6e554164dfae3183dc2edabd54d040398",
+            "size": 454504804,
+            "lfs": {
+              "sha256": "56162b95226733fa896c1da20f12db1951d11385e63701991ab9b4095557c8d1",
+              "size": 454504804,
+              "pointerSize": 134
+            }
+          },
+          {
+            "rfilename": "ReactID-Eval-SEQ/ReactID_Eval_SEQ_120.json",
+            "blobId": "7d365dd87c476d3f2e1f203cff0ab7374c5f891c",
+            "size": 91430
+          },
+          {
+            "rfilename": "ReactID-Eval-SEQ/images.tar",
+            "blobId": "af9ec57e527fd54e371cc3b4e0bf7e3058bf8d1a",
+            "size": 114059264,
+            "lfs": {
+              "sha256": "932100ee1201525769571ede86507f8c5ee87ac75ceeef2c60dc412e6c4df5f3",
+              "size": 114059264,
+              "pointerSize": 134
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "identity_bases": {
+    "as_of": "2026-10-17 Asia/Shanghai",
+    "scope": "IPVG2027潜在开源基线/方案；与官方主办baseline不同，不把论文存在当成代码权重已公开。仅下载README、许可证、脚本、元数据和ReactID论文文本，未clone大仓、下载权重、执行GPU实验。",
+    "user_hardware": "16–32张40GB卡，2–4节点×8卡；GPU型号/节点内NVLink及跨节点互联未知，A10040GB仅规划假设。",
+    "recommendation": "主线Wan2.1-VACE1.3B+DiffSynth公开adapter/LoRA训练，Track1用ConsisID训练/评测作直接对照，Stand-In(+Wan2.1 VACE)/AnyID作强推理对照；按验证收益再上14B。ReactID给Track2设计参考，但目前未找到其公开code/checkpoint，不能等其发布作为唯一前提。",
+    "records": [
+      {
+        "name": "Wan2.1-VACE-1.3B / 14B + DiffSynth-Studio",
+        "role": "可训练工程主线；先1.3B完成闭环，再升级14B",
+        "track1_fit": "主体参考生成直接适用，但非专门脸ID编码器；与Stand-In现成推理组合做强对照，训练中加入脸区/身份约束需自己实现并测定收益。",
+        "track2_fit": "同时接收参考图、控制视频和mask，最适合在现有公开代码上增加subject-action timeline条件；当前VACE本身不等同ReactID的timestamped action attention。",
+        "availability": "官方VACE推理代码和Wan-AI 1.3B/14B权重可直接获取；原VACE repo无训练入口。ModelScope维护的DiffSynth-Studio有明确VACE adapter full/LoRA训练、验证例。",
+        "training": {
+          "public": true,
+          "qualification": "公开框架微调例，不声称复现VACE原始完整数据和训练recipe",
+          "entry": "examples/wanvideo/model_training/train.py",
+          "full_adapter_example": "examples/wanvideo/model_training/full/Wan2.1-VACE-1.3B.sh",
+          "lora_example": "examples/wanvideo/model_training/lora/Wan2.1-VACE-14B.sh",
+          "details": "1.3B例480×832×49帧，--trainable_models vace；14B LoRA例480×832×17帧，rank32，target q/k/v/o/ffn，二者均gradient_checkpointing_offload。full路径训练的是vace控制模块，并不自动训练整个Wan基座。"
+        },
+        "hardware_evidence": "官方支持8卡FSDP+xDiT推理；以上训练例没有报告经过验证的A10040GB峰值显存/吞吐。不能从8卡命令推导40GB无条件可训练。",
+        "resource_plan_inference": "16–32×40GB建议先单节点8卡的1.3B adapter训练pilot并缓存T5/VAE输出，余卡做评测/采样；14B LoRA需逐步扩大帧数并测峰值显存，必要时FSDP/ZeRO3与CPU offload。此为工程建议，未经本环境GPU实测。",
+        "license": "VACE代码、Wan2.1-VACE1.3B/14B权重均Apache2；DiffSynth-Studio许可证随所用commit核对，上游依赖另计。",
+        "artifacts": [
+          {
+            "repo": "https://github.com/ali-vilab/VACE",
+            "commit": "48eb44f1c4be87cc65a98bff985a26976841e9f3"
+          },
+          {
+            "repo": "https://github.com/modelscope/DiffSynth-Studio",
+            "commit": "4e3496991455b300fd60ab023113422cd16899f5"
+          },
+          {
+            "repo": "https://huggingface.co/Wan-AI/Wan2.1-VACE-1.3B",
+            "revision": "574e6a744642ce3bee319afc31496b88bde8aac4",
+            "gated": false,
+            "license_card": "apache-2.0",
+            "files": [
+              {
+                "name": "Wan2.1_VAE.pth",
+                "size": 507609880
+              },
+              {
+                "name": "diffusion_pytorch_model.safetensors",
+                "size": 7146067848
+              },
+              {
+                "name": "models_t5_umt5-xxl-enc-bf16.pth",
+                "size": 11361920418
+              }
+            ]
+          },
+          {
+            "repo": "https://huggingface.co/Wan-AI/Wan2.1-VACE-14B",
+            "revision": "539c162b1387eac9dc4c20bd3f74671309e76a4c",
+            "gated": false,
+            "license_card": "apache-2.0",
+            "files": [
+              {
+                "name": "Wan2.1_VAE.pth",
+                "size": 507609880
+              },
+              {
+                "name": "diffusion_pytorch_model-00001-of-00007.safetensors",
+                "size": 9887603256
+              },
+              {
+                "name": "diffusion_pytorch_model-00002-of-00007.safetensors",
+                "size": 9839059648
+              },
+              {
+                "name": "diffusion_pytorch_model-00003-of-00007.safetensors",
+                "size": 9839059744
+              },
+              {
+                "name": "diffusion_pytorch_model-00004-of-00007.safetensors",
+                "size": 9839059744
+              },
+              {
+                "name": "diffusion_pytorch_model-00005-of-00007.safetensors",
+                "size": 9839059744
+              },
+              {
+                "name": "diffusion_pytorch_model-00006-of-00007.safetensors",
+                "size": 7910235256
+              },
+              {
+                "name": "diffusion_pytorch_model-00007-of-00007.safetensors",
+                "size": 6098227760
+              },
+              {
+                "name": "models_t5_umt5-xxl-enc-bf16.pth",
+                "size": 11361920418
+              }
+            ]
+          }
+        ],
+        "sources": [
+          "https://github.com/ali-vilab/VACE",
+          "https://github.com/modelscope/DiffSynth-Studio/blob/main/examples/wanvideo/model_training/full/Wan2.1-VACE-1.3B.sh",
+          "https://github.com/modelscope/DiffSynth-Studio/blob/main/examples/wanvideo/model_training/lora/Wan2.1-VACE-14B.sh"
+        ]
+      },
+      {
+        "name": "ConsisID",
+        "role": "Track1专门人脸身份保留的训练与评测主对照",
+        "track1_fit": "单张脸参考+文字→身份保持视频，与Track1形式直接一致。",
+        "track2_fit": "不原生接受动作timeline；可作为subject-ID branch/脸区loss与数据预处理的参考，但把timestamped多动作建模迁入CogVideoX仍需研发。",
+        "availability": "官方推理、训练、预处理、评测与公开preview训练数据均已发布；基于CogVideoX-5B，部分数据受限未全部开放。",
+        "training": {
+          "public": true,
+          "entry": "train.py; train_single_rank.sh; train_multi_rank.sh",
+          "details": "官方多节点样例为2节点16进程、DeepSpeed ZeRO2、bf16、gradient checkpointing、720×480×49帧、per-GPU batch1。配置含作者固定内网地址，服务器上必须替换，不应直接照抄。"
+        },
+        "hardware_evidence": "官方推理表720×480×49帧：默认37GB allocated/44GB reserved；model CPU offload22/25GB；sequential offload16/22GB；加VAE tiling5/7GB。以上是推理而非训练显存，并提示offload变慢及可能影响质量。训练没有在同一表报告40GB实测。",
+        "resource_plan_inference": "单40GB卡推理需offload或其他优化；多卡训练优先运行官方ZeRO2微调pilot，如参数/激活峰值仍超过40GB需改ZeRO3/FSDP或冻结更多层，并重新验证兼容性。",
+        "license": "大部分代码Apache2；CogVideoX transformer受其独立模型许可，InsightFace/人脸编码权重也不能仅凭项目Apache推定同许可。",
+        "artifacts": [
+          {
+            "repo": "https://github.com/PKU-YuanGroup/ConsisID",
+            "commit": "60429e4b0d24d36ce8df7fb58f7ab42b86e2b70e"
+          },
+          {
+            "repo": "https://huggingface.co/BestWishYsh/ConsisID-preview",
+            "revision": "950bc3f0902db44799e223a12ad972f9c52b341d",
+            "gated": false,
+            "license_card": "apache-2.0",
+            "files": [
+              {
+                "name": "face_encoder/detection_Resnet50_Final.pth",
+                "size": 109497761
+              },
+              {
+                "name": "face_encoder/glint360k_curricular_face_r101_backbone.bin",
+                "size": 261202954
+              },
+              {
+                "name": "face_encoder/parsing_bisenet.pth",
+                "size": 53289463
+              },
+              {
+                "name": "face_encoder/parsing_parsenet.pth",
+                "size": 85331193
+              },
+              {
+                "name": "text_encoder/model-00001-of-00002.safetensors",
+                "size": 4994582224
+              },
+              {
+                "name": "text_encoder/model-00002-of-00002.safetensors",
+                "size": 4530066360
+              },
+              {
+                "name": "transformer/diffusion_pytorch_model-00001-of-00002.safetensors",
+                "size": 9997146608
+              },
+              {
+                "name": "transformer/diffusion_pytorch_model-00002-of-00002.safetensors",
+                "size": 2437212904
+              },
+              {
+                "name": "vae/diffusion_pytorch_model.safetensors",
+                "size": 862388596
+              }
+            ]
+          }
+        ],
+        "sources": [
+          "https://github.com/PKU-YuanGroup/ConsisID",
+          "https://github.com/PKU-YuanGroup/ConsisID/blob/main/train_multi_rank.sh",
+          "https://github.com/PKU-YuanGroup/ConsisID/blob/main/util/deepspeed_configs/accelerate_config_machine_multi.yaml",
+          "https://huggingface.co/THUDM/CogVideoX-5b/blob/main/LICENSE"
+        ]
+      },
+      {
+        "name": "Stand-In (Wan2.1 / Wan2.2)",
+        "role": "现成强身份推理对照；与VACE组合控制动作",
+        "track1_fit": "153M轻量ID模块，单脸图+prompt，直接对口；官方偏向正面中近景，人脸转角/远景需单独stress-test。",
+        "track2_fit": "官方infer_with_vace支持Wan2.1参考图+pose/depth等控制视频，有身份/动作权衡参数vace_scale。不能把Wan2.2普通Stand-In已支持推导为Wan2.2+VACE已支持。",
+        "availability": "推理代码、Wan2.1一份与Wan2.2高/低噪两份adapter均可拿；训练数据/预处理/训练代码仍TODO。trainers目录仅工具文件，不是已发布训练器。",
+        "training": {
+          "public": false,
+          "qualification": "要继续训练需自己在DiffSynth等框架补adapter训练接线，不能承诺直接复现官方153M训练。"
+        },
+        "hardware_evidence": "README未报告可靠显存数；adapter每份629,225,119字节，底座为14B或Wan2.2双专家。模型文件小不代表整套推理/训练显存小。",
+        "resource_plan_inference": "优先在40GB卡以CPU offload跑通官方推理，必要时自加分片；未实测前不保证能单40GB卡运行默认长视频。多卡训练不是开箱即用。",
+        "license": "代码与adapter模型卡Apache2；人脸识别antelopev2等依赖另核。",
+        "artifacts": [
+          {
+            "repo": "https://github.com/WeChatCV/Stand-In",
+            "commit": "e351224366be169076e94af1454115d91d458313"
+          },
+          {
+            "repo": "https://huggingface.co/BowenXue/Stand-In",
+            "revision": "c6e9017606276ee1a01c63fdb8f90da789678647",
+            "gated": false,
+            "license_card": "apache-2.0",
+            "files": [
+              {
+                "name": "Stand-In_wan2.1_T2V_14B.ckpt",
+                "size": 629225119
+              },
+              {
+                "name": "Stand-In_wan2.2_T2V_A14B_high.ckpt",
+                "size": 629225119
+              },
+              {
+                "name": "Stand-In_wan2.2_T2V_A14B_low.ckpt",
+                "size": 629225119
+              }
+            ]
+          }
+        ],
+        "sources": [
+          "https://github.com/WeChatCV/Stand-In",
+          "https://github.com/WeChatCV/Stand-In/blob/main/infer_with_vace.py",
+          "https://github.com/WeChatCV/Stand-In/blob/main/download_models.py"
+        ]
+      },
+      {
+        "name": "AnyID (CVPR2026 preview)",
+        "role": "现代Wan2.2-5B强推理备选；先比较同样单参考输入",
+        "track1_fit": "支持脸、肖像参考与文字，最多5张图或1个视频；当前不能混用图与视频。官方多参考优势须在比赛允许输入范围内使用，不能自行引入额外人物参考。",
+        "track2_fit": "适合主体条件与属性控制，对timestamped action sequence不原生支持。",
+        "availability": "代码和preview LoRA可拿；Wan2.2 TI2V5B底座+1,314,172,936字节AnyID LoRA，预合并后推理。trainer文件夹实际仅模型/推理/merge工具，未见训练entry或RL recipe。",
+        "training": {
+          "public": false,
+          "qualification": "论文提到human-centric RL，不等于该RL训练实现/数据已开放。"
+        },
+        "hardware_evidence": "官网明确设计运行环境NVIDIA A100、CUDA12.1，但未说明A10040/80GB，未给峰值显存。例1280×704×121帧且offload_model False，不可承诺40GB默认运行。",
+        "resource_plan_inference": "可在单节点8卡环境改分片/offload并profile；作为推理基线比作为首个训练底座更确定。",
+        "license": "代码与HF权重CC BY-NC-SA4.0，仅非商业、署名、相同许可共享；需与比赛最终用途及上游Wan条款核对。",
+        "artifacts": [
+          {
+            "repo": "https://github.com/JoHnneyWang/AnyID",
+            "commit": "239fa15a401ff4f1abcbd90ead4a57d5505e87e2"
+          },
+          {
+            "repo": "https://huggingface.co/JonneyWang/AnyID",
+            "revision": "d516b069c7ba6cfd487cfa432a4d44509b020fa2",
+            "gated": false,
+            "license_card": "cc-by-nc-sa-4.0",
+            "files": [
+              {
+                "name": "anyid_lora.safetensors",
+                "size": 1314172936
+              }
+            ]
+          }
+        ],
+        "sources": [
+          "https://github.com/JoHnneyWang/AnyID",
+          "https://huggingface.co/JonneyWang/AnyID",
+          "https://github.com/JoHnneyWang/AnyID/blob/main/LICENSE"
+        ]
+      },
+      {
+        "name": "Phantom-Wan-1.3B / 14B",
+        "role": "人/物体、多主体泛化推理对照；不是训练主线",
+        "track1_fit": "单或多参考主体一致性生成，兼顾人脸；与专用face-ID模型比较身份与动作权衡。",
+        "track2_fit": "人/动物/物体主体泛化较适合，但不原生接受动作时间线。",
+        "availability": "1.3B和14B代码与权重已发布；14B Pro和Phantom训练代码仍TODO。",
+        "training": {
+          "public": false
+        },
+        "hardware_evidence": "README给单卡与8卡FSDP+xDiT推理入口，未给显存GB数；不能套用Wan原始1.3B的8.19GB宣传数作为Phantom实测。14B官方checkpoint合计约57.15GB、1.3B约5.69GB，还需Wan T5+VAE，磁盘大小不等于GPU显存。",
+        "resource_plan_inference": "1.3B先做快速多seed对照；14B在8卡节点分片推理。继续训练需重接公开训练框架并验证Phantom权重/条件通路兼容性。",
+        "license": "代码及HF权重Apache2，外部数据/识别模型分别核对。",
+        "artifacts": [
+          {
+            "repo": "https://github.com/Phantom-video/Phantom",
+            "commit": "bd84b602dcc949e23c89cbbf266b6f5975f2f025"
+          },
+          {
+            "repo": "https://huggingface.co/bytedance-research/Phantom",
+            "revision": "926cb19b8273d3841edcf905ca4ddb57f8e43207",
+            "gated": false,
+            "license_card": "apache-2.0",
+            "files": [
+              {
+                "name": "Phantom-Wan-1.3B.pth",
+                "size": 5692970224
+              },
+              {
+                "name": "Phantom_Wan_14B-00001-of-00006.safetensors",
+                "size": 9782642624
+              },
+              {
+                "name": "Phantom_Wan_14B-00002-of-00006.safetensors",
+                "size": 9524424752
+              },
+              {
+                "name": "Phantom_Wan_14B-00003-of-00006.safetensors",
+                "size": 9450866864
+              },
+              {
+                "name": "Phantom_Wan_14B-00004-of-00006.safetensors",
+                "size": 9451004040
+              },
+              {
+                "name": "Phantom_Wan_14B-00005-of-00006.safetensors",
+                "size": 9524424840
+              },
+              {
+                "name": "Phantom_Wan_14B-00006-of-00006.safetensors",
+                "size": 9420714056
+              }
+            ]
+          }
+        ],
+        "sources": [
+          "https://github.com/Phantom-video/Phantom",
+          "https://huggingface.co/bytedance-research/Phantom"
+        ]
+      }
+    ],
+    "reactid_audit": {
+      "name": "ReactID ICLR2026",
+      "status": "paper_and_gated_dataset_available_code_checkpoint_not_verified",
+      "code_checkpoint_search": "已查HiDream-ai全部27个公开GitHub repo，没有ReactID repo；HF API search ReactID models/spaces为空，dataset仅HiDream-ai/ReactID-Data。论文首文/复现声明未列自身代码或权重链接。未找到不等于证明永久不发布。",
+      "paper_training": "Wan2.1-T2V1.3B，10k steps，globalbatch32，AdamW lr1e-5 warmup500，8×A100，总1464 GPU小时、65.8s/step；未明确A10040/80GB。5秒推理约316秒，50steps，CFG5。不可把以上训练时间线性缩放承诺16/32卡新配置速度。",
+      "data": {
+        "url": "https://huggingface.co/datasets/HiDream-ai/ReactID-Data",
+        "revision": "ea51455678b58038f416d2f44dc2031295706172",
+        "gated": "manual",
+        "card": "4.1M subject-text-video triples；论文1.2M为进一步timeline子集，二者不同统计口径",
+        "usedStorage_bytes_api": 8860159762106,
+        "access": "需要用HF注册邮箱填写官方form，卡称48小时审查；这不是无需登录可下载。"
+      },
+      "track2_research": "训练课程由易到难，主体感知cross-attention，temporally adaptive RoPE，以及时间分段动作注释对Track2很贴；可在VACE公开训练器独立实现部分思想，先只做1项改动和明确消融。",
+      "sources": [
+        "https://proceedings.iclr.cc/paper_files/paper/2026/hash/6600458132d025c68a01e82081597b32-Abstract-Conference.html",
+        "https://proceedings.iclr.cc/paper_files/paper/2026/file/6600458132d025c68a01e82081597b32-Paper-Conference.pdf",
+        "https://huggingface.co/datasets/HiDream-ai/ReactID-Data"
+      ]
+    },
+    "not_primary": [
+      {
+        "name": "ID-Animator",
+        "reason": "官方checkpoint与推理可拿，训练仍TODO，GitHub实际未见LICENSE（HF模型卡标Apache2，不能自动覆盖代码许可）。AnimateDiff/SD1.5较旧，可做legacy对照而非16–32卡训练主线；没有核到可靠官方显存GB数。",
+        "artifacts": [
+          {
+            "repo": "https://github.com/ID-Animator/ID-Animator",
+            "commit": "0170eed6893a22db628f2d54255e9ddeb9043aa3"
+          },
+          {
+            "repo": "https://huggingface.co/ID-Animator/ID-Animator",
+            "revision": "e05b6be22ef49a3ac6017373a0ca15e86dfc1459",
+            "gated": false,
+            "license_card": "apache-2.0",
+            "files": [
+              {
+                "name": "animator.ckpt",
+                "size": 247325616
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "EchoShot",
+        "reason": "官方train.py/train.sh与1.3B权重可拿，HF权重卡Apache2但代码repo无LICENSE。发布generate.py只有文本多镜头输入、无face/reference条件参数；论文reference扩展不能直接当作当前发布Track1人脸条件pipeline。prompt extension API可关，非必须收费API。",
+        "artifacts": [
+          {
+            "repo": "https://github.com/D2I-ai/EchoShot",
+            "commit": "3ce6509136ceb45616498a75d2f70cb9b9e8422d"
+          },
+          {
+            "repo": "https://huggingface.co/JonneyWang/EchoShot",
+            "revision": "0ab3ec86a054b5751c4a9910d86fcd92307a0ab0",
+            "gated": false,
+            "license_card": "apache-2.0",
+            "files": [
+              {
+                "name": "EchoShot-1.3B-preview.pth",
+                "size": 5676327524
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "StableAnimator",
+        "reason": "MIT代码、推理/训练均公开，需参考人像+姿态序列，不是原生prompt-to-video。可用于Track2动作控制组件；baseline8GB推理(512²，15s demo，4090约5min)；训练官方约70GB混合分辨率或40GB单512²，不能据此称任意A10040默认稳定训练。SVD及face weights有独立许可。",
+        "artifacts": [
+          {
+            "repo": "https://github.com/Francis-Rings/StableAnimator",
+            "commit": "020e7f23a768410e0183ce943397d96a609f4ec1"
+          },
+          {
+            "repo": "https://huggingface.co/FrancisRing/StableAnimator",
+            "revision": "172658c01f49905d09f33c8872cc701e3f6d9ec5",
+            "gated": false,
+            "license_card": "apache-2.0",
+            "files": [
+              {
+                "name": "Animation/face_encoder.pth",
+                "size": 228754558
+              },
+              {
+                "name": "Animation/glintr100_torch.pth",
+                "size": 261223796
+              },
+              {
+                "name": "Animation/pose_net.pth",
+                "size": 829269
+              },
+              {
+                "name": "Animation/unet.pth",
+                "size": 6201376518
+              },
+              {
+                "name": "stable-video-diffusion-img2vid-xt/image_encoder/model.fp16.safetensors",
+                "size": 1264217240
+              },
+              {
+                "name": "stable-video-diffusion-img2vid-xt/image_encoder/model.safetensors",
+                "size": 2528371296
+              },
+              {
+                "name": "stable-video-diffusion-img2vid-xt/svd_xt.safetensors",
+                "size": 9559625980
+              },
+              {
+                "name": "stable-video-diffusion-img2vid-xt/svd_xt_image_decoder.safetensors",
+                "size": 9503252964
+              },
+              {
+                "name": "stable-video-diffusion-img2vid-xt/unet/diffusion_pytorch_model.fp16.safetensors",
+                "size": 3049435868
+              },
+              {
+                "name": "stable-video-diffusion-img2vid-xt/unet/diffusion_pytorch_model.safetensors",
+                "size": 6098682464
+              },
+              {
+                "name": "stable-video-diffusion-img2vid-xt/vae/diffusion_pytorch_model.fp16.safetensors",
+                "size": 195531910
+              },
+              {
+                "name": "stable-video-diffusion-img2vid-xt/vae/diffusion_pytorch_model.safetensors",
+                "size": 391017740
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "past_ipvg_recipes": [
+      {
+        "name": "IPVG-STD (rain152/IPVG, 2025)",
+        "idea": "空间/时间分开：Qwen3优化T2I/I2V prompt→HyperLoRA生成ID首帧→Wan2.2 TI2V5B/I2V14B。可学习先把身份首帧做好再生成运动。",
+        "limits": "作者repo自报往届第二；不是2027官方baseline。README称MIT但API tree未见LICENSE；代码指向多个额外工程/模型，未做实际可运行验收。",
+        "artifact": {
+          "repo": "https://github.com/rain152/IPVG",
+          "commit": "cd70f169e9a86d47e7860392b8b80c8d59a6d75a"
+        }
+      },
+      {
+        "name": "AESR (oceanflowlab/AESR, ACM-MM2026)",
+        "idea": "适合AI自动迭代：playbook prompt enhancement→draft critique→typed failure→关键帧修复→视频编辑；复用“分析失败并更新经验”思路。",
+        "limits": "原repo是training-free API-oriented，涉及Seedance2/Qwen3.5/GPT-image等provider调用；README明确尚无软件license，只作source-available inspection。不能称纯本地开源底座，也不能承诺无API费。",
+        "artifact": {
+          "repo": "https://github.com/oceanflowlab/AESR",
+          "commit": "a2b3d010e4b66eed0398ead1b592bc9038f8f6db"
+        },
+        "sources": [
+          "https://arxiv.org/abs/2608.20749",
+          "https://github.com/oceanflowlab/AESR"
+        ]
+      }
+    ],
+    "automation_boundary": "可以让AI自动编写/修改受约束训练配置、检查数据、运行评测、分析失败并提出下一轮；固定holdout、记录输入/代码/权重hash和GPU小时，有限trial预算，只凭验证集晋级。不能把搜索seed/改prompt后挑最佳当作新模型训练提升，也不能用最终test反复调参。"
+  },
+  "compute": {
+    "as_of": "2026-10-17 Asia/Shanghai",
+    "user_hardware": {
+      "gpu_vram_gb": 40,
+      "gpus_per_node": 8,
+      "nodes_min": 2,
+      "nodes_max": 4,
+      "gpu_model": "未知，A100 40GB仅为规划假设",
+      "interconnect": "节点内NVLink/PCIe与节点间IB/RoCE/以太网均待实测"
+    },
+    "scope": "公开原作者/维护者代码与文档核验；未下载模型权重、未付费、未跑GPU实测。官方记录不等于用户服务器实测。",
+    "primary_recommendation": {
+      "model": "Wan2.2-I2V-A14B",
+      "trainer": "DiffSynth-Studio，分别训练high-noise和low-noise LoRA",
+      "first_profile": "一节点8×40GB，先480p级832×480、49帧、microbatch=1、预缓存VAE/text，LoRA rank16或32，梯度检查点。参数为我方起跑建议，非官方40GB保证。",
+      "sharding": "8卡分片需求优先验证DeepSpeed ZeRO-3；ZeRO-2/DDP并不分片冻结的基础权重。DiffSynth有DeepSpeed框架支持，但未找到Wan2.2-A14B 8×40GB LoRA的官方端到端显存基准。",
+      "fallback": "先用单专家、降低时空token/分开运行验证；若分片后端不兼容，冻结base量化LoRA或单GPUCPU-offload可独立验证，不能把单GPU offload直接叠加多卡。",
+      "node_allocation": "第1节点trainer，第2节点infer/eval；有第3/4节点时优先独立消融/候选采样，先不跨节点同步训练。最终批量生成可每节点独立8卡模型组并行。",
+      "caveats": [
+        "16–32卡×40GB不是连续640–1280GB显存，每进程都必须满足各自峰值。",
+        "多节点只有在网络、共享存储、NCCL吞吐测清后才扩展；普通以太网可能使同步训练变慢。",
+        "40GB A100不支持Hopper专用FlashAttention3/FP8 Tensor Core路径；不能照搬H100/H800速度。",
+        "单卡/多卡推理能装下不等于LoRA训练能装下，activation与反向传播另占显存。"
+      ]
+    },
+    "wan22_official_inference_benchmark": {
+      "source_url": "https://github.com/Wan-Video/Wan2.2/blob/main/assets/comp_effic.png",
+      "context_url": "https://github.com/Wan-Video/Wan2.2#computational-efficiency-on-different-gpus",
+      "local_image": "work/ipvg_video_sources/wan22_compute.png",
+      "task": "普通I2V-A14B，非IPVG身份模型；无本地复现实测",
+      "explicit_conditions": [
+        "多卡14B使用--ulysses_size 4/8 --dit_fsdp --t5_fsdp",
+        "Hopper架构使用FlashAttention3",
+        "无--use_prompt_extend",
+        "warm-up后多个样本取平均",
+        "图中480P/720P为分辨率档位；未列精确像素、帧数或sampling steps"
+      ],
+      "undisclosed": [
+        "benchmark具体帧数",
+        "benchmark具体sampling steps",
+        "机器互联与全套依赖版本"
+      ],
+      "default_config_separate_from_benchmark": {
+        "frame_num": 81,
+        "fps": 16,
+        "i2v_sample_steps": 40,
+        "sample_shift": 5.0,
+        "warning": "这些是仓库默认值；benchmark未明确重述，不能宣称测量必定采用它们。",
+        "sources": [
+          "https://github.com/Wan-Video/Wan2.2/blob/main/wan/configs/shared_config.py",
+          "https://github.com/Wan-Video/Wan2.2/blob/main/wan/configs/wan_i2v_A14B.py"
+        ]
+      },
+      "records": [
+        {
+          "gpu_family": "A100/A800",
+          "gpus": 1,
+          "resolution": "480P",
+          "seconds": 810.0,
+          "peak_gb_per_gpu": 41.0
+        },
+        {
+          "gpu_family": "A100/A800",
+          "gpus": 1,
+          "resolution": "720P",
+          "seconds": 2810.9,
+          "peak_gb_per_gpu": 59.7
+        },
+        {
+          "gpu_family": "A100/A800",
+          "gpus": 4,
+          "resolution": "480P",
+          "seconds": 215.4,
+          "peak_gb_per_gpu": 40.7
+        },
+        {
+          "gpu_family": "A100/A800",
+          "gpus": 4,
+          "resolution": "720P",
+          "seconds": 730.5,
+          "peak_gb_per_gpu": 51.6
+        },
+        {
+          "gpu_family": "A100/A800",
+          "gpus": 8,
+          "resolution": "480P",
+          "seconds": 121.6,
+          "peak_gb_per_gpu": 26.1
+        },
+        {
+          "gpu_family": "A100/A800",
+          "gpus": 8,
+          "resolution": "720P",
+          "seconds": 393.4,
+          "peak_gb_per_gpu": 37.0
+        },
+        {
+          "gpu_family": "H100/H800",
+          "gpus": 8,
+          "resolution": "480P",
+          "seconds": 52.9,
+          "peak_gb_per_gpu": 26.1
+        },
+        {
+          "gpu_family": "H100/H800",
+          "gpus": 8,
+          "resolution": "720P",
+          "seconds": 159.0,
+          "peak_gb_per_gpu": 37.0
+        },
+        {
+          "gpu_family": "RTX4090",
+          "model": "TI2V-5B-I2V",
+          "gpus": 1,
+          "resolution": "720P",
+          "seconds": 524.8,
+          "peak_gb_per_gpu": 22.8
+        }
+      ],
+      "interpretation": "8×40GB在官方普通I2V推理配置上有内存参考依据；4卡480P约40.7GB仍超过40，不可凭容量总和保证。720P每卡37GB余量很小，身份模块/更长视频可能OOM。",
+      "illustrative_batch_budget": {
+        "formula": "videos × seconds_per_video / 3600 / independent_8GPU_node_groups",
+        "warning": "仅把上述普通I2V基准用于量级推算，不是IPVG实测或承诺；额外身份条件、帧数、采样步数、训练、评价、I/O、重跑需另加。最多3 runs是提交上限，不是必须全部跑满。",
+        "rows": [
+          {
+            "videos": 1000,
+            "resolution": "480P",
+            "one_node_wall_hours": 33.78,
+            "two_nodes_ideal_wall_hours": 16.89,
+            "four_nodes_ideal_wall_hours": 8.44
+          },
+          {
+            "videos": 1000,
+            "resolution": "720P",
+            "one_node_wall_hours": 109.28,
+            "two_nodes_ideal_wall_hours": 54.64,
+            "four_nodes_ideal_wall_hours": 27.32
+          },
+          {
+            "videos": 3000,
+            "resolution": "480P",
+            "one_node_wall_hours": 101.33,
+            "two_nodes_ideal_wall_hours": 50.67,
+            "four_nodes_ideal_wall_hours": 25.33
+          },
+          {
+            "videos": 3000,
+            "resolution": "720P",
+            "one_node_wall_hours": 327.83,
+            "two_nodes_ideal_wall_hours": 163.92,
+            "four_nodes_ideal_wall_hours": 81.96
+          }
+        ]
+      }
+    },
+    "model_options": [
+      {
+        "name": "Wan2.2 I2V-A14B",
+        "task": "通用I2V，27B总参/每步14B专家；身份参考不等于只固定首帧，IPVG需额外机制/训练",
+        "source_url": "https://github.com/Wan-Video/Wan2.2",
+        "license": "代码与发布模型Apache-2.0",
+        "license_url": "https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B",
+        "inference": "官方README保守单卡要求80GB；多卡详细数据见本JSON基准图。480P/720P。",
+        "training": "DiffSynth官方维护者样例分开high/low-noise、832×480×49帧、rank32；未给40GB训练峰值或耗时。",
+        "training_source": "https://github.com/modelscope/DiffSynth-Studio/blob/main/examples/wanvideo/model_training/lora/Wan2.2-I2V-A14B.sh",
+        "priority": "首选研发底座，但先profile训练"
+      },
+      {
+        "name": "Wan2.2 TI2V-5B",
+        "task": "统一T2V/I2V，720p档1280×704、24fps",
+        "source_url": "https://github.com/Wan-Video/Wan2.2",
+        "license": "Apache-2.0",
+        "inference": "官方24GB RTX4090+offload+convert+t5_cpu；I2V表524.8s/22.8GB。80GB可关offload加速。",
+        "training": "DiffSynth维护者提供LoRA/full样例；musubi当前Wan文档只支持2.2的14B，不能把5B交给其wan trainer。",
+        "training_source": "https://github.com/modelscope/DiffSynth-Studio/blob/main/examples/wanvideo/model_training/lora/Wan2.2-TI2V-5B.sh",
+        "priority": "低成本功能/闭环工程baseline"
+      },
+      {
+        "name": "Wan2.1 T2V-1.3B / I2V-14B",
+        "task": "1.3B为小型T2V；14B支持I2V，可借其丰富控制与身份适配生态",
+        "source_url": "https://github.com/Wan-Video/Wan2.1",
+        "license": "Apache-2.0",
+        "inference": "1.3B官方8.19GB，RTX4090生成5秒480P约4分钟（无量化等优化）；不是I2V-14B成本。",
+        "training": "DiffSynth和musubi支持；小模型有利于debug但不能自动成为身份赛强baseline。",
+        "priority": "调试或已有Wan2.1身份/控制模型复现"
+      },
+      {
+        "name": "HunyuanVideo-1.5 8.3B",
+        "task": "T2V/I2V，480P/720P，121/241帧示例；另有SR到1080P",
+        "source_url": "https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5",
+        "license": "Tencent Hunyuan Community License，非Apache",
+        "license_url": "https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5/blob/main/LICENSE",
+        "inference": "官方14GB最低仅offload推理；480p I2V step-distilled官方称RTX4090可75秒，8或12步。该新闻未充分说明duration/fps，不能当任意IPVG输出75秒。",
+        "training": "原作者train.py有FSDP2、sequence parallel、gradient checkpoint、LoRA；8卡示例sp_size8、rank8/alpha16、Muon。需替换dummy dataloader，不能原样跑比赛数据。未给8×40GB峰值/秒每step。",
+        "training_source": "https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5/blob/main/train.py",
+        "priority": "具明确原生FSDP/SP训练实现的备选，许可影响跨模型数据循环"
+      },
+      {
+        "name": "HunyuanVideo 13B原版",
+        "task": "较旧通用视频模型",
+        "source_url": "https://github.com/Tencent-Hunyuan/HunyuanVideo",
+        "license": "Tencent Hunyuan Community License",
+        "license_url": "https://github.com/Tencent-Hunyuan/HunyuanVideo/blob/main/LICENSE.txt",
+        "inference": "官方129帧，544×960最低45GB、720×1280最低60GB，建议80GB；40GB不能原样单卡运行。",
+        "training": "musubi支持LoRA，但不因其推理/量化支持推定40GB多卡完整训练性能。",
+        "priority": "已有相关adapter才优先，通常1.5更合适"
+      },
+      {
+        "name": "CogVideoX / CogVideoX1.5",
+        "task": "5B I2V/T2V；1.5支持1360×768，默认81帧；旧版720×480默认49帧",
+        "source_url": "https://github.com/zai-org/CogVideo",
+        "license": "代码Apache-2.0；2B权重Apache-2.0；5B/1.5权重CogVideoX自定义研究/商用许可",
+        "license_url": "https://huggingface.co/zai-org/CogVideoX1.5-5B-I2V/blob/main/LICENSE",
+        "training": "原作者Diffusers finetune明确：5B rank128 LoRA DDP BF16，49×480×720约24GB；1.5 rank128 LoRA DDP BF16，81×768×1360约35GB。8×40可用DDP作为工程起点；显存每卡，不是合计。",
+        "training_source": "https://github.com/zai-org/CogVideo/blob/main/finetune/README.md",
+        "full_sft_caution": "官方1.5 8-GPU ZeRO3 SFT约55GB/卡，需opt+param offload才约40GB/卡，边界很紧；不能把LoRA35GB当全参足够。",
+        "priority": "40GB每卡有明确LoRA硬件表，适合低风险基线；画质/动作上限需验证"
+      },
+      {
+        "name": "ConsisID",
+        "task": "面向人类身份保持，CogVideoX-5B底座，49帧/8fps/720×480",
+        "source_url": "https://github.com/PKU-YuanGroup/ConsisID",
+        "license": "多数代码Apache-2.0；Transformer明确沿用CogVideoX LICENSE，不能只看HF的Apache标签",
+        "license_url": "https://github.com/PKU-YuanGroup/ConsisID#-license",
+        "inference": "官方默认allocated37GB/reserved44GB；model_cpu_offload22/25GB，sequential16/22GB，继续tiling最低5/7GB。是累积推理优化，明显更慢且可能影响质量，非训练显存。",
+        "training": "有单节点8GPU和2节点16GPU DeepSpeed ZeRO2配置、训练脚本；未见40GB训练峰值/速度。论文级重训不能只据44GB推理表估算。",
+        "training_sources": [
+          "https://github.com/PKU-YuanGroup/ConsisID/blob/main/train_single_rank.sh",
+          "https://github.com/PKU-YuanGroup/ConsisID/blob/main/util/deepspeed_configs/accelerate_config_machine_single.yaml",
+          "https://github.com/PKU-YuanGroup/ConsisID/blob/main/util/deepspeed_configs/accelerate_config_machine_multi.yaml"
+        ],
+        "priority": "直接身份保持baseline/算法参考，比通用I2V更贴Task1"
+      },
+      {
+        "name": "Wan-Animate-2 / Wan2.2-Animate-2-14B",
+        "task": "2026-08-07发布，参考图+driving video，强身份保持；Base与10步distilled",
+        "source_url": "https://github.com/Wan-Video/Wan-Animate-2",
+        "license": "Apache-2.0",
+        "inference": "官方默认8×A800 720P，另测2×A800 480P；未写A800具体容量，不能说2×40GB必可。",
+        "training": "DiffSynth已有LoRA/full脚本；原作者仓库当前主要推理。",
+        "constraint": "需要额外动作驱动视频，不是timestamp文本开箱即用；比赛是否允许驱动模板/外部动作数据需按最终规则，自动生产驱动也另有成本。",
+        "priority": "后续时序动作控制分支，不当首轮纯文本baseline"
+      },
+      {
+        "name": "Wan-Dancer",
+        "task": "2026新音乐驱动长舞蹈视频，720P/30fps，超过一分钟",
+        "source_url": "https://github.com/Wan-Video/Wan-Dancer",
+        "license": "Apache-2.0",
+        "inference": "原作者只声明在8×A80080GB测试；没有8×40保证。",
+        "training": "DiffSynth提供适配脚本；资源与IPVG任务差距较大",
+        "priority": "研究参考，不作优先比赛底座"
+      }
+    ],
+    "trainer_compatibility": [
+      {
+        "name": "DiffSynth-Studio",
+        "source_url": "https://github.com/modelscope/DiffSynth-Studio",
+        "license": "Apache-2.0代码；各base权重保留各自许可",
+        "supports": "Wan2.1、Wan2.2 A14B/5B/Animate/Animate2与LoRA/full；支持预缓存(split training)、梯度checkpoint、Accelerate/DeepSpeed。",
+        "critical_rules": [
+          "--enable_model_cpu_offload专门Offload Training目前仅单GPU，DDP不做梯度同步，且与DeepSpeed不兼容。",
+          "DeepSpeed ZeRO3-offload与原生PyTorch checkpoint不能随意混用，应使用维护者适配的DeepSpeed activation_checkpointing配置。",
+          "通用DeepSpeed框架支持不等于Wan2.2-A14B 8×40已实测；首次必须检查梯度同步、恢复、LoRA导出和回载。"
+        ],
+        "sources": [
+          "https://github.com/modelscope/DiffSynth-Studio/blob/main/docs/en/Training/DeepSpeed.md",
+          "https://github.com/modelscope/DiffSynth-Studio/blob/main/docs/en/Training/Offload_Training.md",
+          "https://github.com/modelscope/DiffSynth-Studio/blob/main/docs/en/Pipeline_Usage/Model_Training.md"
+        ]
+      },
+      {
+        "name": "musubi-tuner",
+        "source_url": "https://github.com/kohya-ss/musubi-tuner",
+        "license": "多数Apache-2.0，Hunyuan派生目录保留Tencent许可",
+        "supports": "Wan2.1/2.2、HunyuanVideo/1.5等LoRA，缓存latents/text、FP8冻结base、block swap。",
+        "critical_rules": [
+          "Wan2.2支持仅14B，5B不可照用该trainer。",
+          "文档24GB支持720×1280×81是视频推理；24GB training一项明确为720×1280单帧图像训练，不能转述为81帧LoRA训练24GB。",
+          "支持Accelerate多GPU，但未找到经过核验的该模型8×40 FSDP/ZeRO多节点显存基准；block swap需单独验证兼容，不直接当分片训练主方案。"
+        ],
+        "sources": [
+          "https://github.com/kohya-ss/musubi-tuner/blob/main/docs/wan.md",
+          "https://github.com/kohya-ss/musubi-tuner/blob/main/docs/hunyuan_video_1_5.md",
+          "https://github.com/kohya-ss/musubi-tuner/blob/main/docs/block_swap.md"
+        ]
+      }
+    ],
+    "license_implications": [
+      {
+        "model": "Wan2.1/2.2",
+        "finding": "原作者代码和模型Apache2；实际训练数据、外部face encoder、动作模板仍分别保留许可。",
+        "source": "https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B"
+      },
+      {
+        "model": "HunyuanVideo-1.5",
+        "finding": "许可5(b)禁止用Hunyuan及其输出/结果改进其他AI模型，Hunyuan或其衍生物除外；不可默认把其合成片拿去训练Wan。还有限定地域（排除EU/UK/韩国）、AUP和大规模商用额外条件。研究服务器在中国不代表提交/公开分发所有场景都无条件允许。",
+        "source": "https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5/blob/main/LICENSE"
+      },
+      {
+        "model": "CogVideoX5B/1.5与ConsisID",
+        "finding": "学术研究免费；商用须登记基础授权，超100万人次/月另需授权；ConsisID明确底座Transformer仍沿用CogVideoX许可。",
+        "sources": [
+          "https://huggingface.co/zai-org/CogVideoX1.5-5B-I2V/blob/main/LICENSE",
+          "https://github.com/PKU-YuanGroup/ConsisID#-license"
+        ]
+      }
+    ],
+    "newer_wan_status": {
+      "finding": "官方云服务已提供Wan2.7（并有更高版本API导航）；本次核到可本地训练的通用权重为Wan2.1/2.2，2026年还有Wan-Animate-2/Wan-Dancer专门分支。不能把API型号、第三方所谓Wan2.7本地下载页当可训练开源权重。",
+      "sources": [
+        "https://www.alibabacloud.com/help/en/model-studio/use-video-generation/",
+        "https://api.github.com/orgs/Wan-Video/repos?per_page=100"
+      ]
+    },
+    "throughput_calibration": {
+      "recommended": "先做50训练steps（跳过前10步warmup），记录后20–40步median与p95、每卡allocated/reserved、CPU内存/IO、loss和LoRA梯度非零、checkpoint保存/恢复。固定10–30个heldout样本按实际比赛时长/帧率生成。",
+      "formula": "training_wall_hours = optimizer_steps × measured_seconds_per_optimizer_step / 3600；GPUh再乘同步用卡数；batch/accum/SP/ZeRO必须写清。",
+      "control_loop": "先固定身份分组validation与小预算，不按test反复挑seed；代理只更改白名单配置/代码分支，日志+checkpoint+预算上限+异常熔断。自动化能完成调参/训练/评测，但不能保证研究新颖性和获奖。"
+    },
+    "pinned_repos": [
+      {
+        "repo": "Wan-Video/Wan2.1",
+        "status": 200,
+        "sha": "9737cba9c1c3c4d04b33fcad41c111989865d315",
+        "date": "2026-03-05T09:38:07Z"
+      },
+      {
+        "repo": "Wan-Video/Wan2.2",
+        "status": 200,
+        "sha": "1ea34ff48f87168174e12956e200b1d908b1c5ff",
+        "date": "2026-09-21T06:16:22Z"
+      },
+      {
+        "repo": "Wan-Video/Wan-Animate-2",
+        "status": 200,
+        "sha": "3ad2fef7d61d6200c9c653e0fe47be7616b323f3",
+        "date": "2026-08-08T06:27:43Z"
+      },
+      {
+        "repo": "Wan-Video/Wan-Dancer",
+        "status": 200,
+        "sha": "e6c87a94ec733230dac15b924c015f6e6501e618",
+        "date": "2026-07-17T08:49:55Z"
+      },
+      {
+        "repo": "Tencent-Hunyuan/HunyuanVideo-1.5",
+        "status": 200,
+        "sha": "60783e704160023913bee78f0b47036d393d4dfa",
+        "date": "2026-04-10T06:14:58Z"
+      },
+      {
+        "repo": "zai-org/CogVideo",
+        "status": 200,
+        "sha": "7a1af7154511e0ce4e4be8d62faa8c5e5a3532d2",
+        "date": "2025-11-04T11:15:43Z"
+      },
+      {
+        "repo": "PKU-YuanGroup/ConsisID",
+        "status": 200,
+        "sha": "60429e4b0d24d36ce8df7fb58f7ab42b86e2b70e",
+        "date": "2026-03-08T12:49:42Z"
+      },
+      {
+        "repo": "modelscope/DiffSynth-Studio",
+        "status": 200,
+        "sha": "4e3496991455b300fd60ab023113422cd16899f5",
+        "date": "2026-10-16T10:15:39Z"
+      },
+      {
+        "repo": "kohya-ss/musubi-tuner",
+        "status": 200,
+        "sha": "f8a1b03794a49239a3539015075f5123d6c07d66",
+        "date": "2026-09-27T12:25:26Z"
+      }
+    ]
+  },
+  "project_choice": {
+    "first_trainable_base": "Wan2.1-VACE-1.3B adapter with DiffSynth-Studio",
+    "identity_controls": [
+      "ConsisID",
+      "Stand-In",
+      "AnyID"
+    ],
+    "later_video_base": "Wan2.2 I2V-A14B after profiling and identity adaptation",
+    "qualification": "VACE is a general subject/control base; extra face identity constraints and timestamped action conditioning need implementation"
+  },
+  "page_id": null
+}

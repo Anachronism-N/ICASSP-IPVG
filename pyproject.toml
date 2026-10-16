@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "icassp-ipvg"
+version = "0.1.0"
+description = "Reproducible IPVG challenge experiments and local evaluation"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9"]
+download = ["huggingface-hub>=0.25,<2"]
+
+[project.scripts]
+ipvg = "ipvg.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

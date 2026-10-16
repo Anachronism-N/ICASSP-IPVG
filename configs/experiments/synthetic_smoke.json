@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "run_id": "synthetic_smoke",
+  "task": "inference",
+  "hypothesis": "CPU工程流程能产出、解码、追溯并打包三条合成视频；不衡量模型质量",
+  "manifest": "examples/synthetic_manifest.jsonl",
+  "split": "dev",
+  "backend": {"kind": "synthetic"},
+  "resources": {"gpus": 0, "timeout_s": 60, "max_gpu_hours": 0},
+  "parameters": {"width": 64, "height": 64, "fps": 8, "duration_s": 1},
+  "model_revisions": {}
+}

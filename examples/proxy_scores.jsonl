@@ -1,0 +1,3 @@
+{"sample_id":"demo_001","score_kind":"local_proxy","scores":{"example_metric":0.5},"failure_classes":["example_only"]}
+{"sample_id":"demo_002","score_kind":"local_proxy","scores":{"example_metric":0.5},"failure_classes":["example_only"]}
+{"sample_id":"demo_003","score_kind":"local_proxy","scores":{"example_metric":0.5},"failure_classes":["example_only"]}
