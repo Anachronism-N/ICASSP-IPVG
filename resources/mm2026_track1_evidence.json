@@ -1,0 +1,111 @@
+{
+  "as_of": "2026-10-18 Asia/Shanghai",
+  "official_challenge": {
+    "url": "https://hidream-ai.github.io/ipvg-challenge-2026.github.io/",
+    "source": "https://github.com/HiDream-ai/ipvg-challenge-2026.github.io/blob/529dd657f9c8149ea523815f3b1d657f6c08ac46/index.html",
+    "revision": "529dd657f9c8149ea523815f3b1d657f6c08ac46",
+    "track1_leaderboard": [
+      {
+        "rank": 1,
+        "team": "MIPL_Video",
+        "score_lower_is_better": 2.5
+      },
+      {
+        "rank": 1,
+        "team": "USTC-CMI",
+        "score_lower_is_better": 2.5
+      },
+      {
+        "rank": 3,
+        "team": "xuanyuan_fuxi",
+        "score_lower_is_better": 3
+      }
+    ],
+    "track2_leaderboard": [
+      {
+        "rank": 1,
+        "team": "USTC-CMI",
+        "score_lower_is_better": 1.25
+      },
+      {
+        "rank": 2,
+        "team": "WislabGDUT",
+        "score_lower_is_better": 1.8125
+      },
+      {
+        "rank": 3,
+        "team": "USTC-AC",
+        "score_lower_is_better": 2.9375
+      }
+    ],
+    "dataset_boundary": "The 2026 Track 1 official test consists of 200 eval.json samples (img and prompt), one generated video per sample. Both editions use VIP-200K training data, but the 2027 page describes 200 identities x five prompts = 1,000 test pairs. Training-source continuity does not establish identical test files or output specifications.",
+    "test_release_url": "https://github.com/HiDream-ai/ipvg-challenge-2026.github.io/releases/download/testset/IPVG2026-Test-Track1.zip"
+  },
+  "official_programme": "https://2026.acmmm.org/site/technical-programme.html",
+  "related_work": [
+    {
+      "name": "AESR: Identity-Preserving Text-to-Video Generation via Agentic Enhancement and Semantic Repair",
+      "team": "MIPL_Video",
+      "competition": "MM 2026 IPVG Track 1 joint first, not sole first",
+      "paper": "https://arxiv.org/abs/2608.20749",
+      "repo": "https://github.com/oceanflowlab/AESR",
+      "revision": "a2b3d010e4b66eed0398ead1b592bc9038f8f6db",
+      "availability": "Actual orchestration, playbooks, evaluation and repair scripts are present. Training-free API-oriented; no released trainable video checkpoint or training entry. The last provider video-edit call remains explicit in the example workflow.",
+      "license": "No software license. README explicitly says source-available for inspection until authors add one.",
+      "reuse_boundary": "Learn prompt enhancement, failure reflection, typed critique, keyframe repair and multi-candidate selection as research ideas; do not present the repository as a permissively licensed, local, training-ready winner model. Closed generation/editing providers mean reproducing the exact result needs their service access and costs."
+    },
+    {
+      "name": "Chronos: Sequential Identity-Preserving Video Generation by Temporal Anchoring",
+      "team": "USTC-CMI",
+      "competition": "MM 2026 Track 1 joint first and Track 2 first",
+      "primary_source": "https://2026.acmmm.org/site/technical-programme.html",
+      "availability": "Official programme confirms title, authors and method abstract. An author-linked public code/checkpoint/training release was not verified in this audit.",
+      "method": "Semantic prompt anchoring, visual frame anchoring and metric-guided routing among heterogeneous generators. Treat these as design references, not an available checkpoint."
+    },
+    {
+      "name": "KeyID: Decoupled Drafting and Keyframe Editing for Identity-Preserving Video Generation",
+      "team": "WislabGDUT",
+      "competition": "MM 2026 Track 2 second; not a verified Track 1 podium entry",
+      "paper": "https://arxiv.org/abs/2608.16154",
+      "repo": "https://github.com/WISLab-GDUT/KeyID",
+      "revision": "d4d68cc7eea7660376fb6bce74460cda45e23513",
+      "availability": "Repository tree contains README only; no executable pipeline, released weights or training entry."
+    },
+    {
+      "name": "IPVG-STD",
+      "competition": "MM 2025, not MM 2026",
+      "repo": "https://github.com/rain152/IPVG",
+      "revision": "cd70f169e9a86d47e7860392b8b80c8d59a6d75a",
+      "availability": "Prompt decomposition -> HyperLoRA identity first frame -> Wan2.2 generation scripts. No project training entry. README claims MIT, but no LICENSE file in audited tree.",
+      "reuse_boundary": "Historical modular recipe; do not attribute the 2026 third-place team to this paper solely from a similar team name."
+    }
+  ],
+  "direct_base_order": [
+    {
+      "role": "Local identity-preserving inference first",
+      "name": "Stand-In",
+      "repo": "https://github.com/WeChatCV/Stand-In",
+      "revision": "e351224366be169076e94af1454115d91d458313",
+      "availability": "Real identity adapter weights and inference, plus Wan2.1 VACE integration; training data/preprocessing/training code remain TODO. trainers/ contains only utility files.",
+      "license": "Apache-2.0 project and adapter card; upstream face-recognition models have separate terms."
+    },
+    {
+      "role": "Modern 5B inference comparison",
+      "name": "AnyID",
+      "repo": "https://github.com/JoHnneyWang/AnyID",
+      "revision": "239fa15a401ff4f1abcbd90ead4a57d5505e87e2",
+      "availability": "Wan2.2 TI2V-5B preview LoRA with inference and merge scripts. Directory named trainer does not include an actual training or human-centric RL entry.",
+      "license": "CC BY-NC-SA 4.0."
+    },
+    {
+      "role": "Existing face-identity training entry",
+      "name": "ConsisID",
+      "repo": "https://github.com/PKU-YuanGroup/ConsisID",
+      "revision": "60429e4b0d24d36ce8df7fb58f7ab42b86e2b70e",
+      "availability": "train.py, train_single_rank.sh, train_multi_rank.sh, data preprocessing and evaluation exist. More complete for immediate identity-specific supervised fine-tuning than inference-only adapters.",
+      "license": "Majority Apache-2.0; CogVideoX transformer and third-party face weights retain their separate terms."
+    }
+  ],
+  "vace_position": "VACE1.3B+DiffSynth remains useful as the existing trainable engineering/control baseline. It is not inherently a face-specialist and should not be promoted as a strong Track 1 identity baseline before comparison with Stand-In/AnyID/ConsisID.",
+  "verification": "Read-only primary research plus local evidence files. No repository code edited, no weights downloaded and no model execution."
+}
