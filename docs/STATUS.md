@@ -37,3 +37,7 @@
 ## 独立Wan5B Teacher实验附录
 
 新增[独立Teacher实验快照](../research/wm_teacher/PUBLICATION.md)，包含本地双向Teacher训练/插值方案、原协议评分与配对统计代码。此附录不改变IPVG比赛主线/官方规则或身份质量结论。2026-10-18 21:38 CST已验收3033生成视频与完整解码、三模型GTref108/Physics198-66和固定120验证loss；公共VBench/WMB评分及最终Teacher质量/人工review尚未完成，完整结果后续独立更新。公开内容不包含原仓Git历史、数据、权重、凭据或私有日志。
+
+## 独立Teacher实验全覆盖验收
+
+[2026-10-18 23:13:15 CST完整实测报告](../research/wm_teacher/docs/32_插值Teacher完整评测结论.md)：三插值3033视频及所有评分/固定验证loss的严格覆盖与报告构建通过。模型质量/人工review依报告保留FAIL或pending，不改变比赛项目原结果；原数据、权重与秘密不公开。

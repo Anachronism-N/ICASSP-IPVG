@@ -1,9 +1,3 @@
-# Selected Teacher experiment source snapshot
+# Verified Teacher experiment results
 
-This directory deliberately excludes the original Git history, cookies, credentials, data, model weights, videos, environments and private logs. Internal node addresses are placeholders; configure your own deployment before running scripts.
-
-Use PUBLICATION_MANIFEST.json for source/snapshot hashes and the measured snapshot time. Historical planning documents are not proof of current experiment completion. All benchmark coverage, fixed validation loss and Teacher review requirements still apply.
-
-## Verified status
-
-As of 2026-10-18 21:38 CST, all3033 videos and full frame decoding,108 GTref cases/model,198 Physics inputs/66 scenarios/model and three fixed120 validation losses are verified. WM-Bench VBench8 dimensions are complete; public355-case VBench and three350-case WMB judges are still running. Final experimental coverage and Teacher quality/human review are not complete. Parent IPVG competition experiments and rules are unchanged.
+All3033 original outputs and full frame decoding, per-model WM/public VBench8 dimensions, GTref108, Physics198/66, WMB350 and fixed120 validation losses passed strict coverage verification. See [final report](docs/32_插值Teacher完整评测结论.md) for measured scores, candidate trade-offs, automatic gate failures and human review pending. This appendix does not change the parent IPVG competition hypotheses/rules/results. No claim of SOTA or accepted streaming Teacher is made. The source snapshot excludes private media, weights, credentials, identifying logs and original source Git history.

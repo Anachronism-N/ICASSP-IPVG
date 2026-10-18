@@ -19,8 +19,11 @@ FILES = [
     "docs/27_数据预处理与训练格式适配.md", "docs/28_数据总量与项目目标评估.md",
     "docs/30_Teacher模型训练实验记录.md", "docs/31_服务器迁移与CodingAgent交接.md",
     "patches/diffsynth_studio_fb337fb.patch", "docs/32_插值Teacher完整评测结论.md",
+    "eval/summary.json", "eval/summary.md", "eval/diag/merge_eval_complete_20261018.json",
+    "training_metadata/full/ds_zero2_offload.json",
 ] + ["scripts/" + name for name in (
     "gen_jobs.py", "run_gen.sh", "score_extra.sh", "eval_val_loss.py", "score_merge_cpu.py",
+    "train_full_16gpu.sh", "train_round2_16gpu.sh", "launch_round2.sh",
     "monitor_merge.py", "wmb_merge_score.py", "val_merge_score.py", "merge_final_gate.py",
     "analyze_merge_metrics.py", "report_merge_results.py", "export_experiment_snapshot.py", "build_eval_jobs.py", "build_extra_bench_jobs.py",
     "gt_ref_metrics.py", "vbench_eval.py", "score_pool.py", "summarize_eval.py",

@@ -1,3 +1,7 @@
+# 完整插值评测验收更新
+
+> 2026-10-18 23:13:15 CST：原3033视频完整解码、三模型全部WM/公共VBench8维、GTref108、Physics198/66、WMB350与三份固定120loss已严格通过；summary和Teacher页重建完成。见docs/32_插值Teacher完整评测结论.md。实验执行/覆盖完成不等于Teacher质量自动或人工验收通过；下文旧快照按时间解释。
+
 # 30 Teacher 模型（Wan2.2-TI2V-5B 双向）训练实验记录
 
 > 更新至2026-10-18：当前新4节点32卡已恢复生成/评分资产并实际接续，α0.3/α0.5各1011条完整解码、GTref108与Physics66场景CPU覆盖已核验，α0.7仍生成；完整WM/VBench、WMB、3份120条loss与Teacher gate/用户review未齐。旧183/3033暂停属于01:21历史冻结边界，不是当前进度。准确18:54:37 CST快照、托管任务与JSON指针统一见`docs/31_服务器迁移与CodingAgent交接.md`顶部；动态增量读`eval/diag/merge_monitor_latest.json`，恢复清单读`eval/diag/merge_resume_20261018.json`（旧stage字段不代表当前）。Phase E3913输出/14组评分已结束并保留。凡写“实测”的数字来自`eval/summary.md`或原始结果；“推断”尚未验证。
@@ -297,7 +301,7 @@ Physics-IQ同样做了5,000次配对bootstrap，但抽样单位是66个物理场
 
 ## 7. GitHub 发布状态
 
-用户已授权实验方案、代码与分析发布到新目标`Anachronism-N/ICASSP-IPVG`。旧机冻结时本地提交`c038304`、旧origin/main `e329f76`仅历史记录，旧push认证失败，不代表新目标已有当前代码。新机git-lfs3.4.1已恢复，hook不能跳过；当前代理网络和认证推送权限已经核验，独立分支wm-teacher-experiments-20261018准备选择性脱敏快照，**尚未push**。公开使用独立脱敏快照，保留本地运维交接与未提交改动；数据、权重、cookies、token、私钥、私有迁移备份/历史日志和受限视频不加入公共提交，不宣称发布或完整实验成功。
+用户已授权实验方案、代码与分析发布到新目标`Anachronism-N/ICASSP-IPVG`。旧机冻结时本地提交`c038304`、旧origin/main `e329f76`仅历史记录，旧push认证失败，不代表新目标已有当前代码。新机git-lfs3.4.1已恢复，hook不能跳过；当前代理网络和认证推送权限已经核验，独立分支wm-teacher-experiments-20261018首批选择性脱敏快照已push，**远端hash040814269512ddad93cc9734811940bd8de54630已核验**。完整GPU结果后续追加，不把初次发布当实验完成。公开使用独立脱敏快照，保留本地运维交接与未提交改动；数据、权重、cookies、token、私钥、私有迁移备份/历史日志和受限视频不加入公共提交，不宣称发布或完整实验成功。
 
 ## 8. 工程问题记录
 

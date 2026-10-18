@@ -1,3 +1,7 @@
+# 完整插值评测验收更新
+
+> 2026-10-18 23:13:15 CST：原3033视频完整解码、三模型全部WM/公共VBench8维、GTref108、Physics198/66、WMB350与三份固定120loss已严格通过；summary和Teacher页重建完成。见docs/32_插值Teacher完整评测结论.md。实验执行/覆盖完成不等于Teacher质量自动或人工验收通过；下文旧快照按时间解释。
+
 # 项目进展全记录
 
 > 最后更新：2026-10-18 21:38 CST；旧机01:21暂停仅历史。
@@ -7,7 +11,7 @@
 - 三插值3033视频全部生成且完整解码；三模型GTref108、Physics198/66与固定120loss均已独立严格验证。数据、checkpoint、prompt、seed和Phase E3913输出及raw/po评分保留。
 - Physics raw A03/A05/A07=29.634157/28.169852/26.875848；DreamSim=0.16940009/0.16556586/0.15975603；loss=0.19359857/0.19132043/0.18940758。全部是固定seed本地实测，配对区间见eval/diag/merge_all_analysis_20261018.json，物理与领域收益有tradeoff。
 - 三模型WM8维评分完整，公共VBench和三节点WMB继续并行；final gate仍pending，Teacher质量/用户review未通过，不能开始Student/大训练。当前资源与日志看docs/31顶部和monitor JSON。
-- 持久化评分/监控/验收及安全公开导出已回归验证。GitHub代理与授权权限已解决，发布到指定ICASSP-IPVG独立分支及research/wm_teacher子目录，不携带原仓cookies历史。当前尚未push，最终全部评分验收后追加报告；不销毁旧机。
+- 持久化评分/监控/验收及安全公开导出已回归验证。GitHub代理与授权权限已解决，发布到指定ICASSP-IPVG独立分支及research/wm_teacher子目录，不携带原仓cookies历史。首批快照已正常push并核验远端040814269512ddad93cc9734811940bd8de54630；最终全部评分验收后追加报告并再次核对远端，不销毁旧机。
 
 ## 2026-10-18 私有本地资产导出（12:15历史验证记录）
 

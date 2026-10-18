@@ -1,0 +1,13 @@
+{
+  "status": "COMPLETE",
+  "at": "2026-10-18 22:59:39 CST",
+  "models": [
+    "m_full1_a03",
+    "m_full1_a05",
+    "m_full1_a07"
+  ],
+  "video_expected": 3033,
+  "fixed_val_n": 120,
+  "benchmark_coverage": "PASS",
+  "caveat": "Experimental outputs/coverage only. Teacher quality gate and user review are separate; no Student/FT3 training authorized."
+}

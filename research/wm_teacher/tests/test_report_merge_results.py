@@ -189,6 +189,16 @@ class ReportTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             report.number(float("nan"))
 
+    def test_official_dynamic_bool_scores_are_valid_only_for_dynamic(self):
+        rows = [{"video_path": "case-0.mp4", "video_results": True},
+                {"video_path": "case-1.mp4", "video_results": False}]
+        expected = {"case-0.mp4", "case-1.mp4"}
+        self.assertEqual(report.vbench_values({"dynamic_degree": [0.5, rows]},
+                                             "dynamic_degree", expected), 0.5)
+        with self.assertRaises(RuntimeError):
+            report.vbench_values({"subject_consistency": [0.5, rows]},
+                                 "subject_consistency", expected)
+
     def test_wrong_score_case_rejected(self):
         model = report.MODELS[0]
         self.write_json(f"eval/vbench_i2v/scores/{model}__i2v_subject_eval_results.json",

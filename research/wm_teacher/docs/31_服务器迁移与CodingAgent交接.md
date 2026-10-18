@@ -1,3 +1,7 @@
+# 完整插值评测验收更新
+
+> 2026-10-18 23:13:15 CST：原3033视频完整解码、三模型全部WM/公共VBench8维、GTref108、Physics198/66、WMB350与三份固定120loss已严格通过；summary和Teacher页重建完成。见docs/32_插值Teacher完整评测结论.md。实验执行/覆盖完成不等于Teacher质量自动或人工验收通过；下文旧快照按时间解释。
+
 # 31 服务器迁移与 Coding Agent 交接
 
 > 用途：让另一台服务器上的 coding agent 不依赖聊天历史，就能审阅并接着推进项目。
@@ -21,7 +25,7 @@
 - 配对统计：eval/diag/merge_all_analysis_20261018.json（全部三模型），保留原两模型merge_a03_a05_analysis_20261018.json。A03物理比A05+1.464305分、CI[0.030637,3.105535]，但末帧和运动误差更差；与base/R4物理差CI含0。固定案例/seed、未按来源聚类、多重比较未调整，不据单指标推荐Teacher。
 - 已验证持久代码score_merge_cpu.py、monitor_merge.py、wmb_merge_score.py、val_merge_score.py、merge_final_gate.py及配对分析CLI；独立全回归测试通过，具体测试数量/时间以每次报告为准（CPU入口最初22项只是历史子集）。完整门禁要求两full manifests、三模型全解码、48维case集合、WMB350/1750/700、Physics66、GTref108及固定120loss均通过后才重建summary/Teacher页。
 - 托管monitor YQ9EwY、VBench eTQBxB、WMB0KHxiL/TDIiHu/kc50Z7、final JBurrX仍活跃；m9OYH5验证loss已完成，8po4Fs CPU已完成。旧r60iAs/rwO4Pz/4C9bK1/00qFx9/5HCYQa为已替换历史任务，不能再启动。句柄仅本会话有效，重新接手核对实际PID/日志和输出。
-- 代理已解决GitHub连接，认证身份和目标仓库推送权限已验证。目标Anachronism-N/ICASSP-IPVG，独立分支wm-teacher-experiments-20261018，实验快照放research/wm_teacher；不推原含cookies历史，不覆盖比赛项目文件。**目前尚未推送**，不能把快照导出当公开成功。最终评分结束后再追加完整报告。旧服务器未销毁。
+- 代理已解决GitHub连接，认证身份和目标仓库推送权限已验证。目标Anachronism-N/ICASSP-IPVG，独立分支wm-teacher-experiments-20261018，实验快照放research/wm_teacher；不推原含cookies历史，不覆盖比赛项目文件。**2026-10-18 21:42首批安全快照已推送**，远端分支hash040814269512ddad93cc9734811940bd8de54630与本地一致；已推送的是当前方案、代码和CPU分析，不代表GPU评分/实验完成。最终评分结束后追加完整报告并核验新远端hash。旧服务器未销毁。
 
 > 以下章节是有时间戳的历史快照；当前接续以上节和eval/diag/merge_resume_20261018.json为准。
 

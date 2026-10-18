@@ -1,0 +1,547 @@
+{
+ "vbench_i2v": {
+  "Wan2.2-TI2V-5B (ours, base)（本地复现）": {
+   "imaging_quality": 0.7106062536762474,
+   "aesthetic_quality": 0.619714569961521,
+   "subject_consistency": 0.9544887364015417,
+   "dynamic_degree": 0.5609756097560976,
+   "i2v_background": 0.990932711369674,
+   "i2v_subject": 0.9782692885418551,
+   "motion_smoothness": 0.9870531319019015,
+   "background_consistency": 0.9754072743453747
+  },
+  "Wan2.2-TI2V-5B (ours, base) + prompt-optimized（本地复现）": {
+   "dynamic_degree": 0.46747967479674796,
+   "aesthetic_quality": 0.6243259360252972,
+   "i2v_subject": 0.9818892516204859,
+   "background_consistency": 0.9793783112038895,
+   "motion_smoothness": 0.9885025084202328,
+   "i2v_background": 0.9924355010086789,
+   "subject_consistency": 0.9590540926747004,
+   "imaging_quality": 0.712282216507791
+  },
+  "Full-FT 5B (FT2, base init + general data)（本地复现）": {
+   "i2v_subject": 0.9786932218108115,
+   "motion_smoothness": 0.9880371801864624,
+   "aesthetic_quality": 0.6169791616184611,
+   "imaging_quality": 0.7092983842751377,
+   "dynamic_degree": 0.5691056910569106,
+   "i2v_background": 0.9908309487137226,
+   "background_consistency": 0.9718604224902045,
+   "subject_consistency": 0.9509950669015427
+  },
+  "Full-FT 5B (FT2, base init + general data) + prompt-optimized（本地复现）": {
+   "dynamic_degree": 0.45528455284552843,
+   "aesthetic_quality": 0.6242872972723464,
+   "motion_smoothness": 0.9895699722206034,
+   "i2v_background": 0.9929520049363102,
+   "i2v_subject": 0.9822133604830842,
+   "imaging_quality": 0.7116517073869179,
+   "background_consistency": 0.9792084766819572,
+   "subject_consistency": 0.9583739658610688
+  },
+  "Full-FT 5B (FT1) + prompt-optimized（本地复现）": {
+   "background_consistency": 0.9760205003464258,
+   "imaging_quality": 0.7059028016340052,
+   "aesthetic_quality": 0.6205174716425613,
+   "i2v_background": 0.9914392812003239,
+   "i2v_subject": 0.9806276509447432,
+   "motion_smoothness": 0.988127756117942,
+   "subject_consistency": 0.955465053734155,
+   "dynamic_degree": 0.46747967479674796
+  },
+  "0.7·base + 0.3·FT1 (weight merge)（本地复现）": {
+   "i2v_subject": 0.979711321330955,
+   "imaging_quality": 0.7093486667529153,
+   "i2v_background": 0.9899919765955265,
+   "motion_smoothness": 0.9877144101409977,
+   "background_consistency": 0.9743107880291954,
+   "aesthetic_quality": 0.6184629126333855,
+   "subject_consistency": 0.9541517221341086,
+   "dynamic_degree": 0.5528455284552846
+  },
+  "0.5·base + 0.5·FT1 (weight merge)（本地复现）": {
+   "imaging_quality": 0.7085319007329148,
+   "motion_smoothness": 0.9880008012868822,
+   "subject_consistency": 0.9535746642587792,
+   "aesthetic_quality": 0.6176555738482676,
+   "dynamic_degree": 0.5772357723577236,
+   "i2v_background": 0.9899988374004671,
+   "background_consistency": 0.9728998493346235,
+   "i2v_subject": 0.9795895035034877
+  },
+  "0.3·base + 0.7·FT1 (weight merge)（本地复现）": {
+   "imaging_quality": 0.707950201061854,
+   "background_consistency": 0.9720131410371273,
+   "i2v_background": 0.9903595020123029,
+   "i2v_subject": 0.9785638699123287,
+   "aesthetic_quality": 0.6174574149326539,
+   "dynamic_degree": 0.5650406504065041,
+   "subject_consistency": 0.9512925598250455,
+   "motion_smoothness": 0.9878589612765859
+  },
+  "Round2 LoRA（本地复现）": {
+   "i2v_background": 0.9881209418109251,
+   "background_consistency": 0.9724344889322917,
+   "i2v_subject": 0.9752285586249432,
+   "imaging_quality": 0.7085245864991606,
+   "motion_smoothness": 0.9867119422684598,
+   "dynamic_degree": 0.5609756097560976,
+   "aesthetic_quality": 0.6166567508603485,
+   "subject_consistency": 0.9498363024766839
+  },
+  "Round3 LoRA（本地复现）": {
+   "dynamic_degree": 0.540650406504065,
+   "i2v_subject": 0.9754851820834769,
+   "aesthetic_quality": 0.6161908009522398,
+   "i2v_background": 0.9878399230758532,
+   "motion_smoothness": 0.9868503782299375,
+   "subject_consistency": 0.9500068097226423,
+   "imaging_quality": 0.7080226153319434,
+   "background_consistency": 0.970929608359614
+  },
+  "Round4 LoRA (aes-filtered)（本地复现）": {
+   "subject_consistency": 0.9503290864839635,
+   "i2v_background": 0.9883338700658686,
+   "imaging_quality": 0.7089575719255019,
+   "aesthetic_quality": 0.6169772931387727,
+   "motion_smoothness": 0.9869632028911659,
+   "dynamic_degree": 0.5365853658536586,
+   "background_consistency": 0.9715722880232225,
+   "i2v_subject": 0.976163125390119
+  },
+  "Round4 LoRA (aes-filtered) + prompt-optimized（本地复现）": {
+   "i2v_background": 0.9905950569163221,
+   "i2v_subject": 0.980781693148722,
+   "aesthetic_quality": 0.6218431466062304,
+   "motion_smoothness": 0.9879164293131312,
+   "subject_consistency": 0.9568953269141093,
+   "dynamic_degree": 0.47560975609756095,
+   "imaging_quality": 0.7071046198881653,
+   "background_consistency": 0.9773925407946292
+  },
+  "DreamX-World-1.0（官方榜单）": {
+   "i2v_subject": 0.9826999999999999,
+   "i2v_background": 0.9904000000000001,
+   "subject_consistency": 0.9534999999999999,
+   "background_consistency": 0.9723999999999999,
+   "motion_smoothness": 0.9852,
+   "dynamic_degree": 0.7211,
+   "aesthetic_quality": 0.637,
+   "imaging_quality": 0.7145999999999999
+  },
+  "Magi-1（官方榜单）": {
+   "i2v_subject": 0.9839,
+   "i2v_background": 0.99,
+   "subject_consistency": 0.9396,
+   "background_consistency": 0.9673999999999999,
+   "motion_smoothness": 0.9868000000000001,
+   "dynamic_degree": 0.6820999999999999,
+   "aesthetic_quality": 0.6474,
+   "imaging_quality": 0.6970999999999999
+  },
+  "Wan2.2-TI2V-5B (Qwen prompt-optimized)（官方榜单）": {
+   "i2v_subject": 0.9843000000000001,
+   "i2v_background": 0.9926999999999999,
+   "subject_consistency": 0.9495,
+   "background_consistency": 0.9681000000000001,
+   "motion_smoothness": 0.9865,
+   "dynamic_degree": 0.5285,
+   "aesthetic_quality": 0.6401,
+   "imaging_quality": 0.7070000000000001
+  },
+  "Wan2.2-I2V-A14B (Qwen prompt-optimized)（官方榜单）": {
+   "i2v_subject": 0.986,
+   "i2v_background": 0.9956,
+   "subject_consistency": 0.9499,
+   "background_consistency": 0.9712999999999999,
+   "motion_smoothness": 0.9822,
+   "dynamic_degree": 0.48619999999999997,
+   "aesthetic_quality": 0.6470999999999999,
+   "imaging_quality": 0.7067
+  },
+  "Step-Video-TI2V（官方榜单）": {
+   "i2v_subject": 0.9786,
+   "i2v_background": 0.9863,
+   "subject_consistency": 0.9601999999999999,
+   "background_consistency": 0.9706,
+   "motion_smoothness": 0.9924,
+   "dynamic_degree": 0.4878,
+   "aesthetic_quality": 0.6229,
+   "imaging_quality": 0.7044
+  },
+  "Gen-4-I2V（官方榜单）": {
+   "i2v_subject": 0.9784,
+   "i2v_background": 0.9745999999999999,
+   "subject_consistency": 0.9323,
+   "background_consistency": 0.9679000000000001,
+   "motion_smoothness": 0.9899,
+   "dynamic_degree": 0.552,
+   "aesthetic_quality": 0.6177,
+   "imaging_quality": 0.7041
+  },
+  "Wan2.2-I2V-A14B (w/o prompt-optimized)（官方榜单）": {
+   "i2v_subject": 0.9752,
+   "i2v_background": 0.9903,
+   "subject_consistency": 0.9468000000000001,
+   "background_consistency": 0.9672,
+   "motion_smoothness": 0.9832,
+   "dynamic_degree": 0.5285,
+   "aesthetic_quality": 0.6153,
+   "imaging_quality": 0.7036
+  },
+  "DynamiCrafter-1024（官方榜单）": {
+   "i2v_subject": 0.9817,
+   "i2v_background": 0.986,
+   "subject_consistency": 0.9569,
+   "background_consistency": 0.9738,
+   "motion_smoothness": 0.9738,
+   "dynamic_degree": 0.474,
+   "aesthetic_quality": 0.6646,
+   "imaging_quality": 0.6934
+  },
+  "LTX-2-I2V (w/o prompt-optimized)（官方榜单）": {
+   "i2v_subject": 0.9937999999999999,
+   "i2v_background": 0.9934999999999999,
+   "subject_consistency": 0.9765,
+   "background_consistency": 0.9725,
+   "motion_smoothness": 0.9929000000000001,
+   "dynamic_degree": 0.08539999999999999,
+   "aesthetic_quality": 0.6361,
+   "imaging_quality": 0.7272
+  },
+  "Wan2.1-I2V-14B-720P（官方榜单）": {
+   "i2v_subject": 0.9695,
+   "i2v_background": 0.9643999999999999,
+   "subject_consistency": 0.9486,
+   "background_consistency": 0.9706999999999999,
+   "motion_smoothness": 0.9790000000000001,
+   "dynamic_degree": 0.5138,
+   "aesthetic_quality": 0.6475,
+   "imaging_quality": 0.7044
+  },
+  "HunyuanVideo-I2V（官方榜单）": {
+   "i2v_subject": 0.9853000000000001,
+   "i2v_background": 0.9737,
+   "subject_consistency": 0.9526,
+   "background_consistency": 0.9670000000000001,
+   "motion_smoothness": 0.9923000000000001,
+   "dynamic_degree": 0.222,
+   "aesthetic_quality": 0.6255,
+   "imaging_quality": 0.7014
+  },
+  "CogVideoX-5b-I2V（官方榜单）": {
+   "i2v_subject": 0.9719,
+   "i2v_background": 0.9673999999999999,
+   "subject_consistency": 0.9434,
+   "background_consistency": 0.9642000000000001,
+   "motion_smoothness": 0.9840000000000001,
+   "dynamic_degree": 0.3317,
+   "aesthetic_quality": 0.6187,
+   "imaging_quality": 0.7001000000000001
+  }
+ },
+ "wm_bench": {
+  "真实视频 (GT)": {
+   "subject_consistency": 0.933099634864333,
+   "i2v_subject": 0.9726962360384425,
+   "motion_smoothness": 0.9871187507081658,
+   "i2v_background": 0.9787497724592685,
+   "imaging_quality": 0.6552875373156968,
+   "aesthetic_quality": 0.4799994437230958,
+   "dynamic_degree": 0.6666666666666666,
+   "background_consistency": 0.9534962030104649
+  },
+  "Wan2.2-TI2V-5B (ours, base)": {
+   "imaging_quality": 0.6411421220879836,
+   "aesthetic_quality": 0.4809916012541012,
+   "subject_consistency": 0.9220026660250661,
+   "dynamic_degree": 0.6018518518518519,
+   "i2v_background": 0.9808855793804481,
+   "i2v_subject": 0.9762925836016181,
+   "motion_smoothness": 0.9872812984265609,
+   "background_consistency": 0.9467918678566262
+  },
+  "Round1 LoRA": {
+   "subject_consistency": 0.9212710107693931,
+   "i2v_background": 0.9694920906707369,
+   "dynamic_degree": 0.5740740740740741,
+   "background_consistency": 0.9500448909806617,
+   "motion_smoothness": 0.9873416362005322,
+   "aesthetic_quality": 0.4759935877389378,
+   "imaging_quality": 0.6394869330041008,
+   "i2v_subject": 0.9601489129717701
+  },
+  "Round2 LoRA": {
+   "i2v_background": 0.9768111975477252,
+   "background_consistency": 0.9496695718647521,
+   "i2v_subject": 0.9689077713837224,
+   "imaging_quality": 0.633804886373935,
+   "motion_smoothness": 0.9873802453017271,
+   "dynamic_degree": 0.5833333333333334,
+   "aesthetic_quality": 0.4753514740754057,
+   "subject_consistency": 0.9174468255058552
+  },
+  "Round3 LoRA": {
+   "dynamic_degree": 0.5925925925925926,
+   "i2v_subject": 0.9663433324173093,
+   "aesthetic_quality": 0.4751077691713969,
+   "i2v_background": 0.9755914830678593,
+   "motion_smoothness": 0.9869151691260392,
+   "subject_consistency": 0.9196441330055901,
+   "imaging_quality": 0.6291427587039762,
+   "background_consistency": 0.9504470731005257
+  },
+  "Round4 LoRA (aes-filtered)": {
+   "subject_consistency": 0.920096862277039,
+   "i2v_background": 0.9761774113070635,
+   "imaging_quality": 0.6336673294706084,
+   "aesthetic_quality": 0.477339253657394,
+   "motion_smoothness": 0.9869168134815967,
+   "dynamic_degree": 0.6018518518518519,
+   "background_consistency": 0.9506587181562259,
+   "i2v_subject": 0.967429147268197
+  },
+  "Full-FT 5B (FT1)": {
+   "i2v_subject": 0.96695681794788,
+   "imaging_quality": 0.6322972272476509,
+   "background_consistency": 0.9484701180163725,
+   "motion_smoothness": 0.9866535958950303,
+   "aesthetic_quality": 0.47923033960439543,
+   "dynamic_degree": 0.6296296296296297,
+   "i2v_background": 0.9755708399456408,
+   "subject_consistency": 0.9201227028354036
+  },
+  "Full-FT 5B (FT2, base init + general data)": {
+   "i2v_subject": 0.979240748822965,
+   "motion_smoothness": 0.9900286357682613,
+   "aesthetic_quality": 0.47749195661809707,
+   "imaging_quality": 0.6373211725107712,
+   "dynamic_degree": 0.5648148148148148,
+   "i2v_background": 0.983656055999023,
+   "background_consistency": 0.9461032161006221,
+   "subject_consistency": 0.9238189109348128
+  },
+  "0.7·base + 0.3·FT1 (weight merge)": {
+   "i2v_subject": 0.9730757992452495,
+   "imaging_quality": 0.639751698518332,
+   "i2v_background": 0.9800036601377305,
+   "motion_smoothness": 0.98690151496168,
+   "background_consistency": 0.9496176166298949,
+   "aesthetic_quality": 0.4802742237570109,
+   "subject_consistency": 0.9222225408319866,
+   "dynamic_degree": 0.5925925925925926
+  },
+  "0.5·base + 0.5·FT1 (weight merge)": {
+   "imaging_quality": 0.6389856588333288,
+   "motion_smoothness": 0.9869042402042628,
+   "subject_consistency": 0.9224222461486028,
+   "aesthetic_quality": 0.480852618675541,
+   "dynamic_degree": 0.6111111111111112,
+   "i2v_background": 0.9813783109395042,
+   "background_consistency": 0.9510922561457128,
+   "i2v_subject": 0.9731620449545206
+  },
+  "0.3·base + 0.7·FT1 (weight merge)": {
+   "imaging_quality": 0.6392979344425488,
+   "background_consistency": 0.9506811824845679,
+   "i2v_background": 0.9785904998573716,
+   "i2v_subject": 0.9711416572546241,
+   "aesthetic_quality": 0.48011578081382644,
+   "dynamic_degree": 0.6111111111111112,
+   "subject_consistency": 0.9230073692742735,
+   "motion_smoothness": 0.9872014653320383
+  },
+  "CogVideoX-5B-I2V": {
+   "aesthetic_quality": 0.45922247210034617,
+   "subject_consistency": 0.9266678403522589,
+   "i2v_subject": 0.9547585234149464,
+   "imaging_quality": 0.580608669819475,
+   "i2v_background": 0.9444538472237547,
+   "motion_smoothness": 0.9833729804294904,
+   "background_consistency": 0.9429989567509404,
+   "dynamic_degree": 0.5277777777777778
+  },
+  "Wan2.1-I2V-14B-720P": {
+   "motion_smoothness": 0.9854372940738608,
+   "imaging_quality": 0.692234391732253,
+   "i2v_background": 0.966115312245847,
+   "dynamic_degree": 0.7037037037037037,
+   "i2v_subject": 0.9629943119541363,
+   "background_consistency": 0.9304406483968098,
+   "aesthetic_quality": 0.4836252734616951,
+   "subject_consistency": 0.8995966496316854
+  },
+  "HunyuanVideo-I2V": {
+   "aesthetic_quality": 0.46661300515687026,
+   "motion_smoothness": 0.9936360295079463,
+   "dynamic_degree": 0.4351851851851852,
+   "background_consistency": 0.9459146217063621,
+   "i2v_subject": 0.9728823889443581,
+   "subject_consistency": 0.9248177524703486,
+   "imaging_quality": 0.5779531645329903,
+   "i2v_background": 0.9725446108275922
+  }
+ },
+ "wm_gtref": {
+  "base": {
+   "n": 108,
+   "dreamsim": 0.17463796300652584,
+   "dreamsim_last": 0.20868250396516588,
+   "motion_err": 0.9941611857125741
+  },
+  "round1": {
+   "n": 108,
+   "dreamsim": 0.15985819053502728,
+   "dreamsim_last": 0.18680693761066156,
+   "motion_err": 0.8807759411212013
+  },
+  "round2": {
+   "n": 108,
+   "dreamsim": 0.1607062940336304,
+   "dreamsim_last": 0.18689142609084095,
+   "motion_err": 0.7427117964139724
+  },
+  "round3": {
+   "n": 108,
+   "dreamsim": 0.15765591080725927,
+   "dreamsim_last": 0.1818040587283947,
+   "motion_err": 0.729827746746445
+  },
+  "round4": {
+   "n": 108,
+   "dreamsim": 0.1569177562623848,
+   "dreamsim_last": 0.18372398559693937,
+   "motion_err": 0.729800968556768
+  },
+  "full1": {
+   "n": 108,
+   "dreamsim": 0.1596324783692389,
+   "dreamsim_last": 0.18605914380815294,
+   "motion_err": 0.6719236640360768
+  },
+  "ft2": {
+   "n": 108,
+   "dreamsim": 0.17220936053329045,
+   "dreamsim_last": 0.20771468844678667,
+   "motion_err": 0.9215754328285514
+  },
+  "m_full1_a03": {
+   "n": 108,
+   "dreamsim": 0.16940009019073143,
+   "dreamsim_last": 0.2047130537253839,
+   "motion_err": 0.9407764240044553
+  },
+  "m_full1_a05": {
+   "n": 108,
+   "dreamsim": 0.16556585768674628,
+   "dreamsim_last": 0.19522358201168202,
+   "motion_err": 0.9009528410010638
+  },
+  "m_full1_a07": {
+   "n": 108,
+   "dreamsim": 0.15975603323291848,
+   "dreamsim_last": 0.1880050124945464,
+   "motion_err": 0.8053928850720952
+  },
+  "cogvideox": {
+   "n": 108,
+   "dreamsim": 0.19396416337033848,
+   "dreamsim_last": 0.2414851983388265,
+   "motion_err": 0.830107576701606
+  },
+  "wan21": {
+   "n": 108,
+   "dreamsim": 0.2181837201854329,
+   "dreamsim_last": 0.25442174132223483,
+   "motion_err": 0.8212681403132004
+  },
+  "hunyuan": {
+   "n": 108,
+   "dreamsim": 0.19804420883272902,
+   "dreamsim_last": 0.24376521673467424,
+   "motion_err": 0.8584880477500042
+  }
+ },
+ "physiq": {
+  "round4_po": 32.47,
+  "base": 30.13,
+  "ft2_po": 31.43,
+  "base_po": 32.48,
+  "full1": 24.82,
+  "m_full1_a05": 28.17,
+  "m_full1_a03": 29.63,
+  "round4": 27.33,
+  "full1_po": 31.29,
+  "ft2": 28.34,
+  "m_full1_a07": 26.88
+ },
+ "wmb": {
+  "full1_po": {
+   "instruction": 2.0885714285714285,
+   "physical_laws": 4.577142857142857,
+   "common_sense": 1.6314285714285715,
+   "total": 8.297142857142857
+  },
+  "m_full1_a05": {
+   "instruction": 2.1942857142857144,
+   "physical_laws": 4.274285714285714,
+   "common_sense": 1.3457142857142856,
+   "total": 7.814285714285713
+  },
+  "round4_po": {
+   "instruction": 2.117142857142857,
+   "physical_laws": 4.611428571428571,
+   "common_sense": 1.6685714285714286,
+   "total": 8.397142857142857
+  },
+  "base": {
+   "instruction": 2.2657142857142856,
+   "physical_laws": 4.508571428571429,
+   "common_sense": 1.522857142857143,
+   "total": 8.297142857142857
+  },
+  "round4": {
+   "instruction": 2.0485714285714285,
+   "physical_laws": 4.022857142857143,
+   "common_sense": 1.0285714285714285,
+   "total": 7.1
+  },
+  "base_po": {
+   "instruction": 2.3257142857142856,
+   "physical_laws": 4.72,
+   "common_sense": 1.8114285714285714,
+   "total": 8.857142857142858
+  },
+  "full1": {
+   "instruction": 1.997142857142857,
+   "physical_laws": 4.08,
+   "common_sense": 1.0142857142857142,
+   "total": 7.091428571428572
+  },
+  "m_full1_a03": {
+   "instruction": 2.2514285714285713,
+   "physical_laws": 4.3428571428571425,
+   "common_sense": 1.437142857142857,
+   "total": 8.031428571428572
+  },
+  "m_full1_a07": {
+   "instruction": 2.1,
+   "physical_laws": 4.182857142857142,
+   "common_sense": 1.2285714285714286,
+   "total": 7.511428571428572
+  },
+  "ft2_po": {
+   "instruction": 2.3285714285714287,
+   "physical_laws": 4.697142857142857,
+   "common_sense": 1.7971428571428572,
+   "total": 8.822857142857142
+  },
+  "ft2": {
+   "instruction": 2.2514285714285713,
+   "physical_laws": 4.451428571428571,
+   "common_sense": 1.4428571428571428,
+   "total": 8.145714285714286
+  }
+ }
+}

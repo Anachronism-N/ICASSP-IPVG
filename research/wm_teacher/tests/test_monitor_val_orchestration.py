@@ -184,7 +184,8 @@ class MonitorTests(TemporaryRoot):
         self.assertEqual(report["generation_logs"], 1)
         self.assertEqual(len(report["errors"]), 1)
         self.assertTrue(all(n["error"] for n in report["nodes"]))
-        self.assertEqual([c.args[0] for c in query.call_args_list], self.state()["nodes"])
+        self.assertCountEqual([c.args[0] for c in query.call_args_list], self.state()["nodes"])
+        self.assertEqual([n["rank"] for n in report["nodes"]], [n["rank"] for n in self.state()["nodes"]])
         self.assertIn("Nonempty count/sample decoding only", report["caveat"])
         self.assertNotIn("accepted", report)
 

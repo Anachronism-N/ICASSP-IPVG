@@ -54,7 +54,9 @@ def vbench_values(result, dim, expected):
     require(isinstance(row, list) and len(row) == 2 and finite(row[0]) and
             isinstance(row[1], list), "Invalid/non-finite VBench dimension: " + dim)
     require(all(isinstance(x, dict) and isinstance(x.get("video_path"), str) and
-                finite(x.get("video_results")) for x in row[1]), "Non-finite VBench per-case score")
+                (finite(x.get("video_results")) or
+                 dim == "dynamic_degree" and isinstance(x.get("video_results"), bool))
+                for x in row[1]), "Non-finite VBench per-case score")
     actual = [Path(x["video_path"]).name for x in row[1]]
     require(len(actual) == len(expected) and set(actual) == expected,
             "Wrong/incomplete VBench case coverage: " + dim)

@@ -1,15 +1,15 @@
 {
-  "created_at": "2026-10-18 21:40:10 CST",
+  "created_at": "2026-10-18 23:13:20 CST",
   "files": [
     {
       "path": "README.md",
       "source_sha256": "ceb68424bfc7bc407badcaa0f02db75c5825f4fe30245bbcb015bd52bdd1f691",
-      "snapshot_sha256": "ceb68424bfc7bc407badcaa0f02db75c5825f4fe30245bbcb015bd52bdd1f691"
+      "snapshot_sha256": "5cdaba4ae39d46be4b178862b537c93c16a1a32ad8575c163beff6b9e0e90574"
     },
     {
       "path": "PROGRESS.md",
-      "source_sha256": "73cbe2e43cddf01e169d329deca56482bf865d3a7d7c251ec3928ce8818f3496",
-      "snapshot_sha256": "501d3bedb44f95bc1f1a4d16e45c6cd365cd5d5ff4e5597cfc4e177cc7378837"
+      "source_sha256": "f1d611eb111f3b91d2d8956a60c747006f03f051f3044426ac881ea4155ce8ee",
+      "snapshot_sha256": "a778b2e8672f598739ed1dc94fc67c36231de1e78260f424ab2e58ae916fcbc1"
     },
     {
       "path": "docs/README.md",
@@ -43,13 +43,13 @@
     },
     {
       "path": "docs/30_Teacher模型训练实验记录.md",
-      "source_sha256": "39368edaed12c37c39da2ca09dc77e879162f058736cb8930cb03bf5d53fdc4f",
-      "snapshot_sha256": "39368edaed12c37c39da2ca09dc77e879162f058736cb8930cb03bf5d53fdc4f"
+      "source_sha256": "c6ac9a334ed5d97d01bebb27f6f2e59baab07d54afc3ed1e043d02fdb0c214ed",
+      "snapshot_sha256": "c6ac9a334ed5d97d01bebb27f6f2e59baab07d54afc3ed1e043d02fdb0c214ed"
     },
     {
       "path": "docs/31_服务器迁移与CodingAgent交接.md",
-      "source_sha256": "64fc2e94a9a5db550ee9676121d871db8eb24a540a338853e659e3bc110e26c6",
-      "snapshot_sha256": "c94f5e0f2e53b593ad14bc71a00d5fae5591560ebf88e156f6c243e63e85cf76"
+      "source_sha256": "b47bfbd9aa5783c5143931fba4cccbeb088fa277c1d1bfba3cbb5c9f5178e4e3",
+      "snapshot_sha256": "0aa67f8fc4c5003f7c576e2b497873d538e88bc46e231f90be15695f7a05cbce"
     },
     {
       "path": "patches/diffsynth_studio_fb337fb.patch",
@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "48177d81f9f92b9f79ea68bf2b9ec5beab4ba36d0354c87a46e4631564a4efdb",
-      "snapshot_sha256": "48177d81f9f92b9f79ea68bf2b9ec5beab4ba36d0354c87a46e4631564a4efdb"
+      "source_sha256": "ff0a4fd845132f75edafb7d2eb35ec93e47faf28f84da1d2cfe3df72610e2a84",
+      "snapshot_sha256": "ff0a4fd845132f75edafb7d2eb35ec93e47faf28f84da1d2cfe3df72610e2a84"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -238,8 +238,8 @@
     },
     {
       "path": "tests/test_monitor_val_orchestration.py",
-      "source_sha256": "02d67c62fdf1878562e361808df32696916c5fb99e3d4e44a5186d67ce37cb63",
-      "snapshot_sha256": "02d67c62fdf1878562e361808df32696916c5fb99e3d4e44a5186d67ce37cb63"
+      "source_sha256": "809e3789415a3e4709fe097735f2cabca302bdd4d2ba0a481ffb6d2bee5428ab",
+      "snapshot_sha256": "809e3789415a3e4709fe097735f2cabca302bdd4d2ba0a481ffb6d2bee5428ab"
     },
     {
       "path": "tests/test_wmb_final_orchestration.py",
@@ -338,32 +338,49 @@
     },
     {
       "path": "scripts/report_merge_results.py",
-      "source_sha256": "d40131602c63dcdd4d08345aed27dc59b957ebd2978735baf63b70ca822837dc",
-      "snapshot_sha256": "d40131602c63dcdd4d08345aed27dc59b957ebd2978735baf63b70ca822837dc"
+      "source_sha256": "d271eb683e4826d425390649b84044e6c6d6f7ab2d51c595ae4f076e6d4389d5",
+      "snapshot_sha256": "d271eb683e4826d425390649b84044e6c6d6f7ab2d51c595ae4f076e6d4389d5"
     },
     {
       "path": "tests/test_report_merge_results.py",
-      "source_sha256": "b97fadf45d407f8c4bac935d07fe11493375e72cd9b1b9dbe13ec279450113c1",
-      "snapshot_sha256": "b97fadf45d407f8c4bac935d07fe11493375e72cd9b1b9dbe13ec279450113c1"
+      "source_sha256": "777d0c1eab97d7982ee58c1beb115f72d6059b8189a91e33bbd40149d68101af",
+      "snapshot_sha256": "777d0c1eab97d7982ee58c1beb115f72d6059b8189a91e33bbd40149d68101af"
     },
     {
       "path": "tests/test_score_pool.py",
       "source_sha256": "f7c24925c0252419f7d06a9b7ad745e9b676e4177ef99f3c032ed34c9c8f261c",
       "snapshot_sha256": "f7c24925c0252419f7d06a9b7ad745e9b676e4177ef99f3c032ed34c9c8f261c"
+    },
+    {
+      "path": "docs/32_插值Teacher完整评测结论.md",
+      "source_sha256": "b51b0c616fadaee0a0c01b0b84ab6255d9d698498a1b8c00070715abc0814225",
+      "snapshot_sha256": "b51b0c616fadaee0a0c01b0b84ab6255d9d698498a1b8c00070715abc0814225"
+    },
+    {
+      "path": "eval/summary.json",
+      "source_sha256": "c11e5b7fd9b93b8587b2963a23258a9a81166648fe63d93d32c572a0b8340dee",
+      "snapshot_sha256": "c11e5b7fd9b93b8587b2963a23258a9a81166648fe63d93d32c572a0b8340dee"
+    },
+    {
+      "path": "eval/summary.md",
+      "source_sha256": "4885f58df6addd72795456eae9b20da65d092d5918e19027e82e697cc2c922bd",
+      "snapshot_sha256": "4885f58df6addd72795456eae9b20da65d092d5918e19027e82e697cc2c922bd"
+    },
+    {
+      "path": "eval/diag/merge_eval_complete_20261018.json",
+      "source_sha256": "bb68d9ff46d3e072c3dd46a8a895e31e3a0467b43e52a003aa7ea83f55b5fb94",
+      "snapshot_sha256": "bb68d9ff46d3e072c3dd46a8a895e31e3a0467b43e52a003aa7ea83f55b5fb94"
     }
   ],
   "experiment_progress": {
-    "at": "2026-10-18 21:38 CST",
+    "at": "2026-10-18 23:13:15 CST",
     "complete_nonempty": 3033,
     "total": 3033,
-    "by_model": {
-      "m_full1_a03": 1011,
-      "m_full1_a05": 1011,
-      "m_full1_a07": 1011
-    }
+    "all_full_decodes": true,
+    "benchmark_coverage": "PASS",
+    "fixed_val_n_each": 120,
+    "caveat": "Completed experiment execution/coverage, not automatic human/Teacher quality acceptance."
   },
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
-  "publication_transform": "Internal deployment addresses and shared-storage root replaced by placeholders. No source Git history or private media.",
-  "supplement_verified_at": "2026-10-18 22:18:15 CST",
-  "supplement": "Dynamic one-token-per-GPU scoring scheduler and strict final report implementation; source and publication regressions verified. No claim that unfinished dimensions or user review passed."
+  "publication_transform": "Internal deployment/storage roots are placeholders; raw data, weights, private logs, credentials and original wm_dataset Git history excluded."
 }
