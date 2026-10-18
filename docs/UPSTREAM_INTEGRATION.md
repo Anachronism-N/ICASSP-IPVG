@@ -1,6 +1,6 @@
 # 上游模型接入与验收
 
-本项目将实验控制与真实模型分开。CPU synthetic smoke用于检验控制流程，不能代替GPU backend验收。本仓库已实现VACE参考图推理与训练adapter，尚未在目标GPU验收；其他模型通过外部命令backend接入，不能因上游有权重就声称本项目适配已完成。
+本项目将实验控制与真实模型分开。CPU synthetic smoke用于检验控制流程，不能代替GPU backend验收。VACE1.3B小尺寸单卡/7卡LoRA训练、导出和回载，以及64条真实参考图生成已在A10040GB验收；AnyID over Wan2.2 TI2V-5B已完成8条单参考推理。Track2视频latent窗口原型已跑12条，但未显示事件方向增益。具体参数、成本及未验证项见 [双赛道报告](EXPERIMENT_TWO_TRACKS.md)，不能据此推断长训练、14B、默认长视频或正式赛道已通过。
 
 本文依据 2026-10-17 的已有源码/模型卡核查，实际服务器必须使用固定 commit 与 revision。完整参数应以该固定版本的源码和 `--help` 为准；未知项写为 TODO，不发明 upstream CLI。
 
@@ -11,7 +11,7 @@
 | Wan2.1 VACE 1.3B + DiffSynth | 首个训练与推理闭环 | 基座/条件权重；DiffSynth 条件模块训练、推理 | manifest/参考图接线，子集训练、恢复、导出回载与真实 proxy |
 | ConsisID | Track 1 直接身份训练对照 | 预处理、train.py、单/多节点脚本、推理/评测、权重 | 适配本项目数据、清理作者路径、40GB峰值和许可检查 |
 | Stand-In | 强身份推理与 Wan2.1 VACE 对照 | 身份 adapter、推理、Wan2.1 VACE 集成 | 训练仍 TODO；Wan2.2+VACE 不能当作者已验证组合 |
-| AnyID | Wan2.2 5B 身份推理对照 | preview LoRA、合并/推理 | 未核到官方训练/RL recipe；默认长视频显存未确认 |
+| AnyID | Wan2.2 5B 身份推理对照 | preview LoRA、CPU合并及8条480²/49帧单参考推理已验收 | 未核到官方训练/RL recipe；缺脸覆盖、广动作、默认长视频与原生采样器成本仍需确认 |
 | Phantom 1.3B/14B | 人/动物/物体主体泛化对照 | 权重与推理 | 训练仍 TODO；时间线不是原生输入 |
 | Wan2.2 I2V A14B + DiffSynth | 后续质量/容量升级 | 基座推理与框架训练能力 | 高/低噪声 LoRA、身份条件、分片和40GB适配 |
 | ReactID | Track 2 研究参考 | 论文与门禁数据 | 当前未核到可直接下载的官方代码/权重，不作为唯一运行前提 |
@@ -26,7 +26,7 @@
 | [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio) | `4e3496991455b300fd60ab023113422cd16899f5` |
 | [ConsisID](https://github.com/PKU-YuanGroup/ConsisID) | `60429e4b0d24d36ce8df7fb58f7ab42b86e2b70e` |
 | [Stand-In](https://github.com/WeChatCV/Stand-In) | `e351224366be169076e94af1454115d91d458313` |
-| [AnyID](https://github.com/JoHnneyWang/AnyID) | `239fa15a401ff4f1abcbd90ead4a57d5505e87e2` |
+| [AnyID](https://github.com/JoHnneyWang/AnyID) | 当前8条试跑使用 `6c714f71af6e08d2af29aecd74a3a9fd9e8f94a3`；初始调研版本 `239fa15a401ff4f1abcbd90ead4a57d5505e87e2` |
 | [Phantom](https://github.com/Phantom-video/Phantom) | `bd84b602dcc949e23c89cbbf266b6f5975f2f025` |
 | [Wan2.2](https://github.com/Wan-Video/Wan2.2) | `1ea34ff48f87168174e12956e200b1d908b1c5ff` |
 | [Wan2.1 VACE 1.3B 权重](https://huggingface.co/Wan-AI/Wan2.1-VACE-1.3B) | `574e6a744642ce3bee319afc31496b88bde8aac4` |
