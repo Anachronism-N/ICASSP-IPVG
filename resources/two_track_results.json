@@ -3,7 +3,6 @@
   "status": "finite_two_track_experiments_completed",
   "full_environment_cpu_tests_passed": 203,
   "independent_aggregate_recalculation_completed": true,
-  "full_environment_cpu_tests_passed": 203,
   "independent_cpu_metric_recalculation_matches": true,
   "track1": {
     "model": "AnyID preview LoRA over Wan2.2 TI2V-5B",
