@@ -1,0 +1,23 @@
+{
+  "time": "2026-10-17 19:27:39",
+  "models": {
+    "0.3": {
+      "keys": 825,
+      "sampled_tensors": 20,
+      "max_abs_error": 0,
+      "finite": true
+    },
+    "0.5": {
+      "keys": 825,
+      "sampled_tensors": 20,
+      "max_abs_error": 0,
+      "finite": true
+    },
+    "0.7": {
+      "keys": 825,
+      "sampled_tensors": 20,
+      "max_abs_error": 0,
+      "finite": true
+    }
+  }
+}

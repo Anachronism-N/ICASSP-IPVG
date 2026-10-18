@@ -1,0 +1,47 @@
+{
+  "created_at": "2026-10-18 15:56:32 CST",
+  "n_scenarios": 66,
+  "views_per_scenario": 3,
+  "bootstrap": 5000,
+  "seed": 20261018,
+  "observed": {
+    "m_full1_a05": 28.16985202416532,
+    "base": 30.13037868892134,
+    "round4": 27.326697526382866,
+    "full1": 24.81923763151294,
+    "ft2": 28.337988402338148
+  },
+  "paired": {
+    "m_full1_a05 minus base": {
+      "delta": -1.9605266647560207,
+      "ci95": [
+        -3.5322503115680646,
+        -0.5816632284169991
+      ]
+    },
+    "m_full1_a05 minus round4": {
+      "delta": 0.8431544977824537,
+      "ci95": [
+        -1.409250817689554,
+        3.0613487286907457
+      ]
+    },
+    "m_full1_a05 minus full1": {
+      "delta": 3.3506143926523784,
+      "ci95": [
+        1.798039046096908,
+        5.137658842215413
+      ]
+    },
+    "m_full1_a05 minus ft2": {
+      "delta": -0.16813637817282867,
+      "ci95": [
+        -1.9301471511310933,
+        1.4624183940031052
+      ]
+    }
+  },
+  "formula_validation": "Point values match official metrics and first 3 resamples per model match IQTable recomputation within1e-8",
+  "protocol": "Original raw, fixed generated seed; complete 3-view scenario groups paired",
+  "caveat": "Intervals only reflect this fixed case/seed sample; no generation/seed/judge/training variability, no causal claim; multiple comparisons unadjusted."
+}

@@ -1,0 +1,51 @@
+{
+  "DreamSim_ft2_minus_base": {
+    "n": 108,
+    "delta": -0.002428602473235426,
+    "ci95": [
+      -0.005717723345223036,
+      0.000787782841534523
+    ]
+  },
+  "WMB_ft2_minus_base": {
+    "n": 350,
+    "delta": -0.15142857142857144,
+    "ci95": [
+      -0.28285714285714286,
+      -0.02850000000000104
+    ]
+  },
+  "DreamSim_ft2_minus_round4": {
+    "n": 108,
+    "delta": 0.015291604270905625,
+    "ci95": [
+      0.006688607212753945,
+      0.02467901255981421
+    ]
+  },
+  "WMB_ft2_minus_round4": {
+    "n": 350,
+    "delta": 1.0457142857142858,
+    "ci95": [
+      0.8685714285714285,
+      1.22
+    ]
+  },
+  "VBench_points_ft2_minus_base": {
+    "n": 355,
+    "ci95": [
+      -0.2305875907861658,
+      0.15048665273515513
+    ],
+    "bootstrap_mean_delta": -0.040006902667848634
+  },
+  "VBench_points_ft2_minus_round4": {
+    "n": 355,
+    "ci95": [
+      0.08566440138898805,
+      0.6161639437118985
+    ],
+    "bootstrap_mean_delta": 0.3519902398872489
+  },
+  "caveat": "Paired bootstrap over cases for the one generated seed; not seed variance, no guarantee on future prompts, no causal isolation of training changes."
+}

@@ -1,0 +1,169 @@
+diff --git a/diffsynth/core/data/unified_dataset.py b/diffsynth/core/data/unified_dataset.py
+index aed4975..a13498d 100644
+--- a/diffsynth/core/data/unified_dataset.py
++++ b/diffsynth/core/data/unified_dataset.py
+@@ -1,5 +1,5 @@
+ from .operators import *
+-import torch, json, pandas
++import torch, json, pandas, time
+ 
+ 
+ class UnifiedDataset(torch.utils.data.Dataset):
+@@ -91,13 +91,25 @@ class UnifiedDataset(torch.utils.data.Dataset):
+             data = self.cached_data[data_id % len(self.cached_data)]
+             data = self.cached_data_operator(data)
+         else:
+-            data = self.data[data_id % len(self.data)].copy()
+-            for key in self.data_file_keys:
+-                if key in data:
+-                    if key in self.special_operator_map:
+-                        data[key] = self.special_operator_map[key](data[key])
+-                    elif key in self.data_file_keys:
+-                        data[key] = self.main_data_operator(data[key])
++            # Robust loading. Read failures on the shared fuse mount come in bursts (several
++            # consecutive files fail for a few seconds), and one exception kills every DDP rank, so:
++            # retry with backoff (up to ~3 min total), moving to the next item after each failure.
++            for attempt in range(12):
++                try:
++                    data = self.data[(data_id + attempt) % len(self.data)].copy()
++                    for key in self.data_file_keys:
++                        if key in data:
++                            if key in self.special_operator_map:
++                                data[key] = self.special_operator_map[key](data[key])
++                            elif key in self.data_file_keys:
++                                data[key] = self.main_data_operator(data[key])
++                    break
++                except Exception as e:
++                    if attempt == 11:
++                        raise
++                    print(f"[UnifiedDataset] load failed for item {data_id + attempt} "
++                          f"(attempt {attempt + 1}/12): {e}", flush=True)
++                    time.sleep(min(30, 2 ** attempt))
+         return data
+ 
+     def __len__(self):
+diff --git a/diffsynth/diffusion/parsers.py b/diffsynth/diffusion/parsers.py
+index cc19051..bfddb6c 100644
+--- a/diffsynth/diffusion/parsers.py
++++ b/diffsynth/diffusion/parsers.py
+@@ -37,6 +37,9 @@ def add_training_config(parser: argparse.ArgumentParser):
+     parser.add_argument("--trainable_models", type=str, default=None, help="Models to train, e.g., dit, vae, text_encoder.")
+     parser.add_argument("--find_unused_parameters", default=False, action="store_true", help="Whether to find unused parameters in DDP.")
+     parser.add_argument("--weight_decay", type=float, default=0.01, help="Weight decay.")
++    parser.add_argument("--lr_scheduler", type=str, default="constant", choices=["constant", "cosine"], help="constant, or linear warmup + cosine decay to --min_lr_ratio * lr over the run.")
++    parser.add_argument("--lr_warmup_steps", type=int, default=0, help="Warmup steps (cosine scheduler only).")
++    parser.add_argument("--min_lr_ratio", type=float, default=0.0, help="Final lr as a fraction of --learning_rate (cosine scheduler only).")
+     parser.add_argument("--task", type=str, default="sft", required=False, help="Task type.")
+     parser.add_argument("--customized_optimizer", type=str, default=None, help="Customized optimizer, e.g., `bitsandbytes.optim.Adam8bit` and `torch.optim.Adam`. The default optimizer is `torch.optim.AdamW`.")
+     return parser
+diff --git a/diffsynth/diffusion/runner.py b/diffsynth/diffusion/runner.py
+index 0e2c921..ca58197 100644
+--- a/diffsynth/diffusion/runner.py
++++ b/diffsynth/diffusion/runner.py
+@@ -63,8 +63,28 @@ def launch_training_task(
+ 
+     optimizer_class = get_optimizer_class(customized_optimizer)
+     optimizer = optimizer_class(model.trainable_modules(), lr=learning_rate, weight_decay=weight_decay)
+-    scheduler = torch.optim.lr_scheduler.ConstantLR(optimizer)
+     dataloader = torch.utils.data.DataLoader(dataset, shuffle=True, collate_fn=lambda x: x[0], num_workers=num_workers)
++    if getattr(args, "lr_scheduler", "constant") == "cosine":
++        import math
++        # accelerate's AcceleratedScheduler calls scheduler.step() num_processes times per optimizer
++        # step (split_batches=False), so count in those units: the un-sharded dataloader length.
++        # Under DeepSpeed the engine itself steps the scheduler once per optimizer step (accelerate's
++        # DeepSpeedSchedulerWrapper.step is a no-op), so count in optimizer steps there.
++        from accelerate.utils import DistributedType
++        k = 1 if accelerator.distributed_type == DistributedType.DEEPSPEED else accelerator.num_processes
++        total = max(1, num_epochs * math.ceil(len(dataloader) / accelerator.num_processes) * k)
++        warm, floor = args.lr_warmup_steps * k, args.min_lr_ratio
++
++        def lr_lambda(step):
++            if step < warm:
++                return (step + 1) / warm
++            p = min(1.0, (step - warm) / max(1, total - warm))
++            return floor + (1 - floor) * 0.5 * (1 + math.cos(math.pi * p))
++        scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
++        if accelerator.is_main_process:
++            print(f"[lr] cosine: total_steps={total} warmup={warm} min_lr_ratio={floor}", flush=True)
++    else:
++        scheduler = torch.optim.lr_scheduler.ConstantLR(optimizer)
+ 
+     if enable_model_cpu_offload:
+         optimizer, dataloader, scheduler = accelerator.prepare(optimizer, dataloader, scheduler)
+diff --git a/diffsynth/pipelines/wan_video.py b/diffsynth/pipelines/wan_video.py
+index c1e4dfb..870b8da 100644
+--- a/diffsynth/pipelines/wan_video.py
++++ b/diffsynth/pipelines/wan_video.py
+@@ -186,6 +186,15 @@ class WanVideoPipeline(BasePipeline):
+         return pipe
+ 
+ 
++    @staticmethod
++    def zero_star_guidance(positive, negative, scale):
++        pos, neg = positive.float(), negative.float()
++        axes = tuple(range(1, pos.ndim))
++        optimal = (pos * neg).sum(dim=axes, keepdim=True) / (neg.square().sum(dim=axes, keepdim=True) + 1e-8)
++        scaled_negative = optimal * neg
++        return (scaled_negative + scale * (pos - scaled_negative)).to(positive.dtype)
++
++
+     @torch.no_grad()
+     def __call__(
+         self,
+@@ -237,6 +246,8 @@ class WanVideoPipeline(BasePipeline):
+         # Classifier-free guidance
+         cfg_scale: float = 5.0,
+         cfg_merge: bool = False,
++        cfg_zero_star: bool = False,
++        cfg_zero_steps: int = 0,
+         # Boundary
+         switch_DiT_boundary: float = 0.875,
+         # Scheduler
+@@ -267,6 +278,10 @@ class WanVideoPipeline(BasePipeline):
+         progress_bar_cmd=tqdm,
+         output_type: Literal["quantized", "floatpoint"] = "quantized",
+     ):
++        if cfg_zero_steps < 0 or cfg_zero_steps > num_inference_steps:
++            raise ValueError("cfg_zero_steps must be between 0 and num_inference_steps")
++        if cfg_zero_steps and not cfg_zero_star:
++            raise ValueError("cfg_zero_steps requires cfg_zero_star=True")
+         # Scheduler
+         self.scheduler.set_timesteps(num_inference_steps, denoising_strength=denoising_strength, shift=sigma_shift)
+         
+@@ -326,9 +341,14 @@ class WanVideoPipeline(BasePipeline):
+                     noise_pred_posi, noise_pred_nega = noise_pred_posi.chunk(2, dim=0)
+                 else:
+                     noise_pred_nega = self.model_fn(**models, **inputs_shared, **inputs_nega, timestep=timestep)
+-                noise_pred = noise_pred_nega + cfg_scale * (noise_pred_posi - noise_pred_nega)
++                if cfg_zero_star:
++                    noise_pred = self.zero_star_guidance(noise_pred_posi, noise_pred_nega, cfg_scale)
++                else:
++                    noise_pred = noise_pred_nega + cfg_scale * (noise_pred_posi - noise_pred_nega)
+             else:
+                 noise_pred = noise_pred_posi
++            if cfg_zero_star and progress_id < cfg_zero_steps:
++                noise_pred = torch.zeros_like(noise_pred)
+ 
+             # Scheduler
+             inputs_shared["latents"] = self.scheduler.step(noise_pred, self.scheduler.timesteps[progress_id], inputs_shared["latents"])
+diff --git a/examples/wanvideo/model_training/train.py b/examples/wanvideo/model_training/train.py
+index ce8fedc..5807695 100644
+--- a/examples/wanvideo/model_training/train.py
++++ b/examples/wanvideo/model_training/train.py
+@@ -37,7 +37,6 @@ class WanTrainingModule(DiffusionTrainingModule):
+         audio_processor_config = self.parse_path_or_model_id(audio_processor_path)
+         self.pipe = WanVideoPipeline.from_pretrained(torch_dtype=torch.bfloat16, device=device, model_configs=model_configs, tokenizer_config=tokenizer_config, audio_processor_config=audio_processor_config)
+         self.pipe = self.split_pipeline_units(task, self.pipe, trainable_models, lora_base_model)
+-        self.resume_from_checkpoint(resume_from_checkpoint, remove_prefix_in_ckpt)
+         
+         # Training mode
+         self.switch_pipe_to_training_mode(
+@@ -46,6 +45,8 @@ class WanTrainingModule(DiffusionTrainingModule):
+             preset_lora_path, preset_lora_model,
+             task=task,
+         )
++        # Resume AFTER LoRA layers are injected, otherwise LoRA keys are unexpected
++        self.resume_from_checkpoint(resume_from_checkpoint, remove_prefix_in_ckpt)
+         
+         # Store other configs
+         self.use_gradient_checkpointing = use_gradient_checkpointing

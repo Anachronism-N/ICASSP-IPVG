@@ -1,0 +1,8 @@
+*.mp4
+*.safetensors
+*.pth
+*.tar
+*.log
+__pycache__/
+cookies*
+.git/config

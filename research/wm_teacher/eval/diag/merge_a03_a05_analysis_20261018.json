@@ -1,0 +1,531 @@
+{
+  "created_at": "2026-10-18 20:41:32 CST",
+  "models": [
+    "m_full1_a03",
+    "m_full1_a05"
+  ],
+  "references": {
+    "base": "base",
+    "round4": "R4",
+    "full1": "FT1",
+    "ft2": "FT2"
+  },
+  "bootstrap": 5000,
+  "seed": 20261018,
+  "confidence_interval": "paired percentile 95%; identical row indices for every model",
+  "gtref": {
+    "n_cases": 108,
+    "case_ids": [
+      "celebvhq__-jiQdqoe1cU_w019",
+      "celebvhq__AD35pIGtiUY_w031",
+      "celebvhq__GSwNuK9xedg_w025",
+      "celebvhq__HV4tgr2lhec_w250",
+      "celebvhq__Kw8jKvJEVTk_w112",
+      "celebvhq__PepoBfMwpfc_w084",
+      "celebvhq__SaUYfjxV8Ic_w029",
+      "celebvhq__VWX9yxvtjxo_w024",
+      "celebvhq__qvo_HDqOKww_w009",
+      "celebvhq__rV7FQaAf4nc_w061",
+      "charades__40NIM_1280x704_24fps_w005",
+      "charades__4EM25_1280x704_24fps_w002",
+      "charades__4HZ3B_1280x704_24fps_w000",
+      "charades__4T97L_1280x704_24fps_w002",
+      "charades__6SY30_1280x704_24fps_w003",
+      "charades__C3JAS_1280x704_24fps_w007",
+      "charades__S673O_1280x704_24fps_w005",
+      "charades__XIUQJ_1280x704_24fps_w005",
+      "charades__ZC8L5_1280x704_24fps_w001",
+      "charades__ZP5TG_1280x704_24fps_w007",
+      "direct__ADT_Apartment_release_multiuser_meal_seq135_M1292_preview_rgb_w000",
+      "direct__ADT_Apartment_release_multiuser_meal_seq136_M1292_preview_rgb_w004",
+      "direct__AriaEverydayActivities_1.0.0_loc2_script4_seq7_rec1_preview_rgb_w018",
+      "direct__AriaEverydayActivities_1.0.0_loc2_script5_seq1_rec1_preview_rgb_w021",
+      "direct__Hot3DAria_v4.0.0_P0012_44c5f677_preview_rgb_w011",
+      "direct__Hot3DAria_v4.0.0_P0020_39f7c9d8_preview_rgb_w011",
+      "direct__Hot3DQuest_v4.0.0_P0003_20a97e64_preview_rgb_w005",
+      "direct__Hot3DQuest_v4.0.0_P0005_a41b2415_preview_rgb_w004",
+      "direct__Hot3DQuest_v4.0.0_P0013_b6ee6ae4_preview_rgb_w015",
+      "direct__Hot3DQuest_v4.0.0_P0017_d52cdc84_preview_rgb_w013",
+      "easycom__01-00-280_1280x704_24fps_w006",
+      "easycom__01-00-280_1280x704_24fps_w007",
+      "easycom__16-00-520_1280x704_24fps_w000",
+      "easycom__16-00-520_1280x704_24fps_w010",
+      "easycom__19-00-530_1280x704_24fps_w002",
+      "easycom__19-00-530_1280x704_24fps_w008",
+      "easycom__23-00-586_1280x704_24fps_w000",
+      "easycom__23-00-586_1280x704_24fps_w004",
+      "easycom__23-00-599_1280x704_24fps_w003",
+      "easycom__23-00-599_1280x704_24fps_w004",
+      "h2o__subject1_ego_h1_0_cam4_w000",
+      "h2o__subject1_ego_h1_0_cam4_w001",
+      "hoigen1m__72JtNUzI3sg-0_00_42.440-0_00_53.440_w000",
+      "hoigen1m__IGFwscZ17bo-0_01_11.480-0_01_59.480_w006",
+      "hoigen1m__VwtT2bUIPCc-0_19_10.800-0_19_19.200_w000",
+      "hoigen1m__ZkjQ82KDyBA-0_13_24.036-0_13_35.714_w001",
+      "hoigen1m__aDXyvTJSvJE-0_07_17.453-0_07_34.187_w001",
+      "hoigen1m__coyQRGJCrW4-0_02_26.279-0_02_37.040_w000",
+      "hoigen1m__elxNMZKQ4b0-0_03_39.135-0_03_46.184_w000",
+      "hoigen1m__gqe69z-4QqU-0_00_44.586-0_00_50.759_w000",
+      "hoigen1m__hclNa99dFsU-0_04_16.600-0_04_27.320_w000",
+      "hoigen1m__jP3E0XTermg-0_06_00.016-0_06_09.333_w000",
+      "matrix__part_0_2024-06-03_23-43-07_000028_w001",
+      "matrix__part_0_2024-06-03_23-52-38_000029_w001",
+      "matrix__part_1003_2024-07-05_17-06-38_000016_w001",
+      "matrix__part_1009_2024-07-05_21-24-29_000049_w001",
+      "matrix__part_100_2024-06-05_21-09-39_000048_w000",
+      "matrix__part_100_2024-06-05_21-10-55_000004_w000",
+      "matrix__part_101_2024-06-05_21-24-11_000001_w001",
+      "matrix__part_10_2024-06-04_03-40-21_000030_w000",
+      "matrix__part_10_2024-06-04_03-47-36_000016_w001",
+      "matrix__part_10_2024-06-04_03-50-45_000032_w001",
+      "mira__dataset_wan22_training_mira_processed_2026-05-09T14-02-04Z-a3d773_p1_c00000_w012",
+      "mira__dataset_wan22_training_mira_processed_2026-05-09T18-31-19Z-193c23_p3_c00000_w075",
+      "mira__dataset_wan22_training_mira_processed_2026-05-10T22-54-22Z-1269bd_p3_c00000_w009",
+      "mira__dataset_wan22_training_mira_processed_2026-05-11T00-23-32Z-c3c0c1_p2_c00000_w042",
+      "mira__dataset_wan22_training_mira_processed_2026-05-11T09-27-04Z-446903_p1_c00000_w024",
+      "mira__dataset_wan22_training_mira_processed_2026-05-11T16-26-10Z-a52514_p1_c00000_w070",
+      "mira__dataset_wan22_training_mira_processed_2026-05-12T01-34-39Z-64c1b0_p1_c00000_w007",
+      "mira__dataset_wan22_training_mira_processed_2026-05-13T19-17-59Z-915c7e_p0_c00000_w031",
+      "mira__dataset_wan22_training_mira_processed_2026-05-13T19-48-07Z-fe1e4c_p3_c00000_w087",
+      "mira__dataset_wan22_training_mira_processed_2026-05-13T22-55-09Z-925586_p0_c00000_w001",
+      "noxi__017_expert_w046",
+      "noxi__017_expert_w073",
+      "noxi__017_expert_w187",
+      "noxi__039_expert_w046",
+      "noxi__039_expert_w056",
+      "noxi__039_expert_w064",
+      "noxi__070_expert_w047",
+      "noxi__070_expert_w060",
+      "noxi__070_expert_w093",
+      "noxi__070_expert_w097",
+      "openvidhd__OpenVidHD_part_10.zip_rmLEXpv6YRg_29_55to308_w000",
+      "openvidhd__OpenVidHD_part_11.zip_a9lWoUL3Tp8_22_138to338_w000",
+      "openvidhd__OpenVidHD_part_12.zip_6pwJ4cOSdno_20_0to175_w000",
+      "openvidhd__OpenVidHD_part_12.zip_bsPPXNe4pBQ_4_0to149_w000",
+      "openvidhd__OpenVidHD_part_13.zip_hG0wWL8w7xQ_30_16to384_w000",
+      "openvidhd__OpenVidHD_part_13.zip_hG0wWL8w7xQ_30_16to384_w001",
+      "seamless__V01_S0346_I00000720_P1694_w002",
+      "seamless__V01_S0346_I00000720_P1694_w009",
+      "seamless__V01_S0346_I00000720_P1694_w010",
+      "seamless__V01_S0346_I00000720_P1694_w014",
+      "seamless__V01_S0346_I00000720_P1694_w016",
+      "seamless__V01_S0346_I00000720_P1694_w017",
+      "seamless__V01_S0346_I00000720_P1694_w023",
+      "seamless__V01_S0346_I00000720_P1694_w030",
+      "seamless__V01_S0346_I00000720_P1694_w033",
+      "seamless__V01_S0346_I00000720_P1694_w035",
+      "vfhq__Clip+ATARNwcX8QU+P3+C2+F143113-143625_w001",
+      "vfhq__Clip+FNi-n2VOBJU+P0+C2+F3435-3650_w000",
+      "vfhq__Clip+GDJeo67LqWA+P0+C2+F12062-12262_w000",
+      "vfhq__Clip+QXrS4YwG3j0+P0+C0+F9150-9366_w000",
+      "vfhq__Clip+QzHYB_3ylrE+P0+C0+F274-474_w000",
+      "vfhq__Clip+Zywnb0j4CME+P0+C2+F19360-19517_w000",
+      "vfhq__Clip+_3k4xpjlFn0+P0+C0+F1909-2147_w000",
+      "vfhq__Clip+haeb50MFuso+P0+C0+F5618-5787_w000",
+      "vfhq__Clip+qYoFlP2Z50E+P1+C2+F2860-3038_w000",
+      "vfhq__Clip+rn6CVpmmrno+P1+C0+F21853-22135_w001"
+    ],
+    "lower_is_better": [
+      "dreamsim",
+      "dreamsim_last",
+      "motion_ratio"
+    ],
+    "observed": {
+      "dreamsim": {
+        "m_full1_a03": 0.16940009019073146,
+        "m_full1_a05": 0.16556585768674625,
+        "base": 0.17463796300652584,
+        "round4": 0.1569177562623848,
+        "full1": 0.1596324783692389,
+        "ft2": 0.17220936053329047
+      },
+      "dreamsim_last": {
+        "m_full1_a03": 0.2047130537253839,
+        "m_full1_a05": 0.19522358201168202,
+        "base": 0.20868250396516588,
+        "round4": 0.18372398559693937,
+        "full1": 0.18605914380815294,
+        "ft2": 0.20771468844678667
+      },
+      "motion_ratio": {
+        "m_full1_a03": 0.9407764240044553,
+        "m_full1_a05": 0.9009528410010638,
+        "base": 0.9941611857125738,
+        "round4": 0.729800968556768,
+        "full1": 0.6719236640360768,
+        "ft2": 0.9215754328285515
+      }
+    },
+    "paired": {
+      "dreamsim": {
+        "m_full1_a03 minus base": {
+          "delta": -0.005237872815794418,
+          "ci95": [
+            -0.008755005237266975,
+            -0.0022500409779173374
+          ]
+        },
+        "m_full1_a03 minus round4": {
+          "delta": 0.012482333928346632,
+          "ci95": [
+            0.0045300005095792375,
+            0.020720754302808165
+          ]
+        },
+        "m_full1_a03 minus full1": {
+          "delta": 0.00976761182149251,
+          "ci95": [
+            0.00137647358631646,
+            0.018306506519424316
+          ]
+        },
+        "m_full1_a03 minus ft2": {
+          "delta": -0.0028092703425589925,
+          "ci95": [
+            -0.006653266086208604,
+            0.0007733787386965584
+          ]
+        },
+        "m_full1_a05 minus base": {
+          "delta": -0.0090721053197796,
+          "ci95": [
+            -0.014715062200241259,
+            -0.003860462619060725
+          ]
+        },
+        "m_full1_a05 minus round4": {
+          "delta": 0.00864810142436145,
+          "ci95": [
+            0.0030254364416095188,
+            0.014615663298532177
+          ]
+        },
+        "m_full1_a05 minus full1": {
+          "delta": 0.005933379317507329,
+          "ci95": [
+            -9.847168845159266e-05,
+            0.011948542473952701
+          ]
+        },
+        "m_full1_a05 minus ft2": {
+          "delta": -0.0066435028465441715,
+          "ci95": [
+            -0.012696948706137917,
+            -0.0006236477766507964
+          ]
+        },
+        "m_full1_a03 minus m_full1_a05": {
+          "delta": 0.0038342325039851816,
+          "ci95": [
+            -0.00027950300064719596,
+            0.008115947843287829
+          ]
+        }
+      },
+      "dreamsim_last": {
+        "m_full1_a03 minus base": {
+          "delta": -0.00396945023978198,
+          "ci95": [
+            -0.01005355837168517,
+            0.0015595797311376636
+          ]
+        },
+        "m_full1_a03 minus round4": {
+          "delta": 0.02098906812844453,
+          "ci95": [
+            0.010443403047543985,
+            0.032022748252859806
+          ]
+        },
+        "m_full1_a03 minus full1": {
+          "delta": 0.018653909917230958,
+          "ci95": [
+            0.007447931818940021,
+            0.02974872780894791
+          ]
+        },
+        "m_full1_a03 minus ft2": {
+          "delta": -0.0030016347214027687,
+          "ci95": [
+            -0.009172623411372855,
+            0.002886403117466854
+          ]
+        },
+        "m_full1_a05 minus base": {
+          "delta": -0.013458921953483863,
+          "ci95": [
+            -0.021451554571588833,
+            -0.00578059449240014
+          ]
+        },
+        "m_full1_a05 minus round4": {
+          "delta": 0.011499596414742646,
+          "ci95": [
+            0.00443191485548461,
+            0.019030991582958783
+          ]
+        },
+        "m_full1_a05 minus full1": {
+          "delta": 0.009164438203529076,
+          "ci95": [
+            0.0003399837348196243,
+            0.01776678273799243
+          ]
+        },
+        "m_full1_a05 minus ft2": {
+          "delta": -0.012491106435104652,
+          "ci95": [
+            -0.021447411110555686,
+            -0.004201118441091645
+          ]
+        },
+        "m_full1_a03 minus m_full1_a05": {
+          "delta": 0.009489471713701883,
+          "ci95": [
+            0.002679977441827456,
+            0.016713468537286467
+          ]
+        }
+      },
+      "motion_ratio": {
+        "m_full1_a03 minus base": {
+          "delta": -0.05338476170811862,
+          "ci95": [
+            -0.09522721631468617,
+            -0.014312675999635401
+          ]
+        },
+        "m_full1_a03 minus round4": {
+          "delta": 0.21097545544768737,
+          "ci95": [
+            0.11029854622823675,
+            0.32229814270923063
+          ]
+        },
+        "m_full1_a03 minus full1": {
+          "delta": 0.2688527599683786,
+          "ci95": [
+            0.15809353594237685,
+            0.39127675932676736
+          ]
+        },
+        "m_full1_a03 minus ft2": {
+          "delta": 0.019200991175904042,
+          "ci95": [
+            -0.02349987364900089,
+            0.06419437466807708
+          ]
+        },
+        "m_full1_a05 minus base": {
+          "delta": -0.09320834471151027,
+          "ci95": [
+            -0.1538628011188395,
+            -0.034126619745312524
+          ]
+        },
+        "m_full1_a05 minus round4": {
+          "delta": 0.17115187244429567,
+          "ci95": [
+            0.07107906003134908,
+            0.27920360230047075
+          ]
+        },
+        "m_full1_a05 minus full1": {
+          "delta": 0.2290291769649869,
+          "ci95": [
+            0.12013283387902192,
+            0.3516730703086904
+          ]
+        },
+        "m_full1_a05 minus ft2": {
+          "delta": -0.02062259182748761,
+          "ci95": [
+            -0.07596607341625197,
+            0.03762016716744446
+          ]
+        },
+        "m_full1_a03 minus m_full1_a05": {
+          "delta": 0.039823583003391665,
+          "ci95": [
+            0.008449917413156536,
+            0.07194379044967437
+          ]
+        }
+      }
+    }
+  },
+  "physics": {
+    "n_scenarios": 66,
+    "views_per_scenario": 3,
+    "scenario_ids": [
+      "trimmed-ball-and-block-fall.mp4",
+      "trimmed-ball-behind-rotating-paper.mp4",
+      "trimmed-ball-hits-duck.mp4",
+      "trimmed-ball-hits-nothing.mp4",
+      "trimmed-ball-in-basket.mp4",
+      "trimmed-ball-in-sand.mp4",
+      "trimmed-ball-ramp.mp4",
+      "trimmed-ball-rolls-off.mp4",
+      "trimmed-ball-rolls-on-glass.mp4",
+      "trimmed-ball-train.mp4",
+      "trimmed-balls-collide.mp4",
+      "trimmed-block-domino.mp4",
+      "trimmed-blow-balloon.mp4",
+      "trimmed-cut-orange.mp4",
+      "trimmed-cut-paper.mp4",
+      "trimmed-domino-in-juice.mp4",
+      "trimmed-dominos-with-space.mp4",
+      "trimmed-double-cradle.mp4",
+      "trimmed-duck-and-dominos.mp4",
+      "trimmed-duck-falls-in-box.mp4",
+      "trimmed-duck-static.mp4",
+      "trimmed-fill-glass-red-drink.mp4",
+      "trimmed-glass-stays-same.mp4",
+      "trimmed-juice-in-water.mp4",
+      "trimmed-light-on-block.mp4",
+      "trimmed-light-on-mug-block.mp4",
+      "trimmed-light-on-mug.mp4",
+      "trimmed-light-on-statue.mp4",
+      "trimmed-liquid-on-duck.mp4",
+      "trimmed-liquid-overfill.mp4",
+      "trimmed-lit-candle.mp4",
+      "trimmed-magnet-domino.mp4",
+      "trimmed-magnet-transparent-peakaboo.mp4",
+      "trimmed-magnet-wrench.mp4",
+      "trimmed-marble-run-x.mp4",
+      "trimmed-marble-run-y.mp4",
+      "trimmed-match-blows-balloon.mp4",
+      "trimmed-match.mp4",
+      "trimmed-mirror-ball-fall.mp4",
+      "trimmed-mirror-ball-rotate.mp4",
+      "trimmed-mirror-teapot-rotate.mp4",
+      "trimmed-mug-breaks.mp4",
+      "trimmed-napkin-soak.mp4",
+      "trimmed-paint-on-glass.mp4",
+      "trimmed-paper-fall-water.mp4",
+      "trimmed-paper-in-water.mp4",
+      "trimmed-paper-smoke.mp4",
+      "trimmed-potato-in-water.mp4",
+      "trimmed-roll-behind-box.mp4",
+      "trimmed-roll-front-box.mp4",
+      "trimmed-roll-in-box.mp4",
+      "trimmed-rolling-reflection.mp4",
+      "trimmed-silk-cover.mp4",
+      "trimmed-single-cradle.mp4",
+      "trimmed-siphon.mp4",
+      "trimmed-smiley-ball-rotates.mp4",
+      "trimmed-solid-ball-peakaboo.mp4",
+      "trimmed-stable-blocks.mp4",
+      "trimmed-teapot-rotates.mp4",
+      "trimmed-two-balls-pass.mp4",
+      "trimmed-unstable-block-stack.mp4",
+      "trimmed-water-in-juice.mp4",
+      "trimmed-weight-on-ceramic.mp4",
+      "trimmed-weight-on-paper.mp4",
+      "trimmed-weight-on-pillow.mp4",
+      "trimmed-weight-protects-duck.mp4"
+    ],
+    "protocol": "Original raw 120f@24 pad/smear/crf12; complete three-view groups",
+    "units": "100 * unrounded final_score_orig; delta in percentage points; higher is better",
+    "formula_validation": {
+      "iqtable_point_matches_saved_metric_abs_tolerance": 1e-08,
+      "iqtable_resamples_checked_per_model": 3
+    },
+    "observed": {
+      "m_full1_a03": 29.63415725077075,
+      "m_full1_a05": 28.16985202416532,
+      "base": 30.13037868892134,
+      "round4": 27.326697526382866,
+      "full1": 24.819237631512944,
+      "ft2": 28.337988402338148
+    },
+    "paired": {
+      "m_full1_a03 minus base": {
+        "delta": -0.4962214381505916,
+        "ci95": [
+          -1.5527308563070243,
+          0.5088666210492216
+        ]
+      },
+      "m_full1_a03 minus round4": {
+        "delta": 2.3074597243878827,
+        "ci95": [
+          -0.22947702705609332,
+          4.942135759895517
+        ]
+      },
+      "m_full1_a03 minus full1": {
+        "delta": 4.814919619257804,
+        "ci95": [
+          2.7407684820153824,
+          7.114853250809769
+        ]
+      },
+      "m_full1_a03 minus ft2": {
+        "delta": 1.2961688484326004,
+        "ci95": [
+          0.0646736532275927,
+          2.496352230905868
+        ]
+      },
+      "m_full1_a05 minus base": {
+        "delta": -1.9605266647560207,
+        "ci95": [
+          -3.5322503115680646,
+          -0.5816632284169991
+        ]
+      },
+      "m_full1_a05 minus round4": {
+        "delta": 0.8431544977824537,
+        "ci95": [
+          -1.409250817689554,
+          3.0613487286907457
+        ]
+      },
+      "m_full1_a05 minus full1": {
+        "delta": 3.350614392652375,
+        "ci95": [
+          1.798039046096908,
+          5.137658842215413
+        ]
+      },
+      "m_full1_a05 minus ft2": {
+        "delta": -0.16813637817282867,
+        "ci95": [
+          -1.9301471511310933,
+          1.4624183940031052
+        ]
+      },
+      "m_full1_a03 minus m_full1_a05": {
+        "delta": 1.464305226605429,
+        "ci95": [
+          0.03063719419382683,
+          3.105535336334339
+        ]
+      }
+    }
+  },
+  "source_sha256": {
+    "eval/wm_bench/cases.jsonl": "66dc6e46338987058593af761e3d3b7f23dfd40d26f8231d8a9dcf50fce56f8d",
+    "Physics-IQ/descriptions/descriptions_original.csv": "66dbe342affda20d4abb76579a36d985cb7e221b5b6eae571069f50f155c37fc",
+    "eval/wm_bench/gtref_m_full1_a03.json": "d333d34161943fe770bc84346e71860661499a144c477d1e5cdce83e0492272b",
+    "eval/physiq/results/physics-IQ-benchmark/results/m_full1_a03-op-run_01.csv": "48947f551d5062e89253e16b3c8b13418de97271b2554e6609f8551bc2f12106",
+    "eval/physiq/results/physics-IQ-benchmark/results/m_full1_a03-op-run_01_metrics.json": "b0c8317241e94799986483b3c11d6f552c4672c7e333eaf9894b13dcc11521f1",
+    "eval/wm_bench/gtref_m_full1_a05.json": "f25e398d633719dc53faf86104b6eb44d23824f523c255913775183d7193ceb6",
+    "eval/physiq/results/physics-IQ-benchmark/results/m_full1_a05-op-run_01.csv": "f838182daec1be0e3ea8afcd76b5ca3c3ee888a28c56a71116a93df8b73cecee",
+    "eval/physiq/results/physics-IQ-benchmark/results/m_full1_a05-op-run_01_metrics.json": "99e2de4890cc021d21219b20b7c621587a5a1fc36234bfe1804a968bb0be9fe9",
+    "eval/wm_bench/gtref_base.json": "a0172348ef35560618992f64e9c9353932c7646521e2c19ebf24f2450a394cbb",
+    "eval/physiq/results/physics-IQ-benchmark/results/base-op-run_01.csv": "a4de9545792faa3d39e98905887cb2921a5d48fb73defee13d06f5bea479e606",
+    "eval/physiq/results/physics-IQ-benchmark/results/base-op-run_01_metrics.json": "9ee444561e04dd3fede81cee516a78f04263064e47b2152e10cacfe730ed126b",
+    "eval/wm_bench/gtref_round4.json": "9731588d03073933da3e543dd1c89e5deea438c6fcd9af1d794243bba08be2ab",
+    "eval/physiq/results/physics-IQ-benchmark/results/round4-op-run_01.csv": "590159b8f04f2818ee51063081c40deb148a62991f22a8bbf07e8ba5e0a6a73a",
+    "eval/physiq/results/physics-IQ-benchmark/results/round4-op-run_01_metrics.json": "4e11e225590810c2ac7ec0de3a82615e8dcb2893d5827686ef64b35de9b767a4",
+    "eval/wm_bench/gtref_full1.json": "fd43a7f6ab024d59a1168aa82d7638944eb860831319dcc99fc960e144aa3016",
+    "eval/physiq/results/physics-IQ-benchmark/results/full1-op-run_01.csv": "3894a17bcae60e6d8763a506fe967c4267f80b158e1704a2dfd982ab443e577c",
+    "eval/physiq/results/physics-IQ-benchmark/results/full1-op-run_01_metrics.json": "ce126f573a00d81ad3f5fa39b816eae48392e494146e9fd028bbe0118276dec6",
+    "eval/wm_bench/gtref_ft2.json": "53b86b4404f36b013aef5dd7f64612fe626a857d378baee1b66667c472a7e9c4",
+    "eval/physiq/results/physics-IQ-benchmark/results/ft2-op-run_01.csv": "dade0240d116ac743d1f7a7e97fd02d2159d3573085d545f75a469c60051b801",
+    "eval/physiq/results/physics-IQ-benchmark/results/ft2-op-run_01_metrics.json": "25b5255b8eab523cdc847e6e0fe79fcc0379404230caedb4c11b9b2ebd544fb1"
+  },
+  "caveat": "Fixed generated seed and paired case/scenario percentile bootstrap only; no source-cluster, generation-seed, training or judge variability. Multiple comparisons are unadjusted. This is neither causal training evidence nor WMB/VBench/validation-loss/full-evaluation/Teacher acceptance."
+}

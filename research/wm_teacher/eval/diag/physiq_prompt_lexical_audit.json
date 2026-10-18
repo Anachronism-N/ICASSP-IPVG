@@ -1,0 +1,39 @@
+{
+  "n_cases": 198,
+  "lexical_flags": 4,
+  "caveat": "Lexical omission flags only; synonyms and image-based additions require human review. Not a semantic ground-truth score.",
+  "flags": [
+    {
+      "id": "0053",
+      "missing_terms": [
+        "metal"
+      ],
+      "raw": "A Newton's cradle device on the table and two of the metal balls are held up by a blue handled grabber tool. The claw releases the two balls. Static shot with no camera movement.",
+      "expanded": "On a light wooden table against a plain off-white wall, a chrome Newton\u2019s cradle with a black base sits centered in frame, its five polished steel balls suspended by thin wires. To the left, a blue-handled grabber tool with black grips holds two of the balls aloft, slightly separated from the stationary trio. The scene is evenly lit with soft, natural light casting gentle shadows beneath the cradle and tool. At the start, the grabber\u2019s claw gently releases the two held balls, which swing forward in unison toward the resting balls. Upon impact, the two balls on the far right arc outward with equal momentum, while the released pair come to a near halt. The swinging balls then rebound back, repeating the transfer of motion in a smooth, rhythmic oscillation. The camera remains completely still throughout, capturing the entire sequence from a straight-on, eye-level perspective that emphasizes the symmetry and physics of the motion."
+    },
+    {
+      "id": "0150",
+      "missing_terms": [
+        "grey"
+      ],
+      "raw": "A small white lampshade is on a light wood surface. A grey tennis ball rolls out of the black tube sitting on the table and rolls on the table towards the right. Static shot with no camera movement.",
+      "expanded": "A static, eye-level shot captures a light-colored wooden table surface under soft, diffuse indoor lighting. In the upper left corner, a black cylindrical tube rests on the table, while a plain white rectangular box sits near the top center. A small, brown spherical object, appearing to be a tennis ball, is captured in motion, rolling from the left side of the frame toward the right. The ball moves with a smooth, continuous trajectory across the wood grain, leaving a slight motion blur that indicates its speed. The background features a dark area behind the tube and a yellowish wall or surface behind the white box. The camera remains completely still throughout the sequence, maintaining a fixed perspective on the scene as the ball traverses the table from the vicinity of the black tube toward the open space on the right."
+    },
+    {
+      "id": "0160",
+      "missing_terms": [
+        "metal"
+      ],
+      "raw": "A Newton's cradle device on the table and one of the metal balls is held up by a blue handled grabber tool. The claw releases the ball. Static shot with no camera movement.",
+      "expanded": "A Newton's cradle sits on a light wooden table against a plain white wall, illuminated by soft, even indoor lighting that highlights the metallic sheen of the apparatus. The device features a polished chrome frame with a black base, supporting five suspended steel balls. On the left, a blue-handled grabber tool with black plastic claws holds the outermost ball, lifting it slightly away from the stationary row. The claw gently opens, releasing the ball, which swings down and strikes the line of balls. The impact travels through the stationary spheres, causing the ball on the far right to swing outward in a smooth arc before swinging back. The camera remains completely static throughout, maintaining a steady, eye-level view of the entire scene without any movement or zoom."
+    },
+    {
+      "id": "0161",
+      "missing_terms": [
+        "metal"
+      ],
+      "raw": "A Newton's cradle device on the table and one of the metal balls is held up by a blue handled grabber tool. The claw releases the ball. Static shot with no camera movement.",
+      "expanded": "A Newton's cradle device sits centered on a light wooden table, its chrome frame gleaming under soft, even lighting against a plain off-white wall. Five polished steel balls hang in a neat row from thin wires, their reflections visible on the black base below. To the left, a blue and black grabber tool holds the leftmost ball slightly raised, poised for release. The claw gently opens, letting the ball drop into the line. It strikes the stationary balls, transmitting force through the row until the rightmost ball swings outward in a smooth arc before returning. The motion repeats briefly as the balls collide and rebound, gradually slowing. The camera remains fixed throughout, capturing the entire sequence from a steady, eye-level perspective with no movement, focusing entirely on the mechanical interaction of the cradle and the subtle motion of the released ball."
+    }
+  ]
+}

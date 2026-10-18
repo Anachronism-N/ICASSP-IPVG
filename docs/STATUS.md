@@ -33,3 +33,7 @@
 源码commit、固定模型revision、数据/split/hash、seed、每run超时与GPU小时、产物校验、代理指标协议与失败原因均在本地台账留存。公共仓库只发布代码、方案、许可说明及聚合结论，不含真实媒体、embedding、私有路径或原始身份清单。
 
 会议/赛事时间及已确认与未确认事项见 [RULES_AND_DATA.md](RULES_AND_DATA.md)。参赛报告不自动等于CCF B Full/Regular论文；不承诺录用。
+
+## 独立Wan5B Teacher实验附录
+
+新增[独立Teacher实验快照](../research/wm_teacher/PUBLICATION.md)，包含本地双向Teacher训练/插值方案、原协议评分与配对统计代码。此附录不改变IPVG比赛主线/官方规则或身份质量结论。2026-10-18 21:38 CST已验收3033生成视频与完整解码、三模型GTref108/Physics198-66和固定120验证loss；公共VBench/WMB评分及最终Teacher质量/人工review尚未完成，完整结果后续独立更新。公开内容不包含原仓Git历史、数据、权重、凭据或私有日志。

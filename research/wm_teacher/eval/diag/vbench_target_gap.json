@@ -1,0 +1,227 @@
+{
+  "created_at": "2026-10-17 22:32:34",
+  "reference": "DreamX World snapshot; all totals recomputed 8 dimensions excluding camera",
+  "models": {
+    "base": {
+      "total_delta": -0.9276466082720258,
+      "wins_nondynamic": 4,
+      "dimensions": [
+        {
+          "dim": "i2v_subject",
+          "raw_pctpoint_difference": -0.4430711458144776,
+          "total_point_contribution": -0.12973505089437737,
+          "non_dynamic": true
+        },
+        {
+          "dim": "i2v_background",
+          "raw_pctpoint_difference": 0.05327113696739216,
+          "total_point_contribution": 0.01803356024623973,
+          "non_dynamic": true
+        },
+        {
+          "dim": "subject_consistency",
+          "raw_pctpoint_difference": 0.09887364015418454,
+          "total_point_contribution": 0.01052765605679258,
+          "non_dynamic": true
+        },
+        {
+          "dim": "background_consistency",
+          "raw_pctpoint_difference": 0.3007274345374733,
+          "total_point_contribution": 0.03701944168615416,
+          "non_dynamic": true
+        },
+        {
+          "dim": "motion_smoothness",
+          "raw_pctpoint_difference": 0.18531319019015058,
+          "total_point_contribution": 0.05779297994391097,
+          "non_dynamic": true
+        },
+        {
+          "dim": "dynamic_degree",
+          "raw_pctpoint_difference": -16.012439024390236,
+          "total_point_contribution": -0.7278381374722834,
+          "non_dynamic": false
+        },
+        {
+          "dim": "aesthetic_quality",
+          "raw_pctpoint_difference": -1.7285430038479044,
+          "total_point_contribution": -0.15714027307708223,
+          "non_dynamic": true
+        },
+        {
+          "dim": "imaging_quality",
+          "raw_pctpoint_difference": -0.39937463237524895,
+          "total_point_contribution": -0.03630678476138627,
+          "non_dynamic": true
+        }
+      ],
+      "nondynamic_subtotal_gap": -0.19980847079974842
+    },
+    "round4": {
+      "total_delta": -1.3223343639902962,
+      "wins_nondynamic": 1,
+      "dimensions": [
+        {
+          "dim": "i2v_subject",
+          "raw_pctpoint_difference": -0.6536874609880949,
+          "total_point_contribution": -0.1914053235500395,
+          "non_dynamic": true
+        },
+        {
+          "dim": "i2v_background",
+          "raw_pctpoint_difference": -0.20661299341314665,
+          "total_point_contribution": -0.06994346425631234,
+          "non_dynamic": true
+        },
+        {
+          "dim": "subject_consistency",
+          "raw_pctpoint_difference": -0.31709135160363777,
+          "total_point_contribution": -0.03376257497004172,
+          "non_dynamic": true
+        },
+        {
+          "dim": "background_consistency",
+          "raw_pctpoint_difference": -0.08277119767774455,
+          "total_point_contribution": -0.01018910539517998,
+          "non_dynamic": true
+        },
+        {
+          "dim": "motion_smoothness",
+          "raw_pctpoint_difference": 0.1763202891165938,
+          "total_point_contribution": 0.05498839517124396,
+          "non_dynamic": true
+        },
+        {
+          "dim": "dynamic_degree",
+          "raw_pctpoint_difference": -18.45146341463414,
+          "total_point_contribution": -0.83870288248337,
+          "non_dynamic": false
+        },
+        {
+          "dim": "aesthetic_quality",
+          "raw_pctpoint_difference": -2.0022706861227313,
+          "total_point_contribution": -0.1820246078293392,
+          "non_dynamic": true
+        },
+        {
+          "dim": "imaging_quality",
+          "raw_pctpoint_difference": -0.5642428074497996,
+          "total_point_contribution": -0.05129480067725451,
+          "non_dynamic": true
+        }
+      ],
+      "nondynamic_subtotal_gap": -0.4836314815069233
+    },
+    "round4_po": {
+      "total_delta": -1.1890342993433056,
+      "wins_nondynamic": 4,
+      "dimensions": [
+        {
+          "dim": "i2v_subject",
+          "raw_pctpoint_difference": -0.19183068512779178,
+          "total_point_contribution": -0.05616967824074484,
+          "non_dynamic": true
+        },
+        {
+          "dim": "i2v_background",
+          "raw_pctpoint_difference": 0.019505691632204503,
+          "total_point_contribution": 0.006603145440827523,
+          "non_dynamic": true
+        },
+        {
+          "dim": "subject_consistency",
+          "raw_pctpoint_difference": 0.33953269141093756,
+          "total_point_contribution": 0.03615203596871075,
+          "non_dynamic": true
+        },
+        {
+          "dim": "background_consistency",
+          "raw_pctpoint_difference": 0.49925407946292966,
+          "total_point_contribution": 0.061458002026580874,
+          "non_dynamic": true
+        },
+        {
+          "dim": "motion_smoothness",
+          "raw_pctpoint_difference": 0.2716429313131208,
+          "total_point_contribution": 0.08471633597789512,
+          "non_dynamic": true
+        },
+        {
+          "dim": "dynamic_degree",
+          "raw_pctpoint_difference": -24.5490243902439,
+          "total_point_contribution": -1.1158647450110866,
+          "non_dynamic": false
+        },
+        {
+          "dim": "aesthetic_quality",
+          "raw_pctpoint_difference": -1.5156853393769598,
+          "total_point_contribution": -0.13778957630699637,
+          "non_dynamic": true
+        },
+        {
+          "dim": "imaging_quality",
+          "raw_pctpoint_difference": -0.7495380111834593,
+          "total_point_contribution": -0.06813981919849631,
+          "non_dynamic": true
+        }
+      ],
+      "nondynamic_subtotal_gap": -0.07316955433222326
+    },
+    "ft2": {
+      "total_delta": -0.9686521401218062,
+      "wins_nondynamic": 2,
+      "dimensions": [
+        {
+          "dim": "i2v_subject",
+          "raw_pctpoint_difference": -0.4006778189188376,
+          "total_point_contribution": -0.11732191933674092,
+          "non_dynamic": true
+        },
+        {
+          "dim": "i2v_background",
+          "raw_pctpoint_difference": 0.04309487137225121,
+          "total_point_contribution": 0.014588649753639544,
+          "non_dynamic": true
+        },
+        {
+          "dim": "subject_consistency",
+          "raw_pctpoint_difference": -0.25049330984572293,
+          "total_point_contribution": -0.026671491071543575,
+          "non_dynamic": true
+        },
+        {
+          "dim": "background_consistency",
+          "raw_pctpoint_difference": -0.05395775097953859,
+          "total_point_contribution": -0.0066421802153675885,
+          "non_dynamic": true
+        },
+        {
+          "dim": "motion_smoothness",
+          "raw_pctpoint_difference": 0.2837180186462396,
+          "total_point_contribution": 0.08848215145680322,
+          "non_dynamic": true
+        },
+        {
+          "dim": "dynamic_degree",
+          "raw_pctpoint_difference": -15.199430894308941,
+          "total_point_contribution": -0.6908832224685882,
+          "non_dynamic": false
+        },
+        {
+          "dim": "aesthetic_quality",
+          "raw_pctpoint_difference": -2.0020838381538897,
+          "total_point_contribution": -0.1820076216503536,
+          "non_dynamic": true
+        },
+        {
+          "dim": "imaging_quality",
+          "raw_pctpoint_difference": -0.5301615724862208,
+          "total_point_contribution": -0.048196506589656435,
+          "non_dynamic": true
+        }
+      ],
+      "nondynamic_subtotal_gap": -0.27776891765321937
+    }
+  },
+  "caveat": "Cross-model leaderboard one-vs-five seed comparison; not a paired significance test or evidence that fine-tuning caused specific gain."
+}
