@@ -235,6 +235,10 @@ def paired_report(base, candidate, output):
     p10=[]
     for sample in left:
         a,b=left[sample],right[sample]
+        for record in (a,b):
+            values=record['frame_cosines']
+            if len(values)!=8 or any(v is not None and (isinstance(v,bool) or not isinstance(v,(int,float)) or not np.isfinite(v)) for v in values):
+                raise ValueError('Paired frame cosines must contain exactly eight finite values or missing entries')
         coverage.append(b['scores']['face_detection_coverage']-a['scores']['face_detection_coverage'])
         if a['identity_id']!=b['identity_id']:
             raise ValueError('Paired actor IDs differ')

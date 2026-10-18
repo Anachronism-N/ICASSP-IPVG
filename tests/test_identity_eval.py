@@ -61,6 +61,18 @@ def test_empty_pairs_rejected_without_nan_output(tmp_path):
         module.paired_report(left,right,tmp_path/'result.json')
 
 
+@pytest.mark.parametrize('values',[[.2]*7,[.2]*9,[float('nan')]*8])
+def test_pair_rejects_wrong_frame_count_and_nonfinite(values,tmp_path):
+    import json
+    record={'sample_id':'sample','identity_id':'actor','frame_cosines':values,'scores':{'face_detection_coverage':1,'sampled_gray_motion_mean_abs':1}}
+    report={'protocol':{},'weight_hashes':{},'records':[record]}
+    left,right=tmp_path/'left.json',tmp_path/'right.json'
+    left.write_text(json.dumps(report))
+    right.write_text(json.dumps(report))
+    with pytest.raises(ValueError,match='exactly eight'):
+        module.paired_report(left,right,tmp_path/'result.json')
+
+
 def test_no_encoder_auto_download(tmp_path):
     pytest.importorskip('onnxruntime')
     pytest.importorskip('insightface')
