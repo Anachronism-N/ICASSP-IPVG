@@ -18,11 +18,11 @@ FILES = [
     "docs/24_Wan2.2首轮训练执行计划.md", "docs/25_Wan22_Training_Infra.md",
     "docs/27_数据预处理与训练格式适配.md", "docs/28_数据总量与项目目标评估.md",
     "docs/30_Teacher模型训练实验记录.md", "docs/31_服务器迁移与CodingAgent交接.md",
-    "patches/diffsynth_studio_fb337fb.patch",
+    "patches/diffsynth_studio_fb337fb.patch", "docs/32_插值Teacher完整评测结论.md",
 ] + ["scripts/" + name for name in (
     "gen_jobs.py", "run_gen.sh", "score_extra.sh", "eval_val_loss.py", "score_merge_cpu.py",
     "monitor_merge.py", "wmb_merge_score.py", "val_merge_score.py", "merge_final_gate.py",
-    "analyze_merge_metrics.py", "export_experiment_snapshot.py", "build_eval_jobs.py", "build_extra_bench_jobs.py",
+    "analyze_merge_metrics.py", "report_merge_results.py", "export_experiment_snapshot.py", "build_eval_jobs.py", "build_extra_bench_jobs.py",
     "gt_ref_metrics.py", "vbench_eval.py", "score_pool.py", "summarize_eval.py",
     "build_teacher_review.py", "build_demo.py", "serve_demo.py", "merge_ckpt.py",
     "build_round1_mixture.py", "build_round2_mixture.py", "build_round3_mixture.py",
@@ -31,7 +31,7 @@ FILES = [
     "finalize_5s.py", "inventory_5s.py", "slice_new_sources.py", "caption_5s_extra.py",
 )] + ["tests/" + name for name in (
     "test_score_merge_cpu.py", "test_monitor_val_orchestration.py", "test_wmb_final_orchestration.py", "test_analyze_merge_metrics.py",
-    "test_export_experiment_snapshot.py",
+    "test_export_experiment_snapshot.py", "test_report_merge_results.py", "test_score_pool.py",
 )] + ["eval/diag/" + name for name in (
     "ft2_paired_bootstrap.json", "merge_integrity.json", "physiq_paired_bootstrap.json",
     "caption_token_lengths.json", "parameter_drift.json", "validation_noise_analysis.json",

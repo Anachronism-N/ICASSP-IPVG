@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "3bbada0eb9e3923b1243db66bf7876fa425de932db3f11cea7f9b185255484d9",
-      "snapshot_sha256": "3bbada0eb9e3923b1243db66bf7876fa425de932db3f11cea7f9b185255484d9"
+      "source_sha256": "48177d81f9f92b9f79ea68bf2b9ec5beab4ba36d0354c87a46e4631564a4efdb",
+      "snapshot_sha256": "48177d81f9f92b9f79ea68bf2b9ec5beab4ba36d0354c87a46e4631564a4efdb"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -133,8 +133,8 @@
     },
     {
       "path": "scripts/score_pool.py",
-      "source_sha256": "31ce7ad8a6a1f7bda716b4f6df32507b92ce8deffda2b97cf351bed495a81589",
-      "snapshot_sha256": "97f8b4ec56759e952e2fff989783f614263898165cd5876b61bd7ad6482a3674"
+      "source_sha256": "6be8e4fbb27bd2e18716e8734b4f4acc711f67acc25dc93e1375431b410eca22",
+      "snapshot_sha256": "4bf2801522a81023c0c42387832d9b09225326e783f193fc6fb029fdc2fe02ba"
     },
     {
       "path": "scripts/summarize_eval.py",
@@ -335,6 +335,21 @@
       "path": "eval/diag/merge_all_analysis_20261018.json",
       "source_sha256": "ef17e416ecf9561a4c7d7b7206a1ee3e3521ce15c56708c1c7c3f86f86fa5a9a",
       "snapshot_sha256": "ef17e416ecf9561a4c7d7b7206a1ee3e3521ce15c56708c1c7c3f86f86fa5a9a"
+    },
+    {
+      "path": "scripts/report_merge_results.py",
+      "source_sha256": "d40131602c63dcdd4d08345aed27dc59b957ebd2978735baf63b70ca822837dc",
+      "snapshot_sha256": "d40131602c63dcdd4d08345aed27dc59b957ebd2978735baf63b70ca822837dc"
+    },
+    {
+      "path": "tests/test_report_merge_results.py",
+      "source_sha256": "b97fadf45d407f8c4bac935d07fe11493375e72cd9b1b9dbe13ec279450113c1",
+      "snapshot_sha256": "b97fadf45d407f8c4bac935d07fe11493375e72cd9b1b9dbe13ec279450113c1"
+    },
+    {
+      "path": "tests/test_score_pool.py",
+      "source_sha256": "f7c24925c0252419f7d06a9b7ad745e9b676e4177ef99f3c032ed34c9c8f261c",
+      "snapshot_sha256": "f7c24925c0252419f7d06a9b7ad745e9b676e4177ef99f3c032ed34c9c8f261c"
     }
   ],
   "experiment_progress": {
@@ -348,5 +363,7 @@
     }
   },
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
-  "publication_transform": "Internal deployment addresses and shared-storage root replaced by placeholders. No source Git history or private media."
+  "publication_transform": "Internal deployment addresses and shared-storage root replaced by placeholders. No source Git history or private media.",
+  "supplement_verified_at": "2026-10-18 22:18:15 CST",
+  "supplement": "Dynamic one-token-per-GPU scoring scheduler and strict final report implementation; source and publication regressions verified. No claim that unfinished dimensions or user review passed."
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Parallel VBench scoring: one subprocess per (suite, model, dim), CONC at a time, spread over the
-launcher GPUs (each scorer needs ~2-3GB, so they can share GPUs with generation jobs).
+Parallel VBench scoring: one subprocess per (suite, model, dim), up to CONC at a time,
+one per available scoring GPU. Pass only GPUs that are not being used for generation.
 Already-finished (suite, model, dim) results are skipped by vbench_eval.py itself.
 
 Usage: /dockerdata/venv_vbench/bin/python score_pool.py SUITE:MODEL[,MODEL..] [SUITE:MODELS ...] [--conc 16]
@@ -11,7 +11,7 @@ import os
 import subprocess
 import sys
 import time
-import threading
+import queue
 from concurrent.futures import ThreadPoolExecutor
 
 ROOT = "/srv/wm_teacher"
@@ -47,7 +47,9 @@ def main():
     gpus = [g for g in dict.fromkeys(a.gpus.split(",")) if g not in reserved]
     if not gpus:
         raise RuntimeError("All requested GPUs are reserved by WorldModelBench scoring")
-    locks = {g: threading.Lock() for g in gpus}
+    available_gpus = queue.Queue()
+    for g in gpus:
+        available_gpus.put(g)
     print(f"VBench GPUs: {','.join(gpus)}; WMB reserved: {','.join(sorted(reserved))}", flush=True)
     env = dict(os.environ, VBENCH_CACHE_DIR="/dockerdata/vbench_cache")
 
@@ -63,20 +65,23 @@ def main():
             print(f"staged {suite}/{m}: {r.stdout.strip().splitlines()[:1]}", flush=True)
             tasks += [(suite, m, d) for d in DIMS]
 
-    def run(i_task):
-        i, (suite, m, d) = i_task
-        g = gpus[i % len(gpus)]
-        log = f"{L}/score_{suite}_{m}_{d}.log"
-        t = time.time()
-        with locks[g], open(log, "w") as f:
-            rc = subprocess.run([PY, EVAL, "--suite", suite, "--model", m, "--dims", d],
-                                cwd="/dockerdata/wm_eval/VBench", env=dict(env, CUDA_VISIBLE_DEVICES=g),
-                                stdout=f, stderr=subprocess.STDOUT).returncode
-        print(f"{time.strftime('%H:%M:%S')} {suite}/{m}/{d} rc={rc} {(time.time() - t) / 60:.0f}min", flush=True)
-        return rc
+    def run(task):
+        suite, m, d = task
+        g = available_gpus.get()
+        try:
+            log = f"{L}/score_{suite}_{m}_{d}.log"
+            t = time.time()
+            with open(log, "w") as f:
+                rc = subprocess.run([PY, EVAL, "--suite", suite, "--model", m, "--dims", d],
+                                    cwd="/dockerdata/wm_eval/VBench", env=dict(env, CUDA_VISIBLE_DEVICES=g),
+                                    stdout=f, stderr=subprocess.STDOUT).returncode
+            print(f"{time.strftime('%H:%M:%S')} {suite}/{m}/{d} rc={rc} {(time.time() - t) / 60:.0f}min", flush=True)
+            return rc
+        finally:
+            available_gpus.put(g)
 
-    with ThreadPoolExecutor(a.conc) as ex:
-        results = list(ex.map(run, enumerate(tasks)))
+    with ThreadPoolExecutor(min(a.conc, len(gpus))) as ex:
+        results = list(ex.map(run, tasks))
     if any(results):
         raise SystemExit("VBench scoring failed; see per-dimension logs")
     print("[pool done]", flush=True)
