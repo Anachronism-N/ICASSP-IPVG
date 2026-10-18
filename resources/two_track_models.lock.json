@@ -1,0 +1,30 @@
+{
+  "as_of": "2026-10-18",
+  "engineering_base": {"model": "Wan-AI/Wan2.1-VACE-1.3B", "revision": "574e6a744642ce3bee319afc31496b88bde8aac4", "diffsynth_commit": "4e3496991455b300fd60ab023113422cd16899f5"},
+  "identity_specialist": {
+    "code_url": "https://github.com/JoHnneyWang/AnyID",
+    "code_commit": "6c714f71af6e08d2af29aecd74a3a9fd9e8f94a3",
+    "license": "CC BY-NC-SA 4.0 upstream code/model; underlying Wan licensing remains separate",
+    "preview_lora_repo": "JonneyWang/AnyID",
+    "preview_lora_revision": "d516b069c7ba6cfd487cfa432a4d44509b020fa2",
+    "lora_size_bytes": 1314172936,
+    "lora_sha256": "e689b497ccef999a4582192cc0dcaaecd5392fc81b9c90fdab2b9ff87b299c5b",
+    "lora_rank": 256,
+    "lora_alpha": 256,
+    "local_merged_dit_sha256": "945f6822bb09f09e021cec6b18af474bb1a44085274669c8b6802aeb9dd92692",
+    "local_merged_config_sha256": "84ea7f82273bc15bd78f3f16b8683a1a5034af800808b5ca351f67256c2073f6",
+    "base_repo": "Wan-AI/Wan2.2-TI2V-5B",
+    "base_revision": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e",
+    "base_source_weights_verified": true,
+    "base_files": {
+      "Wan2.2_VAE.pth": "20eb789667fa5e60e7516bf509512f6cb61f01b0aa0695eadaea930c13892b36",
+      "diffusion_pytorch_model-00001-of-00003.safetensors": "720b06c4ade5e87c1246bba8ac95b664c638749cd9b102cf84d823bb44c026a1",
+      "diffusion_pytorch_model-00002-of-00003.safetensors": "09ec5ef720d8396f6cfa51fbdcbdb2327e37722afd6e89fd38f1e7e5e782c283",
+      "diffusion_pytorch_model-00003-of-00003.safetensors": "6306f7894c345de9093ad588771c2abfaeb668a81f7a6d9a918bd26ba3568e49",
+      "models_t5_umt5-xxl-enc-bf16.pth": "7cace0da2b446bbbbc57d031ab6cf163a3d59b366da94e5afe36745b746fd81d"
+    },
+    "runtime": {"torch": "2.7.1", "diffusers": "0.32.2", "transformers": "4.49.0", "peft": "0.15.2", "decord": "0.6.0", "einops": "0.8.2"},
+    "upstream_training_release_verified": false
+  },
+  "timeline_prototype": {"implementation": "independent output-prediction video-time guidance", "not_a_reproduction": ["Chronos", "KeyID", "Prompt Relay", "ReactID"], "denoiser_calls_per_step": {"positive": 3, "negative": 1}, "reference_prefix_mask": 0}
+}

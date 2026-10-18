@@ -2,7 +2,7 @@
 
 ICASSP 2027 身份保持视频生成比赛工程。优先完成 Track 1 的可靠提交，并验证 Track 2 的动作时间线研究。已确认资源为2节点、每节点8张A100 40GB，共16张；互联与可用时长仍需服务器确认。
 
-当前版本提供**可运行的实验管理工具、CPU端到端烟测，以及待GPU验证的VACE训练/推理适配器**。不含比赛数据、模型权重、完整官方评分器或已经训练好的参赛模型。`campaign`执行有限的配置列表；可供coding agent调用，目前没有内置付费LLM调用或自主科研模型。
+当前版本提供**实验管理工具、CPU烟测、已小规模GPU验收的VACE训练/推理适配器，以及AnyID身份专用推理与视频时间窗原型**。功能验收与生成质量分开记录，见实验报告。不含比赛数据、模型权重、完整官方评分器或已经训练好的参赛模型。`campaign`执行有限的配置列表；可供coding agent调用，目前没有内置付费LLM调用或自主科研模型。
 
 ## 从这里开始
 
@@ -11,6 +11,8 @@ ICASSP 2027 身份保持视频生成比赛工程。优先完成 Track 1 的可�
 | 阶段目标、算力安排、验收门槛 | [项目方案](docs/PROJECT_PLAN.md) |
 | 方法假设、同预算实验、论文路线 | [研究与消融](docs/RESEARCH_PLAN.md) |
 | MM2026头部方案、身份基线与ITA视频模型迁移 | [相关工作与迁移方案](docs/RELATED_WORK_AND_TRANSFER.md) |
+| AnyID5B身份对照、视频时间窗探针、成本及真实负结果 | [双赛道实验报告](docs/EXPERIMENT_TWO_TRACKS.md) |
+| 本地身份评分校准与参考裁剪消融 | [CREMA-D H1实验](docs/EXPERIMENT_CREMA_D_H1.md) |
 | 服务器安装、数据准备、运行命令 | [服务器手册](docs/SERVER_RUNBOOK.md) |
 | 模型安装、输入契约、训练回载 | [上游模型接入](docs/UPSTREAM_INTEGRATION.md) |
 | AI迭代职责、预算和实验决策 | [自动化协议](docs/AUTOMATION.md) |
@@ -55,7 +57,7 @@ ipvg report runs --output runs/REPORT.md
 5. 修改`configs/experiments/vace_reference.json`与`vace_lora_pilot.json`中的实际路径和预算。先`experiment plan`，然后在分配的GPU作业中`experiment run`。
 6. 在小规模试跑后记录峰值显存、秒每视频、训练步速、checkpoint回载和开发集结果，再扩展模型与数据。
 
-当前VACE推理适配器是**单进程单GPU参考图基线**，没有实现8卡分片推理。训练适配器使用上游Accelerate DDP；40GB显存兼容性未验证，不应直接当作14B训练方案。Track 2只提供明确标记的时间线文本化对照，结构化时间条件仍是研究任务。
+当前VACE推理适配器是**单进程单GPU参考图基线**，没有实现8卡分片推理。训练适配器使用上游Accelerate DDP；1.3B小尺寸单卡及7卡训练/导出/回载已在A10040GB试跑，不能当作14B或长训练显存保证。AnyID preview使用Wan2.2 TI2V-5B与独立合并LoRA，已完成8条身份基线。Track2新增视频latent窗口guidance及等调用flatten/swapped对照，12条探针未显示增益；时间/动作问题仍未解决。
 
 ## 目录
 

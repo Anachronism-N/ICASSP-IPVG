@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "run_id": "vace_timeline_window_pilot",
+  "task": "inference",
+  "purpose": "development",
+  "hypothesis": "Video-time window guidance functional probe versus three identical positive flattened calls and one negative per step; not official Track2 scoring.",
+  "manifest": "data/timeline_probe/pilot.jsonl",
+  "split": "dev",
+  "backend": {"kind": "command", "command": ["{python}", "scripts/adapters/diffsynth_vace_window.py", "--request", "{request}"]},
+  "resources": {"gpus": 1, "timeout_s": 1800, "max_gpu_hours": 0.5},
+  "model_revisions": {"Wan-AI/Wan2.1-VACE-1.3B": "574e6a744642ce3bee319afc31496b88bde8aac4", "Wan-AI/Wan2.1-T2V-1.3B:tokenizer": "37ec512624d61f7aa208f7ea8140a131f93afc9a"},
+  "parameters": {
+    "upstream_dir": "upstream/DiffSynth-Studio",
+    "model_files": ["models/vace1p3b/diffusion_pytorch_model.safetensors", "models/vace1p3b/models_t5_umt5-xxl-enc-bf16.pth", "models/vace1p3b/Wan2.1_VAE.pth"],
+    "tokenizer_dir": "models/umt5/google/umt5-xxl",
+    "width": 320, "height": 192, "num_frames": 33, "fps": 8,
+    "num_inference_steps": 20, "cfg_scale": 5, "seed": 42,
+    "timeline_guidance_mode": "window"
+  }
+}
