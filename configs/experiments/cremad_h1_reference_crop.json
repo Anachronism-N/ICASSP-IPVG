@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "run_id": "cremad_h1_reference_crop_pilot",
+  "task": "inference",
+  "purpose": "development",
+  "hypothesis": "H1: only reference face square crop changes; evaluate against the original reference anchor at matched generation budget.",
+  "manifest": "data/cremad_h1_crop/pilot.jsonl",
+  "split": "dev",
+  "backend": {"kind": "command", "command": ["{python}", "scripts/adapters/diffsynth_vace.py", "--request", "{request}"]},
+  "resources": {"gpus": 1, "timeout_s": 3600, "max_gpu_hours": 1},
+  "model_revisions": {"Wan-AI/Wan2.1-VACE-1.3B": "574e6a744642ce3bee319afc31496b88bde8aac4", "Wan-AI/Wan2.1-T2V-1.3B:tokenizer": "37ec512624d61f7aa208f7ea8140a131f93afc9a"},
+  "parameters": {
+    "upstream_dir": "upstream/DiffSynth-Studio",
+    "model_files": ["models/vace1p3b/diffusion_pytorch_model.safetensors", "models/vace1p3b/models_t5_umt5-xxl-enc-bf16.pth", "models/vace1p3b/Wan2.1_VAE.pth"],
+    "tokenizer_dir": "models/umt5/google/umt5-xxl",
+    "width": 480, "height": 480, "num_frames": 49, "fps": 16,
+    "num_inference_steps": 20, "cfg_scale": 5, "seed": 42, "reference_index": 0
+  }
+}

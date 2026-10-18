@@ -56,6 +56,14 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 有可靠动作起止预测时，可自定义`action_temporal_iou_mean`与`action_start_mae_s`；先明确预测区间与目标时间窗的配对规则，缺失动作另记。若只有VLM是否支持某窗动作的判断，用`action_window_support`等明确的代理名称，不声称已获得真实时间定位。按视频真实时间戳取片段，尤其不能把可变帧率视频一律当作固定24fps。
 
+## 已实现的离线身份评价入口
+
+`scripts/identity_eval.py` 提供 `calibrate/evaluate/compare`，`scripts/prepare_reference_crop.py` 仅修改生成条件并保留原身份anchor。运行依赖在独立CPU ONNX环境安装，基础包不强制安装视觉库；没有本地ONNX文件即失败，不自动下载。权重hash及非商业研究许可见 `resources/identity_encoder.lock.json`。
+
+固定8帧且恰好一脸才能取embedding；多脸/缺脸省略相似度并记录失败，识别coverage与检测coverage分开。真实源视频校准的视频均值阈值仅用于至少7有效帧的视频均值判断，不将其解释为帧级FAR。配对比较使用共同有效帧和原始参考，不按生成分数调阈值。
+
+身份余弦、演员级bootstrap、P10、覆盖率、灰度运动与静态比例同时报告。灰度运动不是动作符合度，单种子说话头部域改善不能称SOTA或广动作泛化。完整预注册与本地校准/对照结论见 [EXPERIMENT_CREMA_D_H1.md](EXPERIMENT_CREMA_D_H1.md)。
+
 ## 冻结协议与复现记录
 
 每个run旁保留`metric_protocol.json`或等价文档，至少记录：

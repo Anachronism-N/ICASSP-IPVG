@@ -108,5 +108,65 @@ class ManifestTests(unittest.TestCase):
         self.assertEqual({row["split"] for row in rows}, {"train"})
 
 
+class CremaPreparationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        import importlib.util
+        path = Path(__file__).resolve().parents[1] / "scripts" / "prepare_cremad.py"
+        spec = importlib.util.spec_from_file_location("prepare_cremad_test", path)
+        cls.module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cls.module)
+
+    def test_lfs_pointer_is_strict_and_pinned(self):
+        valid = "version https://git-lfs.github.com/spec/v1\noid sha256:" + "a" * 64 + "\nsize 42\n"
+        self.assertEqual(self.module.parse_pointer(valid), {"sha256": "a" * 64, "size": 42})
+        for invalid in (valid.replace("size 42", "size 0"), valid.replace("a" * 64, "not-a-hash"), "not a pointer"):
+            with self.assertRaises(ValueError):
+                self.module.parse_pointer(invalid)
+
+    def test_selection_is_deterministic_and_uses_distinct_utterances(self):
+        names = ["1001_DFA_NEU_XX.flv", "1001_IEO_NEU_XX.flv", "1001_IEO_HAP_XX.flv",
+                 "1001_DFA_HAP_XX.flv", "../1001_IEO_HAP_XX.flv"]
+        first = self.module.select_clips(names, actors=1)
+        self.assertEqual(first, self.module.select_clips(list(reversed(names)), actors=1))
+        self.assertNotIn(first[0]["reference"], first[0]["targets"])
+        self.assertTrue(all(name.split("_")[1] != first[0]["reference"].split("_")[1]
+                            for name in first[0]["targets"]))
+        with self.assertRaises(ValueError):
+            self.module.select_clips(["1001_DFA_NEU_XX.flv"], actors=1)
+
+    def test_frozen_download_plan_cannot_be_changed(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "download_plan.json"
+            self.module.save_plan(path, {"actors": 64})
+            original = path.read_bytes()
+            self.module.save_plan(path, {"actors": 64})
+            with self.assertRaisesRegex(FileExistsError, "frozen selection"):
+                self.module.save_plan(path, {"actors": 1})
+            self.assertEqual(path.read_bytes(), original)
+
+    def test_download_cap_and_existing_corruption_fail_without_network(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "clip.flv"
+            expected = {"size": 2, "sha256": "a" * 64}
+            with self.assertRaisesRegex(ValueError, "cap"):
+                self.module.fetch_file("unused", path, expected, 1)
+            path.write_bytes(b"xx")
+            with self.assertRaisesRegex(ValueError, "differs"):
+                self.module.fetch_file("unused", path, expected, 2)
+
+    def test_download_checks_hash_and_preserves_failed_partial(self):
+        import io
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "clip.flv"
+            expected = {"size": 2, "sha256": "a" * 64}
+            with patch.object(self.module, "urlopen", return_value=io.BytesIO(b"xx")):
+                with self.assertRaisesRegex(ValueError, "checksum"):
+                    self.module.fetch_file("unused", path, expected, 2)
+            self.assertFalse(path.exists())
+            self.assertTrue(path.with_suffix(".flv.partial").exists())
+
+
 if __name__ == "__main__":
     unittest.main()

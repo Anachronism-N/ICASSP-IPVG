@@ -105,6 +105,185 @@ def test_training_entry_seeds_before_accelerator_without_device_state(monkeypatc
     assert executed[0][2]==[str(tmp_path/"train.py"),"--height","480"]
 
 
+@pytest.fixture
+def training_observations_module():
+    entry=Path(__file__).resolve().parents[1]/"scripts/adapters/training_entry.py"
+    spec=importlib.util.spec_from_file_location("ipvg_training_observations_test",entry)
+    module=importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+@pytest.fixture
+def observed_cpu_training(monkeypatch,training_observations_module):
+    torch=pytest.importorskip("torch")
+    accelerate=pytest.importorskip("accelerate")
+    monkeypatch.setenv("RANK","0")
+    monkeypatch.setenv("WORLD_SIZE","1")
+    runner=types.ModuleType("diffsynth.diffusion.runner")
+    runner.get_optimizer_class=lambda customized_optimizer=None: torch.optim.AdamW
+    logger_module=types.ModuleType("diffsynth.diffusion.logger")
+
+    class ModelLogger:
+        def on_training_end(self,accelerator,model,save_steps=None):
+            self.closed=True
+
+    logger_module.ModelLogger=ModelLogger
+    diffusion=types.ModuleType("diffsynth.diffusion")
+    diffusion.runner=runner
+    for name,module in [("diffsynth",types.ModuleType("diffsynth")),
+                        ("diffsynth.diffusion",diffusion),
+                        ("diffsynth.diffusion.runner",runner),
+                        ("diffsynth.diffusion.logger",logger_module)]:
+        monkeypatch.setitem(sys.modules,name,module)
+
+    class SmallLoRA(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.lora_A=torch.nn.Parameter(torch.ones(2))
+            self.lora_B=torch.nn.Parameter(torch.zeros(2))
+            self.base=torch.nn.Parameter(torch.ones(1024),requires_grad=False)
+
+        def forward(self):
+            return (self.lora_A*self.lora_B-1).square().sum()
+
+    return training_observations_module,torch,accelerate,runner,ModelLogger,SmallLoRA
+
+
+def test_training_observations_flag_stays_in_wrapper_argv(tmp_path):
+    request={"parameters":{},"repo_root":str(tmp_path),"output_dir":str(tmp_path/"output"),
+             "run_dir":str(tmp_path/"run")}
+    metadata={"csv":"metadata.csv","fields":["video","vace_reference_image","prompt"]}
+    command=build_training_command(request,metadata,["dit","t5","vae"],"tokenizer",tmp_path/"upstream")
+    assert "--observations-dir" not in command
+    request["parameters"]["pilot_observations"]=True
+    command=build_training_command(request,metadata,["dit","t5","vae"],"tokenizer",tmp_path/"upstream")
+    assert command[command.index("--observations-dir")+1]==request["run_dir"]
+    assert command.index("--observations-dir") < command.index("--")
+
+
+def test_training_observations_real_adamw_and_accumulation(observed_cpu_training,tmp_path):
+    module,torch,accelerate,runner,Logger,SmallLoRA=observed_cpu_training
+    original_optimizer=runner.get_optimizer_class
+    original_backward=accelerate.Accelerator.backward
+    original_end=Logger.on_training_end
+    accelerator=accelerate.Accelerator(cpu=True,gradient_accumulation_steps=2)
+    model=SmallLoRA()
+    baseline=SmallLoRA()
+    baseline_optimizer=torch.optim.AdamW([baseline.lora_A,baseline.lora_B],lr=0.1)
+    for _ in range(2):
+        baseline().backward()
+        baseline_optimizer.step()
+        baseline_optimizer.zero_grad()
+    logger=Logger()
+    with module.observe_training(tmp_path) as observations:
+        optimizer=runner.get_optimizer_class()(filter(lambda p:p.requires_grad,model.parameters()),lr=0.1)
+        model,optimizer=accelerator.prepare(model,optimizer)
+        assert not observations.report["initial_snapshot_taken"]
+        for _ in range(4):
+            with accelerator.accumulate(model):
+                accelerator.backward(model())
+                optimizer.step()
+                optimizer.zero_grad()
+        logger.on_training_end(accelerator,model)
+    report=json.loads((tmp_path/"rank_0.json").read_text())
+    assert logger.closed
+    assert torch.equal(model.lora_A,baseline.lora_A)
+    assert torch.equal(model.lora_B,baseline.lora_B)
+    assert report["status"]=="passed"
+    assert report["backward_calls"]==4
+    assert report["actual_optimizer_steps"]==2
+    assert report["trainable_parameter_count"]==4
+    assert report["trainable_tensor_count"]==2
+    assert report["steps"][0]["nonzero_gradient_tensors"]==1  # LoRA A starts with zero gradient.
+    assert all(step["completed"] and step["gradients_finite"] for step in report["steps"])
+    assert report["parameter_max_abs_change"]>0
+    assert report["parameter_total_abs_change"]>=report["parameter_max_abs_change"]
+    assert report["initial_trainable_sha256"]!=report["final_trainable_sha256"]
+    assert report["rank_parameters_synchronized"]
+    assert report["device"]=="cpu"
+    assert report["resource_end"]["elapsed_wall_s"]>=report["resource_start"]["elapsed_wall_s"]
+    assert runner.get_optimizer_class is original_optimizer
+    assert accelerate.Accelerator.backward is original_backward
+    assert Logger.on_training_end is original_end
+    assert not observations.parameters[0].is_cuda
+
+
+@pytest.mark.parametrize("failure,match",[("loss","nonfinite loss"),("gradient","nonfinite trainable gradients"),
+                                         ("zero","zero or absent"),("update","No trainable parameter update"),
+                                         ("no_step","No completed native optimizer step"),
+                                         ("no_end","without completed training observations")])
+def test_training_observations_reject_failures_and_keep_evidence(observed_cpu_training,tmp_path,failure,match):
+    module,torch,accelerate,runner,Logger,SmallLoRA=observed_cpu_training
+    original_optimizer=runner.get_optimizer_class
+    original_backward=accelerate.Accelerator.backward
+    accelerator=accelerate.Accelerator(cpu=True,gradient_accumulation_steps=1)
+    model=SmallLoRA()
+    with pytest.raises(RuntimeError,match=match):
+        with module.observe_training(tmp_path):
+            optimizer=runner.get_optimizer_class()(filter(lambda p:p.requires_grad,model.parameters()),
+                                                  lr=0 if failure=="update" else 0.1,weight_decay=0)
+            loss=model()
+            if failure=="loss":
+                loss=loss*float("nan")
+            elif failure=="zero":
+                loss=loss*0
+            accelerator.backward(loss)
+            if failure=="gradient":
+                model.lora_B.grad.fill_(float("inf"))
+            if failure!="no_step":
+                optimizer.step()
+            if failure!="no_end":
+                Logger().on_training_end(accelerator,model)
+    report=json.loads((tmp_path/"rank_0.json").read_text())
+    assert report["status"]=="failed"
+    assert report["errors"]
+    assert "resource_end" in report
+    assert runner.get_optimizer_class is original_optimizer
+    assert accelerate.Accelerator.backward is original_backward
+    if failure=="loss":
+        assert report["losses"][0]["value"] is None
+        assert not report["initial_snapshot_taken"]
+    if failure=="gradient":
+        assert report["actual_optimizer_steps"]==0
+        assert not report["steps"][0]["completed"]
+        assert not report["steps"][0]["gradients_finite"]
+
+
+@pytest.mark.parametrize("mismatch",[False,True])
+def test_training_observations_rank_hash_comparison(observed_cpu_training,tmp_path,mismatch):
+    module,torch,accelerate,runner,Logger,SmallLoRA=observed_cpu_training
+    model=SmallLoRA()
+    observations=module.TrainingObservations(tmp_path)
+    optimizer=torch.optim.AdamW([model.lora_A,model.lora_B],lr=0.1)
+    observations.attach(optimizer)
+    local=types.SimpleNamespace(process_index=0,num_processes=2,device="cpu",sync_gradients=True,
+                                unwrap_model=lambda model:model)
+    loss=model()
+    observations.loss(local,loss)
+    loss.backward()
+    optimizer.step()
+
+    def gather(items):
+        remote=dict(items[0],rank=1)
+        if mismatch:
+            remote["final_trainable_sha256"]="different"
+        return items+[remote]
+
+    try:
+        if mismatch:
+            with pytest.raises(RuntimeError,match="hashes differ"):
+                observations.finish(local,model,gather)
+        else:
+            observations.finish(local,model,gather)
+        report=json.loads((tmp_path/"rank_0.json").read_text())
+        assert report["status"]==("failed" if mismatch else "passed")
+        assert report["rank_parameters_synchronized"] is not mismatch
+        assert len(report["rank_summaries"])==2
+    finally:
+        observations.close()
+
+
 def test_reference_adapter_refuses_ignored_control_before_gpu_import(monkeypatch,tmp_path):
     entry=Path(__file__).resolve().parents[1]/"scripts/adapters/diffsynth_vace.py"
     spec=importlib.util.spec_from_file_location("ipvg_vace_adapter_test",entry)

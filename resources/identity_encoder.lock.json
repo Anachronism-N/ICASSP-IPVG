@@ -1,0 +1,15 @@
+{
+  "model": "InsightFace buffalo_l",
+  "official_asset": "https://github.com/deepinsight/insightface/releases/download/model-zoo/buffalo_l.zip",
+  "zip_size_bytes": 288621354,
+  "zip_sha256": "80ffe37d8a5940d59a7384c201a2a38d4741f2f3c51eef46ebb28218a7b0ca2f",
+  "files": {
+    "det_10g.onnx": "5838f7fe053675b1c7a08b633df49e7af5495cee0493c7dcf6697200b85b5b91",
+    "w600k_r50.onnx": "4c06341c33c2ca1f86781dab0e829f88ad5b64be9fba56e56bc9ebdefc619e43"
+  },
+  "runtime": {"insightface": "0.7.3", "onnxruntime": "1.23.2", "provider": "CPUExecutionProvider"},
+  "license": {"library_code": "MIT", "official_pretrained_weights": "non-commercial research only", "dataset_and_personality_rights": "must be checked separately"},
+  "loaded_tasks": ["detection", "recognition"],
+  "excluded_tasks": ["attributes", "face_swap", "real_name_identification"],
+  "automatic_download": false
+}

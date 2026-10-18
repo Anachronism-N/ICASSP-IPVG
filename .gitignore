@@ -31,4 +31,9 @@ token*
 *.tar.zst
 *.zip
 *.parquet
+*.onnx
+/identity_runs/
+/identity_venv/
+/publish/
+*.flv
 .DS_Store

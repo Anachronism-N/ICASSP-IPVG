@@ -117,8 +117,10 @@ def build_training_command(request, metadata_report, model_paths, tokenizer, ups
         raise ValueError("Custom FSDP/DeepSpeed launchers need a separate validated backend config; this adapter is DDP only")
     command.extend([str(Path(request["repo_root"]) / "scripts/adapters/training_entry.py"),
                     "--upstream-train", str(upstream / "examples/wanvideo/model_training/train.py"),
-                    "--seed", str(parameters.get("seed",42)), "--",
-                    "--dataset_base_path", request["repo_root"],
+                    "--seed", str(parameters.get("seed",42))])
+    if parameters.get("pilot_observations") is True:
+        command.extend(["--observations-dir", request["run_dir"]])
+    command.extend(["--", "--dataset_base_path", request["repo_root"],
                     "--dataset_metadata_path", metadata_report["csv"],
                     "--data_file_keys", ",".join(x for x in metadata_report["fields"] if x != "prompt"),
                     "--extra_inputs", ",".join(x for x in metadata_report["fields"] if x not in ("prompt", "video")),
