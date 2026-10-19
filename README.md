@@ -12,6 +12,7 @@ ICASSP 2027 身份保持视频生成比赛工程。优先完成 Track 1 的可�
 | 方法假设、同预算实验、论文路线 | [研究与消融](docs/RESEARCH_PLAN.md) |
 | MM2026头部方案、身份基线与ITA视频模型迁移 | [相关工作与迁移方案](docs/RELATED_WORK_AND_TRANSFER.md) |
 | AnyID5B身份对照、视频时间窗探针、成本及真实负结果 | [双赛道实验报告](docs/EXPERIMENT_TWO_TRACKS.md) |
+| AnyID原生GPU文本编码吞吐优化及覆盖率复验 | [T5设备实验](docs/EXPERIMENT_ANYID_T5.md) |
 | 本地身份评分校准与参考裁剪消融 | [CREMA-D H1实验](docs/EXPERIMENT_CREMA_D_H1.md) |
 | 服务器安装、数据准备、运行命令 | [服务器手册](docs/SERVER_RUNBOOK.md) |
 | 模型安装、输入契约、训练回载 | [上游模型接入](docs/UPSTREAM_INTEGRATION.md) |

@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "run_id": "anyid_gpu_t5_pilot",
+  "task": "inference",
+  "purpose": "development",
+  "hypothesis": "Execution device only: native GPU T5 with unchanged offload, weights, prompts, seeds, sampler and single reference. Evaluate against original identity anchors.",
+  "manifest": "data/anyid/pilot.jsonl",
+  "split": "dev",
+  "backend": {"kind": "command", "command": ["{python}", "scripts/adapters/anyid.py", "--request", "{request}"]},
+  "resources": {"gpus": 1, "timeout_s": 900, "max_gpu_hours": 0.25},
+  "model_revisions": {
+    "JoHnneyWang/AnyID:code": "6c714f71af6e08d2af29aecd74a3a9fd9e8f94a3",
+    "JonneyWang/AnyID:LoRA": "d516b069c7ba6cfd487cfa432a4d44509b020fa2",
+    "Wan-AI/Wan2.2-TI2V-5B": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e"
+  },
+  "parameters": {
+    "upstream_dir": "upstream/AnyID",
+    "base_dir": "models/Wan2.2-TI2V-5B",
+    "merged_dit": "models/anyid_merged",
+    "t5_cpu": false,
+    "width": 480, "height": 480, "num_frames": 49, "fps": 16,
+    "num_inference_steps": 20, "cfg_scale": 5, "seed": 42, "sample_shift": 3.0
+  }
+}
