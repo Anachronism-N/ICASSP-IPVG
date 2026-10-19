@@ -1,6 +1,6 @@
 # 35 Teacher：机制诊断与随机标签审计
 
-> 2026-10-19预注册。P1执行/发布完成，A07降CFG失败。新机制诊断尚未执行；不启动Student、蒸馏、AR或全量FT3。
+> 2026-10-19预注册，2026-10-20验收更新：P1执行/发布完成，M1实际18状态/72前向及独立54378项复算通过，0.182380 GPUh/上限2；详见文档37。以下方案保留预注册边界，不启动Student、蒸馏、AR或全量FT3。
 
 ## 1. 已确认的计算事实
 
@@ -49,4 +49,4 @@ CPU冻结清单可以先执行；不向外部VLM发原media，不把词数审计
 - L1固定340窗口完整CPU解码全部通过：17来源各20、全部实测121帧/24fps，原CSV/抽样RNG/逐video/JSON/contact hash与权限复验通过，8 CPU worker每decoder1线程，实际76.160217秒。全340来源identity/canonical仍UNKNOWN、语义NOT_REVIEWED；不能将decoder通过当caption准确或父来源独立。安全聚合见eval/diag/teacher_label_audit_L1_public_summary_20261020.json。
 - 首样本导航试审发现可见caption矛盾，例如人物朝向与终局折叠、静止视角描述；只保留私有triage，不据四个非全clip审阅估全库错误率，不原地重标。
 - 外部五项已核验原文/实现/许可边界，见[相关工作](36_Teacher优化相关工作与可证伪方案.md)：基座保真、VideoDPO、OpenVid数据原则、Zero*、APG。没有任何一项已证明本5B动作/画质/物理齐升。
-- M1代码与无GPU测试开发中；真实GPU72前向仍需最终冻结预检后执行。共享文件系统全CSV resolve造成预检风险已诊断，不绕过hash或用部分单测冒充完成。
+- M1已实际执行72前向并独立复算全部指标；25专项CPU测试通过。共享文件系统全CSV resolve预检阻塞已修为完整路径lexical匹配后只resolve唯一命中，原SHA校验保持。Zero k接近1，暂不支持盲开投影生成网格；不把本地前向诊断当rollout因果证明。

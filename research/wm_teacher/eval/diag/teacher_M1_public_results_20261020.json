@@ -1,0 +1,75 @@
+{
+  "status": "independently_verified_completed",
+  "states": 18,
+  "forward_predictions": 72,
+  "allocated_gpu_hours": 0.1823801606024305,
+  "max_gpu_hours": 2,
+  "verification": {
+    "numeric_leaves_compared": 54378,
+    "max_numeric_abs_difference": 0,
+    "frozen_runtime_verified": 233,
+    "analysis_sha256": "b7279c3c8da89ef7e79a87c5a498a76d41eea8a71da176e22df9f0ed7aeba55e"
+  },
+  "by_timestep": [
+    {
+      "index": 5,
+      "sigma": 0.97826087474823,
+      "timestep_bf16": 980,
+      "base_positive_MSE": 0.1925054577489694,
+      "a07_positive_MSE": 0.1830320047835509,
+      "positive_relative_delta": 0.061960024690985334,
+      "negative_relative_delta": 0.05603606249098961,
+      "difference_relative_delta": 0.857029610482316,
+      "difference_angle_degrees": 55.260932074897376,
+      "cfg5_relative_delta": 0.17398385341604716,
+      "base_zero_k": 0.9981316129366556,
+      "a07_zero_k": 0.9993498722712199
+    },
+    {
+      "index": 25,
+      "sigma": 0.8333333134651184,
+      "timestep_bf16": 832,
+      "base_positive_MSE": 0.1234255221982797,
+      "a07_positive_MSE": 0.11934210422138374,
+      "positive_relative_delta": 0.039745964574429256,
+      "negative_relative_delta": 0.03833183537054844,
+      "difference_relative_delta": 0.9798668474255123,
+      "difference_angle_degrees": 61.40499496419756,
+      "cfg5_relative_delta": 0.09811869859383655,
+      "base_zero_k": 0.9994398256142935,
+      "a07_zero_k": 0.9991542994976044
+    },
+    {
+      "index": 45,
+      "sigma": 0.357142835855484,
+      "timestep_bf16": 358,
+      "base_positive_MSE": 0.24982073406378427,
+      "a07_positive_MSE": 0.24547951916853586,
+      "positive_relative_delta": 0.0459356592936139,
+      "negative_relative_delta": 0.04501189970844049,
+      "difference_relative_delta": 1.0404119326049743,
+      "difference_angle_degrees": 63.59260190475541,
+      "cfg5_relative_delta": 0.11439192114911262,
+      "base_zero_k": 0.9989449083805084,
+      "a07_zero_k": 0.9988147715727488
+    }
+  ],
+  "positive_MSE_A07_wins": 18,
+  "zero_k_range": [
+    0.995319128036499,
+    1.0006132125854492
+  ],
+  "zero_max_guided_norm_relative_change": {
+    "base": 0.016975286322134808,
+    "a07": 0.008084530423218042
+  },
+  "zero_max_guided_angle_degrees": {
+    "base": 0.7656615186241913,
+    "a07": 0.8722279639152607
+  },
+  "scope": "GT forward-process, six training-visible cases/three timesteps/seed0; not rollout evidence or causal quality cure",
+  "next_decision": "no automatic Zero/APG grid; semantic-label evidence then baseline-preserving controlled training proposal",
+  "teacher_passed": false,
+  "human_review": "pending",
+  "raw_summary_sha256": "ce301d0b4eef6423645b8305d642dc96b856d4b92c60e5f7d2955d7ddec961a9"
+}

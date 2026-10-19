@@ -408,8 +408,8 @@
     },
     {
       "path": "docs/35_Teacher机制诊断与随机标签审计计划.md",
-      "source_sha256": "e6de148a8fa2a3e4d449ac2541ce000da5fb612fa8ec7800313272bee050ef92",
-      "snapshot_sha256": "e6de148a8fa2a3e4d449ac2541ce000da5fb612fa8ec7800313272bee050ef92"
+      "source_sha256": "afb1b5042eea93a85205cc88f0019783eadbfa73561c3993b0ad69c2ef4d8ecd",
+      "snapshot_sha256": "afb1b5042eea93a85205cc88f0019783eadbfa73561c3993b0ad69c2ef4d8ecd"
     },
     {
       "path": "docs/36_Teacher优化相关工作与可证伪方案.md",

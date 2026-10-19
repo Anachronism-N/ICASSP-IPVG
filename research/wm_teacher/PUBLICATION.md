@@ -1,3 +1,11 @@
+# M1/L1 complete-execution and literature update (2026-10-20)
+
+M1 completed 18 shared GT-forward-process states and 72 native model predictions. Independent CPU reconstruction matched all 54,378 numeric outputs (maximum difference 0); conservative allocated cost 0.182380 GPUh within 2. See docs/37_Teacher机制诊断M1实测结论.md and eval/diag/teacher_M1_public_results_20261020.json. This is not rollout replay, a causal quality cure, or Teacher approval.
+
+L1 decoded all 340 frozen windows and verified original files/provenance/contact hashes. Semantic review remains pending, all canonical source identities UNKNOWN; no population label error rate is claimed. See docs/35 and the safe L1 summary. Five relevant methods and official-source/license boundaries are documented in docs/36.
+
+Native scheduler and pipeline source snapshots plus the upstream Apache-2.0 license are included for mathematical regression tests; pipeline local modifications are identified. No tensor, media, original caption manifest, model weights or credentials are published. Historical sections below describe their own earlier stage. Teacher automatic FAIL/user review pending remain unchanged.
+
 # M1/L1 completed diagnostic update (2026-10-20)
 
 M1:18 shared GT-forward states and72 single-branch predictions completed and independently tensor/hash/formula verified,0.182380 allocated GPUh within2. Positive MSE improves18/18 but both positive and NEG drift; optimized scale stays near1 on these states. Do not claim a NEG-only cause or automatic Zero cure.
