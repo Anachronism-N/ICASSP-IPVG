@@ -1,0 +1,193 @@
+{
+  "status": "independently_verified_completed",
+  "videos": 24,
+  "rows": 24,
+  "generation_gpu_hours": 2.198436767679329,
+  "scoring_allocated_gpu_hours": 0.7144450019734602,
+  "total_gpu_hours": 2.912881769652789,
+  "cap_gpu_hours": 12,
+  "means": [
+    {
+      "model": "base",
+      "cfg": 5,
+      "subject_consistency": 0.9396661627623771,
+      "imaging_quality": 0.6589803109549951,
+      "dreamsim": 0.15804815540711084,
+      "dreamsim_last": 0.17961361010869345,
+      "motion_ratio": 0.3449271595782763
+    },
+    {
+      "model": "base",
+      "cfg": 3,
+      "subject_consistency": 0.94958419766691,
+      "imaging_quality": 0.6374560077656728,
+      "dreamsim": 0.15918901728259194,
+      "dreamsim_last": 0.18038495381673178,
+      "motion_ratio": 0.3790112301931663
+    },
+    {
+      "model": "m_full1_a07",
+      "cfg": 5,
+      "subject_consistency": 0.9290885574287838,
+      "imaging_quality": 0.6521303729643179,
+      "dreamsim": 0.15659083508782917,
+      "dreamsim_last": 0.1837044656276703,
+      "motion_ratio": 0.10218831474246996
+    },
+    {
+      "model": "m_full1_a07",
+      "cfg": 3,
+      "subject_consistency": 0.941325358591146,
+      "imaging_quality": 0.6176042565957902,
+      "dreamsim": 0.1599192569653193,
+      "dreamsim_last": 0.19629405935605368,
+      "motion_ratio": 0.44013073377140044
+    }
+  ],
+  "models": {
+    "base": {
+      "machine_metrics": "PASS",
+      "guards": {
+        "anti_static_motion": true,
+        "dreamsim": true,
+        "dreamsim_last": true,
+        "motion_ratio": true
+      },
+      "metrics": {
+        "dreamsim": {
+          "delta": 0.00114086187548108,
+          "ci95": [
+            -0.010099208189381485,
+            0.010957769221729705
+          ],
+          "positive_sources": 3
+        },
+        "dreamsim_last": {
+          "delta": 0.0007713437080383301,
+          "ci95": [
+            -0.022272249062856037,
+            0.018687744935353596
+          ],
+          "positive_sources": 3
+        },
+        "imaging_quality": {
+          "delta": -0.021524303189322285,
+          "ci95": [
+            -0.05996543540113888,
+            -0.0013280017316833297
+          ],
+          "positive_sources": 1
+        },
+        "motion_ratio": {
+          "delta": 0.034084070614890015,
+          "ci95": [
+            -0.020419718245489698,
+            0.09700628558913445
+          ],
+          "positive_sources": 4
+        },
+        "subject_consistency": {
+          "delta": 0.009918034904532932,
+          "ci95": [
+            0.00044942709306875866,
+            0.0227691682262553
+          ],
+          "positive_sources": 5
+        }
+      },
+      "motion_cfg3_over_cfg5": [
+        0.8701629633294853,
+        1.0187532358725087,
+        0.958252662600832,
+        0.9721309331896911,
+        0.9526540763784904,
+        0.8397791341764685
+      ]
+    },
+    "m_full1_a07": {
+      "machine_metrics": "FAIL",
+      "guards": {
+        "anti_static_motion": false,
+        "dreamsim": true,
+        "dreamsim_last": false,
+        "motion_ratio": false
+      },
+      "metrics": {
+        "dreamsim": {
+          "delta": 0.0033284218774901515,
+          "ci95": [
+            -0.008441736300786337,
+            0.015481006768014699
+          ],
+          "positive_sources": 4
+        },
+        "dreamsim_last": {
+          "delta": 0.012589593728383383,
+          "ci95": [
+            -0.011738797028859457,
+            0.04299979408582052
+          ],
+          "positive_sources": 4
+        },
+        "imaging_quality": {
+          "delta": -0.034526116368527614,
+          "ci95": [
+            -0.08478833277494784,
+            -0.002746696261991884
+          ],
+          "positive_sources": 1
+        },
+        "motion_ratio": {
+          "delta": 0.33794241902893046,
+          "ci95": [
+            0.04058513312503497,
+            0.6459197552194423
+          ],
+          "positive_sources": 5
+        },
+        "subject_consistency": {
+          "delta": 0.012236801162362124,
+          "ci95": [
+            -0.002569619483417903,
+            0.030337041036950212
+          ],
+          "positive_sources": 4
+        }
+      },
+      "motion_cfg3_over_cfg5": [
+        0.954681897550651,
+        1.0548730817994993,
+        2.5650627055978568,
+        1.0174694622168203,
+        0.8763642883615164,
+        0.41844105354794664
+      ]
+    }
+  },
+  "private_evidence_sha256": {
+    "probe_summary.json": "1f77f878034f73ee00419696b8280215bca0550a48b193306d04a260f65d774c",
+    "scoring/score_rows.json": "8d13f3c6f17159adeeb7ad5e64b062f436cb4616d3aded4b4d45faad30b5cc49",
+    "scoring/score_summary.json": "6109d0f14ca1bace96fecde3029560c4e7aa9326d0b34acb50759247f0ce63f2",
+    "visual_review/agent_semantic_review.json": "360ce107d10c8dbaff626308d49b4cb58ddd5530dbd07fc00361b860015bf6e2"
+  },
+  "teacher_automatic": "FAIL",
+  "teacher_human": "pending",
+  "scope": "six training-visible internal sources, agent-corrected dense labels, seed0; not unseen holdout/public selection",
+  "motion_case_order": [
+    "charades",
+    "direct",
+    "easycom",
+    "hoigen1m",
+    "matrix",
+    "robomind"
+  ],
+  "decision": "no CFG3 promotion; A07 guards and manipulation fail; base imaging/semantic tradeoff",
+  "bootstrap": {
+    "unit": "source",
+    "sources": 6,
+    "replicates": 5000,
+    "rng_seed": 20261019,
+    "across_seed": false,
+    "multiple_comparison_adjustment": false
+  }
+}
