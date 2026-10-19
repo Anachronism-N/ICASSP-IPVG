@@ -1,3 +1,9 @@
+# M1/L1 completed diagnostic update (2026-10-20)
+
+M1:18 shared GT-forward states and72 single-branch predictions completed and independently tensor/hash/formula verified,0.182380 allocated GPUh within2. Positive MSE improves18/18 but both positive and NEG drift; optimized scale stays near1 on these states. Do not claim a NEG-only cause or automatic Zero cure.
+
+L1:340 randomly stratified windows fully decoded and provenance/hash verified,17 sources20 each,76.160217 seconds CPU. Semantic review remains pending, canonical sources UNKNOWN; full decode is not caption accuracy. See docs35–37 and the two public aggregate JSON summaries. Five original-paper/implementation audits are retained with license and model-transfer limits. Teacher automatic FAIL/user review pending remains unchanged.
+
 # P1 complete-result update (2026-10-19)
 
 P1 generation and original-algorithm scoring are complete: 24 verified videos, 24 scored rows, 2.912882 allocated GPUh within the 12 GPUh cap. Independent re-decode, source/output/metric hashes and formula/aggregate checks passed. See docs/34_Teacher_CFG开发消融结论.md and eval/diag/teacher_p1_results_20261019.json. Lower CFG is rejected as an A07 repair: imaging, last-frame/motion guards and manipulation fail. Base passes the preregistered machine screen but has imaging/semantic tradeoffs; no promotion or Teacher approval. Teacher automatic FAIL and user review pending remain unchanged.

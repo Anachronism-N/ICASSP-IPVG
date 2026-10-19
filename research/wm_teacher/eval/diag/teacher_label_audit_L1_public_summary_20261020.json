@@ -1,0 +1,28 @@
+{
+  "status": "CPU_full_decode_provenance_complete_NOT_semantic_review",
+  "windows": 340,
+  "sources": 17,
+  "sample_per_source": 20,
+  "sample_design": "dataset_stratified_equal_probability_window_sampling_without_replacement",
+  "decode_status": {
+    "decoded_all_frames": 340
+  },
+  "wall_seconds": 76.16021740529686,
+  "cpu_workers": 8,
+  "decoder_threads": 1,
+  "GPU_used": false,
+  "semantic_review": "pending",
+  "semantic_labels_assigned": 0,
+  "canonical_parent": "UNKNOWN",
+  "replacements": 0,
+  "media_uploaded": false,
+  "report_sha256": "c05e6b1b51518f5ae6f6702b2d5429d9bf4775371535a6705fac82cab1dc66fa",
+  "acceptance_sha256": "3e561254ec0bd02d573638c34ab9bb4ee81e04eecdbb1bac19dc774d44def431",
+  "manifest_sha256": "267a9ff4c1f318c25758e2ffd97d70e49b8ec2cfe314668501cfa8d7f41391ab",
+  "csv_sha256": "2fd1615c3c538d9d9462ad166b78129f8c349174bffd5ce1085888d5f001a0a6",
+  "metadata_distribution": {
+    "frames121": 340,
+    "fps24": 340
+  },
+  "agent_navigation_triage": "four fixed first-per-source contacts flagged visible contradictions/unverifiable; not full-clip gold/population error rate"
+}

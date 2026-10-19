@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "fbd7973b7b8b0de31400215f93f12520ad3c438ea75b7e44fb6a8ac316f463f8",
-      "snapshot_sha256": "ff0a4fd845132f75edafb7d2eb35ec93e47faf28f84da1d2cfe3df72610e2a84"
+      "source_sha256": "e186ecabaaac586fc129e051e5dd50f978033dc501f79e6d3bc9bf9cbc165712",
+      "snapshot_sha256": "0d0082d8d89f978b8b8cbdce98e9773a2ad3634d16c6390bfc1c66ceb3181d1b"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -253,7 +253,7 @@
     },
     {
       "path": "tests/test_export_experiment_snapshot.py",
-      "source_sha256": "f2778fde830bfaa5a3c10b798a8e4a0686eb5abfd283bfe852a306c5a3a023ab",
+      "source_sha256": "ce3458b06f0ad5421ca4cb5fd2444ed384353a6adb8316a1d894d67da5f1db83",
       "snapshot_sha256": "8683d6f5d4aacafdd1c3963505387a1e2ad851d366bc8687dbe003b9c833b101"
     },
     {
@@ -405,6 +405,76 @@
       "path": "eval/diag/teacher_p1_results_20261019.json",
       "source_sha256": "479ff25ddee0d3015acc44329bd7f4dbcfa2377e072ecf821b898784fb51b8de",
       "snapshot_sha256": "479ff25ddee0d3015acc44329bd7f4dbcfa2377e072ecf821b898784fb51b8de"
+    },
+    {
+      "path": "docs/35_Teacher机制诊断与随机标签审计计划.md",
+      "source_sha256": "e6de148a8fa2a3e4d449ac2541ce000da5fb612fa8ec7800313272bee050ef92",
+      "snapshot_sha256": "e6de148a8fa2a3e4d449ac2541ce000da5fb612fa8ec7800313272bee050ef92"
+    },
+    {
+      "path": "docs/36_Teacher优化相关工作与可证伪方案.md",
+      "source_sha256": "801a5cdcb1d5c322a6f8b6d29a1b8464ca951ba6c349446687836fd8fd7a9771",
+      "snapshot_sha256": "801a5cdcb1d5c322a6f8b6d29a1b8464ca951ba6c349446687836fd8fd7a9771"
+    },
+    {
+      "path": "scripts/run_teacher_mechanism_probe.py",
+      "source_sha256": "67c9824dba615b93b0c55c740ed8f3205851f201ebde54cc9d605f6d54faabe3",
+      "snapshot_sha256": "b083aa3d75891dbf4ab2b5e8f410315302796498c36815a30812d932498db688"
+    },
+    {
+      "path": "tests/test_teacher_mechanism_probe.py",
+      "source_sha256": "5d64fb952602903e03961d50f8f99ab5d71d11abf1da365a298c86e82e315385",
+      "snapshot_sha256": "5d64fb952602903e03961d50f8f99ab5d71d11abf1da365a298c86e82e315385"
+    },
+    {
+      "path": "scripts/audit_teacher_labels.py",
+      "source_sha256": "dac591b57082f61a3128f632c0078f33afbe7313dcfdf75e7e43c06956a79af8",
+      "snapshot_sha256": "39d5dfdbf03577333b5973a98700b06d9cc3eec25c391373331b70f96ee25c9f"
+    },
+    {
+      "path": "tests/test_audit_teacher_labels.py",
+      "source_sha256": "271bcb78df6d1294948562a6fa98763cea30841be6fb41d669665229f563d4ff",
+      "snapshot_sha256": "271bcb78df6d1294948562a6fa98763cea30841be6fb41d669665229f563d4ff"
+    },
+    {
+      "path": "eval/diag/teacher_label_audit_L1_public_summary_20261020.json",
+      "source_sha256": "0fcaad02aa59a85cda215dd5ee693df6cdb441a9684d0688f2f9201a6ceecdfb",
+      "snapshot_sha256": "0fcaad02aa59a85cda215dd5ee693df6cdb441a9684d0688f2f9201a6ceecdfb"
+    },
+    {
+      "path": "DiffSynth-Studio/LICENSE",
+      "source_sha256": "d43b96112d60d83595395649e61c6bc215f568052a979320489556c6c1262eb1",
+      "snapshot_sha256": "d43b96112d60d83595395649e61c6bc215f568052a979320489556c6c1262eb1"
+    },
+    {
+      "path": "DiffSynth-Studio/diffsynth/diffusion/flow_match.py",
+      "source_sha256": "d4566c8b9df8e481d360c4397cb8938fa8084488251d0a2174f09552ac3e3156",
+      "snapshot_sha256": "8627045dc1e7b7eeb0d7492e73a155475285ff3f946bfcc7d1a986d0651cf728"
+    },
+    {
+      "path": "DiffSynth-Studio/diffsynth/pipelines/wan_video.py",
+      "source_sha256": "6a7010d8ffa4d786a4a5eb728725706b0f6da554aa7aab3ad49fe505b47c579c",
+      "snapshot_sha256": "10e47dc3bf00fbd5dc78c400c8c01edb3541cbcf0c86f751f569c99be1f13997"
+    },
+    {
+      "path": "docs/37_M1同状态预测分解实验结论.md",
+      "source_sha256": "a5cb9b01b3cdcd980661d881e6ebf2764c5da778052c822df04a3b3e03d5b799",
+      "snapshot_sha256": "a5cb9b01b3cdcd980661d881e6ebf2764c5da778052c822df04a3b3e03d5b799"
+    },
+    {
+      "path": "eval/diag/teacher_m1_public_summary_20261020.json",
+      "source_sha256": "8717170c2896114375095ab433c177418b89a1817131010551ce0575388a3866",
+      "snapshot_sha256": "8717170c2896114375095ab433c177418b89a1817131010551ce0575388a3866"
+    },
+    {
+      "path": "docs/37_Teacher机制诊断M1实测结论.md",
+      "source_sha256": "c08f2fc578ea3ffaf3dc991b1eb292af7b826228e6c9f7ce5c63de4bb7e17586",
+      "snapshot_sha256": "c08f2fc578ea3ffaf3dc991b1eb292af7b826228e6c9f7ce5c63de4bb7e17586"
+    },
+    {
+      "path": "eval/diag/teacher_M1_public_results_20261020.json",
+      "source_sha256": "bee65b38fb52185e7fa502c904f3c7e54a498d330cc447e969dc49a4b350a317",
+      "snapshot_sha256": "bee65b38fb52185e7fa502c904f3c7e54a498d330cc447e969dc49a4b350a317"
     }
   ],
   "experiment_progress": {
@@ -439,6 +509,30 @@
     "result_files": [
       "docs/34_Teacher_CFG开发消融结论.md",
       "eval/diag/teacher_p1_results_20261019.json"
+    ]
+  },
+  "m1_l1_increment": {
+    "stage": "M1 real18states72forward and independent54378scalars verified; L1 CPU340decode verified, semantics pending; literature verified",
+    "files": [
+      "docs/35_Teacher机制诊断与随机标签审计计划.md",
+      "docs/36_Teacher优化相关工作与可证伪方案.md",
+      "scripts/run_teacher_mechanism_probe.py",
+      "tests/test_teacher_mechanism_probe.py",
+      "scripts/audit_teacher_labels.py",
+      "tests/test_audit_teacher_labels.py",
+      "scripts/export_experiment_snapshot.py",
+      "tests/test_export_experiment_snapshot.py",
+      "eval/diag/teacher_label_audit_L1_public_summary_20261020.json"
+    ],
+    "M1_max_allocated_gpu_hours": 2,
+    "teacher_automatic": "FAIL",
+    "teacher_human": "pending",
+    "M1_actual_allocated_gpu_hours": 0.1823801606024305,
+    "completed_inputs": 18,
+    "completed_predictions": 72,
+    "public_results": [
+      "docs/37_M1同状态预测分解实验结论.md",
+      "eval/diag/teacher_m1_public_summary_20261020.json"
     ]
   }
 }

@@ -1,0 +1,151 @@
+{
+  "status": "independently_tensor_verified_completed",
+  "shared_inputs": 18,
+  "single_branch_predictions": 72,
+  "source_cases": 6,
+  "step_indices": [
+    5,
+    25,
+    45
+  ],
+  "positive_mse_A07_better_than_base": 18,
+  "allocated_gpu_hours": 0.1823801606024305,
+  "cap_gpu_hours": 2,
+  "ledger": {
+    "accounting": "Both fixed cards allocated for whole coordinator wall, including setup, cache preparation, waiting, CPU analysis, failure and owned-child cleanup; not sum of CUDA kernel time",
+    "allocated_cards": 2,
+    "allocated_gpu_hours": 0.1823801606024305,
+    "conservative_publication_exit_allowance_seconds": 1.0,
+    "failed": false,
+    "hard_wall_seconds": 3600.0,
+    "measured_wall_seconds_before_summary_publication": 327.2842890843749,
+    "owned_cleanup_complete": true,
+    "publication_exit_allowance_explanation": "The final JSON write/stdout/process exit are not GPU kernel time but remain two-card allocation. Charge one additional wall second conservatively, inside the original reservation; this is not a budget extension or a claim that the measured write took exactly one second.",
+    "reserved_allocated_gpu_hours": 2.0,
+    "wall_seconds": 328.2842890843749,
+    "within_reservation": true
+  },
+  "scope": "training_visible_real_GT_forward_process; not rollout replay or video quality evaluation",
+  "per_t_means": [
+    {
+      "step_index": 5,
+      "sigma": 0.97826087474823,
+      "models": {
+        "base": {
+          "positive_target_raw_mse": 0.1925054577489694,
+          "positive_rms": 1.4517194231351216,
+          "negative_rms": 1.4528525670369465,
+          "positive_negative_diff_rms": 0.06133740022778511,
+          "zero_k": 0.9981316129366556
+        },
+        "m_full1_a07": {
+          "positive_target_raw_mse": 0.1830320047835509,
+          "positive_rms": 1.4441770911216736,
+          "negative_rms": 1.4440638820330303,
+          "positive_negative_diff_rms": 0.04786648787558079,
+          "zero_k": 0.9993498722712199
+        }
+      },
+      "deltas": {
+        "positive_rms": 0.0891908345123132,
+        "negative_rms": 0.080116322884957,
+        "cfg5_rms": 0.2567827378710111,
+        "negative_over_positive_rms": 0.901877470078851,
+        "cfg5_over_positive_rms": 2.8669393509102954,
+        "delta_positive_negative_cosine": 0.8203654487927755
+      }
+    },
+    {
+      "step_index": 25,
+      "sigma": 0.8333333134651184,
+      "models": {
+        "base": {
+          "positive_target_raw_mse": 0.1234255221982797,
+          "positive_rms": 1.4717618425687153,
+          "negative_rms": 1.4721813996632893,
+          "positive_negative_diff_rms": 0.02934231112400691,
+          "zero_k": 0.9994398256142935
+        },
+        "m_full1_a07": {
+          "positive_target_raw_mse": 0.11934210422138374,
+          "positive_rms": 1.464807649453481,
+          "negative_rms": 1.4655927022298176,
+          "positive_negative_diff_rms": 0.02673409723987182,
+          "zero_k": 0.9991542994976044
+        }
+      },
+      "deltas": {
+        "positive_rms": 0.05765841156244278,
+        "negative_rms": 0.0556074691315492,
+        "cfg5_rms": 0.14344549675782522,
+        "negative_over_positive_rms": 0.964854543287142,
+        "cfg5_over_positive_rms": 2.498990588049632,
+        "delta_positive_negative_cosine": 0.8708585103352865
+      }
+    },
+    {
+      "step_index": 45,
+      "sigma": 0.357142835855484,
+      "models": {
+        "base": {
+          "positive_target_raw_mse": 0.24982073406378427,
+          "positive_rms": 1.4131022691726685,
+          "negative_rms": 1.4140307704607646,
+          "positive_negative_diff_rms": 0.03194470920910438,
+          "zero_k": 0.9989449083805084
+        },
+        "m_full1_a07": {
+          "positive_target_raw_mse": 0.24547951916853586,
+          "positive_rms": 1.4136079549789429,
+          "negative_rms": 1.4146185119946797,
+          "positive_negative_diff_rms": 0.03111564026524623,
+          "zero_k": 0.9988147715727488
+        }
+      },
+      "deltas": {
+        "positive_rms": 0.0632127324740092,
+        "negative_rms": 0.06198464520275593,
+        "cfg5_rms": 0.15894317626953125,
+        "negative_over_positive_rms": 0.9812764741790216,
+        "cfg5_over_positive_rms": 2.521368339444253,
+        "delta_positive_negative_cosine": 0.8679423133532206
+      }
+    }
+  ],
+  "zero_scale_range": {
+    "base": {
+      "min": 0.995319128036499,
+      "max": 0.9999329447746277,
+      "mean": 0.9988387823104858,
+      "mean_abs_difference_from_1": 0.0011612176895141602
+    },
+    "m_full1_a07": {
+      "min": 0.9978971481323242,
+      "max": 1.0006132125854492,
+      "mean": 0.999106314447191,
+      "mean_abs_difference_from_1": 0.0009618202845255533
+    }
+  },
+  "evidence_sha256": {
+    "mechanism_manifest.json": "da94fee5b89de608bffa9bcb34defd6f9b1f2a65c526ce7339537c90ba2e6dcd",
+    "prepared_index.json": "0dbfb1f18c670d482de8708f9c7bb932c02116ebd29734080adaabe00dfbe7c3",
+    "mechanism_analysis.json": "b7279c3c8da89ef7e79a87c5a498a76d41eea8a71da176e22df9f0ed7aeba55e",
+    "mechanism_summary.json": "ce301d0b4eef6423645b8305d642dc96b856d4b92c60e5f7d2955d7ddec961a9"
+  },
+  "source_verification": {
+    "counts": {
+      "framework": 226,
+      "model_cache": 10,
+      "p1_files": 36,
+      "p1_source": 2
+    },
+    "runner_source_reverified": true,
+    "sha256_reverified": true,
+    "snapshot_files": 233,
+    "status": "passed"
+  },
+  "independent_validation": "18 states,72 saved tensor predictions,hashes and complete analyze_pair exact recomputation passed",
+  "teacher_passed": false,
+  "human_review": "pending",
+  "decision": "both positive and NEG drift; no support for large simple NEG scale mismatch in sampled states; prioritize semantic data and conservative-update preservation before guidance grid"
+}
