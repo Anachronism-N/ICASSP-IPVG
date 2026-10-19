@@ -64,6 +64,12 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 身份余弦、演员级bootstrap、P10、覆盖率、灰度运动与静态比例同时报告。灰度运动不是动作符合度，单种子说话头部域改善不能称SOTA或广动作泛化。完整预注册与本地校准/对照结论见 [EXPERIMENT_CREMA_D_H1.md](EXPERIMENT_CREMA_D_H1.md)。
 
+## 已实现的离线文本辅助代理
+
+`scripts/clip_text_eval.py`使用显式本地OpenAI CLIP ViT-B/32权重及严格SHA校验，不下载；CPU FP32、4线程、官方全帧预处理、8帧均匀采样、原prompt且拒绝截断、单位化余弦不乘logit_scale。协议`clip_b32_frame_text_v1`与ArcFace独立，对所有条件一致重评。
+
+实际64条CREMA-D源dev视频上，匹配prompt优于另一neutral/happy模板仅53.125%，prompt contrast均值0.007626。该域的模板接近且单帧图文模型无法证明说话发生；本代理不能承担动作/表情晋级门槛，仅报告辅助诊断，不能将高余弦称为文本遵循已验收。完整方案见 [上下文效果实验](EXPERIMENT_ANYID_CONTEXT.md)。
+
 ## 冻结协议与复现记录
 
 每个run旁保留`metric_protocol.json`或等价文档，至少记录：

@@ -12,6 +12,19 @@ def test_anyid_keeps_one_reference_prefix_separate_from_output():
     assert module.reference_latent_lengths(17)==[1,5]
 
 
+def test_seed_override_keeps_sample_id_and_legacy_seed():
+    import hashlib
+    offset=int(hashlib.sha256(b'sample_01').hexdigest()[:8],16)
+    assert module.sample_seed({'sample_id':'sample_01'},{})==(42+offset)%2**31
+    assert module.sample_seed({'sample_id':'sample_01','generation_seed':43},{'seed':42})==(43+offset)%2**31
+
+
+@pytest.mark.parametrize('value',[True,-1,2**31,42.0,'42',None])
+def test_seed_override_rejects_invalid_values(value):
+    with pytest.raises(ValueError,match='Generation seed'):
+        module.sample_seed({'sample_id':'sample_01','generation_seed':value},{})
+
+
 def test_text_device_default_and_opt_in():
     assert module.text_encoder_on_cpu({}) is True
     assert module.text_encoder_on_cpu({'t5_cpu':False}) is False

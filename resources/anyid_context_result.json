@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "status": "completed",
+  "decision": "wide_context_not_promoted",
+  "generation_change": "Square reference conditioning margin 0.3 to 0.6 only; original identity anchors, prompts, model, CFG, sampler and seeds unchanged",
+  "outputs": 96,
+  "runs": 10,
+  "actors": 12,
+  "seed_offsets": [42, 43],
+  "additional_dev_actors": 8,
+  "legacy_diagnostic_actors": 4,
+  "identity_protocol_version": "arcface_cremad_v1",
+  "generation_source_sha256": "a966677ab6021e2a89a6b962e57ff76fbca4d4238eb23eb08a858d4fce7977c6",
+  "actual_backend_gpu_hours": 0.9105319952001123,
+  "hard_cap_gpu_hours": 4,
+  "repair_used": false,
+  "all": {
+    "narrow": {"videos": 48, "scoreable_videos": 36, "videos_at_least_seven_frames": 34, "identity_frame_coverage": 0.7239583333333334, "valid_video_identity_mean": 0.8271026371253861, "zero_scoreable_frame_videos": 12},
+    "wide": {"videos": 48, "scoreable_videos": 38, "videos_at_least_seven_frames": 35, "identity_frame_coverage": 0.765625, "valid_video_identity_mean": 0.8290477754728505, "zero_scoreable_frame_videos": 10},
+    "paired_videos": 31,
+    "paired_actors": 12,
+    "identity_actor_mean_delta": 0.005326295355593578,
+    "identity_actor_bootstrap_ci95": [-0.04552155600863949, 0.055781835772439836],
+    "identity_p10_actor_delta": 0.008208025055420077,
+    "coverage_delta": 0.04166666666666663,
+    "recovered_seven_frame_videos": 4,
+    "lost_seven_frame_videos": 3,
+    "gray_motion_ratio": 0.9246789068824036,
+    "static_fraction_delta": 0
+  },
+  "additional_dev": {
+    "narrow": {"videos": 32, "scoreable_videos": 22, "videos_at_least_seven_frames": 22, "identity_frame_coverage": 0.6875},
+    "wide": {"videos": 32, "scoreable_videos": 24, "videos_at_least_seven_frames": 21, "identity_frame_coverage": 0.71484375},
+    "paired_videos": 20,
+    "paired_actors": 8,
+    "identity_actor_mean_delta": 0.013584343144126857,
+    "identity_actor_bootstrap_ci95": [-0.051817516078396395, 0.08217214037892213],
+    "recovered_seven_frame_videos": 1,
+    "lost_seven_frame_videos": 2
+  },
+  "legacy_diagnostic": {
+    "narrow_identity_frame_coverage": 0.796875,
+    "wide_identity_frame_coverage": 0.8671875,
+    "identity_actor_mean_delta": -0.011189800221472979
+  },
+  "seed_strata": {
+    "42": {"narrow_identity_frame_coverage": 0.75, "wide_identity_frame_coverage": 0.796875, "identity_actor_mean_delta": 0.03914504193446853},
+    "43": {"narrow_identity_frame_coverage": 0.6979166666666666, "wide_identity_frame_coverage": 0.734375, "identity_actor_mean_delta": -0.007674129118888893}
+  },
+  "checks": {
+    "coverage_increases_all": true,
+    "coverage_increases_new_dev": true,
+    "new_dev_seven_frame_videos_not_down": false,
+    "minimum_paired_actor_coverage": true,
+    "identity_point_estimate_within_minus_0_02": true,
+    "p10_point_estimate_within_minus_0_02": true,
+    "seed_coverage_not_degraded_more_than_0_05": true,
+    "gray_motion_ratio_at_least_0_8": true,
+    "static_fraction_not_degraded_more_than_0_10": true,
+    "identity_confidence_bound_noninferiority_supported": false
+  },
+  "text_diagnostic": {
+    "protocol": "clip_b32_frame_text_v1",
+    "model": "OpenAI CLIP ViT-B/32",
+    "weights_sha256": "40d365715913c9da98579312b702a82c18be219cc2a73407c4526f58eba950af",
+    "narrow_text_cosine_mean": 0.2568590420608719,
+    "wide_text_cosine_mean": 0.2559407182658712,
+    "actor_mean_paired_delta": -0.000918323795000712,
+    "source_dev_videos": 64,
+    "source_matching_prompt_higher_fraction": 0.53125,
+    "source_prompt_contrast_mean": 0.0076255700550973415,
+    "action_semantic_gate_usable": false
+  },
+  "official_score": null,
+  "human_blind_review_completed": false,
+  "holdout_used": false,
+  "bootstrap": "Sorted actors, random seed42, 2000 resamples; actor is unit, not frame or seed",
+  "limitations": [
+    "Additional actors are development expansion, not independent final holdout.",
+    "Valid-video identity means use different observed subsets; missing identity is omitted, never imputed to zero.",
+    "Identity confidence interval crosses zero and its lower bound does not establish noninferiority at -0.02.",
+    "Original failure recovery does not outweigh new losses; predeclared new-dev seven-frame coverage gate failed.",
+    "Gray motion and single-frame CLIP cannot prove speech, smile, action order, natural motion or perceptual quality.",
+    "Negative result retained without expanding margin or seed search."
+  ]
+}

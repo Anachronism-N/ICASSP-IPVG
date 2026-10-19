@@ -17,6 +17,13 @@ def reference_latent_lengths(output_frames):
     return [1,(output_frames-1)//4+1]
 
 
+def sample_seed(row, parameters):
+    value=row.get('generation_seed',parameters.get('seed',42))
+    if isinstance(value,bool) or not isinstance(value,int) or not 0<=value<2**31:
+        raise ValueError('Generation seed must be an integer in [0, 2**31)')
+    return (value+int(hashlib.sha256(row['sample_id'].encode()).hexdigest()[:8],16))%2**31
+
+
 def text_encoder_on_cpu(parameters):
     value=parameters.get('t5_cpu',True)
     if not isinstance(value,bool):
@@ -91,7 +98,7 @@ def main():
     output=Path(request['output_dir'])
     output.mkdir(exist_ok=True,parents=True)
     for row in request['samples']:
-        seed=(int(parameters.get('seed',42))+int(hashlib.sha256(row['sample_id'].encode()).hexdigest()[:8],16))%2**31
+        seed=sample_seed(row,parameters)
         with Image.open(row['reference_images'][0]) as image:
             reference=process_image(image.convert('RGB'),height,width)
         pipeline.text_encoder.calls.clear()
