@@ -11,10 +11,12 @@ from ipvg.common import load_json,resolve_path,write_json
 UPSTREAM_REVISION='6c714f71af6e08d2af29aecd74a3a9fd9e8f94a3'
 
 
-def reference_latent_lengths(output_frames):
+def reference_latent_lengths(output_frames, reference_count=1):
     if isinstance(output_frames,bool) or not isinstance(output_frames,int) or output_frames<1 or output_frames%4!=1:
         raise ValueError('Output frames must be 4k+1')
-    return [1,(output_frames-1)//4+1]
+    if isinstance(reference_count,bool) or not isinstance(reference_count,int) or not 1<=reference_count<=5:
+        raise ValueError('Require one to five image references')
+    return [reference_count,(output_frames-1)//4+1]
 
 
 def sample_seed(row, parameters):
@@ -68,8 +70,9 @@ def main():
     if base==merged or not (merged/'config.json').is_file():
         raise ValueError('Require a separate premerged AnyID DiT directory')
     for row in request['samples']:
-        if len(row['reference_images'])!=1 or row.get('control_video_path'):
-            raise ValueError('Compare one image only, without target/control videos')
+        reference_latent_lengths(parameters.get('num_frames',49),len(row['reference_images']))
+        if row.get('control_video_path'):
+            raise ValueError('Image references only, without target/control videos')
     sys.path[:0]=[str(upstream/'trainer/models/wan22'),str(upstream)]
     os.environ.update(HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',TOKENIZERS_PARALLELISM='false')
     import torch
@@ -82,7 +85,7 @@ def main():
     if width%32 or height%32 or width<32 or height<32:
         raise ValueError('AnyID dimensions must be positive multiples of 32')
     output_frames=parameters.get('num_frames',49)
-    inner_t=reference_latent_lengths(output_frames)
+    reference_latent_lengths(output_frames)
     torch.cuda.reset_peak_memory_stats()
     torch.cuda.synchronize()
     started=time.monotonic()
@@ -93,20 +96,30 @@ def main():
             'loading_seconds':time.monotonic()-started,'samples':[],
             't5_cpu':t5_cpu,'offload_model':True,'kind':'resource_profile_not_quality_score'}
     pipeline.text_encoder=TimedTextEncoder(pipeline.text_encoder,torch.cuda.synchronize)
+    denoiser_calls=[]
+    def observe_denoiser(module,args,kwargs):
+        denoiser_calls.append({'reference_latents':int(kwargs['ref'][0].shape[1]),
+                              'timestep_tokens':int(kwargs['t'].shape[-1]),
+                              'seq_len':int(kwargs['seq_len'])})
+    pipeline.model.register_forward_pre_hook(observe_denoiser,with_kwargs=True)
     metrics_path=Path(request['run_dir'])/'backend_metrics.json'
     write_json(metrics_path,report)
     output=Path(request['output_dir'])
     output.mkdir(exist_ok=True,parents=True)
     for row in request['samples']:
         seed=sample_seed(row,parameters)
-        with Image.open(row['reference_images'][0]) as image:
-            reference=process_image(image.convert('RGB'),height,width)
+        references=[]
+        inner_t=reference_latent_lengths(output_frames,len(row['reference_images']))
+        for reference_path in row['reference_images']:
+            with Image.open(reference_path) as image:
+                references.append(process_image(image.convert('RGB'),height,width))
         pipeline.text_encoder.calls.clear()
+        denoiser_calls.clear()
         torch.cuda.reset_peak_memory_stats()
         torch.cuda.synchronize()
         generated_at=time.monotonic()
-        video=pipeline.generate(row['prompt'],img=[reference],size=(width,height),max_area=width*height,
-                                frame_num=output_frames+4,inner_t=inner_t,shift=parameters.get('sample_shift',3.0),
+        video=pipeline.generate(row['prompt'],img=references,size=(width,height),max_area=width*height,
+                                frame_num=output_frames+4*inner_t[0],inner_t=inner_t,shift=parameters.get('sample_shift',3.0),
                                 sampling_steps=parameters.get('num_inference_steps',20),
                                 guide_scale=parameters.get('cfg_scale',5.0),seed=seed,offload_model=True,
                                 n_prompt=parameters.get('negative_prompt',''))
@@ -121,7 +134,13 @@ def main():
         text_calls=list(pipeline.text_encoder.calls)
         if len(text_calls)!=2:
             raise RuntimeError('Expected exactly two native positive/negative text encodings')
+        if len(denoiser_calls)!=2*parameters.get('num_inference_steps',20) or any(
+                call['reference_latents']!=inner_t[0] or call['timestep_tokens']!=call['seq_len'] for call in denoiser_calls):
+            raise RuntimeError('Native denoiser reference/step/timestep shape mismatch')
         report['samples'].append({'sample_id':row['sample_id'],'seed':seed,'generated_frames':len(frames),
+                                  'reference_count':len(references),'inner_t':inner_t,
+                                  'native_frame_num':output_frames+4*inner_t[0],
+                                  'denoiser_calls':list(denoiser_calls),
                                   'generation_seconds':elapsed,'text_encoding_calls':text_calls,
                                   'text_encoding_seconds':sum(call['elapsed_seconds'] for call in text_calls),
                                   'peak_allocated_vram_gb':torch.cuda.max_memory_allocated()/1e9,

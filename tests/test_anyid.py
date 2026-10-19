@@ -10,6 +10,14 @@ spec.loader.exec_module(module)
 def test_anyid_keeps_one_reference_prefix_separate_from_output():
     assert module.reference_latent_lengths(49)==[1,13]
     assert module.reference_latent_lengths(17)==[1,5]
+    assert module.reference_latent_lengths(49,2)==[2,13]
+    assert module.reference_latent_lengths(49,5)==[5,13]
+
+
+@pytest.mark.parametrize('count',[0,6,True,2.0,'2',None])
+def test_invalid_reference_counts_fail(count):
+    with pytest.raises(ValueError,match='one to five'):
+        module.reference_latent_lengths(49,count)
 
 
 def test_seed_override_keeps_sample_id_and_legacy_seed():
