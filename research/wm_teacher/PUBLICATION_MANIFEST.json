@@ -108,7 +108,7 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "ff0a4fd845132f75edafb7d2eb35ec93e47faf28f84da1d2cfe3df72610e2a84",
+      "source_sha256": "3d90cbf64922327010441d623dc49a206c15b48827af4d8e1f8122b7164208e8",
       "snapshot_sha256": "ff0a4fd845132f75edafb7d2eb35ec93e47faf28f84da1d2cfe3df72610e2a84"
     },
     {
@@ -253,7 +253,7 @@
     },
     {
       "path": "tests/test_export_experiment_snapshot.py",
-      "source_sha256": "8683d6f5d4aacafdd1c3963505387a1e2ad851d366bc8687dbe003b9c833b101",
+      "source_sha256": "994349b129184ada0a36119cc1fff4a2468ed1e66a4fa42b2c9fe7a8934cccf2",
       "snapshot_sha256": "8683d6f5d4aacafdd1c3963505387a1e2ad851d366bc8687dbe003b9c833b101"
     },
     {
@@ -370,6 +370,31 @@
       "path": "eval/diag/merge_eval_complete_20261018.json",
       "source_sha256": "bb68d9ff46d3e072c3dd46a8a895e31e3a0467b43e52a003aa7ea83f55b5fb94",
       "snapshot_sha256": "bb68d9ff46d3e072c3dd46a8a895e31e3a0467b43e52a003aa7ea83f55b5fb94"
+    },
+    {
+      "path": "docs/33_Teacher优化开发消融计划.md",
+      "source_sha256": "f73ec6efa942f27acc244b74d537b6b201d547beb501a97eb2123a6ed292c7d6",
+      "snapshot_sha256": "f73ec6efa942f27acc244b74d537b6b201d547beb501a97eb2123a6ed292c7d6"
+    },
+    {
+      "path": "scripts/run_teacher_probe.py",
+      "source_sha256": "e6af1350fae047d9a641d5045b662f66364fe8acabdd7927ae33c0805b3a1646",
+      "snapshot_sha256": "e6af1350fae047d9a641d5045b662f66364fe8acabdd7927ae33c0805b3a1646"
+    },
+    {
+      "path": "scripts/score_teacher_probe.py",
+      "source_sha256": "d0f23c70532e9934b78bf58f964dce76235af4669f75eba401b8d56d2ce174e8",
+      "snapshot_sha256": "d0f23c70532e9934b78bf58f964dce76235af4669f75eba401b8d56d2ce174e8"
+    },
+    {
+      "path": "tests/test_run_teacher_probe.py",
+      "source_sha256": "214c8ac6a9694a16821d31c30180c8da76d94fe9431300d600856fae35d33fc5",
+      "snapshot_sha256": "214c8ac6a9694a16821d31c30180c8da76d94fe9431300d600856fae35d33fc5"
+    },
+    {
+      "path": "tests/test_score_teacher_probe.py",
+      "source_sha256": "92d4dcaf62a3ea8c18cd9da72f41a1200f64675f1993ee43a67b32214189fe9e",
+      "snapshot_sha256": "92d4dcaf62a3ea8c18cd9da72f41a1200f64675f1993ee43a67b32214189fe9e"
     }
   ],
   "experiment_progress": {
@@ -382,5 +407,21 @@
     "caveat": "Completed experiment execution/coverage, not automatic human/Teacher quality acceptance."
   },
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
-  "publication_transform": "Internal deployment/storage roots are placeholders; raw data, weights, private logs, credentials and original wm_dataset Git history excluded."
+  "publication_transform": "Internal deployment/storage roots are placeholders; raw data, weights, private logs, credentials and original wm_dataset Git history excluded.",
+  "p1_increment": {
+    "stage": "plan_and_code; generation/scoring/results pending",
+    "date": "2026-10-19",
+    "files": [
+      "docs/33_Teacher优化开发消融计划.md",
+      "scripts/run_teacher_probe.py",
+      "scripts/score_teacher_probe.py",
+      "tests/test_run_teacher_probe.py",
+      "tests/test_score_teacher_probe.py",
+      "scripts/export_experiment_snapshot.py",
+      "tests/test_export_experiment_snapshot.py"
+    ],
+    "experiment_gpu_hours_cap": 12,
+    "teacher_automatic": "FAIL",
+    "teacher_review": "pending"
+  }
 }
