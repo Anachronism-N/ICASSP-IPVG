@@ -51,7 +51,7 @@ def test_seed_strata_not_independent_frame_observations():
     assert result['identity_actor_mean_delta']==pytest.approx(-.2)
 
 
-@pytest.mark.parametrize('value',[True,'42',44])
+@pytest.mark.parametrize('value',[True,'42',42.0,44])
 def test_matching_invalid_seed_offsets_rejected(value):
     a,b=[row(seed=value)],[row(seed=value)]
     with pytest.raises(ValueError,match='seed offset'):

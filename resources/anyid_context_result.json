@@ -14,6 +14,13 @@
   "actual_backend_gpu_hours": 0.9105319952001123,
   "hard_cap_gpu_hours": 4,
   "repair_used": false,
+  "validation": {
+    "full_environment_tests_passed": 246,
+    "clean_environment_tests_passed": 102,
+    "clean_environment_optional_skips": 15,
+    "cpu_smoke_passed": true,
+    "independent_aggregate_matches": true
+  },
   "all": {
     "narrow": {"videos": 48, "scoreable_videos": 36, "videos_at_least_seven_frames": 34, "identity_frame_coverage": 0.7239583333333334, "valid_video_identity_mean": 0.8271026371253861, "zero_scoreable_frame_videos": 12},
     "wide": {"videos": 48, "scoreable_videos": 38, "videos_at_least_seven_frames": 35, "identity_frame_coverage": 0.765625, "valid_video_identity_mean": 0.8290477754728505, "zero_scoreable_frame_videos": 10},

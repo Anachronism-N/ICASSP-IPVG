@@ -10,7 +10,7 @@ def summarize_pairs(narrow,wide,actors,seed=None):
     def index(records):
         result={}
         for row in records:
-            if isinstance(row['seed_offset'],bool) or row['seed_offset'] not in (42,43):
+            if isinstance(row['seed_offset'],bool) or not isinstance(row['seed_offset'],int) or row['seed_offset'] not in (42,43):
                 raise ValueError('Unexpected seed offset')
             key=(row['sample_id'],row['seed_offset'])
             if key in result: raise ValueError('Duplicate sample/seed')

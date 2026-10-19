@@ -58,3 +58,9 @@ def test_legacy_cohort_must_match_dev():
     original,narrow,wide,legacy=inputs()
     legacy[0]['prompt']='changed'
     with pytest.raises(ValueError): module.paired_manifests(original,narrow,wide,legacy,'diagnostic_neutral')
+
+
+def test_explicit_diagnostic_pilot_must_exist():
+    original,narrow,wide,legacy=inputs()
+    with pytest.raises(ValueError,match='pilot is absent'):
+        module.paired_manifests(original,narrow,wide,legacy,'absent_sample')
