@@ -70,6 +70,14 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 实际64条CREMA-D源dev视频上，匹配prompt优于另一neutral/happy模板仅53.125%，prompt contrast均值0.007626。该域的模板接近且单帧图文模型无法证明说话发生；本代理不能承担动作/表情晋级门槛，仅报告辅助诊断，不能将高余弦称为文本遵循已验收。完整方案见 [上下文效果实验](EXPERIMENT_ANYID_CONTEXT.md)。
 
+## 独立口部局部动态代理
+
+`scripts/mouth_motion_eval.py`以固定SCRFD五点中的双眼对齐112平方、17帧/16相邻采样pair，Farneback flow扣除鼻侧参照ROI的中位平移向量，报告嘴ROI残差幅度；无脸/多人不计分，不跨缺失帧连线。它与ArcFace身份协议独立，不调整人脸阈值/身份anchor，不加载新表情模型。源/控制校准使用16演员calibration、16validation，阈值为校准rigid-control视频最大+1e-6；此域val的freeze/rigid activation均0、源activation1，不是动作真值TPR。
+
+原dev的neutral/happy同时与两种台词混杂，未有人工作为嘴动/说话阳性标签；2D对齐仍受3D转头、眼点抖动和插值影响。因此只能标`local_mouth_motion_v1`辅助非静态活动诊断，不能称说话、微笑、唇同步、自然性或官方得分。各生成条件同新协议重评，低覆盖省略motion均值、coverage另报；全量above-control视频率包含缺失造成的可用性损失，不把缺失身份余弦填0。共同motion比基于双方合格的同一视频，但有效时点可能不完全相同，仍需报告配对数量与掉帧局限。
+
+`scripts/compare_anyid_multiscale.py`复核两方媒体/输出hash、评分协议/权重、身份/seed配对、口部16pair覆盖和均值自洽，重算身份与动态质量门槛。完整冻结设置、结果和副作用说明见 [双尺度实验](EXPERIMENT_ANYID_MULTISCALE.md)。
+
 ## 冻结协议与复现记录
 
 每个run旁保留`metric_protocol.json`或等价文档，至少记录：
