@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "ba8c17bc175c00fea65ec3978904f6854431e41ca79310853268d0fd25385918",
-      "snapshot_sha256": "ba8c17bc175c00fea65ec3978904f6854431e41ca79310853268d0fd25385918"
+      "source_sha256": "62eb34e628c970f9a30275eb866c87c367dd2b7db463710e48821fc504815116",
+      "snapshot_sha256": "62eb34e628c970f9a30275eb866c87c367dd2b7db463710e48821fc504815116"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -254,8 +254,8 @@
     },
     {
       "path": "tests/test_export_experiment_snapshot.py",
-      "source_sha256": "5393ba275f316e105356f26043d05526c6216595dd804be815a974fc8c52e32c",
-      "snapshot_sha256": "5393ba275f316e105356f26043d05526c6216595dd804be815a974fc8c52e32c"
+      "source_sha256": "8825479831dff595432f6db70b42104d79917b14aa8ce616836173e794a5929e",
+      "snapshot_sha256": "8825479831dff595432f6db70b42104d79917b14aa8ce616836173e794a5929e"
     },
     {
       "path": "eval/diag/ft2_paired_bootstrap.json",
@@ -586,6 +586,16 @@
       "path": "DiffSynth-Studio/diffsynth/diffusion/loss.py",
       "source_sha256": "17733a01efd0b1cd01c4e005a4d1d3b51fc653b853714d348403286bb95fb1cb",
       "snapshot_sha256": "17733a01efd0b1cd01c4e005a4d1d3b51fc653b853714d348403286bb95fb1cb"
+    },
+    {
+      "path": "scripts/serve_label_review.py",
+      "source_sha256": "ff9a5081010a0f0ff889e4f5faae845983dfaf0894b374810b992bdf82aca00e",
+      "snapshot_sha256": "ff9a5081010a0f0ff889e4f5faae845983dfaf0894b374810b992bdf82aca00e"
+    },
+    {
+      "path": "tests/test_serve_label_review.py",
+      "source_sha256": "39f94d6ffcd216f215e2018009aef28fbd120294f5b4220e8f9647473252b3bb",
+      "snapshot_sha256": "39f94d6ffcd216f215e2018009aef28fbd120294f5b4220e8f9647473252b3bb"
     }
   ],
   "experiment_progress": {
@@ -716,5 +726,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "Four-update cached-input LoRA technical smoke only; no quality/generalization claim; private checkpoint/media/captions excluded"
+  "latest_increment_scope": "Blind human caption-label review web service code only; no media, captions, tokens or reviews"
 }
