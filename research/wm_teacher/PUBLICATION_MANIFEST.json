@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "62eb34e628c970f9a30275eb866c87c367dd2b7db463710e48821fc504815116",
-      "snapshot_sha256": "62eb34e628c970f9a30275eb866c87c367dd2b7db463710e48821fc504815116"
+      "source_sha256": "5a68c76140f54bad3cd8069f15a21e81aa4ae3f9d0d0d529c8eaee2a69ed6eb1",
+      "snapshot_sha256": "5a68c76140f54bad3cd8069f15a21e81aa4ae3f9d0d0d529c8eaee2a69ed6eb1"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -254,8 +254,8 @@
     },
     {
       "path": "tests/test_export_experiment_snapshot.py",
-      "source_sha256": "8825479831dff595432f6db70b42104d79917b14aa8ce616836173e794a5929e",
-      "snapshot_sha256": "8825479831dff595432f6db70b42104d79917b14aa8ce616836173e794a5929e"
+      "source_sha256": "6d5d83193fcaec1748b65e63d11e632ae4345fd864294e18d9bdc7715b531ccb",
+      "snapshot_sha256": "6d5d83193fcaec1748b65e63d11e632ae4345fd864294e18d9bdc7715b531ccb"
     },
     {
       "path": "eval/diag/ft2_paired_bootstrap.json",
@@ -596,6 +596,11 @@
       "path": "tests/test_serve_label_review.py",
       "source_sha256": "ddba4caf312b25910433db117506b5b6b57b19b6aa01af671358872d2dcce4e9",
       "snapshot_sha256": "ddba4caf312b25910433db117506b5b6b57b19b6aa01af671358872d2dcce4e9"
+    },
+    {
+      "path": "docs/43_四节点追平SOTA实验计划.md",
+      "source_sha256": "9554a35f653681ad072af4300bb07b9e157a00849e7289f7d23a405a262118c7",
+      "snapshot_sha256": "9554a35f653681ad072af4300bb07b9e157a00849e7289f7d23a405a262118c7"
     }
   ],
   "experiment_progress": {
@@ -726,5 +731,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "Label review service: code-server proxy base-path support; code only"
+  "latest_increment_scope": "Pre-registered four-node SOTA-gap plan (docs/43); plan only, no results"
 }
