@@ -48,8 +48,8 @@
     },
     {
       "path": "docs/31_服务器迁移与CodingAgent交接.md",
-      "source_sha256": "b47bfbd9aa5783c5143931fba4cccbeb088fa277c1d1bfba3cbb5c9f5178e4e3",
-      "snapshot_sha256": "0aa67f8fc4c5003f7c576e2b497873d538e88bc46e231f90be15695f7a05cbce"
+      "source_sha256": "ea0ff700e95875e0088e6afac225ce2b9ec5c43d9357d391e2df9213bb2ad222",
+      "snapshot_sha256": "223df7e1fffefdfc0d8a452102dae04ea47d4c40f18bf047f21d3b8c6d4ecbc6"
     },
     {
       "path": "patches/diffsynth_studio_fb337fb.patch",
@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "92cf03c81a9ce9433957881642e037da88edc99fed44a5123184fb0b246df5b7",
-      "snapshot_sha256": "00aca3b0471de9df7e77c6fadd8a400ec1391680d713e7573ce5ce15458f67c8"
+      "source_sha256": "ba8c17bc175c00fea65ec3978904f6854431e41ca79310853268d0fd25385918",
+      "snapshot_sha256": "ba8c17bc175c00fea65ec3978904f6854431e41ca79310853268d0fd25385918"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -254,8 +254,8 @@
     },
     {
       "path": "tests/test_export_experiment_snapshot.py",
-      "source_sha256": "2dfd9f53bd98b19c02fc0e0edbfe5c4360f6ff9d2856ec1bdbeef6a09a7e5046",
-      "snapshot_sha256": "2dfd9f53bd98b19c02fc0e0edbfe5c4360f6ff9d2856ec1bdbeef6a09a7e5046"
+      "source_sha256": "5393ba275f316e105356f26043d05526c6216595dd804be815a974fc8c52e32c",
+      "snapshot_sha256": "5393ba275f316e105356f26043d05526c6216595dd804be815a974fc8c52e32c"
     },
     {
       "path": "eval/diag/ft2_paired_bootstrap.json",
@@ -509,8 +509,8 @@
     },
     {
       "path": "docs/40_四节点受控训练资源规划.md",
-      "source_sha256": "e4291e1a37e9ea8d8faa42cbe61e423cd381e1670ea1944b2649cb1e00c63b56",
-      "snapshot_sha256": "e4291e1a37e9ea8d8faa42cbe61e423cd381e1670ea1944b2649cb1e00c63b56"
+      "source_sha256": "d965f2a3488c6037dd1df10c29fe29e6cffc84399da02e11cea89c22093f069d",
+      "snapshot_sha256": "d965f2a3488c6037dd1df10c29fe29e6cffc84399da02e11cea89c22093f069d"
     },
     {
       "path": "docs/41_窗口标注链与命名歧义验收.md",
@@ -551,6 +551,41 @@
       "path": "eval/diag/C1_FT1_membership_public_summary_20261020.json",
       "source_sha256": "95a926aca6777693ad2b5c58295f669a2365c2e7cb5df8b6db790966c6b30a65",
       "snapshot_sha256": "95a926aca6777693ad2b5c58295f669a2365c2e7cb5df8b6db790966c6b30a65"
+    },
+    {
+      "path": "docs/42_LoRA有限训练技术Smoke.md",
+      "source_sha256": "0fd65af7995054952f94700e0aaea9b3924227a76d825001e1fac433109bb8c1",
+      "snapshot_sha256": "0fd65af7995054952f94700e0aaea9b3924227a76d825001e1fac433109bb8c1"
+    },
+    {
+      "path": "eval/diag/LoRA_native_CPU_microcheck_20261020.json",
+      "source_sha256": "df3d9297b47018711512d1dda174532a0643dedfe7cf43ca686f48d5014e87fb",
+      "snapshot_sha256": "df3d9297b47018711512d1dda174532a0643dedfe7cf43ca686f48d5014e87fb"
+    },
+    {
+      "path": "eval/diag/teacher_training_smoke_public_results_20261020.json",
+      "source_sha256": "ecf402377bba5cb8399c43285d2b3d779f342626ad953e3ad863471bc78664ce",
+      "snapshot_sha256": "ecf402377bba5cb8399c43285d2b3d779f342626ad953e3ad863471bc78664ce"
+    },
+    {
+      "path": "scripts/run_teacher_training_smoke.py",
+      "source_sha256": "3694e182e7809475940376932be2a19f35cb1c05554ac065792ebecc7e90dc1e",
+      "snapshot_sha256": "3694e182e7809475940376932be2a19f35cb1c05554ac065792ebecc7e90dc1e"
+    },
+    {
+      "path": "tests/test_teacher_training_smoke.py",
+      "source_sha256": "13d5e141918972becd95d2174a19031d539d91e4cd78d1d42f3b84fb32850277",
+      "snapshot_sha256": "13d5e141918972becd95d2174a19031d539d91e4cd78d1d42f3b84fb32850277"
+    },
+    {
+      "path": "DiffSynth-Studio/diffsynth/diffusion/training_module.py",
+      "source_sha256": "acace5db2c5aa22760b84d4e6865a83c8fa261f78c04b43a5fd1c7d04d0ab349",
+      "snapshot_sha256": "acace5db2c5aa22760b84d4e6865a83c8fa261f78c04b43a5fd1c7d04d0ab349"
+    },
+    {
+      "path": "DiffSynth-Studio/diffsynth/diffusion/loss.py",
+      "source_sha256": "17733a01efd0b1cd01c4e005a4d1d3b51fc653b853714d348403286bb95fb1cb",
+      "snapshot_sha256": "17733a01efd0b1cd01c4e005a4d1d3b51fc653b853714d348403286bb95fb1cb"
     }
   ],
   "experiment_progress": {
@@ -680,5 +715,6 @@
     "actual_training_sampling_confirmed": false,
     "parent_source_disjointness_confirmed": false,
     "training_started": false
-  }
+  },
+  "latest_increment_scope": "Four-update cached-input LoRA technical smoke only; no quality/generalization claim; private checkpoint/media/captions excluded"
 }

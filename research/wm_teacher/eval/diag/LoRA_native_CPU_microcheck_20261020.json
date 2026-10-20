@@ -1,0 +1,39 @@
+{
+  "status": "native_LoRA_and_FlowMatchSFTLoss_CPU_microcheck_PASS",
+  "optimizer_updates": 4,
+  "base_weights_unchanged": true,
+  "trainable_dtype": "FP32 adapter, bf16 frozen base under autocast",
+  "native_functions_AST_extracted": true,
+  "optimizer_RNG_and_adapter_serialization_restore": true,
+  "same_rng_loss_before_after_restore": 4.557217597961426,
+  "checkpoint_buffer_sha256": "52838f3fc10236b80fbc4542795b49505dc2b922a7a3a67513fa835d63ef1c72",
+  "GPU_initialized": false,
+  "full5B_training_validated": false,
+  "steps": [
+    {
+      "step": 1,
+      "loss": 1.2139784097671509,
+      "grad_norm": 0.38379138708114624
+    },
+    {
+      "step": 2,
+      "loss": 3.194051504135132,
+      "grad_norm": 0.5691116452217102
+    },
+    {
+      "step": 3,
+      "loss": 3.4283697605133057,
+      "grad_norm": 0.667762815952301
+    },
+    {
+      "step": 4,
+      "loss": 4.707869529724121,
+      "grad_norm": 1.0090603828430176
+    }
+  ],
+  "source_hashes": {
+    "diffusion/training_module.py": "acace5db2c5aa22760b84d4e6865a83c8fa261f78c04b43a5fd1c7d04d0ab349",
+    "diffusion/loss.py": "17733a01efd0b1cd01c4e005a4d1d3b51fc653b853714d348403286bb95fb1cb",
+    "diffusion/flow_match.py": "d4566c8b9df8e481d360c4397cb8938fa8084488251d0a2174f09552ac3e3156"
+  }
+}

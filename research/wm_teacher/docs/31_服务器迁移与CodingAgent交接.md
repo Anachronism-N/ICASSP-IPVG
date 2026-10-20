@@ -1,3 +1,49 @@
+# 最新技术验收更新（2026-10-20）
+
+单卡cached-input LoRA真实4更新及保存恢复技术smoke已独立验收PASS：0.087707allocatedGPUh，峰PyTorch allocated21.5941GiB/reserved22.9355GiB，基座hash不变，adapter/AdamW/RNG扰动后严格恢复且同probe预测/loss差0。自有进程退出、GPU释放；详见文档42与无身份聚合JSON。这不是原/校订训练对照、FT3质量收益或Teacher通过。公开15项CPU测试读取随快照提供的原framework，不依赖私有缓存。
+
+四节点GPU数量由助手自主安排，仍保留预算/失败计费/数据和用户门禁；独立第二语义复核两次上游空流仍阻塞，不能用主流程试审替代独立review或human gold。
+
+# 最新资源与技术smoke更新（2026-10-20 19:35 CST）
+
+用户重新授权四节点全部可用，rank3不再保留给其他实验；下方原让位段仅为历史。GPU数量选择由助手自主，不再逐小实验询问，但仍自限阶段预算且用户暂停优先。
+
+下一任务仅单卡LoRA技术smoke，最多4optimizer更新/2allocatedGPUh，复用M1已核真实121帧校订text/VAEcache。代码及CPU验收完成后才实际GPU；独立语义复核未通过，不用它绕过正式训练数据门禁。详见文档42，不是全量FT3/Student/AR/质量晋级。
+
+# 资源让位更新（2026-10-20）
+
+用户要求空出一个节点：rank3（worker-2）整机留给其他实验。已核8卡均0MiB且无GPU计算进程；本项目后续只用rank0/1/2，不在rank3训练、生成、评分或占卡，直到用户重新授权。无进程需要终止，无文件删除。实际节点地址与约束见私有eval/diag/wm_resource_allocation_20261020.json。
+
+# C1完整验收更新（2026-10-20）
+
+- C1新12原caption视频及12评分完成，旧12校订对照复用并完整hash/解码；原算法公式和pair diagnostics独立复算一致。实际新增1.894074 allocated GPUh/上限6，详见文档39。
+- 校订减原平均：base主体+1.765pp/画质+1.321pp/DreamSim−0.026690，A07主体+2.459pp/画质+4.672pp/DreamSim−0.033748。仅输入版本效应，机器人动作失败仍在，不称模型训练成功/泛化。
+- 本轮仅主节点4卡，未充分利用四节点；四节点现状需要现场核验，不把历史32卡或占卡当本轮吞吐。原raw/po/CSV/旧机保留，Teacher自动FAIL、用户review pending。下方运行ID和实时状态均为有时间戳历史。
+
+# 当前语义校准与C1推进（2026-10-20）
+
+- M1实际18状态/72前向及独立54,378数值复算完成，0.182380 GPUh/上限2。五项文献/完整M1与L1解码报告已发布f4d175a，95文件和5远端关键文件核验通过。
+- L1固定17个首样本的全部121帧agent校准试审已完成：13例至少一可见矛盾、12例动作类矛盾。非340总体错误率，非人类gold/Teacher review；原340语义审核仍pending，原CSV保留。
+- C1已实际启动4卡原caption条件推理：六case×base/A07×CFG5新增12视频，对照复用既有P1校订caption12视频。仅caption版本变化，最大新增生成2+评分4=6 allocated GPUh。真实run=/dockerdata/wm_tmp/teacher_C1_20261020_run01，托管wwKpv9，父PID141332；生成完整解码和预算通过才评分。C1专项17、源241、发布236测试已实跑通过，运行/单测不等于12视频评分完成。
+- C1不是训练，不证明FT1/A07训练caption归因，不混raw/po或公开benchmark扫参。Teacher自动FAIL、人审pending；不盲FT3/Student/AR。下文历史进度按时间理解。
+
+# 当前已验证状态（2026-10-19）
+
+- P1六来源×base/A07×CFG5/3共24视频和24原算法评分全部完成，完整decode/hash/公式独立复验PASS，实验实际2.912882 allocated GPUh/上限12。
+- 降CFG不是A07安全修复：主体+1.224pp但画质−3.453pp；末帧/运动guard失败、机器人motion比0.418441且抓取失败。base机器筛选PASS不等于语义/Teacher通过。见[完整结论](34_Teacher_CFG开发消融结论.md)。
+- 完整P1方案代码分析与结论已推送指定Teacher分支b5ba1c6c29c224a4a56749ef5cb8557da02b4af2，远端3关键文件逐字节及81manifest提交文件核验通过。
+- 后续先同x_t正/负预测机制诊断与随机分层标签审计，再决定小训练或Zero单因素；新GPU试验预算/实现须冻结后才执行。Teacher自动仍FAIL、人审pending，不启Student/蒸馏/AR或盲FT3。
+- 一小时独立空闲占卡授权已到期并释放，不擅自续占；旧机保留。下方旧进度均按时间戳理解。
+
+# 当前 Teacher 优化接续（2026-10-19 10:52 CST）
+
+- 上一轮全部插值评测与最终发布已完成；质量自动 FAIL、人审 pending，见文档32。下文10-18生成/评分任务均为历史，不得重启。
+- 文档33 P1：六来源×base/A07×CFG5/3共24视频已实际启动。4张A100采样中（首批30–31/50步），每卡约29GB；此时最终视频0/24，不称完成。
+- 清单、原/新caption、CSV实际物理行和视频内容hash已独立核验；源码与DiffSynth运行包已复制到本轮本地目录并逐文件hash冻结。独立183项单测通过不代替真实生成/评分。
+- 本轮生成上限4 allocated GPUh，评分上限8、合计12；仅24条完整解码/zero exit/预算通过才启动原算法评分。操作状态见eval/diag/teacher_opt_state_20261019.json，任务句柄只在当前会话有效，接续须实查。
+- 用户另授权四节点空闲占卡最多1小时：28张未用于P1的卡已验证低功耗预留（约681MiB/卡），独立最多28 GPUh，真实实验优先；不把占卡称为实验利用率/质量进展。到时自动释放，必要时用私有账本RELEASE_ALL标记提前释放。
+- P1新代码/方案/结果发布尚未核验；不能沿用上一轮GitHub提交宣称本轮已发布。
+
 # 完整插值评测验收更新
 
 > 2026-10-18 23:13:15 CST：原3033视频完整解码、三模型全部WM/公共VBench8维、GTref108、Physics198/66、WMB350与三份固定120loss已严格通过；summary和Teacher页重建完成。见docs/32_插值Teacher完整评测结论.md。实验执行/覆盖完成不等于Teacher质量自动或人工验收通过；下文旧快照按时间解释。
@@ -48,12 +94,12 @@
 > 以下按当时恢复/评分/监控里程碑保留，部分早期段落仍写“尚未恢复/尚未smoke/尚无分数”。这些不是当前待办；现已完成恢复及α0.3/α0.5的CPU全量验证，旧CPU任务r60iAs已由顶部持久化入口替代。
 
 - 用户确认四节点：rank0 `PRIVATE_NODE_ADDRESS`、rank1 `PRIVATE_NODE_ADDRESS`、rank2 `PRIVATE_NODE_ADDRESS`、rank3 `PRIVATE_NODE_ADDRESS`；均为8张A100-40GB。此前新集群Agent报告SSH连通、32卡bf16测试通过，不是生成/评分smoke。旧集群本会话于10-18尝试BatchMode访问新rank0遭认证拒绝，故本会话未验证新节点可读取私有备份，也未执行新机解包；新集群Agent应从本机共享挂载确认访问权限。
-- 共享ROOT保持不变；三个worker最初未挂载，已按用户授权的remount/taiji_client命令补挂/srv/PRIVATE_STORAGE，现四节点暂停JSON均可读。挂载工具同时尝试gy4别名并报只读，目标gy2正常；未为无关别名改动权限。
+- 共享ROOT保持不变；三个worker最初未挂载，已按用户授权的remount/taiji_client命令补挂PRIVATE_SHARED_MOUNT，现四节点暂停JSON均可读。挂载工具同时尝试gy4别名并报只读，目标gy2正常；未为无关别名改动权限。
 - 四节点torch-base已有torch2.7.1；已补齐缺失的av19.0.1，未升级其他包。rank0框架导入及cfg_zero_star/cfg_zero_steps接口检查通过。
 - 共享盘已有生成所需5B DiT、converted T5/VAE、tokenizer与三份merge权重。rank0复制完成，12个必需文件源/目标SHA256一致，三份merge另与固定迁移摘要一致。已从rank0本地盘分发到三个worker；四节点各约62.79GB缓存均通过12文件大小/SHA256验证，worker共享框架导入也通过。校验清单位于各节点/dockerdata/models/generation_cache_sha256.json。
 - 首轮rank0独立生成smoke（MsCTXe）完成50步采样及VAE解码，但save_video保存失败：新机缺imageio-ffmpeg，ImageIO落到PyAV后端并拒绝quality参数；不能算smoke通过。已四节点补齐与旧机导出一致的imageio-ffmpeg0.6.0，四节点真实save_video quality5+121帧/1280×704完整编码解码测试通过，run_gen启动检查加入该依赖。
 - rank0 GPU完整smoke已通过：独立输出/dockerdata/wm_tmp/migration_smoke_retry_1792289824830.mp4，121帧/24fps/1280×704完整解码PASS；同输出用正确配套FFmpeg另生成_physiq_5s_verified.mp4，120帧/24fps/1280×720预处理完整解码PASS。VrFZCi原任务exit1仅是末尾绑定旧FFmpeg导致转换失败，已单独修复，不重跑已生成视频。三个worker同case/seed单条GPU生成及121帧/24fps/1280×704完整解码也均PASS（77tkNp/XMUqrN/7o8Wvw）；四节点本案例解码RGB帧SHA256均为074a9b667962052b4ca2b2155734b8d5d3284bc9c3ef063e159293593d563940。只证明本案例重现，不是多seed/全评测结论。随后2850条正式恢复已启动（见下方调度记录）；正式评分尚未开始，原183视频、Phase E分数与原始清单保留。
-- 新机定向检查最初未找到Physics-IQ完整GT、VILA/judge及独立评测环境；两节点旧机密码认证失败。旧集群本会话仍能用既有BatchMode SSH访问worker，已按用户请求直接导出到仓库外私有`/srv/research/wm_migration_private_20261018`（根700、文件600）。worker6份归档（94,357,647,360字节）和launcher9份归档（169,117,040,640字节）及环境导出均已写完，另含VBench外链真实权重1份。共16归档264,197,908,480字节（约264.20GB/246.05GiB）。**2026-10-18 12:15:23 CST最终验证已通过**：16包SHA256、15个目录源内容比较PASS，额外CLIP/DINO真实目标对比PASS，207外链目标全覆盖，无partial且700/600权限通过。完成证据`manifests/backup_complete.json`与`manifests/final_verification.log`，恢复说明`RESTORE_PRIVATE.md`。新Agent可从共享备份恢复所列资产，不再需要密码登录旧机下载；回收旧机前仍需确认新机访问权限和项目ROOT以及其它任务资产无遗漏。凭据未写入本文，归档可能有历史敏感日志，只可私下使用，禁止公开上传。
+- 新机定向检查最初未找到Physics-IQ完整GT、VILA/judge及独立评测环境；两节点旧机密码认证失败。旧集群本会话仍能用既有BatchMode SSH访问worker，已按用户请求直接导出到仓库外私有`PRIVATE_MIGRATION_BACKUP`（根700、文件600）。worker6份归档（94,357,647,360字节）和launcher9份归档（169,117,040,640字节）及环境导出均已写完，另含VBench外链真实权重1份。共16归档264,197,908,480字节（约264.20GB/246.05GiB）。**2026-10-18 12:15:23 CST最终验证已通过**：16包SHA256、15个目录源内容比较PASS，额外CLIP/DINO真实目标对比PASS，207外链目标全覆盖，无partial且700/600权限通过。完成证据`manifests/backup_complete.json`与`manifests/final_verification.log`，恢复说明`RESTORE_PRIVATE.md`。新Agent可从共享备份恢复所列资产，不再需要密码登录旧机下载；回收旧机前仍需确认新机访问权限和项目ROOT以及其它任务资产无遗漏。凭据未写入本文，归档可能有历史敏感日志，只可私下使用，禁止公开上传。
 - 用户提供私有归档路径及manifests/SHA256SUMS后，新机按RESTORE_PRIVATE允许的拟恢复项独立校验继续部署，无需把全备份marker缺失变成无限等待。原自有等待任务4qWpRQ已停止、未解包；新任务F6PVxU交叉核对角色/单归档/SHA256SUMS，顺序复制5份评分归档（venv_vbench、venv_piq、conda_vila、wm_eval、vbench_cache），完整源/目标SHA256通过且tar成员安全范围验证后才解到空目标。不会覆盖现有torch-base、models，也不恢复外链归档到共享盘。这里只证明选中评分资产，不冒充全备份/源比较完成，旧机仍保留。逐项恢复记录在新机/dockerdata/wm_migration_private_20261018/scoring_restore_verified.json；归档/导入通过也不等于正式benchmark完成。
 - score_extra.sh的FFmpeg从失效的另一共享盘硬编码改为imageio_ffmpeg.get_ffmpeg_exe()解析的配套v7.0.2可执行文件，允许FFMPEG显式覆盖。实测/opt/conda/envs/torch-base/bin/ffmpeg虽有滤镜但没有libx264，不能用于原协议编码。配套FFmpeg的libx264/pad/fillborders检查及真实120帧/24fps/1280×720转换、完整解码、上下8px边缘smear核对均通过。原120帧+pad/smear+crf12协议未变；GPU重试任务VrFZCi此前绑定了缺libx264的旧路径，生成若已通过但后续转换失败，应单独用正确配套FFmpeg验证已有输出，不重跑生成。
 - scripts/run_gen.sh已改成**单节点前台托管入口**，必须显式设置NODE_RANK和NNODES；每节点8个子进程由父进程等待并在退出时回收，不再SSH旧worker或nohup/setsid脱管。四节点分别设置NODE_RANK=0/1/2/3、NNODES=4，分片为0..31。原历史pipeline未设置这些参数，会在启动前失败；不要重启它们。
