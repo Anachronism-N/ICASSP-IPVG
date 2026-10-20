@@ -37,6 +37,16 @@
 
 新增局部mouth_motion_v1先在32dev演员源视频与freeze/rigid控制独立校准：阈值0.455497，val源activation=1、两control均0，不是说话/表情TPR。生成mouth可评分34/48两方相同，但全量above-control口动视频25→21，合格率52.0833%→43.75%；paircoverage71.4844%→72.2656%未达到75%，共同视频口部flow比0.801056。保留`dualscale_not_promoted`，不统一扩参考数量，不将身份高分或全局灰度motion当说话效果。双参考也改变输出RoPE起始位置，不能将效果单独归因全图语义。完整环境277项CPU测试通过，干净环境108项通过/17项跳过、烟测通过，独立复算一致。具体方案和重算入口见 [双尺度效果实验](EXPERIMENT_ANYID_MULTISCALE.md)，聚合证据`resources/anyid_multiscale_result.json`。
 
+## MM2026相关共同评价与选锚消融完成（2026-10-20）
+
+VBench原AMT运动平滑/MUSIQ成像质量已离线共评48视频：24条Track1历史输出及24条物体source/重建；16条新稀疏重建均33帧320×1928fps、K5/28call、无损锚像素通过。缺CurricularFace/GME/Story/人工及官方完整scorer，组合总分保持null，不以此声称官方MM2026成绩。
+
+Track1同8输入上VACE-H1、AnyID-single、AnyID-dual的ImagingQuality分别.699044/.566525/.599807，MotionSmoothness分别.993428/.992380/.993344；同7条可评分video的strict ArcFace分别.472679/.849399/.872528。身份与质量存在取舍，小样本不是最终base比较或对获奖队伍胜出证据。
+
+KeyID-inspired仅改固定事件分段内内容自适应选锚，不含身份编辑/IPKE、PromptRelay、LTX。4生成物体草稿共同非锚MAE1.905378→1.869175（约降低1.90%），事件方向通过均3/8、两事件均完成均1/4，不能声称补全缺失动作或KeyID整体提升。MUSIQ.421485→.421974、AMT平滑.996665→.996381，保留小型重建组件信号，不扩大稀疏重建当任务主线。4自绘正例另报，不混入生成效果。首pilot因NumPy本机lscpu被断网子进程guard误拦失败，一次初始化兼容修复后完成，未放松模型下载保护。
+
+具体方案/开源状态/作者权重更新/资源和所有限制见[实验报告](EXPERIMENT_MM2026_KEYFRAMES.md)。KeyID最新仍README-only，没有完整KeyID复现或其改进结果；后续优先独立引入Stand-In14B或许可明确TPIGE强基线、补齐GME/Cur评测，不再只做参考预处理小搜索。
+
 ## 当前实验与限制
 
 唯一H1对照是参考人脸bbox扩边.3的正方形裁剪，原参考仍作身份评价anchor。模型、prompt、sample_id/seed、采样步和候选数固定，不训练新LoRA。实验预注册及聚合结果见 [CREMA-D H1](EXPERIMENT_CREMA_D_H1.md)。crop64/64条完整解码；63样本/32演员共同帧配对，原基线身份均值0.143337、crop0.349797，配对提升+0.205661，演员bootstrap95%区间[0.168833,0.245416]。身份P10提升+0.192157、coverage+0.007813、灰度运动proxy比1.029227、静态比例无变化。新生成耗费0.602265GPU小时，所有任务正常退出。只在该单种子说话头部dev上支持H1，不是完整动作/人工/holdout/SOTA结论。

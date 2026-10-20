@@ -1,6 +1,6 @@
 # 相关工作与 ITA 视频模型迁移方案
 
-核查日期：2026-10-18。硬件为2节点、每节点8张A100 40GB。本文将可复现基线、方法参考和待验证设计分开；没有新增GPU实验或实现私有模型适配。ITA在本文暂指图像Image、文本Text、音频Audio共同输入，直接输出RGB视频；若原模型定义不同，需要相应调整。
+核查日期：2026-10-20。硬件为2节点、每节点8张A100 40GB。本文将可复现基线、方法参考和待验证设计分开；没有新增GPU实验或实现私有模型适配。ITA在本文暂指图像Image、文本Text、音频Audio共同输入，直接输出RGB视频；若原模型定义不同，需要相应调整。
 
 ## 沿用的训练资源与不同的测试任务
 
@@ -16,10 +16,13 @@ MM2026与ICASSP2027的Track 1均指向VIP-200K，支持复用数据解析、参�
 |---|---|---|
 | AESR / MIPL_Video，MM2026 Track 1并列第一 | playbook提示增强、视频批评、关键帧修正与生成/编辑路径选择；有编排代码 | API导向，涉及商业模型；仓库当前明确未补软件许可证，只作阅读参考，不直接拷入工程；不能称纯本地可训练冠军底座 |
 | Chronos / USTC-CMI，Track 1并列第一、Track 2第一 | 官方摘要给出语义prompt锚定、视觉关键帧锚定与指标引导候选路由 | 本次只核到官方方法摘要，未找到可直接启动的作者代码/权重；是重要方法对照，不等待其开源才能推进 |
-| KeyID / WislabGDUT，Track 2第二 | 动态草稿、身份关键帧编辑与运动插值 | 当前作者仓库主要为README，不能把论文的code available表述当成训练或推理已可运行 |
+| KeyID / WislabGDUT，Track 2第二 | 动态草稿、身份关键帧编辑与运动插值 | 2026-10-20核查仍仅README，revision d4d68cc7、无软件许可/可执行pipeline。现本地仅KeyID启发的选锚模块，不是IPKE或完整KeyID复现 |
+| TPIGE，历史IPVG方法 | Apache-2.0公开GE与VACE推理，Andyplus1/IPT2V | 可作真正可复用方法基线，原14B/身份与提示组件需独立版本及GPU验收；迁移1.3B只称TPIGE-inspired，不冒称MM2026获奖实现 |
 | IPVG STD，MM2025 | 身份首帧与视频运动分开，采用HyperLoRA与Wan2.2 | 属于上一届方法，作者自述第二；需要独立环境和实际验收，README称MIT但独立LICENSE未核到 |
 
-原始入口：[AESR](https://github.com/oceanflowlab/AESR)、[AESR论文](https://arxiv.org/abs/2608.20749)、[KeyID](https://github.com/WISLab-GDUT/KeyID)、[IPVG STD](https://github.com/rain152/IPVG)。以上方案说明提示、身份锚点、编辑和候选选择具有实际价值；不能仅因它们未训练新视频模型，就忽略它们作为强对照的必要性。
+原始入口：[AESR](https://github.com/oceanflowlab/AESR)、[AESR论文](https://arxiv.org/abs/2608.20749)、[KeyID](https://github.com/WISLab-GDUT/KeyID)、[IPVG STD](https://github.com/rain152/IPVG)。以上方案说明提示、身份锚点、编辑和候选选择具有实际价值；不能仅因它们未训练新视频模型，就忽略它们作为强对照的必要性。[TPIGE公开实现](https://github.com/Andyplus1/IPT2V)的revision74390b4b具有真实Apache-2.0 LICENSE.txt，与仅README宣称许可的仓库分开。
+
+AESR已公开evaluation/README中的候选自动权重：`.15*(GME+Story)+.20*(Cur+Arc)+.15*(Motion+Imaging)`，并明确此式不能复现主办人工组件。这更新了此前只读论文中“权重未提供”的证据边界：论文未给数值，而作者eval文档给了选片权重。它不是官方FinalScore。VBenchAMT/MUSIQ现已在本项目同protocol真实执行；缺CurricularFace/GME/Story和人工不补0、不重归一化，不把我们的ArcFace/CLIP设置直接等同作者未锁的face/text实现。详情见[共同评测与选锚实验](EXPERIMENT_MM2026_KEYFRAMES.md)。
 
 ## Track 1应该从哪个底座迭代
 

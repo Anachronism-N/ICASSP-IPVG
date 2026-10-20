@@ -78,6 +78,12 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 `scripts/compare_anyid_multiscale.py`复核两方媒体/输出hash、评分协议/权重、身份/seed配对、口部16pair覆盖和均值自洽，重算身份与动态质量门槛。完整冻结设置、结果和副作用说明见 [双尺度实验](EXPERIMENT_ANYID_MULTISCALE.md)。
 
+## MM2026相关共同质量面板
+
+新增`scripts/mm2026_quality_eval.py`直接调用固定VBench fd18b3d原AMT-S MotionSmoothness与MUSIQ-SPAQ ImagingQuality，全帧、FP32、显式本地权重SHA和禁联网保护。每视频ImagingQuality=原MUSIQ MOS/100，MotionSmoothness=1-奇数帧重建MAE/255。已完成48视频共同评价；既有人脸8输入×3方法24视频与受控/生成物体24视频分开，不是MM2026官方test。旧ArcFace strict8frame/单脸/missing与CLIPB32cos辅助不变，名称不冒充作者checkpoint与protocol。
+
+作者AESR选片式为`.15*(GME+Story)+.20*(Cur+Arc)+.15*(Motion+Imaging)`，不是含人工的官方FinalScore；目前缺Cur/GME/Story/人工，因此自动合成分保持null，不使用partial sum。MUSIQ是技术图像质量而非身份或美学充分指标；AMT既是本轮稀疏插值器也是smoothness评价器，有循环偏好，静止也可高分。完整设置、实例结果、缺组件和非完整KeyID限制见[MM2026面板实验](EXPERIMENT_MM2026_KEYFRAMES.md)、`resources/mm2026_eval.lock.json`。
+
 ## 冻结协议与复现记录
 
 每个run旁保留`metric_protocol.json`或等价文档，至少记录：

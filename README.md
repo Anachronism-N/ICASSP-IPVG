@@ -15,6 +15,7 @@ ICASSP 2027 身份保持视频生成比赛工程。优先完成 Track 1 的可�
 | AnyID原生GPU文本编码吞吐优化及覆盖率复验 | [T5设备实验](docs/EXPERIMENT_ANYID_T5.md) |
 | AnyID参考上下文的多身份/双种子质量对照 | [上下文质量实验](docs/EXPERIMENT_ANYID_CONTEXT.md) |
 | 原生同图双尺度参考及口部局部动态控制 | [双尺度效果实验](docs/EXPERIMENT_ANYID_MULTISCALE.md) |
+| MM2026相关VBench共同面板及KeyID启发选锚消融 | [共同评价与选锚实验](docs/EXPERIMENT_MM2026_KEYFRAMES.md) |
 | 本地身份评分校准与参考裁剪消融 | [CREMA-D H1实验](docs/EXPERIMENT_CREMA_D_H1.md) |
 | 服务器安装、数据准备、运行命令 | [服务器手册](docs/SERVER_RUNBOOK.md) |
 | 模型安装、输入契约、训练回载 | [上游模型接入](docs/UPSTREAM_INTEGRATION.md) |
