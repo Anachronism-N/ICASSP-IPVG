@@ -79,6 +79,7 @@ def main():
     sys.path.insert(0,str(args.vbench))
     os.environ.update(VBENCH_CACHE_DIR=str(args.cache),HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1')
     import torch
+    import numpy.testing  # Initialize NumPy's local CPU-capability probe before subprocess lockdown.
     torch.set_num_threads(4)
     if not torch.cuda.is_available() or torch.cuda.device_count()!=1:raise ValueError('Require exactly one visible CUDA device')
     torch.cuda.reset_peak_memory_stats()

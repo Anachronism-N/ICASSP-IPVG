@@ -68,6 +68,7 @@ def main():
     sys.path.insert(0,str(vbench))
     os.environ.update(VBENCH_CACHE_DIR=p['vbench_cache'],HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1')
     import torch
+    import numpy.testing
     import imageio.v2 as imageio
     torch.set_num_threads(4)
     if torch.cuda.device_count()!=1:raise ValueError('Require one visible GPU')
