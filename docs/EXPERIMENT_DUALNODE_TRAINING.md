@@ -1,33 +1,33 @@
 # 真实dense-caption LoRA训练与同规格效果对照
 
-## 2026-10-20预注册
+## 2026-10-20已批准方案及显式修订
 
-当前32train视频/16身份来自许可兼容CREMA-D，参考与目标独立source，dev/holdout身份隔离。只有说话头部辅助域，不是VIP/ReactID或足够SOTA的训练规模。原短标签prompt不用于训练：本地公开Qwen2.5-VL7B从实际全时长重采样训练像素生成100–180词可见外观/场景/beginning-middle-end细节，禁止推断姓名/台词/不可见动作。自动caption不等于人工核真，不凭字数认定正确。
+CREMA-D32train视频/16身份，独立参考source、dev/holdout身份隔离，仅说话头部辅助域，不是VIP/ReactID或足够SOTA训练规模。只训练VACE1.3B条件模块rank16LoRA，不声称AnyID/KeyID公开训练入口可用。完整MM2026官方总分/Cur/GME/Story/人工缺项保持null。
 
-原视频480×360、29.97fps/51–86帧，中心裁为480×352、全时长均匀抽49帧，准备fps=49/原duration；不把1.7–2.9秒冒称49帧16fps原始3秒。上游训练读取前49帧、不读取fps，所以先重采样整个时间跨度而不是默认截前49帧。生成开发规格仍49帧16fps/480×352，三方相同。
+### 数据准备
 
-## 资源决策与训练因素
+原480×360、29.97fps、51–86帧视频中心裁8px为480×352，49帧按全时长均匀抽样，准备fps=49/原duration。上游训练读取前49帧且不使用fps，故预先重采样覆盖整个源；源1.7–2.9秒不冒称原49帧16fps3秒。视频实际解码像素8时点由本地公开Qwen2.5VL7B描述，原请求100–180词、仅可见场景/外观/beginning-middle-end动作，不猜姓名/音频/台词。自动caption并未人工核真。
 
-一个节点能完成本轮，两个节点的用途是并行两学习率而不是效果必需条件；用户未要求实际释放节点，继续沿用此前授权双节点对照，若节点被收回则不启动该节点作业。每节点7健康A100独立DDP（历史异常卡排除），不跨节点DDP，不以占卡证明资源利用率或质量。小数据尾部padding造成每epoch35项中3重复，报告实际训练样本曝光，不扩大重复来伪造数据规模。
+初准备r001第10条188词超过内部180上限停止，合格9条保留。r002对同图至多两次长度修正仍188词，无拒答；保存失败/所有尝试。之后显式批准验收协议dense_caption_v2=100–200词，与完整dense目标一致；不截断、不拼模板、不改模型效果门槛。最终r003复用hash/来源确认的9条合格数据、新23条各一次生成，完成32/32；实际104–200词，未用dev/holdout媒体。模型原始五分片hash一致，复制到新本地目录避免共享读盘，不改其他项目权重。旧失败不覆盖。
 
-唯一因素学习率：launcher标称1e-5、worker5e-5；两方seed42、VACE1.3B官方底座、VACE条件模块LoRA rank16、q/k/v/o/FFN、同dense32、gradaccum1、workers1、BF16/gradient-checkpoint-offload相同。AnyID未有公开作者训练入口、KeyID仅README，不声称训练了它们；VACE本轮是可训练域内对照，不提前定为最终base。
+### 实际训练因素及资源选择
 
-先单卡真实49帧/rank16两样本显存与梯度pilot；随后两节点各1epochDDP pilot5实际optimizer steps/rank；数值finite、梯度非零、参数真实更新、跨rank初末hash同步及导出文件验收。正式两main各14epochs预期70updates/rank，save_steps5尽早保留checkpoint。pilot不续训，main从同官方底座初始化，比较两节点初始LoRAhash。上游默认ConstantLR开始factor1/3、Accelerate多进程推进scheduler，记录每次真实optimizer的actualLR，不称全程恒定标称LR。
+一个节点足够，保留两个节点只并行两学习率（用户曾授权两节点，未实际要求回收），每节点2健康A100，不再每节点7卡占用。排历史故障卡，不跨节点DDP、不抢占他人。两方same seed42/rank16/32dense/gradaccum1/workers1/BF16/gradient-checkpoint-offload、official base初始化，唯一因素标称LR1e-5 vs5e-5。上游ConstantLR初factor1/3及Accelerate多进程scheduler推进保留，记录每次actualLR，不称全程恒定标称LR。
 
-单卡OOM唯一固定降级为17帧全时长重采样，必须两组同时同规格、新runID、保存失败；不能靠增加DDP卡数解决单卡OOM，禁止无限重试。保存仅LoRA，不宣称已验证optimizer/RNG恢复。loss下降只数值健康，必须看dev视频。
+单卡真实49frame480352/rank16、2训练样本pilot1800s/.5GPUh；失败停止不自动降规格重试。通过后两节点各2GPU1epochDDP pilot（期望16实际optimizer updates/rank）1800s/1GPUh。通过后main各4epochs（期望64updates/rank）、save16、7200s/4GPUh；从同official base重启，pilot不续训。每rankfinite loss/grad、实际step、参数非零改变、跨rank初/末hash一致、两node初LoRAhash一致、导出/实际回载验证。DDP复制底座不分片，一张40GB必须先实际通过。
 
-## 同规格效果验证
+### 同规格效果验证
 
-从原dev确定性选8actors×2原prompt16案例；不读取holdout媒体，不用dev调caption/训练。未训练baseline、lr1e-5、lr5e-5各16输出；480×352/49帧16fps/20steps/同seed42/相同独立原reference，不能直接比较旧480²结果。身份ArcFace/覆盖率/P10与共同有效帧actor配对、CLIPB32原prompt、MM2026相关AMT MotionSmoothness/MUSIQImagingQuality一起报告。缺Cur/GME/Story/官方人工则总分null，不称完全MM2026复现。caption只用于训练，评测原prompt不改写刷分。
+baseline未训练+lr1/lr5各16原dev输入（8actors×2原prompt），各49frame16fps48035220stepsseed42，同一独立原reference；必须新同规格baseline，不与旧480平方直接比较。train/dev/holdout身份隔离，评测原prompt不优化刷分。原ArcFacecoverage/P10/共同帧actor配对、CLIPB32辅助、MM2026相关AMT MotionSmoothness/MUSIQImagingQuality一起报告，缺项总分null。
 
-若dev身份和覆盖率不升、图像/文本/动态明显退化，即使loss下降也不晋级；8actors小样本CI仅描述，不承诺稳定增益/正式参赛验收。两lr都无效则停止增加epoch，优先授权广动作真实数据和更强身份基线，不在小辅助域无限训练。Track2仍无真实event训练数据，单列未开展，不伪造双赛道训练。
+loss下降仅数值健康，不算效果改善。8devactors的CI只描述，身份/coverage改善且文本/成像/动态不明显退化才开发候选；不承诺SOTA/最终base。两LR皆无效不堆epoch，转授权更多真实数据与强基线。Track2真实event训练数据目前没有，不伪造双赛道训练。
 
-## 冻结预算和交付
+### 有界预算和交付
 
-最坏51.5GPUh：caption单GPU1800秒/.5；单卡训练pilot1800秒/.5；两7GPU DDPpilot各1800秒/3.5共7；两main每7GPU10800秒/21共42；唯一单GPU修复1800秒/.5；两节点单GPU推理/评价阶段各1800秒/.5共1。启动前按预算核验；controller每runtimeout、保存hash/代码/model/split/seed证据，失败不覆盖。共享模型hash/copy属CPU预处理，但caption阶段GPUallocation等待也计成本。
+原总硬上限51.5GPUh不增加。已caption失败r001约1144s/.318GPUh、r00245s/.013；最终caption最多.5；单卡pilot.5、两2GPU-DDPpilot2、两main8、同规格生成/评价预留4，最坏约15.331GPUh，剩余不为占卡使用。每run自身timeout×卡数匹配预算。最终captionr003是从未用training预留重分配的最后一次修订，任何后续数据/数值失败不追加工程retry，保留失败证据、明确未执行任务。
 
-所有已启动任务跟进到明确退出/失败，必要修复后新ID，限制预算内停止。方案/代码/聚合真实正负结论脱敏正常commit/push并确认CI；原始身份媒体/caption逐条/embedding/checkpoints/凭据不进入公共Git。
+所有已启动作业跟进真实退出，保存代码/model/reference/split/manifest/seed/hash/成本与实际step/checkpoint。导出LoRA不表示optimizer/RNG恢复验收。代码/计划/真实正负结论脱敏正常push并确认CI；media、caption逐条、embedding、checkpoint、内部节点/凭据不Git。
 
 ## 当前阶段
 
-初次dense准备因第10条caption未满足100–180词检查而停止，保留9条合格caption与失败目录；共享权重hash/加载等待仍计caption allocation成本。修复版仅在新目录复用已校验hash/来源的9条合格结果，每个新caption最多两次看同一图序列的长度修正，不放宽字数标准、不凭空凑字数；保存所有尝试。公开权重复制到新本地目录并对比原hash，不改其他项目权重。修复阶段单GPU1800s/.5GPUh，使用原唯一工程修复预留，后续不无限重试；若显存/训练仍失败则如实结束并保存诊断，不超原总预算。
+数据32/32完成，训练尚待真实单卡pilot和两节点验收；没有效果提升证据。实际结果随后追加，不用上一轮ad38099满足训练目标。

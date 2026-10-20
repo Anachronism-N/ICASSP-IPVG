@@ -22,7 +22,7 @@ def sampling_indices(count,frames=49):
 
 def validate_caption(text):
     count=len(text.split())
-    if not 100<=count<=180 or re.search(r"as an ai|i cannot|i can.t view|i.m sorry",text,re.I):
+    if not 100<=count<=200 or re.search(r"as an ai|i cannot|i can.t view|i.m sorry",text,re.I):
         raise ValueError('Dense caption length or refusal validation failed')
     return count
 
@@ -58,7 +58,8 @@ def main():
     model_hashes={p.name:sha256_file(p) for p in sorted(args.model.glob('*.safetensors'))}
     if len(model_hashes)!=5:raise ValueError('Expect original five-shard Qwen2.5VL7B')
     write_json(args.output_dir/'model_provenance.json',{'model':'Qwen2.5-VL-7B-Instruct','sha256':model_hashes,
-                      'config_sha256':sha256_file(args.model/'config.json'),'caption_prompt':CAPTION_PROMPT,'word_range':[100,180]})
+                      'config_sha256':sha256_file(args.model/'config.json'),'caption_prompt':CAPTION_PROMPT,'word_range':[100,200],'acceptance_protocol':'dense_caption_v2',
+                      'revision_reason':'Explicit upper-length acceptance revision; preserve dense content, no result-score threshold change'})
     model=Qwen2_5_VLForConditionalGeneration.from_pretrained(str(args.model),local_files_only=True,
                      torch_dtype=torch.bfloat16,device_map='cuda',attn_implementation='sdpa').eval().requires_grad_(False)
     processor=AutoProcessor.from_pretrained(str(args.model),local_files_only=True,min_pixels=224*224,max_pixels=320*352)
@@ -124,20 +125,6 @@ def main():
             with torch.inference_mode():outputs=model.generate(**inputs,max_new_tokens=512,do_sample=False)
             text=processor.batch_decode(outputs[:,inputs.input_ids.shape[-1]:],skip_special_tokens=True,clean_up_tokenization_spaces=False)[0].strip()
             attempts=[text]
-            for repair in range(2):
-                try:
-                    words=validate_caption(text)
-                    break
-                except ValueError:
-                    instruction=('Rewrite the following draft into one factual English paragraph of 120-150 words. '
-                                 'Preserve only details supported by the same chronological images. '
-                                 'Do not add any new action or fact to pad the length. Output only the paragraph. Draft: '+text)
-                    revision=[{'role':'user','content':[{'type':'image','image':image} for image in images]+[{'type':'text','text':instruction}]}]
-                    formatted=processor.apply_chat_template(revision,tokenize=False,add_generation_prompt=True)
-                    revision_inputs=processor(text=[formatted],images=images,return_tensors='pt',padding=True).to('cuda')
-                    with torch.inference_mode():revised=model.generate(**revision_inputs,max_new_tokens=512,do_sample=False)
-                    text=processor.batch_decode(revised[:,revision_inputs.input_ids.shape[-1]:],skip_special_tokens=True,clean_up_tokenization_spaces=False)[0].strip()
-                    attempts.append(text)
             write_json(args.output_dir/(row['sample_id']+'_caption_attempts.json'),{'attempts':attempts,'bounded_length_repairs':len(attempts)-1})
             words=validate_caption(text)
             candidate=copy.deepcopy(row)
@@ -160,7 +147,7 @@ def main():
                     'word_max':max(r['caption_words'] for r in prepared),'dev_or_holdout_media_consumed':False,
                     'manual_caption_verification':False,'model_hashes':model_hashes,
                     'reuse_partial':str(args.reuse_partial) if args.reuse_partial else None,
-                    'max_length_repairs_per_new_caption':2})
+                    'max_length_repairs_per_new_caption':0,'acceptance_protocol':'dense_caption_v2'})
     except Exception as exc:
         write_json(args.output_dir/'failure.json',{'status':'failed','sample_id':current,'error_class':type(exc).__name__,
                                                   'error':str(exc),'completed':len(prepared)})
