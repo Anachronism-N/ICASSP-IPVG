@@ -589,13 +589,13 @@
     },
     {
       "path": "scripts/serve_label_review.py",
-      "source_sha256": "ff9a5081010a0f0ff889e4f5faae845983dfaf0894b374810b992bdf82aca00e",
-      "snapshot_sha256": "ff9a5081010a0f0ff889e4f5faae845983dfaf0894b374810b992bdf82aca00e"
+      "source_sha256": "f36999380899ddb945fdc0e5a6ab705a986148380a60e2a48a2e0f766c9c7734",
+      "snapshot_sha256": "f36999380899ddb945fdc0e5a6ab705a986148380a60e2a48a2e0f766c9c7734"
     },
     {
       "path": "tests/test_serve_label_review.py",
-      "source_sha256": "39f94d6ffcd216f215e2018009aef28fbd120294f5b4220e8f9647473252b3bb",
-      "snapshot_sha256": "39f94d6ffcd216f215e2018009aef28fbd120294f5b4220e8f9647473252b3bb"
+      "source_sha256": "ddba4caf312b25910433db117506b5b6b57b19b6aa01af671358872d2dcce4e9",
+      "snapshot_sha256": "ddba4caf312b25910433db117506b5b6b57b19b6aa01af671358872d2dcce4e9"
     }
   ],
   "experiment_progress": {
@@ -726,5 +726,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "Blind human caption-label review web service code only; no media, captions, tokens or reviews"
+  "latest_increment_scope": "Label review service: code-server proxy base-path support; code only"
 }

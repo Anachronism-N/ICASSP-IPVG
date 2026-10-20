@@ -189,5 +189,53 @@ class InputVerificationTests(unittest.TestCase):
             self.assertFalse(out.exists())
 
 
+class BasePathTests(ReviewServerTests.__mro__[1]):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.fx = Fixture(self.tmp.name)
+        cases = srv.load_cases(self.fx.root, self.fx.index, self.fx.audit)
+        self.out = self.fx.root / 'out'
+        self.server = srv.make_server(cases, srv.Store(self.out), TOKEN, '127.0.0.1', 0, '/proxy/8791/')
+        threading.Thread(target=self.server.serve_forever, daemon=True).start()
+        self.addCleanup(self.server.server_close)
+        self.addCleanup(self.server.shutdown)
+        self.port = self.server.server_address[1]
+
+    request = ReviewServerTests.request
+
+    def test_prefixed_links_redirects_cookie_and_stripped_proxy(self):
+        r, _ = self.request('GET', '/proxy/8791/?token=' + TOKEN, cookie=False)
+        self.assertEqual(r.status, 303)
+        self.assertEqual(r.getheader('Location'), '/proxy/8791/')
+        self.assertIn('Path=/proxy/8791/', r.getheader('Set-Cookie'))
+        for prefix in ['/proxy/8791', '']:  # absproxy keeps the prefix, proxy strips it
+            r, body = self.request('GET', prefix + '/case/case_one')
+            self.assertEqual(r.status, 200, prefix)
+            text = body.decode()
+            for needle in ['href="/proxy/8791/"', 'src="/proxy/8791/media/case_one/video"',
+                           'action="/proxy/8791/case/case_one"', 'src="/proxy/8791/media/case_one/page/0"']:
+                self.assertIn(needle, text)
+            self.assertNotIn('href="/case/', text)
+            r, data = self.request('GET', prefix + '/media/case_one/video', headers={'Range': 'bytes=0-9'})
+            self.assertEqual((r.status, data), (206, self.fx.video[:10]))
+        r, body = self.request('GET', '/proxy/8791/')
+        self.assertIn('href="/proxy/8791/case/case_one"', body.decode())
+        values = {'reviewer': 'tester', 'objects': 'supported', 'action': 'supported', 'camera': 'supported',
+                  'terminal_state': 'supported', 'overall': 'usable'}
+        for prefix, location in [('', '/case/case_one?saved=1'), ('/proxy/8791', '/proxy/8791/case/case_one?saved=1')]:
+            r, _ = self.request('POST', prefix + '/case/case_one', urlencode(values).encode(),
+                                {'Content-Type': 'application/x-www-form-urlencoded'})
+            self.assertEqual((r.status, r.getheader('Location')), (303, location))
+        r, _ = self.request('GET', '/?token=' + TOKEN, cookie=False)
+        self.assertEqual(r.getheader('Location'), '/')  # stripped proxy re-prefixes Location itself
+        r, _ = self.request('GET', '/proxy/8791/case/case_one', cookie=False)
+        self.assertEqual(r.status, 403)
+
+    def test_invalid_base_rejected(self):
+        with self.assertRaises(ValueError):
+            srv.make_server([], None, TOKEN, '127.0.0.1', 0, '/bad path"')
+
+
 if __name__ == '__main__':
     unittest.main()

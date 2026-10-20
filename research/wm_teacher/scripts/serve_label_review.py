@@ -156,14 +156,14 @@ def page(title, body):
             '<title>%s</title><style>%s</style></head><body>%s</body></html>' % (html.escape(title), STYLE, body)).encode()
 
 
-def index_html(cases, store):
+def index_html(cases, store, base=''):
     done = sum(1 for c in cases if store.get(c['audit_id']))
     rows = []
     for i, c in enumerate(cases, 1):
         rec = store.get(c['audit_id'])
         state = ('<span class="done">已提交 %s</span>' % html.escape(rec['submitted_at'])) if rec else '<span class="todo">待审</span>'
-        rows.append('<tr><td>%d</td><td><a href="/case/%s">%s</a></td><td>%s</td><td>%s</td></tr>' % (
-            i, html.escape(c['audit_id']), html.escape(c['audit_id']), html.escape(c['dataset']), state))
+        rows.append('<tr><td>%d</td><td><a href="%s/case/%s">%s</a></td><td>%s</td><td>%s</td></tr>' % (
+            i, html.escape(base), html.escape(c['audit_id']), html.escape(c['audit_id']), html.escape(c['dataset']), state))
     body = ('<h1>训练caption人工审阅</h1><div class="card">请观看每个5秒原视频（121帧），判断训练caption的描述是否与画面一致。'
             '页面不展示任何助手结论；你的提交为独立人工审阅，可随时修改，历史均保留。已完成 %d / %d。</div>'
             '<div class="card"><table><tr><th>#</th><th>案例</th><th>数据集</th><th>状态</th></tr>%s</table></div>'
@@ -171,14 +171,15 @@ def index_html(cases, store):
     return page('caption人工审阅', body)
 
 
-def case_html(cases, store, pos, message='', error=''):
+def case_html(cases, store, pos, message='', error='', base=''):
+    b = html.escape(base)
     c = cases[pos]
     cid = html.escape(c['audit_id'])
     rec = store.get(c['audit_id']) or {}
-    prev_link = '<a href="/case/%s">← 上一例</a>' % html.escape(cases[pos - 1]['audit_id']) if pos > 0 else '<span></span>'
-    next_link = '<a href="/case/%s">下一例 →</a>' % html.escape(cases[pos + 1]['audit_id']) if pos + 1 < len(cases) else '<span></span>'
-    sheets = ''.join('<div><div>帧 %d–%d</div><a href="/media/%s/page/%d" target="_blank"><img class="sheet" loading="lazy" '
-                     'src="/media/%s/page/%d" alt="contact sheet"></a></div>' % (p['start'], p['end'], cid, i, cid, i)
+    prev_link = '<a href="%s/case/%s">← 上一例</a>' % (b, html.escape(cases[pos - 1]['audit_id'])) if pos > 0 else '<span></span>'
+    next_link = '<a href="%s/case/%s">下一例 →</a>' % (b, html.escape(cases[pos + 1]['audit_id'])) if pos + 1 < len(cases) else '<span></span>'
+    sheets = ''.join('<div><div>帧 %d–%d</div><a href="%s/media/%s/page/%d" target="_blank"><img class="sheet" loading="lazy" '
+                     'src="%s/media/%s/page/%d" alt="contact sheet"></a></div>' % (p['start'], p['end'], b, cid, i, b, cid, i)
                      for i, p in enumerate(c['pages']))
     fields = []
     for key, label in CATEGORIES:
@@ -192,23 +193,26 @@ def case_html(cases, store, pos, message='', error=''):
         v, ' checked' if rec.get('overall') == v else '', t) for v, t in OVERALL)
     notice = ('<div class="ok">%s</div>' % html.escape(message) if message else '') + \
              ('<div class="err">%s</div>' % html.escape(error) if error else '')
-    body = ('<div class="nav"><a href="/">返回列表</a>%s%s</div><h2>%d / %d · %s <small>(%s)</small></h2>%s'
-            '<div class="grid"><div class="card"><video controls preload="metadata" src="/media/%s/video"></video></div>'
+    body = ('<div class="nav"><a href="%s/">返回列表</a>%s%s</div><h2>%d / %d · %s <small>(%s)</small></h2>%s'
+            '<div class="grid"><div class="card"><video controls preload="metadata" src="%s/media/%s/video"></video></div>'
             '<div class="card"><b>训练caption（原文）</b><div class="caption">%s</div></div></div>'
             '<div class="card grid">%s</div>'
-            '<form class="card" method="post" action="/case/%s">%s<fieldset><legend><b>总体结论</b></legend>%s</fieldset>'
+            '<form class="card" method="post" action="%s/case/%s">%s<fieldset><legend><b>总体结论</b></legend>%s</fieldset>'
             '<label>修正后的caption（可选）<textarea name="corrected_caption" rows="5" maxlength="%d">%s</textarea></label>'
             '<label>其他备注（可选）<textarea name="free_notes" rows="3" maxlength="%d">%s</textarea></label>'
             '<label>审阅人<input type="text" name="reviewer" required maxlength="200" value="%s"></label>'
             '<p><button type="submit">提交 / 更新</button></p></form>' % (
-                prev_link, next_link, pos + 1, len(cases), cid, html.escape(c['dataset']), notice, cid,
-                html.escape(c['prompt']), sheets, cid, ''.join(fields), overall, MAX_TEXT,
+                b, prev_link, next_link, pos + 1, len(cases), cid, html.escape(c['dataset']), notice, b, cid,
+                html.escape(c['prompt']), sheets, b, cid, ''.join(fields), overall, MAX_TEXT,
                 html.escape(rec.get('corrected_caption', '')), MAX_TEXT, html.escape(rec.get('free_notes', '')),
                 html.escape(rec.get('reviewer', ''))))
     return page(c['audit_id'] + ' 审阅', body)
 
 
-def make_server(cases, store, token, host='127.0.0.1', port=8791):
+def make_server(cases, store, token, host='127.0.0.1', port=8791, base_path=''):
+    base = base_path.rstrip('/')
+    if base and not re.fullmatch(r'(/[A-Za-z0-9_.-]+)+', base):
+        raise ValueError('invalid base path')
     positions = {c['audit_id']: i for i, c in enumerate(cases)}
 
     class Handler(BaseHTTPRequestHandler):
@@ -286,6 +290,16 @@ def make_server(cases, store, token, host='127.0.0.1', port=8791):
                         return
                     remaining -= len(chunk)
 
+        def _route(self):
+            # code-server /proxy/<port> strips the prefix and re-prefixes Location headers itself;
+            # /absproxy/<port> keeps it. Redirect targets must match what the proxy expects.
+            route = urlsplit(self.path).path
+            self.redirect_base = ''
+            if base and (route == base or route.startswith(base + '/')):
+                route = route[len(base):]
+                self.redirect_base = base
+            return route or '/'
+
         def do_HEAD(self):
             self.do_GET()
 
@@ -293,16 +307,16 @@ def make_server(cases, store, token, host='127.0.0.1', port=8791):
             auth = self._authorized()
             if not auth:
                 return self._deny()
-            route = urlsplit(self.path).path
+            route = self._route()
             if auth == 'query':
-                cookie = '%s=%s; HttpOnly; SameSite=Strict; Path=/' % (COOKIE, token)
-                return self._send(303, b'', extra={'Location': route or '/', 'Set-Cookie': cookie})
+                cookie = '%s=%s; HttpOnly; SameSite=Lax; Path=%s/' % (COOKIE, token, base)
+                return self._send(303, b'', extra={'Location': self.redirect_base + route, 'Set-Cookie': cookie})
             if route == '/':
-                return self._send(200, index_html(cases, store))
+                return self._send(200, index_html(cases, store, base))
             m = re.fullmatch(r'/case/([A-Za-z0-9_]+)', route)
             if m and m.group(1) in positions:
                 saved = 'saved' in parse_qs(urlsplit(self.path).query)
-                return self._send(200, case_html(cases, store, positions[m.group(1)], '已保存。' if saved else ''))
+                return self._send(200, case_html(cases, store, positions[m.group(1)], '已保存。' if saved else '', base=base))
             m = re.fullmatch(r'/media/([A-Za-z0-9_]+)/(video|page/([01]))', route)
             if m and m.group(1) in positions:
                 case = cases[positions[m.group(1)]]
@@ -316,7 +330,7 @@ def make_server(cases, store, token, host='127.0.0.1', port=8791):
         def do_POST(self):
             if not self._authorized():
                 return self._deny()
-            route = urlsplit(self.path).path
+            route = self._route()
             m = re.fullmatch(r'/case/([A-Za-z0-9_]+)', route)
             if not m or m.group(1) not in positions:
                 return self._send(404, page('未找到', '<p>未找到。</p>'))
@@ -333,9 +347,9 @@ def make_server(cases, store, token, host='127.0.0.1', port=8791):
                 form = parse_qs(self.rfile.read(length).decode('utf-8'), keep_blank_values=True, strict_parsing=False)
                 record = validate_form(form, cases[pos])
             except (ValueError, UnicodeDecodeError) as exc:
-                return self._send(400, case_html(cases, store, pos, error='提交未保存：' + str(exc)))
+                return self._send(400, case_html(cases, store, pos, error='提交未保存：' + str(exc), base=base))
             store.save(record)
-            self._send(303, b'', extra={'Location': '/case/%s?saved=1' % cases[pos]['audit_id']})
+            self._send(303, b'', extra={'Location': '%s/case/%s?saved=1' % (self.redirect_base, cases[pos]['audit_id'])})
 
     server = ThreadingHTTPServer((host, port), Handler)
     server.daemon_threads = True
@@ -350,6 +364,7 @@ def main(argv=None):
     parser.add_argument('--index', type=Path, default=DEFAULT_INDEX)
     parser.add_argument('--audit', type=Path, default=DEFAULT_AUDIT)
     parser.add_argument('--out-dir', type=Path, default=DEFAULT_OUT)
+    parser.add_argument('--base-path', default='', help='URL prefix seen by the browser, e.g. /proxy/8791 behind code-server')
     parser.add_argument('--check-only', action='store_true')
     args = parser.parse_args(argv)
     cases = load_cases(args.root, args.index, args.audit)
@@ -362,8 +377,8 @@ def main(argv=None):
     fd = os.open(token_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, 'w') as f:
         f.write(token + '\n')
-    server = make_server(cases, store, token, args.host, args.port)
-    print('SERVING http://%s:%d/?token=%s' % (args.host, server.server_address[1], token), flush=True)
+    server = make_server(cases, store, token, args.host, args.port, args.base_path)
+    print('SERVING http://%s:%d%s/?token=%s' % (args.host, server.server_address[1], args.base_path.rstrip('/'), token), flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
