@@ -1,0 +1,56 @@
+{
+  "status": "four_archived_caption_chains_checked",
+  "cases_checked": 4,
+  "archive_facts_without_ids": [
+    {
+      "case_category": "main_5s",
+      "raw_records": 1,
+      "caption_model": "Qwen3.5-35B-A3B",
+      "words": 142,
+      "finish_reason": "stop",
+      "prompt_matches_training": true,
+      "historical_request_frame_indices_recorded": false
+    },
+    {
+      "case_category": "main_5s",
+      "raw_records": 1,
+      "caption_model": "Qwen3.5-35B-A3B",
+      "words": 129,
+      "finish_reason": "stop",
+      "prompt_matches_training": true,
+      "historical_request_frame_indices_recorded": false
+    },
+    {
+      "case_category": "main_5s",
+      "raw_records": 1,
+      "caption_model": "Qwen3.5-35B-A3B",
+      "words": 217,
+      "finish_reason": "stop",
+      "prompt_matches_training": true,
+      "historical_request_frame_indices_recorded": false
+    },
+    {
+      "case_category": "supplementary",
+      "raw_records": 1,
+      "caption_model": "Qwen3.5-35B-A3B",
+      "words": 175,
+      "finish_reason": "stop",
+      "prompt_matches_training": true,
+      "historical_request_frame_indices_recorded": false
+    }
+  ],
+  "window_recaptioning_current_code": true,
+  "old_whole_video_caption_inheritance_as_explanation": "not supported for these four archived prompt chains",
+  "historical_media_bytes_at_caption_time": "UNKNOWN",
+  "historical_sampled_frame_indices": "UNKNOWN",
+  "current_server_video_num_frames": 16,
+  "current_server_configuration_is_historical_sampling_proof": false,
+  "namespace_affected_selected_training_records": 19,
+  "specific_bad_label_caused_by_namespace_collision_proven": false,
+  "original_data_modified": false,
+  "GPU_used": false,
+  "evidence_sha256": {
+    "main_record_audit": "633d385d0e90e6ced0ad457a38836a61ce5ba04df8359534c10316e81d7465ca",
+    "extra_record_audit": "56c024a0ff800dc125194d9bacd746b40db2e502e7d062db8995600cca5f3459"
+  }
+}

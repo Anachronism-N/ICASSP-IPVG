@@ -108,7 +108,7 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "3052a2f0699bf71cfecd645da3c30d42cfb5fa37fec52f18d285e571ad8b6089",
+      "source_sha256": "0653924716710653a0d0d9690995ae588252ed825b2c6123ced304bc30e1be93",
       "snapshot_sha256": "0d0082d8d89f978b8b8cbdce98e9773a2ad3634d16c6390bfc1c66ceb3181d1b"
     },
     {
@@ -208,8 +208,9 @@
     },
     {
       "path": "scripts/reslice_5s.py",
-      "source_sha256": "28cdc7870cb5956bbcfd41ab3497c2d8fb9426ef851bfee0483aba8b9624110d",
-      "snapshot_sha256": "7d8c38d007d1bebba7c8f0b7cb06edb27434e709cc2ffc4e64526b5857d833f2"
+      "source_sha256": "458982dde5803b346bd16d88bb868de4bb66561dd53b290b4dad63e68fa9291a",
+      "snapshot_sha256": "607497210a1119c6b389e52b4e27ce7ab4feb6a4a8b749d33f2a1e8c838fd8b9",
+      "deployment_path_transforms": "ROOT,FFMPEG,TMP_DIR only; algorithm AST verified"
     },
     {
       "path": "scripts/finalize_5s.py",
@@ -253,7 +254,7 @@
     },
     {
       "path": "tests/test_export_experiment_snapshot.py",
-      "source_sha256": "90a15e37ebd48618d689e36776f6c7fc9a78624ab3b3bde02cf85c2615dcca8b",
+      "source_sha256": "abca1661c4593c294e73213b7c313fec3bd563bcc183b8154c4029396d3eae07",
       "snapshot_sha256": "8683d6f5d4aacafdd1c3963505387a1e2ad851d366bc8687dbe003b9c833b101"
     },
     {
@@ -508,8 +509,28 @@
     },
     {
       "path": "docs/40_四节点受控训练资源规划.md",
-      "source_sha256": "5d1fdfb7b177d3e5e94be2ac47fa9160f04c22f852686a35a414ce7e1b377df5",
-      "snapshot_sha256": "5d1fdfb7b177d3e5e94be2ac47fa9160f04c22f852686a35a414ce7e1b377df5"
+      "source_sha256": "e4291e1a37e9ea8d8faa42cbe61e423cd381e1670ea1944b2649cb1e00c63b56",
+      "snapshot_sha256": "e4291e1a37e9ea8d8faa42cbe61e423cd381e1670ea1944b2649cb1e00c63b56"
+    },
+    {
+      "path": "docs/41_窗口标注链与命名歧义验收.md",
+      "source_sha256": "e9ddd30c5f298d58af56ec3340f6518d541c6a282214053a8456c92f9a908124",
+      "snapshot_sha256": "e9ddd30c5f298d58af56ec3340f6518d541c6a282214053a8456c92f9a908124"
+    },
+    {
+      "path": "eval/diag/namespace_inventory_public_summary_20261020.json",
+      "source_sha256": "1337ed903c11d1e2459d392c8bc52ee2d8414a71cece46c02db703e6f4f09654",
+      "snapshot_sha256": "1337ed903c11d1e2459d392c8bc52ee2d8414a71cece46c02db703e6f4f09654"
+    },
+    {
+      "path": "eval/diag/window_caption_chain_public_summary_20261020.json",
+      "source_sha256": "d6ce930d74e8e5a9d448868bb6d2dfa717cde1bff232b85e01099207dfc623f3",
+      "snapshot_sha256": "d6ce930d74e8e5a9d448868bb6d2dfa717cde1bff232b85e01099207dfc623f3"
+    },
+    {
+      "path": "tests/test_reslice_namespace.py",
+      "source_sha256": "787be147334218bdf3b5043fc5aad79f46fd5866a2a4ab2a31bf9a3f1d1f6fee",
+      "snapshot_sha256": "787be147334218bdf3b5043fc5aad79f46fd5866a2a4ab2a31bf9a3f1d1f6fee"
     }
   ],
   "experiment_progress": {
@@ -606,5 +627,20 @@
     "generation_seeds_initial": 2,
     "training_seed_initial_same_all_arms": true,
     "teacher_passed": false
+  },
+  "namespace_audit_increment": {
+    "status": "CPU_metadata_scope_and_write_guard_verified",
+    "ambiguous_namespaces": 39,
+    "potential_window_keys": 1625,
+    "selected_ft2_multiple_candidate_run_windows": 19,
+    "proved_media_overwrite": false,
+    "old_data_modified": false,
+    "wm_nodes_allowed": [
+      0,
+      1,
+      2
+    ],
+    "node3_reserved_for_other_tasks": true,
+    "training_started": false
   }
 }

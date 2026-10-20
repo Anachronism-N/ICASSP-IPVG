@@ -1,0 +1,38 @@
+{
+  "status": "completed_metadata_potential_collision_scope_NOT_proof_of_media_overwrite",
+  "inventory_sha256": "b587bcccd2094d2d96a48c573deaf5be2f0f1351375b4701a38c24c3bc8756a1",
+  "namespaces": 78558,
+  "ambiguous_namespaces": 39,
+  "potential_overlapping_window_keys": 1625,
+  "coverage": {
+    "ft2": {
+      "total_records": 32365,
+      "ambiguous_namespace_records": 62,
+      "multiple_candidate_run_records": 19,
+      "by_dataset": {
+        "egoexo4d": 19
+      }
+    },
+    "round2_val": {
+      "total_records": 1735,
+      "ambiguous_namespace_records": 0,
+      "multiple_candidate_run_records": 0,
+      "by_dataset": {}
+    },
+    "WM108": {
+      "total_records": 108,
+      "ambiguous_namespace_records": 0,
+      "multiple_candidate_run_records": 0,
+      "by_dataset": {}
+    },
+    "fixed120": {
+      "total_records": 120,
+      "ambiguous_namespace_records": 0,
+      "multiple_candidate_run_records": 0,
+      "by_dataset": {}
+    }
+  },
+  "raw_data_modified": false,
+  "GPU_used": false,
+  "wall_seconds": 5.463845658116043
+}

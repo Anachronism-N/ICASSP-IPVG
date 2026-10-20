@@ -131,6 +131,19 @@ def _blocks(wins):
     return out
 
 
+def validate_run_names(jobs):
+    identities = {}
+    for run, _ in jobs:
+        safe = re.sub(r"[^A-Za-z0-9_.+-]", "_", run["source"])[:150]
+        key = (run["dataset"], safe)
+        identity = (run["source"], tuple(run["segs"]))
+        if key in identities and identities[key] != identity:
+            raise ValueError(
+                "Ambiguous window namespace " + repr(key) + ": distinct runs share an output name; "
+                "preserve existing data and prepare a run-qualified manifest before slicing")
+        identities[key] = identity
+
+
 def process(job, out_root):
     run, wins = job
     rows, fails = [], 0
@@ -265,6 +278,7 @@ def main():
         runs = load_runs(set(targets), a.orient)
         jobs = plan(runs, targets, a.max_per_source, a.seed)
     print(f"[plan] total windows={sum(len(w) for _, w in jobs)} jobs={len(jobs)}", flush=True)
+    validate_run_names(jobs)
     if a.dry_run:
         return
 
