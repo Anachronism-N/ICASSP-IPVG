@@ -1,0 +1,47 @@
+{
+  "status": "namespace_screened_candidates_NOT_training_approved",
+  "original_rows": 32365,
+  "candidate_rows": 32346,
+  "quarantined_rows": 19,
+  "original_csv_sha256": "2fd1615c3c538d9d9462ad166b78129f8c349174bffd5ce1085888d5f001a0a6",
+  "scope_sha256": "1a874efd3253f4e1ce1b8a2696c0e4bdfe9167c38e0c59a373262a753147ace6",
+  "output_sha256": {
+    "namespace_candidates.csv": "029f80911cb5b21b2c797f8959d90b097bb0051148daa8c8239e27b86507b7d6",
+    "namespace_quarantine.csv": "c8d7645ec8f4f58e307f6fc91b260bc5fca6dae82cdea50b2a9c4de24645bbe5"
+  },
+  "candidates_by_dataset": {
+    "ukdash": 1610,
+    "celebvhq": 3092,
+    "openvidgen": 6600,
+    "direct": 1030,
+    "egodex": 2112,
+    "vfhq": 1547,
+    "robomind": 2244,
+    "mira": 3092,
+    "hoigen1m": 5154,
+    "matrix": 1547,
+    "charades": 2577,
+    "seamless": 252,
+    "noxi": 566,
+    "easycom": 721,
+    "openvidhd": 77,
+    "egoexo4d": 74,
+    "h2o": 51
+  },
+  "quarantine_by_dataset": {
+    "egoexo4d": 19
+  },
+  "captions_modified": false,
+  "original_csv_modified": false,
+  "media_deleted_or_modified": false,
+  "quarantine_is_proof_of_label_error": false,
+  "training_approved": false,
+  "GPU_used": false,
+  "remaining_gates": [
+    "semantic-label review",
+    "train/development parent-source isolation",
+    "training scope/budget and gradient/save/restore smoke"
+  ],
+  "human_review": "pending",
+  "teacher_passed": false
+}

@@ -108,7 +108,7 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "0653924716710653a0d0d9690995ae588252ed825b2c6123ced304bc30e1be93",
+      "source_sha256": "3a2db43a45bbb040951319141c960ee46a99ceadc6d09197ce9052a903281a25",
       "snapshot_sha256": "0d0082d8d89f978b8b8cbdce98e9773a2ad3634d16c6390bfc1c66ceb3181d1b"
     },
     {
@@ -254,7 +254,7 @@
     },
     {
       "path": "tests/test_export_experiment_snapshot.py",
-      "source_sha256": "abca1661c4593c294e73213b7c313fec3bd563bcc183b8154c4029396d3eae07",
+      "source_sha256": "33f2b857c661a5cb0f8c6b8949fbd4b6d4d79405a3cf6600fa8bc79666b36619",
       "snapshot_sha256": "8683d6f5d4aacafdd1c3963505387a1e2ad851d366bc8687dbe003b9c833b101"
     },
     {
@@ -514,8 +514,8 @@
     },
     {
       "path": "docs/41_窗口标注链与命名歧义验收.md",
-      "source_sha256": "e9ddd30c5f298d58af56ec3340f6518d541c6a282214053a8456c92f9a908124",
-      "snapshot_sha256": "e9ddd30c5f298d58af56ec3340f6518d541c6a282214053a8456c92f9a908124"
+      "source_sha256": "065bfc49dcad81823d978d4f78bfab62a39da86946e1c5e3caff642ce876b126",
+      "snapshot_sha256": "065bfc49dcad81823d978d4f78bfab62a39da86946e1c5e3caff642ce876b126"
     },
     {
       "path": "eval/diag/namespace_inventory_public_summary_20261020.json",
@@ -531,6 +531,21 @@
       "path": "tests/test_reslice_namespace.py",
       "source_sha256": "787be147334218bdf3b5043fc5aad79f46fd5866a2a4ab2a31bf9a3f1d1f6fee",
       "snapshot_sha256": "787be147334218bdf3b5043fc5aad79f46fd5866a2a4ab2a31bf9a3f1d1f6fee"
+    },
+    {
+      "path": "scripts/prepare_teacher_eligibility.py",
+      "source_sha256": "04b60c02b614d4613d1163732ed15835ef4a5680d0375af72cf9d46707bc1f10",
+      "snapshot_sha256": "04b60c02b614d4613d1163732ed15835ef4a5680d0375af72cf9d46707bc1f10"
+    },
+    {
+      "path": "tests/test_prepare_teacher_eligibility.py",
+      "source_sha256": "b0fef8cb0eaf9bf39b50e05b738d886034548dc607457c89714536f17459dabf",
+      "snapshot_sha256": "b0fef8cb0eaf9bf39b50e05b738d886034548dc607457c89714536f17459dabf"
+    },
+    {
+      "path": "training_metadata/teacher_namespace_candidates_20261020_v1/eligibility_summary.json",
+      "source_sha256": "e11d425b483fd78140a28ea9032e6a79dd5665015ad01f4b474f18e64a0bd761",
+      "snapshot_sha256": "e11d425b483fd78140a28ea9032e6a79dd5665015ad01f4b474f18e64a0bd761"
     }
   ],
   "experiment_progress": {
@@ -642,5 +657,14 @@
     ],
     "node3_reserved_for_other_tasks": true,
     "training_started": false
+  },
+  "namespace_candidate_increment": {
+    "candidate_rows": 32346,
+    "quarantined_rows": 19,
+    "training_approved": false,
+    "semantic_and_parent_source_gates": "pending",
+    "caption_CSVs_published": false,
+    "new_GPU_work": false,
+    "reserved_node_rank": 3
   }
 }
