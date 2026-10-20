@@ -15,6 +15,40 @@ snapshot = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(snapshot)
 
 
+class PublicationAllowlistTests(unittest.TestCase):
+    def test_p1_code_and_plan_are_selected_without_private_cases(self):
+        selected = {"docs/33_Teacher优化开发消融计划.md",
+                    "docs/34_Teacher_CFG开发消融结论.md",
+                    "eval/diag/teacher_p1_results_20261019.json",
+                    "docs/35_Teacher机制诊断与随机标签审计计划.md",
+                    "docs/36_Teacher优化相关工作与可证伪方案.md",
+                    "docs/38_标签语义校准与C1推理条件实验.md",
+                    "docs/39_C1原与校订Caption完整结论.md", "eval/diag/C1_caption_public_results_20261020.json",
+    "eval/diag/C1_FT1_membership_public_summary_20261020.json",
+                    "docs/40_四节点受控训练资源规划.md",
+                    "docs/41_窗口标注链与命名歧义验收.md",
+                    "training_metadata/teacher_namespace_candidates_20261020_v1/eligibility_summary.json",
+                    "scripts/prepare_teacher_eligibility.py", "tests/test_prepare_teacher_eligibility.py",
+                    "eval/diag/namespace_inventory_public_summary_20261020.json",
+                    "eval/diag/window_caption_chain_public_summary_20261020.json",
+                    "tests/test_reslice_namespace.py",
+                    "eval/diag/teacher_L1_semantic_pilot_summary_20261020.json",
+                    "docs/37_Teacher机制诊断M1实测结论.md", "eval/diag/teacher_M1_public_results_20261020.json",
+                    "docs/37_M1同状态预测分解实验结论.md",
+                    "eval/diag/teacher_m1_public_summary_20261020.json",
+                    "eval/diag/teacher_label_audit_L1_public_summary_20261020.json",
+                    "scripts/audit_teacher_labels.py", "scripts/run_teacher_mechanism_probe.py", "scripts/run_teacher_caption_probe.py",
+                    "tests/test_audit_teacher_labels.py", "tests/test_teacher_mechanism_probe.py", "tests/test_teacher_caption_probe.py",
+                    "scripts/run_teacher_probe.py", "scripts/score_teacher_probe.py",
+                    "tests/test_run_teacher_probe.py", "tests/test_score_teacher_probe.py"}
+        self.assertTrue(selected <= set(snapshot.FILES))
+        self.assertEqual(len(snapshot.FILES), len(set(snapshot.FILES)))
+        self.assertFalse(any("teacher_opt_state" in name or "p1_jobs" in name
+                             or "p1_provenance" in name or "idle_reservation" in name
+                             or name.endswith("namespace_candidates.csv") or name.endswith("namespace_quarantine.csv")
+                             for name in snapshot.FILES))
+
+
 class ExportSnapshotTests(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()

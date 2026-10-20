@@ -75,3 +75,11 @@ Charades对象错误校订带来很大的匹配收益。描述性排除该case�
 安全聚合：eval/diag/C1_caption_public_results_20261020.json。独立原诊断SHA：d455a76979c6f6a1f77a929395c0a4e47b52fc800dc9836054e71356aee41237。原tensor/逐case媒体、caption文本和来源identity只私有保存。
 
 方案/代码此前分别发布e767580及4520971，代码阶段99manifest与3关键远端文件核验通过；这些提交不含本文完整结果。结果正常追加提交并逐字节核验，发布证明另记。
+
+## 8. 保存的FT1配方成员关系补核（2026-10-20）
+
+对保存的round5_train.csv共33040行做CPU完整精确路径与parsed caption核查：C1六视频中仅1条出现，且其caption与FT2原文本相同；其余5条没有exact-video匹配，六条校订caption均未在该配方出现。
+
+这是保存配方的成员关系，不是每条实际被优化器采样的记录；路径未匹配不证明父来源或基础预训练未见。六视频在FT2训练CSV的成员关系均已确认，但不能统一说它们全被FT1/A07直接训练过，也不能改称新的未见泛化集。原C1结果仍只说明输入版本效应，非校订重训练收益。
+
+保存配方CSV SHA256=2d11fcb9662edd70e5410307aa93c8730ac6d7ea4ccc09d72327abead179bb19。安全聚合见eval/diag/C1_FT1_membership_public_summary_20261020.json，病例路径与逐条标签hash只私有保留。

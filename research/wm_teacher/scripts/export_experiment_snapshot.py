@@ -54,6 +54,27 @@ FILES = [
     "gtref_merge_a05_paired_bootstrap_20261018.json", "gtref_merge_a03_paired_bootstrap_20261018.json",
     "merge_a03_a05_analysis_20261018.json", "merge_all_cpu_analysis_20261018.json", "merge_all_analysis_20261018.json",
 )]
+FILES += [
+    "docs/38_标签语义校准与C1推理条件实验.md",
+    "docs/39_C1原与校订Caption完整结论.md",
+    "eval/diag/C1_caption_public_results_20261020.json",
+    "eval/diag/C1_FT1_membership_public_summary_20261020.json",
+    "docs/40_四节点受控训练资源规划.md",
+    "docs/41_窗口标注链与命名歧义验收.md",
+    "training_metadata/teacher_namespace_candidates_20261020_v1/eligibility_summary.json",
+    "eval/diag/namespace_inventory_public_summary_20261020.json",
+    "eval/diag/window_caption_chain_public_summary_20261020.json",
+    "eval/diag/teacher_L1_semantic_pilot_summary_20261020.json",
+    "docs/37_Teacher机制诊断M1实测结论.md",
+    "eval/diag/teacher_M1_public_results_20261020.json",
+    "docs/37_M1同状态预测分解实验结论.md",
+    "eval/diag/teacher_m1_public_summary_20261020.json",
+    "scripts/run_teacher_caption_probe.py",
+    "scripts/prepare_teacher_eligibility.py",
+    "tests/test_teacher_caption_probe.py",
+    "tests/test_reslice_namespace.py",
+    "tests/test_prepare_teacher_eligibility.py"
+]
 REQUIRED = {"scripts/gen_jobs.py", "scripts/run_gen.sh", "scripts/score_merge_cpu.py",
             "scripts/analyze_merge_metrics.py", "scripts/monitor_merge.py", "scripts/wmb_merge_score.py",
             "scripts/val_merge_score.py", "scripts/merge_final_gate.py", "docs/30_Teacher模型训练实验记录.md"}

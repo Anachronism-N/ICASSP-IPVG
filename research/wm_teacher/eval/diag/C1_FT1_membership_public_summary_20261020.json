@@ -1,0 +1,15 @@
+{
+  "status": "exact_path_membership_against_saved_round5_FT1_training_recipe",
+  "recipe_rows": 33040,
+  "training_recipe_csv_sha256": "2d11fcb9662edd70e5410307aa93c8730ac6d7ea4ccc09d72327abead179bb19",
+  "provenance_sha256": "e5acbdb3694dda35d08b92ca46fad0d7eebd65def9b0255fb7277b0c7e5ead75",
+  "C1_cases": 6,
+  "exact_video_present_cases": 1,
+  "same_original_caption_cases": 1,
+  "same_corrected_caption_cases": 0,
+  "actual_training_sampling_confirmed": false,
+  "parent_source_disjointness_confirmed": false,
+  "pretraining_disjointness_confirmed": false,
+  "GPU_used": false,
+  "training_started": false
+}

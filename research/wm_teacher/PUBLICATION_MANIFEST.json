@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "3a2db43a45bbb040951319141c960ee46a99ceadc6d09197ce9052a903281a25",
-      "snapshot_sha256": "0d0082d8d89f978b8b8cbdce98e9773a2ad3634d16c6390bfc1c66ceb3181d1b"
+      "source_sha256": "92cf03c81a9ce9433957881642e037da88edc99fed44a5123184fb0b246df5b7",
+      "snapshot_sha256": "00aca3b0471de9df7e77c6fadd8a400ec1391680d713e7573ce5ce15458f67c8"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -254,8 +254,8 @@
     },
     {
       "path": "tests/test_export_experiment_snapshot.py",
-      "source_sha256": "33f2b857c661a5cb0f8c6b8949fbd4b6d4d79405a3cf6600fa8bc79666b36619",
-      "snapshot_sha256": "8683d6f5d4aacafdd1c3963505387a1e2ad851d366bc8687dbe003b9c833b101"
+      "source_sha256": "2dfd9f53bd98b19c02fc0e0edbfe5c4360f6ff9d2856ec1bdbeef6a09a7e5046",
+      "snapshot_sha256": "2dfd9f53bd98b19c02fc0e0edbfe5c4360f6ff9d2856ec1bdbeef6a09a7e5046"
     },
     {
       "path": "eval/diag/ft2_paired_bootstrap.json",
@@ -499,8 +499,8 @@
     },
     {
       "path": "docs/39_C1原与校订Caption完整结论.md",
-      "source_sha256": "f92331eafe933224d16d08b60ec98157d5a430b02a9a8d07eb95409e365751f2",
-      "snapshot_sha256": "f92331eafe933224d16d08b60ec98157d5a430b02a9a8d07eb95409e365751f2"
+      "source_sha256": "0166d46b670e3df665357a18436071ceab89790097f1cfada7c58d132969652f",
+      "snapshot_sha256": "0166d46b670e3df665357a18436071ceab89790097f1cfada7c58d132969652f"
     },
     {
       "path": "eval/diag/C1_caption_public_results_20261020.json",
@@ -546,6 +546,11 @@
       "path": "training_metadata/teacher_namespace_candidates_20261020_v1/eligibility_summary.json",
       "source_sha256": "e11d425b483fd78140a28ea9032e6a79dd5665015ad01f4b474f18e64a0bd761",
       "snapshot_sha256": "e11d425b483fd78140a28ea9032e6a79dd5665015ad01f4b474f18e64a0bd761"
+    },
+    {
+      "path": "eval/diag/C1_FT1_membership_public_summary_20261020.json",
+      "source_sha256": "95a926aca6777693ad2b5c58295f669a2365c2e7cb5df8b6db790966c6b30a65",
+      "snapshot_sha256": "95a926aca6777693ad2b5c58295f669a2365c2e7cb5df8b6db790966c6b30a65"
     }
   ],
   "experiment_progress": {
@@ -666,5 +671,14 @@
     "caption_CSVs_published": false,
     "new_GPU_work": false,
     "reserved_node_rank": 3
+  },
+  "C1_FT1_recipe_membership": {
+    "recipe_rows": 33040,
+    "exact_video_present_cases": 1,
+    "same_original_caption_cases": 1,
+    "same_corrected_caption_cases": 0,
+    "actual_training_sampling_confirmed": false,
+    "parent_source_disjointness_confirmed": false,
+    "training_started": false
   }
 }
