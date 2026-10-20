@@ -315,7 +315,15 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(children[0].returncode, -9)
         self.assertEqual(resources[0]["pid"], children[0].pid)
         self.assertGreater(resources[0]["gpu_hours"], 0)
-        self.assertLessEqual(resources[0]["seconds"], 0.4)
+        # OS scheduling/reaping can overshoot a subsecond test deadline; charge the
+        # actual elapsed time instead of pretending it was clamped to the budget.
+        self.assertLessEqual(resources[0]["seconds"], 0.65)
+        self.assertAlmostEqual(resources[0]["gpu_hours"], resources[0]["seconds"] / 3600)
+        jobs = [{"id": "not-generated", "out": str(self.out / "missing.mp4")}]
+        with mock.patch.object(probe, "decode_video") as decode:
+            self.assertEqual(probe.finish(self.out, jobs, resources, error, 0.4 / 3600,
+                                          0.4 / 3600, "manifest"), 1)
+        decode.assert_not_called()
 
     def test_framework_snapshot_hashes_resources_and_ignores_nonruntime_files(self):
         source = self.root / "DiffSynth-Studio" / "diffsynth"
