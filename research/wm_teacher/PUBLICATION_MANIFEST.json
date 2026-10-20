@@ -108,7 +108,7 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "059a31e029405179dfca9b43e8eaedf29e1657babfa50cf437d0d4d29036a679",
+      "source_sha256": "4c2c595325604d8d7765651ca6c18f98f7f03bfb68d6917019d3935accc8dac1",
       "snapshot_sha256": "0d0082d8d89f978b8b8cbdce98e9773a2ad3634d16c6390bfc1c66ceb3181d1b"
     },
     {
@@ -253,7 +253,7 @@
     },
     {
       "path": "tests/test_export_experiment_snapshot.py",
-      "source_sha256": "0e482669ca747633d024dd71c1bda1ffb1484d72971b84ca04517db5cfa82e5c",
+      "source_sha256": "5ff8b044eb3a841c3858adddea48f89fb7ea10d10197e49cf4a548a981b5128b",
       "snapshot_sha256": "8683d6f5d4aacafdd1c3963505387a1e2ad851d366bc8687dbe003b9c833b101"
     },
     {
@@ -478,8 +478,8 @@
     },
     {
       "path": "docs/38_标签语义校准与C1推理条件实验.md",
-      "source_sha256": "a8548aa465f56b4fec9c92d055661c4c88da27e23f26237cb0d5e38ca7152063",
-      "snapshot_sha256": "a8548aa465f56b4fec9c92d055661c4c88da27e23f26237cb0d5e38ca7152063"
+      "source_sha256": "e7ce9e128d43eaa7fdc1ca46b97e05488244783940aa6e6d111bee3475bd9091",
+      "snapshot_sha256": "7e2131b86aa124adfb20282630d7e53a546693e1d0e2479711153bfb67e1fbb2"
     },
     {
       "path": "eval/diag/teacher_L1_semantic_pilot_summary_20261020.json",
@@ -495,6 +495,16 @@
       "path": "tests/test_teacher_caption_probe.py",
       "source_sha256": "f5a8c688df529ef31dd1f8d91a749f2cb6cd0515e2705a344361ef70e9e85bf6",
       "snapshot_sha256": "ee8abcdb67413a941be7cbc75e26e006cf9743a0746dca3763d9f19aa5a1a63e"
+    },
+    {
+      "path": "docs/39_C1原与校订Caption完整结论.md",
+      "source_sha256": "f92331eafe933224d16d08b60ec98157d5a430b02a9a8d07eb95409e365751f2",
+      "snapshot_sha256": "f92331eafe933224d16d08b60ec98157d5a430b02a9a8d07eb95409e365751f2"
+    },
+    {
+      "path": "eval/diag/C1_caption_public_results_20261020.json",
+      "source_sha256": "52795782f28f3e3a75267894d23fdf7cc8b64e8d8a1fa39aa564862bd04afc09",
+      "snapshot_sha256": "52795782f28f3e3a75267894d23fdf7cc8b64e8d8a1fa39aa564862bd04afc09"
     }
   ],
   "experiment_progress": {
@@ -571,5 +581,17 @@
     "cap_GPUh": 6,
     "training_performed": false,
     "teacher_passed": false
+  },
+  "C1_result_increment": {
+    "stage": "complete_independently_verified_generation_scoring_and_caption_diagnostics",
+    "new_outputs": 12,
+    "new_scored_rows": 12,
+    "reused_corrected_controls": 12,
+    "actual_GPUh": 1.894073579777032,
+    "GPUh_cap": 6,
+    "computing_nodes": 1,
+    "computing_GPUs": 4,
+    "teacher_passed": false,
+    "human_review": "pending"
   }
 }

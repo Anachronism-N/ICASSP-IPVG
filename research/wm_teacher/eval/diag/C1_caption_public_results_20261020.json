@@ -1,0 +1,81 @@
+{
+  "status": "independently_verified_C1_complete",
+  "new_videos": 12,
+  "new_score_rows": 12,
+  "reused_corrected_controls": 12,
+  "generation_GPUh": 1.2924698306578728,
+  "scoring_GPUh": 0.6016037491191593,
+  "total_GPUh": 1.894073579777032,
+  "maximum_GPUh": 6,
+  "means": [
+    {
+      "model": "base",
+      "caption_version": "original",
+      "subject_consistency": 0.9220146650241481,
+      "imaging_quality": 0.645773145764984,
+      "dreamsim": 0.18473820719454023,
+      "dreamsim_last": 0.21493091185887656,
+      "motion_ratio": 0.3690571282564107
+    },
+    {
+      "model": "base",
+      "caption_version": "corrected",
+      "subject_consistency": 0.939666162762377,
+      "imaging_quality": 0.658980310954995,
+      "dreamsim": 0.15804815540711084,
+      "dreamsim_last": 0.17961361010869345,
+      "motion_ratio": 0.3449271595782763
+    },
+    {
+      "model": "m_full1_a07",
+      "caption_version": "original",
+      "subject_consistency": 0.9044964579244454,
+      "imaging_quality": 0.6054136222650197,
+      "dreamsim": 0.1903393069903056,
+      "dreamsim_last": 0.1969057818253835,
+      "motion_ratio": 0.5506108264942069
+    },
+    {
+      "model": "m_full1_a07",
+      "caption_version": "corrected",
+      "subject_consistency": 0.9290885574287838,
+      "imaging_quality": 0.6521303729643179,
+      "dreamsim": 0.15659083508782917,
+      "dreamsim_last": 0.1837044656276703,
+      "motion_ratio": 0.10218831474246996
+    }
+  ],
+  "model_deltas": {
+    "base": {
+      "dreamsim": -0.02669005178742939,
+      "dreamsim_last": -0.035317301750183105,
+      "imaging_quality": 0.013207165190010991,
+      "motion_ratio": -0.02412996867813436,
+      "subject_consistency": 0.01765149773822892
+    },
+    "m_full1_a07": {
+      "dreamsim": -0.03374847190247642,
+      "dreamsim_last": -0.013201316197713217,
+      "imaging_quality": 0.04671675069929813,
+      "motion_ratio": -0.4484225117517369,
+      "subject_consistency": 0.024592099504338365
+    }
+  },
+  "DiD": {
+    "dreamsim": -0.007058420115047034,
+    "dreamsim_last": 0.022115985552469887,
+    "imaging_quality": 0.033509585509287135,
+    "motion_ratio": -0.42429254307360253,
+    "subject_consistency": 0.006940601766109444
+  },
+  "teacher_passed": false,
+  "human_review": "pending",
+  "scope": "fixed6training-visible cases seed0 input-caption counterfactual; not training benefit or holdout",
+  "evidence_sha256": {
+    "caption_manifest.json": "b485f8a67cc0886e1fc0274151baa905f44b63ece3382d4d2fd6ce18a696a6be",
+    "generation_summary.json": "e652ed0ea53821f9f8affd92122aa33d35cd5ccac4d9be82d6a87b2d513cdc0f",
+    "score_summary.json": "49ee3a11bbbcb23a9be24dc56bc9f905c351daf59e3327579e7967143b12457e",
+    "caption_pair_diagnostics.json": "d455a76979c6f6a1f77a929395c0a4e47b52fc800dc9836054e71356aee41237",
+    "scoring/score_rows.json": "8b08d072f7421bb883a76594a2374f1a46d6903173f47f5cf8f07cb4942a42a8"
+  }
+}

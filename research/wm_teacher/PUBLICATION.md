@@ -1,3 +1,9 @@
+# C1 completed input-caption diagnostic (2026-10-20)
+
+12 new original-caption videos and 12 scored rows completed, paired with 12 existing corrected-caption controls. Independent full decode, source/output hashes, original metric formulas and pair reconstruction passed; actual additional allocated cost 1.894074 GPUh within 6. See docs/39_C1原与校订Caption完整结论.md and eval/diag/C1_caption_public_results_20261020.json. Mean matching/quality improves with corrected labels on these six training-visible cases, but manipulation failures and case tradeoffs remain. This is not a trained-model improvement, a holdout estimate, or Teacher approval.
+
+Only four GPUs on the main node computed C1; three other nodes were not used for this run. Resource reservation/history is not experimental throughput. Teacher automatic FAIL/user review pending remain unchanged. Historical stages below are retained with their own timestamps.
+
 # M1/L1 complete-execution and literature update (2026-10-20)
 
 M1 completed 18 shared GT-forward-process states and 72 native model predictions. Independent CPU reconstruction matched all 54,378 numeric outputs (maximum difference 0); conservative allocated cost 0.182380 GPUh within 2. See docs/37_Teacher机制诊断M1实测结论.md and eval/diag/teacher_M1_public_results_20261020.json. This is not rollout replay, a causal quality cure, or Teacher approval.
