@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "5a68c76140f54bad3cd8069f15a21e81aa4ae3f9d0d0d529c8eaee2a69ed6eb1",
-      "snapshot_sha256": "5a68c76140f54bad3cd8069f15a21e81aa4ae3f9d0d0d529c8eaee2a69ed6eb1"
+      "source_sha256": "1a17178ebac42e12e7fcaa66954712b65b300ec3bfe086a54a6f0e6bb74fcff3",
+      "snapshot_sha256": "1a17178ebac42e12e7fcaa66954712b65b300ec3bfe086a54a6f0e6bb74fcff3"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -254,8 +254,8 @@
     },
     {
       "path": "tests/test_export_experiment_snapshot.py",
-      "source_sha256": "6d5d83193fcaec1748b65e63d11e632ae4345fd864294e18d9bdc7715b531ccb",
-      "snapshot_sha256": "6d5d83193fcaec1748b65e63d11e632ae4345fd864294e18d9bdc7715b531ccb"
+      "source_sha256": "3c975cb1ab1d20f46152732499c33e0085ca0a14964e46a745e248ae9824df96",
+      "snapshot_sha256": "3c975cb1ab1d20f46152732499c33e0085ca0a14964e46a745e248ae9824df96"
     },
     {
       "path": "eval/diag/ft2_paired_bootstrap.json",
@@ -601,6 +601,16 @@
       "path": "docs/43_四节点追平SOTA实验计划.md",
       "source_sha256": "9554a35f653681ad072af4300bb07b9e157a00849e7289f7d23a405a262118c7",
       "snapshot_sha256": "9554a35f653681ad072af4300bb07b9e157a00849e7289f7d23a405a262118c7"
+    },
+    {
+      "path": "docs/44_委托代审17例caption结论.md",
+      "source_sha256": "b304da3e415c6b585355731774ba65f403986c89986ce4771c2d2b122843bd29",
+      "snapshot_sha256": "b304da3e415c6b585355731774ba65f403986c89986ce4771c2d2b122843bd29"
+    },
+    {
+      "path": "eval/diag/delegated_label_review_17_public_summary_20261021.json",
+      "source_sha256": "66da35665ee748b3469f8fc3ed888e99066aaa143e7db6416267d8f60d8712b3",
+      "snapshot_sha256": "66da35665ee748b3469f8fc3ed888e99066aaa143e7db6416267d8f60d8712b3"
     }
   ],
   "experiment_progress": {
@@ -731,5 +741,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "Pre-registered four-node SOTA-gap plan (docs/43); plan only, no results"
+  "latest_increment_scope": "Delegated 17-case caption review conclusions (docs/44) and de-identified summary; no captions/media"
 }

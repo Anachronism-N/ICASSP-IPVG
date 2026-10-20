@@ -30,6 +30,8 @@ FILES = [
     "docs/41_窗口标注链与命名歧义验收.md",
     "docs/42_LoRA有限训练技术Smoke.md",
     "docs/43_四节点追平SOTA实验计划.md",
+    "docs/44_委托代审17例caption结论.md",
+    "eval/diag/delegated_label_review_17_public_summary_20261021.json",
     "eval/diag/LoRA_native_CPU_microcheck_20261020.json",
     "eval/diag/teacher_training_smoke_public_results_20261020.json",
     "training_metadata/teacher_namespace_candidates_20261020_v1/eligibility_summary.json",

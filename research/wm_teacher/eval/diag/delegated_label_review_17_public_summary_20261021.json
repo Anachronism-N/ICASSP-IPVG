@@ -1,0 +1,58 @@
+{
+  "protocol": "user_delegated_assistant_review_17_pilot_windows_NOT_human_gold",
+  "date": "2026-10-21",
+  "reviewers": "3 blind assistant reviewers (disjoint 6/6/5 cases), user delegated after web access failed",
+  "cases": 17,
+  "frames_per_case": 121,
+  "selection": "first17 frozen pilot minima per source; order-biased, NOT a population error-rate estimate",
+  "overall": {
+    "reject": 7,
+    "needs_fix": 10
+  },
+  "category_counts": {
+    "objects": {
+      "contradicted": 13,
+      "supported": 4
+    },
+    "action": {
+      "contradicted": 13,
+      "supported": 4
+    },
+    "camera": {
+      "supported": 12,
+      "contradicted": 4,
+      "unverifiable": 1
+    },
+    "terminal_state": {
+      "contradicted": 9,
+      "supported": 5,
+      "unverifiable": 3
+    }
+  },
+  "any_visible_contradiction_cases": 17,
+  "corrected_caption_written_for_all_non_usable": true,
+  "agreement_with_main_assistant_pilot": {
+    "category_exact": "42/68",
+    "direct_supported_vs_contradicted_conflicts": 10,
+    "case_any_contradiction": "13/17"
+  },
+  "agreement_with_blind_second_review_4cases": {
+    "category_exact": "12/16",
+    "direct_conflicts": 1
+  },
+  "dominant_error_types": [
+    "objects hallucinated or misidentified (e.g. held object, furniture, screen)",
+    "actions hallucinated or wrong direction/manner",
+    "terminal state asserted but not visible",
+    "game/rendered footage described as real scene",
+    "person attributes (clothing colour, orientation) wrong"
+  ],
+  "reliable_fields": "camera motion mostly supported",
+  "implications": [
+    "Original captions are not reliable enough to use as-is for targeted training; recaption with a grounded prompt that forbids unseen objects/actions/terminal states.",
+    "Recaption output must be re-audited on a fresh random sample before any training comparison."
+  ],
+  "original_csv_modified": false,
+  "human_gold": false,
+  "training_gate_passed": false
+}
