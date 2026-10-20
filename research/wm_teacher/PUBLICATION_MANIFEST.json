@@ -108,7 +108,7 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "4c2c595325604d8d7765651ca6c18f98f7f03bfb68d6917019d3935accc8dac1",
+      "source_sha256": "3052a2f0699bf71cfecd645da3c30d42cfb5fa37fec52f18d285e571ad8b6089",
       "snapshot_sha256": "0d0082d8d89f978b8b8cbdce98e9773a2ad3634d16c6390bfc1c66ceb3181d1b"
     },
     {
@@ -253,7 +253,7 @@
     },
     {
       "path": "tests/test_export_experiment_snapshot.py",
-      "source_sha256": "5ff8b044eb3a841c3858adddea48f89fb7ea10d10197e49cf4a548a981b5128b",
+      "source_sha256": "90a15e37ebd48618d689e36776f6c7fc9a78624ab3b3bde02cf85c2615dcca8b",
       "snapshot_sha256": "8683d6f5d4aacafdd1c3963505387a1e2ad851d366bc8687dbe003b9c833b101"
     },
     {
@@ -505,6 +505,11 @@
       "path": "eval/diag/C1_caption_public_results_20261020.json",
       "source_sha256": "52795782f28f3e3a75267894d23fdf7cc8b64e8d8a1fa39aa564862bd04afc09",
       "snapshot_sha256": "52795782f28f3e3a75267894d23fdf7cc8b64e8d8a1fa39aa564862bd04afc09"
+    },
+    {
+      "path": "docs/40_四节点受控训练资源规划.md",
+      "source_sha256": "5d1fdfb7b177d3e5e94be2ac47fa9160f04c22f852686a35a414ce7e1b377df5",
+      "snapshot_sha256": "5d1fdfb7b177d3e5e94be2ac47fa9160f04c22f852686a35a414ce7e1b377df5"
     }
   ],
   "experiment_progress": {
@@ -593,5 +598,13 @@
     "computing_GPUs": 4,
     "teacher_passed": false,
     "human_review": "pending"
+  },
+  "four_node_training_plan": {
+    "status": "proposal_only_NOT_started",
+    "proposed_max_allocated_GPUh": 120,
+    "data_semantic_and_source_gates_required": true,
+    "generation_seeds_initial": 2,
+    "training_seed_initial_same_all_arms": true,
+    "teacher_passed": false
   }
 }
