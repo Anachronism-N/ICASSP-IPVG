@@ -84,6 +84,12 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 作者AESR选片式为`.15*(GME+Story)+.20*(Cur+Arc)+.15*(Motion+Imaging)`，不是含人工的官方FinalScore；目前缺Cur/GME/Story/人工，因此自动合成分保持null，不使用partial sum。MUSIQ是技术图像质量而非身份或美学充分指标；AMT既是本轮稀疏插值器也是smoothness评价器，有循环偏好，静止也可高分。完整设置、实例结果、缺组件和非完整KeyID限制见[MM2026面板实验](EXPERIMENT_MM2026_KEYFRAMES.md)、`resources/mm2026_eval.lock.json`。
 
+## 真实LoRA训练同规格效果共评
+
+`scripts/analyze_real_training.py`对五训练run及baseline/LR1e-5/LR5e-5共48同输入输出复核真实optimizer步数/LR、rank初末hash、checkpoint保存覆盖、实际LoRA回载、参考像素/派生seed、49帧480×352解码、所有评分output hash，并复用原strict ArcFace/CLIP/mouth和原AMT/MUSIQ；训练loss不加入质量分数。八dev演员等演员共同有效帧delta与CI是描述性小域统计，不套用旧H1的28演员/56pair晋级门槛，也不把未达到旧样本量解释为没有身份信号。
+
+此轮身份收益但全局motion减少，口部活动16→15/16，保留不晋级结论。完整结果见[真实训练报告](EXPERIMENT_DUALNODE_TRAINING.md)。灰度motion不等价动作质量，AMT高平滑分可能伴随较小运动；必须独立补动作/伪影人工诊断，缺项官方总分仍null。
+
 ## 冻结协议与复现记录
 
 每个run旁保留`metric_protocol.json`或等价文档，至少记录：

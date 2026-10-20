@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "run_id": "real_vace_main_lr5_20261020_r001",
+  "task": "training",
+  "purpose": "development",
+  "hypothesis": "Real isolated32dense-caption sources, fixed reference-conditioned VACE LoRA; compare learning rate1e-5/5e-5 at same epochs/rank/data/seed.",
+  "manifest": "data/dense_train/train.jsonl",
+  "split": "train",
+  "runs_dir": "runs",
+  "backend": {
+    "kind": "command",
+    "command": [
+      "{python}",
+      "scripts/adapters/diffsynth_train.py",
+      "--request",
+      "{request}"
+    ]
+  },
+  "resources": {
+    "gpus": 2,
+    "timeout_s": 7200,
+    "max_gpu_hours": 4.0
+  },
+  "expected_artifacts": [
+    "*.safetensors"
+  ],
+  "model_revisions": {
+    "DiffSynth-Studio": "4e3496991455b300fd60ab023113422cd16899f5",
+    "Wan-AI/Wan2.1-VACE-1.3B": "574e6a744642ce3bee319afc31496b88bde8aac4",
+    "Wan-AI/Wan2.1-T2V-1.3B:tokenizer": "37ec512624d61f7aa208f7ea8140a131f93afc9a"
+  },
+  "parameters": {
+    "upstream_dir": "upstream/DiffSynth-Studio",
+    "model_files": [
+      "models/vace1p3b/diffusion_pytorch_model.safetensors",
+      "models/vace1p3b/models_t5_umt5-xxl-enc-bf16.pth",
+      "models/vace1p3b/Wan2.1_VAE.pth"
+    ],
+    "tokenizer_dir": "models/umt5/google/umt5-xxl",
+    "mode": "lora",
+    "pilot_observations": true,
+    "num_processes": 2,
+    "num_epochs": 4,
+    "dataset_repeat": 1,
+    "learning_rate": 5e-05,
+    "lora_rank": 16,
+    "save_steps": 16,
+    "gradient_accumulation_steps": 1,
+    "width": 480,
+    "height": 352,
+    "num_frames": 49,
+    "fps": 16,
+    "seed": 42,
+    "reference_index": 0,
+    "dataset_num_workers": 1
+  }
+}

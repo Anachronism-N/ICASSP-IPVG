@@ -1,0 +1,379 @@
+{
+  "status": "completed",
+  "decision": "identity_gain_with_motion_tradeoff_not_promoted",
+  "training": [
+    {
+      "run_id": "real_vace_single_pilot_20261020_r001",
+      "status": "passed",
+      "gpus": 1,
+      "actual_optimizer_steps_per_rank": 2,
+      "initial_trainable_sha256": "20709314ce0a10f13161507ca6859ea5f4d9a41df6dfbfd93b49d9102d8b4c3d",
+      "final_trainable_sha256": "ea774941aea8b089f19c307a7645c6ae157768469f035fe277d7fd125315cdff",
+      "trainable_parameter_count": 10936320,
+      "changed_trainable_tensors_per_rank": [
+        300
+      ],
+      "nominal_learning_rate": 1e-05,
+      "first_step_learning_rate": 3.3333333333333333e-06,
+      "last_step_learning_rate": 3.3333333333333333e-06,
+      "epoch_mean_loss_all_ranks": [
+        0.03695455938577652
+      ],
+      "peak_allocated_vram_gb_per_rank": [
+        18.793524736
+      ],
+      "backend_elapsed_seconds": 42.27489418582991,
+      "allocated_gpu_hours": 0.01174302616273053,
+      "checkpoint_sha256": {
+        "step-1.safetensors": "0dd08ef579efbaa388763405a7c7586a86697e48c322ed11eb5a51b6cc38c533",
+        "step-2.safetensors": "0e2f6abb73fa285728885304b54b6248b96c1d4ded4589c3626ca11d692f4336"
+      },
+      "code_commit": "1843123be1ec67d7a4abf8d8fdd995171eff3f31",
+      "source_sha256": "907c7bb9f36c80a0e10c56f7874d146dcec50de2f2b8d9faa03a90acfb09448c"
+    },
+    {
+      "run_id": "real_vace_ddp_pilot_lr1_20261020_r001",
+      "status": "passed",
+      "gpus": 2,
+      "actual_optimizer_steps_per_rank": 16,
+      "initial_trainable_sha256": "20709314ce0a10f13161507ca6859ea5f4d9a41df6dfbfd93b49d9102d8b4c3d",
+      "final_trainable_sha256": "81a3083efffd28ec5619830cc8c670942975155041d6103046159c1566113b8e",
+      "trainable_parameter_count": 10936320,
+      "changed_trainable_tensors_per_rank": [
+        300,
+        300
+      ],
+      "nominal_learning_rate": 1e-05,
+      "first_step_learning_rate": 3.3333333333333333e-06,
+      "last_step_learning_rate": 9.999999999999999e-06,
+      "epoch_mean_loss_all_ranks": [
+        0.07013245258713141
+      ],
+      "peak_allocated_vram_gb_per_rank": [
+        18.815153152,
+        18.814641152
+      ],
+      "backend_elapsed_seconds": 139.6483192932792,
+      "allocated_gpu_hours": 0.07758239960737734,
+      "checkpoint_sha256": {
+        "step-16.safetensors": "77aff520def770b855cee4657032395d960bee6590339730d9509bbd5e21f8cc"
+      },
+      "code_commit": "1843123be1ec67d7a4abf8d8fdd995171eff3f31",
+      "source_sha256": "907c7bb9f36c80a0e10c56f7874d146dcec50de2f2b8d9faa03a90acfb09448c"
+    },
+    {
+      "run_id": "real_vace_ddp_pilot_lr5_20261020_r001",
+      "status": "passed",
+      "gpus": 2,
+      "actual_optimizer_steps_per_rank": 16,
+      "initial_trainable_sha256": "20709314ce0a10f13161507ca6859ea5f4d9a41df6dfbfd93b49d9102d8b4c3d",
+      "final_trainable_sha256": "d484809ac471b1f22588562ff55a13fc048f117d832843823f028da0b9e3b162",
+      "trainable_parameter_count": 10936320,
+      "changed_trainable_tensors_per_rank": [
+        300,
+        300
+      ],
+      "nominal_learning_rate": 5e-05,
+      "first_step_learning_rate": 1.6666666666666667e-05,
+      "last_step_learning_rate": 5e-05,
+      "epoch_mean_loss_all_ranks": [
+        0.06881343659188133
+      ],
+      "peak_allocated_vram_gb_per_rank": [
+        18.814537216,
+        18.815087616
+      ],
+      "backend_elapsed_seconds": 154.3636267450638,
+      "allocated_gpu_hours": 0.08575757041392434,
+      "checkpoint_sha256": {
+        "step-16.safetensors": "c24aa174960fe70c023393915caaf32e7eb5c6740a53df599250003d14cfce45"
+      },
+      "code_commit": "1843123be1ec67d7a4abf8d8fdd995171eff3f31",
+      "source_sha256": "907c7bb9f36c80a0e10c56f7874d146dcec50de2f2b8d9faa03a90acfb09448c"
+    },
+    {
+      "run_id": "real_vace_main_lr1_20261020_r001",
+      "status": "passed",
+      "gpus": 2,
+      "actual_optimizer_steps_per_rank": 64,
+      "initial_trainable_sha256": "20709314ce0a10f13161507ca6859ea5f4d9a41df6dfbfd93b49d9102d8b4c3d",
+      "final_trainable_sha256": "6e593c2207d91ccd3f14ff65093ea26f9358a15df051cdf2540fbaf6fb153895",
+      "trainable_parameter_count": 10936320,
+      "changed_trainable_tensors_per_rank": [
+        300,
+        300
+      ],
+      "nominal_learning_rate": 1e-05,
+      "first_step_learning_rate": 3.3333333333333333e-06,
+      "last_step_learning_rate": 9.999999999999999e-06,
+      "epoch_mean_loss_all_ranks": [
+        0.07013671175809577,
+        0.07733455605921336,
+        0.07270410210185219,
+        0.058691133541287854
+      ],
+      "peak_allocated_vram_gb_per_rank": [
+        18.814944256,
+        18.814473728
+      ],
+      "backend_elapsed_seconds": 517.398012152873,
+      "allocated_gpu_hours": 0.28744334008492944,
+      "checkpoint_sha256": {
+        "step-16.safetensors": "cf1626660ba479f0d86b86098a1d5e25549d3d992d88e5e92a04e259e89a7651",
+        "step-32.safetensors": "d636b2fbcd0d318359cf4ddcc0450ada7ba78588225345c28c6173761fa453fd",
+        "step-48.safetensors": "7f26bc3d0a34babff57968d6eb7fda205bcbc1a7838ef7c5b51368095f2423b8",
+        "step-64.safetensors": "f549d4a816c3b598725a892521dbe120a7c79de7f741bb8673fdfce138e52381"
+      },
+      "code_commit": "1843123be1ec67d7a4abf8d8fdd995171eff3f31",
+      "source_sha256": "907c7bb9f36c80a0e10c56f7874d146dcec50de2f2b8d9faa03a90acfb09448c"
+    },
+    {
+      "run_id": "real_vace_main_lr5_20261020_r001",
+      "status": "passed",
+      "gpus": 2,
+      "actual_optimizer_steps_per_rank": 64,
+      "initial_trainable_sha256": "20709314ce0a10f13161507ca6859ea5f4d9a41df6dfbfd93b49d9102d8b4c3d",
+      "final_trainable_sha256": "89b704fb4977c93e7d194563d411fcd4f23414c00deb71aa7acc3be2914430d1",
+      "trainable_parameter_count": 10936320,
+      "changed_trainable_tensors_per_rank": [
+        300,
+        300
+      ],
+      "nominal_learning_rate": 5e-05,
+      "first_step_learning_rate": 1.6666666666666667e-05,
+      "last_step_learning_rate": 5e-05,
+      "epoch_mean_loss_all_ranks": [
+        0.06881239610083867,
+        0.07514746028755326,
+        0.0703769313331577,
+        0.05623868370457785
+      ],
+      "peak_allocated_vram_gb_per_rank": [
+        18.814473728,
+        18.814232064
+      ],
+      "backend_elapsed_seconds": 532.3107678578235,
+      "allocated_gpu_hours": 0.2957282043654575,
+      "checkpoint_sha256": {
+        "step-16.safetensors": "1714a33b0a42b6a3d41e4114002ba4d0f54633a6f673258cb2b6a238d392b01e",
+        "step-32.safetensors": "1d1396ff651499751b40482a599228622145bdecab3e961d875eb5d01ade22e4",
+        "step-48.safetensors": "7a3b2c59923f143270d751ad7c5ac8f2ea6ec6808546367cdf3d2e71ceab95a5",
+        "step-64.safetensors": "dc2d0ecffa2a67f48119b742293d951ad8803fe709c8250937542f9d536a09b1"
+      },
+      "code_commit": "1843123be1ec67d7a4abf8d8fdd995171eff3f31",
+      "source_sha256": "907c7bb9f36c80a0e10c56f7874d146dcec50de2f2b8d9faa03a90acfb09448c"
+    }
+  ],
+  "quality_panel": {
+    "baseline": {
+      "imaging_quality": 0.731272310675407,
+      "motion_smoothness": 0.9925058300320273,
+      "clip_frame_text_cosine_mean": 0.2662207577377558,
+      "reload": null
+    },
+    "lr1": {
+      "imaging_quality": 0.738241004165338,
+      "motion_smoothness": 0.9940081092621412,
+      "clip_frame_text_cosine_mean": 0.26724382396787405,
+      "reload": {
+        "checkpoint_sha256": "f549d4a816c3b598725a892521dbe120a7c79de7f741bb8673fdfce138e52381",
+        "matched_pairs": 150,
+        "changed_base_tensors": 150
+      }
+    },
+    "lr5": {
+      "imaging_quality": 0.7415971585682459,
+      "motion_smoothness": 0.9954058772410908,
+      "clip_frame_text_cosine_mean": 0.2700889864936471,
+      "reload": {
+        "checkpoint_sha256": "dc2d0ecffa2a67f48119b742293d951ad8803fe709c8250937542f9d536a09b1",
+        "matched_pairs": 150,
+        "changed_base_tensors": 150
+      }
+    }
+  },
+  "comparisons": {
+    "lr1": {
+      "identity": {
+        "paired_videos": 16,
+        "paired_actors": 8,
+        "identity_actor_mean_delta": 0.18121347582200542,
+        "identity_actor_bootstrap_ci95": [
+          0.13313106418354437,
+          0.22701939168036908
+        ],
+        "identity_p10_actor_delta": 0.16851145033724607,
+        "coverage_delta": 0.0,
+        "motion_ratio": 0.7559131827748506,
+        "static_fraction_delta": 0.0,
+        "recovered_seven_frame_videos": 0,
+        "lost_seven_frame_videos": 0,
+        "baseline": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "videos_at_least_seven_frames": 16,
+          "identity_coverage": 1.0,
+          "valid_video_identity_mean": 0.2387964430381544,
+          "motion_mean": 6.576112866401672,
+          "static_fraction": 0.0
+        },
+        "candidate": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "videos_at_least_seven_frames": 16,
+          "identity_coverage": 1.0,
+          "valid_video_identity_mean": 0.4200099188601598,
+          "motion_mean": 4.970970407128334,
+          "static_fraction": 0.0
+        }
+      },
+      "mouth": {
+        "paired_videos": 16,
+        "paired_flow_ratio": 0.9317817317582971,
+        "baseline": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "mean_pair_coverage": 1.0,
+          "above_control_videos": 16,
+          "activity_video_rate_all": 1.0
+        },
+        "candidate": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "mean_pair_coverage": 1.0,
+          "above_control_videos": 15,
+          "activity_video_rate_all": 0.9375
+        }
+      },
+      "quality_mean_deltas": {
+        "imaging_quality": 0.0069686934899310105,
+        "motion_smoothness": 0.0015022792301139232,
+        "clip_frame_text_cosine_mean": 0.0010230662301182747
+      }
+    },
+    "lr5": {
+      "identity": {
+        "paired_videos": 16,
+        "paired_actors": 8,
+        "identity_actor_mean_delta": 0.43384262517793104,
+        "identity_actor_bootstrap_ci95": [
+          0.385491445371008,
+          0.48292119904363057
+        ],
+        "identity_p10_actor_delta": 0.4309119050391018,
+        "coverage_delta": 0.0,
+        "motion_ratio": 0.5189916481150092,
+        "static_fraction_delta": 0.0,
+        "recovered_seven_frame_videos": 0,
+        "lost_seven_frame_videos": 0,
+        "baseline": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "videos_at_least_seven_frames": 16,
+          "identity_coverage": 1.0,
+          "valid_video_identity_mean": 0.2387964430381544,
+          "motion_mean": 6.576112866401672,
+          "static_fraction": 0.0
+        },
+        "candidate": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "videos_at_least_seven_frames": 16,
+          "identity_coverage": 1.0,
+          "valid_video_identity_mean": 0.6726390682160854,
+          "motion_mean": 3.412947654724121,
+          "static_fraction": 0.0
+        }
+      },
+      "mouth": {
+        "paired_videos": 16,
+        "paired_flow_ratio": 1.070636442280505,
+        "baseline": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "mean_pair_coverage": 1.0,
+          "above_control_videos": 16,
+          "activity_video_rate_all": 1.0
+        },
+        "candidate": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "mean_pair_coverage": 1.0,
+          "above_control_videos": 15,
+          "activity_video_rate_all": 0.9375
+        }
+      },
+      "quality_mean_deltas": {
+        "imaging_quality": 0.01032484789283894,
+        "motion_smoothness": 0.00290004720906345,
+        "clip_frame_text_cosine_mean": 0.003868228755891323
+      }
+    }
+  },
+  "train_manifest_sha256": "e141bcd61f9f87fe338aadda8171995428ca2a510f807b302df15c49937af903",
+  "eval_manifest_sha256": "9642d924ba84549930c26e3bc852eb39b7832e345e15810aeae58b523520cf7c",
+  "train_videos": 32,
+  "train_actors": 16,
+  "dev_videos_per_arm": 16,
+  "dev_actors": 8,
+  "training_gpu_hours": 0.7582545406344191,
+  "generation_gpu_hours": 0.3304252224599218,
+  "quality_profile_gpu_hours": 0.020070116918585783,
+  "quality_protocol": {
+    "version": "vbench_mm26_quality_v1",
+    "vbench_revision": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+    "motion_smoothness": "original AMT-S odd-frame reconstruction, 1-MAE/255, all decoded frames",
+    "imaging_quality": "original MUSIQ-SPAQ all-frame mean MOS/100, longer-side preprocessing<=512",
+    "precision": "float32, single CUDA device",
+    "aggregation": "video equal weight; normalized per-video dimensions",
+    "official_final_score": null,
+    "human_score": null,
+    "missing_components": [
+      "CurricularFace author checkpoint",
+      "GME",
+      "StoryScore",
+      "official human evaluation"
+    ],
+    "warning": "Named paper-related dimensions, not exact KeyID face/text protocol or official challenge score."
+  },
+  "quality_weight_hashes": {
+    "amt": "07e7e03405c213fe4405678db9b42d05671e48c56faf6a441b99bb0047d3cf77",
+    "musiq": "358bb6af275e28ea56821d44fb55c6cb83645db11f394d3ad65b2d149965ab50",
+    "config": "a77746791b1d02c839f40791fb82adb28c5058cf3735b2657a4a965a789ce0a8"
+  },
+  "official_score": null,
+  "holdout_used": false,
+  "human_validation_passed": false,
+  "limitations": [
+    "Small acted talking-head domain, one seed; not KeyID/AnyID training or SOTA.",
+    "Stochastic flow-matching timestep losses are not held-out quality or comparable fixed-target losses.",
+    "Missing faces stay missing; paired identities and valid-video means have different denominators.",
+    "AMT smoothness can favor little motion; mouth control is not speech, expression or lip-sync truth.",
+    "Missing CurricularFace, GME, Story and official human scores; no complete MM2026 final score.",
+    "Quality profile GPUh excludes import/preflight; managed command wall upper bound recorded separately."
+  ],
+  "caption_preparation": {
+    "status": "completed",
+    "acceptance_protocol": "dense_caption_v2",
+    "videos": 32,
+    "actors": 16,
+    "word_min": 104,
+    "word_max": 200,
+    "manual_content_verification": false,
+    "failed_attempts_preserved": 2,
+    "reused_valid_captions": 9,
+    "new_single_attempt_captions": 23,
+    "failed_attempts_gpu_hours_approx": 0.3302777777777778,
+    "final_attempt_gpu_hours_upper_bound": 0.5,
+    "notice": "Original request100-180words, explicitly revised acceptance100-200; no truncation or template padding."
+  },
+  "resource_accounting": {
+    "campaign_hard_cap_gpu_hours": 51.5,
+    "training_controller_gpu_hours": 0.7582545406344191,
+    "generation_controller_gpu_hours": 0.3304252224599218,
+    "quality_profile_gpu_hours": 0.020070116918585783,
+    "quality_managed_command_gpu_hours_upper_rounded": 0.025833333333333333,
+    "completed_stage_gpu_hours_upper_including_caption_reserve": 1.9447908742054523,
+    "notice": "Controller uses declaredGPUcount*backendwall; quality managed command includes preflight; caption final is reserved upper bound, not measured utilization."
+  }
+}

@@ -47,6 +47,14 @@ KeyID-inspired仅改固定事件分段内内容自适应选锚，不含身份编
 
 具体方案/开源状态/作者权重更新/资源和所有限制见[实验报告](EXPERIMENT_MM2026_KEYFRAMES.md)。KeyID最新仍README-only，没有完整KeyID复现或其改进结果；后续优先独立引入Stand-In14B或许可明确TPIGE强基线、补齐GME/Cur评测，不再只做参考预处理小搜索。
 
+## 两节点真实dense-caption训练与效果评价完成（2026-10-20）
+
+32train视频/16演员已生成完整dense-caption，49帧480×352、全时长取样，参考独立source，dev/holdout身份隔离。原内部180词上限两次失败保留；显式dense_caption_v2验收100–200词完成104–200词，不截句或拼模板，内容尚未人工核真。VACE1.3B条件rank16LoRA单卡2步、两节点各2卡DDP pilot16步及main64步均通过；实际有限/非零梯度、300tensor更新、跨rank初末hash同步、跨节点同初始化及checkpoint16/32/48/64SHA均核验，main不续pilot。
+
+新同规格baseline+两LR共48/48dev视频、8独立dev演员、原prompt/reference/seed42派生样本seed全部固定。两LoRA真实回载各150pairs且改变150底座tensor。ArcFace均值0.238796→0.420010/0.672639，coverage均100%；等演员identity delta+0.181213/+0.433843，CI95分别[0.133131,0.227019]/[0.385491,0.482921]。MUSIQ0.731272→0.738241/0.741597，原CLIP0.266221→0.267244/0.270089，但灰度motion比例降至0.755913/0.518992，口部全量above-control16/16→15/16两方。较高AMT平滑不能独立证明动态更好，口部flow也不是动作/自然性真值。
+
+结论`identity_gain_with_motion_tradeoff_not_promoted`：真实身份小域收益，整体不晋级或继续堆epoch；不是完整KeyID/AnyID训练、广动作或SOTA。五训练controller0.758255GPUh、三生成0.330425；quality profile0.020070，含启动预检命令取整上界0.025833；caption最终用预留上界保守计阶段≤1.944791GPUh，不用通知延迟时间当算力成本。已启动GPU作业均结束，两节点显存0。完整CPU回归314passed，强化分析复算一致；八份便携配置、聚合资源/真实正负结论见[真实训练报告](EXPERIMENT_DUALNODE_TRAINING.md)、`resources/real_vace_training_result.json`，无真实媒体/caption/节点信息发布。
+
 ## 当前实验与限制
 
 唯一H1对照是参考人脸bbox扩边.3的正方形裁剪，原参考仍作身份评价anchor。模型、prompt、sample_id/seed、采样步和候选数固定，不训练新LoRA。实验预注册及聚合结果见 [CREMA-D H1](EXPERIMENT_CREMA_D_H1.md)。crop64/64条完整解码；63样本/32演员共同帧配对，原基线身份均值0.143337、crop0.349797，配对提升+0.205661，演员bootstrap95%区间[0.168833,0.245416]。身份P10提升+0.192157、coverage+0.007813、灰度运动proxy比1.029227、静态比例无变化。新生成耗费0.602265GPU小时，所有任务正常退出。只在该单种子说话头部dev上支持H1，不是完整动作/人工/holdout/SOTA结论。

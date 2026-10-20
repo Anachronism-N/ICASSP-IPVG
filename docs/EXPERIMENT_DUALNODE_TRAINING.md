@@ -30,4 +30,38 @@ loss下降仅数值健康，不算效果改善。8devactors的CI只描述，身�
 
 ## 当前阶段
 
-数据32/32完成，训练尚待真实单卡pilot和两节点验收；没有效果提升证据。实际结果随后追加，不用上一轮ad38099满足训练目标。
+本轮已结束：32/32dense数据，单GPU2步、两节点各2GPU的16步DDP pilot及64步正式训练均通过。两main分别517.398/532.311秒；所有rank的loss/grad有限且非零、300trainable tensors更新、初末hash跨rank同步，两方官方底座重新初始化的LoRA初hash一致。训练含pilot总controller成本0.758255GPUh，实际peak allocated最大18.815GB。上游scheduler在两卡运行中前3次optimizer update使用标称LR/3、第4次起标称LR；保存16/32/48/64 checkpoint并核SHA。不是optimizer/RNG恢复验收。
+
+### 同16dev输入实测
+
+新增48/48视频完整解码，三个arm均480×352、49帧、16fps、20steps，原anchor/prompt/sample_id不变；seed42加原sample_id的固定hash为实际样本seed。两checkpoint均完整150LoRA pairs回载，真实改变150底座tensor；不是只检查文件存在。
+
+| 指标 | 未训练baseline | LR1e-5 | LR5e-5 |
+|---|---:|---:|---:|
+| 原anchor ArcFace视频均值 | 0.238796 | 0.420010 | 0.672639 |
+| 身份frame coverage | 100% | 100% | 100% |
+| MUSIQ ImagingQuality | 0.731272 | 0.738241 | 0.741597 |
+| AMT MotionSmoothness | 0.992506 | 0.994008 | 0.995406 |
+| 原prompt CLIP全帧余弦 | 0.266221 | 0.267244 | 0.270089 |
+| 灰度相邻帧motion均值 | 6.576113 | 4.970970 | 3.412948 |
+| 全量above-control口部活动 | 16/16 | 15/16 | 15/16 |
+
+身份共同16视频/8actor的等演员配对delta为+0.181213，CI95[0.133131,0.227019]，P10delta+0.168511；高LR为+0.433843，CI95[0.385491,0.482921]，P10delta+0.430912。全部身份有效，因此此轮有效视频均值与配对均值的分母可核对一致；仅小域单seed描述性bootstrap，不是官方FAR/整体效能显著性。
+
+### 结论：身份收益真实，但整体不晋级
+
+两LR在未见训练演员的本域dev上提高身份代理和成像均值，高LR身份更好；同时整体灰度motion相对baseline降至0.755913/0.518992。局部mouth残差flow比0.931782/1.070636、pair coverage均100%，但两者均有1条从above-control活动跌到阈值以下。全局motion下降不必然证明坏动作，嘴部flow也不能证明说话/表情自然：两者必须一起报告，不能把更高AMT平滑分当动态提升。没有固定人工或动作真值解释减少的运动是否去除了抖动、是否损失必要头部动作。因此保留`identity_gain_with_motion_tradeoff_not_promoted`，高LR只作为身份诊断候选，不替换最终base，不继续给32视频堆epoch。
+
+训练/生成已耗controller GPUh分别0.758255/0.330425；两quality profile合计0.020070GPUh，含预检/导入的受管理命令按秒取整上界(56+37)/3600=0.025833。caption旧失败约0.330278，最终r003用0.5GPUh预留上界保守计，阶段合计≤1.944791GPUh，远低51.5hardcap；不把工具延迟通知时长当GPU训练成本。所有已启动GPU作业已结束，两节点显存占用0；未为占满卡追加重复实验。
+
+### 复现与边界
+
+公开聚合证据`resources/real_vace_training_result.json`；八份便携配置在`configs/experiments/real_vace_{single_pilot,ddp_pilot_lr1,ddp_pilot_lr5,main_lr1,main_lr5,eval_baseline,eval_lr1,eval_lr5}.json`。按单卡→DDPpilot→main顺序验收，main不续pilot；LR5配置在另一节点独立运行，`execution_host`不是远程调度。自行配置授权数据和本地权重，真实媒体/caption不发布。
+
+`scripts/analyze_real_training.py`复核五run的实际步数/LR/初末hash/checkpoint覆盖、三方实际LoRA回载、同seed/reference像素、49帧媒体和所有评分output hash，复用冻结身份/口部协议，不改评测门槛。完整CPU回归314passed；无视觉可选依赖的干净环境119passed/21skipped，CPU烟测passed。强化分析复算结果与初版相同，独立CPU重算身份/P10/coverage/CLIP/AMT/MUSIQ/mouth全部一致至1e-12；人工动作真值未核。命令如下（路径按实际本地替换）：
+
+```sh
+PYTHONPATH=src python scripts/analyze_real_training.py --runs-dir runs --scores-dir local_scores --train-manifest data/dense_train/train.jsonl --eval-manifest data/dense_train/eval16_original.jsonl --output runs/real_training_audit.json
+```
+
+数据许可与InsightFace非商业研究权重分开；caption视觉内容未人工核真，train/dev同为CREMA-D辅助域，holdout未使用。Cur/GME/Story/人工与完整官方MM2026总分仍缺，Track2真实event训练尚未开展；没有KeyID整体优化、广动作泛化或SOTA声明。下一步需独立动作/伪影人工诊断与更广许可兼容数据，不能仅靠身份分选择更高LR。
