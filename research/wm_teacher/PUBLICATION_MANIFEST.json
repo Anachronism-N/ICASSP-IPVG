@@ -108,7 +108,7 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "e186ecabaaac586fc129e051e5dd50f978033dc501f79e6d3bc9bf9cbc165712",
+      "source_sha256": "48b2487c4465afe3728d73a33749a24b5b96fee81ce9ac8b1923bee57cf5ccd0",
       "snapshot_sha256": "0d0082d8d89f978b8b8cbdce98e9773a2ad3634d16c6390bfc1c66ceb3181d1b"
     },
     {
@@ -253,7 +253,7 @@
     },
     {
       "path": "tests/test_export_experiment_snapshot.py",
-      "source_sha256": "ce3458b06f0ad5421ca4cb5fd2444ed384353a6adb8316a1d894d67da5f1db83",
+      "source_sha256": "e83cbc361ffef491d4c7bcb8d462733b4ea5d6f08eb4218a3317266e7964edab",
       "snapshot_sha256": "8683d6f5d4aacafdd1c3963505387a1e2ad851d366bc8687dbe003b9c833b101"
     },
     {
@@ -475,6 +475,16 @@
       "path": "eval/diag/teacher_M1_public_results_20261020.json",
       "source_sha256": "bee65b38fb52185e7fa502c904f3c7e54a498d330cc447e969dc49a4b350a317",
       "snapshot_sha256": "bee65b38fb52185e7fa502c904f3c7e54a498d330cc447e969dc49a4b350a317"
+    },
+    {
+      "path": "docs/38_标签语义校准与C1推理条件实验.md",
+      "source_sha256": "a8548aa465f56b4fec9c92d055661c4c88da27e23f26237cb0d5e38ca7152063",
+      "snapshot_sha256": "a8548aa465f56b4fec9c92d055661c4c88da27e23f26237cb0d5e38ca7152063"
+    },
+    {
+      "path": "eval/diag/teacher_L1_semantic_pilot_summary_20261020.json",
+      "source_sha256": "17eb857408323104c4de5d41b47fff3971a21eab90c395959b9247d8e971a5ce",
+      "snapshot_sha256": "17eb857408323104c4de5d41b47fff3971a21eab90c395959b9247d8e971a5ce"
     }
   ],
   "experiment_progress": {
@@ -534,5 +544,14 @@
       "docs/37_M1同状态预测分解实验结论.md",
       "eval/diag/teacher_m1_public_summary_20261020.json"
     ]
+  },
+  "L1_semantic_C1_increment": {
+    "pilot_reviewed": 17,
+    "pages": 34,
+    "any_contradiction_cases": 13,
+    "population_error_rate": null,
+    "human_gold": false,
+    "C1": "plan only;12 new original caption videos versus12 saved corrected controls;not trained",
+    "C1_max_GPUh": 6
   }
 }

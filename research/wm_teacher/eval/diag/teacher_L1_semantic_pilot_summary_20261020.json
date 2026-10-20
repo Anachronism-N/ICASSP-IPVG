@@ -1,0 +1,39 @@
+{
+  "status": "completed_agent_fullframe_calibration_pilot_NOT_population_audit",
+  "reviewed_cases": 17,
+  "pages_verified": 34,
+  "frames_per_case": 121,
+  "reviewer": "main_assistant",
+  "human_gold": false,
+  "selection": "minimum CSV row within each source random20 subset; order-biased pilot",
+  "population_error_rate": null,
+  "whole340_semantic_review": "pending; original manifest unchanged",
+  "case_category_counts": {
+    "objects": {
+      "unverifiable": 5,
+      "contradicted": 5,
+      "supported": 7
+    },
+    "action": {
+      "contradicted": 12,
+      "unverifiable": 2,
+      "supported": 3
+    },
+    "camera": {
+      "supported": 11,
+      "contradicted": 5,
+      "unverifiable": 1
+    },
+    "terminal_state": {
+      "contradicted": 4,
+      "unverifiable": 12,
+      "supported": 1
+    }
+  },
+  "any_visible_contradiction_cases": 13,
+  "independent_second_reviewer": false,
+  "failure_recovery": "previous499 agents could not be confirmed active; lead completed all17 directly",
+  "media_uploaded": false,
+  "private_review_sha256": "11eac8e5fd663c0fb3e8164135bd141241d15eac58806ceb807eabaa98086777",
+  "sample_manifest_sha256": "267a9ff4c1f318c25758e2ffd97d70e49b8ec2cfe314668501cfa8d7f41391ab"
+}
