@@ -1,0 +1,17 @@
+{
+  "as_of": "2026-10-20",
+  "protocol": "vbench_mm26_quality_v1",
+  "vbench": {"repo": "https://github.com/Vchitect/VBench", "revision": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490", "license": "Apache-2.0; third-party AMT and pretrained data/model terms remain separate"},
+  "weights": {
+    "amt-s.pth": {"bytes": 12038359, "sha256": "07e7e03405c213fe4405678db9b42d05671e48c56faf6a441b99bb0047d3cf77", "code_license": "AMT CC BY-NC 4.0"},
+    "musiq_spaq_ckpt-358bb6af.pth": {"bytes": 108610983, "sha256": "358bb6af275e28ea56821d44fb55c6cb83645db11f394d3ad65b2d149965ab50", "implementation": "PyIQA MUSIQ-SPAQ, pretrained weights/data license checked separately"}
+  },
+  "runtime": {"torch": "2.4.1", "torchvision": "0.19.1", "pyiqa": "0.1.16", "numpy": "1.26.4", "decord": "0.6.0", "omegaconf": "2.4.0", "timm": "1.0.30"},
+  "network_enabled": false,
+  "exact_mm2026_official_scorer_verified": false,
+  "official_final_score": null,
+  "aesr_source": {"repo": "https://github.com/oceanflowlab/AESR", "revision": "a2b3d010e4b66eed0398ead1b592bc9038f8f6db", "license": null, "use": "read-only protocol inspection, no code copied", "author_candidate_weights": {"gme": 0.15, "story": 0.15, "curricularface": 0.2, "arcface": 0.2, "motion_smoothness": 0.15, "imaging_quality": 0.15}, "not_official_final_score": true},
+  "keyid_source": {"repo": "https://github.com/WISLab-GDUT/KeyID", "revision": "d4d68cc7eea7660376fb6bce74460cda45e23513", "files": ["README.md"], "license": null, "complete_pipeline_reproduced": false},
+  "missing_for_complete_aesr_panel": ["CurricularFace author checkpoint and compatible cal_face_sim.py", "Alibaba-NLP/gme-Qwen2-VL-7B-Instruct", "MSVBench Gemini captioner plus KaLM embedding", "official human scoring"],
+  "partial_weighted_score_policy": "Omit combined score when components are unavailable; never fill zero or renormalize present components"
+}
