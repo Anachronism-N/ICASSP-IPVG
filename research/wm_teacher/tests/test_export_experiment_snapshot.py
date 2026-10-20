@@ -35,6 +35,8 @@ class PublicationAllowlistTests(unittest.TestCase):
                     "eval/diag/teacher_training_smoke_public_results_20261020.json",
                     "scripts/run_teacher_training_smoke.py", "tests/test_teacher_training_smoke.py",
                     "scripts/serve_label_review.py", "tests/test_serve_label_review.py",
+                    "scripts/prepare_e1_devset.py", "scripts/build_e1_jobs.py", "scripts/score_e1.py",
+                    "tests/test_e1_devset.py", "tests/test_e1_jobs.py", "tests/test_e1_score.py",
                     "DiffSynth-Studio/diffsynth/diffusion/training_module.py",
                     "DiffSynth-Studio/diffsynth/diffusion/loss.py",
                     "training_metadata/teacher_namespace_candidates_20261020_v1/eligibility_summary.json",

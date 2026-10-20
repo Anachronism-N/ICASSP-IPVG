@@ -47,3 +47,11 @@ VBench-I2V（355条，本地1 seed；榜单5 seed，协议不同）：
 ## 6. 产出与发布
 
 每阶段的代码、配置、预注册规则、无身份聚合结果和结论推送GitHub。视频、权重、caption原文和凭据不公开。
+
+## 7. E1执行记录（2026-10-21 03:10 CST）
+
+- 开发集：候选池32346窗、17个数据集。按父来源排除WM108、fixed val120、P1、C1/M1/training smoke，并保守排除2026-10-17的推理开发案例，共排除197个父键、1418个窗口。按seed=20261021分层抽取94例：13个数据集各6例，easycom、h2o各5例，seamless、ukdash各3例，这4个数据集剩余可用父来源不足。jobs与WM108、VBench图片0重叠。egoexo4d的6例父来源映射已丢失，保留并标为unresolved，结果另报一次排除egoexo4d的敏感性分析。L1标签审计不在计划的排除范围内，所以没有排除。
+- 网格：94例 × 12组（shift {3,5,8,12} × cfg {4,5,6}）= 1128条，base模型，seed0，50步，原caption，默认negative prompt。
+- 冒烟：1卡2条，单条319–320秒，峰值显存28.8GiB，121帧解码正常，约0.23 GPUh。
+- 全量：4个节点32卡各自经托管任务启动，采样速度5.65 s/it。预计约101 allocated GPUh、墙钟约3.2小时，上限140。评分在rank0上进行（8卡VBench + CPU GT指标），按score_e1.RULE自动选择。
+- 新增代码：scripts/prepare_e1_devset.py、build_e1_jobs.py、score_e1.py及24项CPU测试。评分算法直接调用vbench_eval、gt_ref_metrics、summarize_eval，未做修改。

@@ -55,7 +55,7 @@ FILES = [
     "gt_ref_metrics.py", "vbench_eval.py", "score_pool.py", "summarize_eval.py",
     "run_teacher_probe.py", "score_teacher_probe.py",
     "audit_teacher_labels.py", "run_teacher_mechanism_probe.py", "run_teacher_caption_probe.py",
-    "prepare_teacher_eligibility.py", "run_teacher_training_smoke.py", "serve_label_review.py",
+    "prepare_teacher_eligibility.py", "run_teacher_training_smoke.py", "serve_label_review.py", "prepare_e1_devset.py", "build_e1_jobs.py", "score_e1.py",
     "build_teacher_review.py", "build_demo.py", "serve_demo.py", "merge_ckpt.py",
     "build_round1_mixture.py", "build_round2_mixture.py", "build_round3_mixture.py",
     "build_round4_mixture.py", "build_round5_mixture.py", "build_ft2_mixture.py",
@@ -66,7 +66,7 @@ FILES = [
     "test_export_experiment_snapshot.py", "test_report_merge_results.py", "test_score_pool.py",
     "test_run_teacher_probe.py", "test_score_teacher_probe.py",
     "test_audit_teacher_labels.py", "test_teacher_mechanism_probe.py", "test_teacher_caption_probe.py",
-    "test_reslice_namespace.py", "test_prepare_teacher_eligibility.py", "test_teacher_training_smoke.py", "test_serve_label_review.py",
+    "test_reslice_namespace.py", "test_prepare_teacher_eligibility.py", "test_teacher_training_smoke.py", "test_serve_label_review.py", "test_e1_devset.py", "test_e1_jobs.py", "test_e1_score.py",
 )] + ["eval/diag/" + name for name in (
     "ft2_paired_bootstrap.json", "merge_integrity.json", "physiq_paired_bootstrap.json",
     "caption_token_lengths.json", "parameter_drift.json", "validation_noise_analysis.json",

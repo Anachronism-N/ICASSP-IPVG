@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "1a17178ebac42e12e7fcaa66954712b65b300ec3bfe086a54a6f0e6bb74fcff3",
-      "snapshot_sha256": "1a17178ebac42e12e7fcaa66954712b65b300ec3bfe086a54a6f0e6bb74fcff3"
+      "source_sha256": "fcd1387bd79843afd8db811d44e5dc958167139d792d860f21078f6d2627b16f",
+      "snapshot_sha256": "fcd1387bd79843afd8db811d44e5dc958167139d792d860f21078f6d2627b16f"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -254,8 +254,8 @@
     },
     {
       "path": "tests/test_export_experiment_snapshot.py",
-      "source_sha256": "3c975cb1ab1d20f46152732499c33e0085ca0a14964e46a745e248ae9824df96",
-      "snapshot_sha256": "3c975cb1ab1d20f46152732499c33e0085ca0a14964e46a745e248ae9824df96"
+      "source_sha256": "d16807aa5fde1fbc0cbb1374f62236297748a4c5cfe0d41be1fd993291cf9ff9",
+      "snapshot_sha256": "d16807aa5fde1fbc0cbb1374f62236297748a4c5cfe0d41be1fd993291cf9ff9"
     },
     {
       "path": "eval/diag/ft2_paired_bootstrap.json",
@@ -599,8 +599,8 @@
     },
     {
       "path": "docs/43_四节点追平SOTA实验计划.md",
-      "source_sha256": "9554a35f653681ad072af4300bb07b9e157a00849e7289f7d23a405a262118c7",
-      "snapshot_sha256": "9554a35f653681ad072af4300bb07b9e157a00849e7289f7d23a405a262118c7"
+      "source_sha256": "8e8624cb720e4ee86ee04951988bc01e0430bb66cb4a6328b27fbc7946b73008",
+      "snapshot_sha256": "8e8624cb720e4ee86ee04951988bc01e0430bb66cb4a6328b27fbc7946b73008"
     },
     {
       "path": "docs/44_委托代审17例caption结论.md",
@@ -611,6 +611,36 @@
       "path": "eval/diag/delegated_label_review_17_public_summary_20261021.json",
       "source_sha256": "66da35665ee748b3469f8fc3ed888e99066aaa143e7db6416267d8f60d8712b3",
       "snapshot_sha256": "66da35665ee748b3469f8fc3ed888e99066aaa143e7db6416267d8f60d8712b3"
+    },
+    {
+      "path": "scripts/prepare_e1_devset.py",
+      "source_sha256": "63f8a96c7c28f4e6776f3f548a8ed871f9baa11db9a373cb2e8d64ee97ade37d",
+      "snapshot_sha256": "caa134ac777f64f2f6867f4f47ea8e749c9f29aa7d76b5e2691cdbc9f7eae2f7"
+    },
+    {
+      "path": "scripts/build_e1_jobs.py",
+      "source_sha256": "43d42b5a0e09ddb06b3ca2c7cc0e9c56ab37bde38f7ae396a37737ce33448deb",
+      "snapshot_sha256": "f1402645aa960d7817d35f1882c6fb9d26cc0acc887ac819c47406edb6a4af2e"
+    },
+    {
+      "path": "scripts/score_e1.py",
+      "source_sha256": "52d7f1398aedb9fae4016659d0bb0b32a772c1b7e3f5c570dbb2330e4eb4c650",
+      "snapshot_sha256": "8c2da0406f44c9ccd113ef42b0cd4668d394fee552ca0df0651e366b3f448308"
+    },
+    {
+      "path": "tests/test_e1_devset.py",
+      "source_sha256": "403d359018f38c48252262abe3655893d36ce7883763af17511fa3540d575a61",
+      "snapshot_sha256": "403d359018f38c48252262abe3655893d36ce7883763af17511fa3540d575a61"
+    },
+    {
+      "path": "tests/test_e1_jobs.py",
+      "source_sha256": "66e470e47ac629a615911879ad4790f67f607eb9224e337da25863fdc9cba98d",
+      "snapshot_sha256": "66e470e47ac629a615911879ad4790f67f607eb9224e337da25863fdc9cba98d"
+    },
+    {
+      "path": "tests/test_e1_score.py",
+      "source_sha256": "2d0d805e33255f3208c08681f08b5b04e99bb6300018f13aeb575d088ecdce6a",
+      "snapshot_sha256": "2d0d805e33255f3208c08681f08b5b04e99bb6300018f13aeb575d088ecdce6a"
     }
   ],
   "experiment_progress": {
@@ -741,5 +771,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "Delegated 17-case caption review conclusions (docs/44) and de-identified summary; no captions/media"
+  "latest_increment_scope": "E1 dev-set inference ablation code/tests and launch record; no media, no results yet"
 }
