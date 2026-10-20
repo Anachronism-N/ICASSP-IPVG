@@ -87,6 +87,20 @@ def test_training_argv_is_local_bounded_and_uses_known_flags(tmp_path):
         build_training_command(request,metadata,["dit","t5","vae"],"tokenizer",tmp_path)
 
 
+@pytest.mark.parametrize('workers',[0,1,3])
+def test_explicit_training_workers(tmp_path,workers):
+    request={'parameters':{'dataset_num_workers':workers},'repo_root':str(tmp_path),'output_dir':str(tmp_path/'out')}
+    command=build_training_command(request,{'csv':'meta.csv','fields':['video','prompt','vace_reference_image']},['dit','t5','vae'],'tokenizer',tmp_path/'upstream')
+    assert command[command.index('--dataset_num_workers')+1]==str(workers)
+
+
+@pytest.mark.parametrize('workers',[True,-1,1.5,'1'])
+def test_invalid_training_workers(tmp_path,workers):
+    request={'parameters':{'dataset_num_workers':workers},'repo_root':str(tmp_path),'output_dir':str(tmp_path/'out')}
+    with pytest.raises(ValueError):
+        build_training_command(request,{'csv':'meta.csv','fields':['video','prompt','vace_reference_image']},['dit','t5','vae'],'tokenizer',tmp_path/'upstream')
+
+
 def test_training_entry_seeds_before_accelerator_without_device_state(monkeypatch,tmp_path):
     entry=Path(__file__).resolve().parents[1]/"scripts/adapters/training_entry.py"
     spec=importlib.util.spec_from_file_location("ipvg_training_entry_test",entry)

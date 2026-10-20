@@ -109,6 +109,8 @@ def build_training_command(request, metadata_report, model_paths, tokenizer, ups
                          ("gradient_accumulation_steps",1),("lora_rank",16)]:
         positive(parameters.get(key, default), key, integer=True)
     positive(parameters.get("learning_rate",5e-5), "learning_rate")
+    if "dataset_num_workers" in parameters:
+        positive(parameters["dataset_num_workers"], "dataset_num_workers", allow_zero=True, integer=True)
     command = [sys.executable, "-m", "accelerate.commands.launch", "--num_processes", str(processes),
                "--mixed_precision", "bf16"]
     if processes > 1:
@@ -134,6 +136,8 @@ def build_training_command(request, metadata_report, model_paths, tokenizer, ups
                     "--save_steps", str(parameters.get("save_steps",50)),
                     "--gradient_accumulation_steps", str(parameters.get("gradient_accumulation_steps",1)),
                     "--use_gradient_checkpointing_offload"])
+    if "dataset_num_workers" in parameters:
+        command.extend(["--dataset_num_workers", str(parameters["dataset_num_workers"])])
     if parameters.get("mode", "lora") == "adapter":
         command.extend(["--trainable_models", "vace"])
     else:

@@ -111,7 +111,8 @@ class TrainingObservations:
                                      "backward_calls": self.report["backward_calls"],
                                      "gradient_tensors": present, "nonzero_gradient_tensors": nonzero,
                                      "gradients_finite": finite, "gradient_max_abs": maximum,
-                                     "completed": False})
+                                     "completed": False,
+                                     "learning_rates": [float(group["lr"]) for group in optimizer.param_groups]})
         self.write()
         if not finite:
             raise RuntimeError("Pilot observed nonfinite trainable gradients")
