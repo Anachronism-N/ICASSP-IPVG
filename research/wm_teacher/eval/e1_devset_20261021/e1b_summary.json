@@ -1,0 +1,86 @@
+{
+ "protocol": "E1b CFG-Zero* single-factor vs s5_c5 (devset 94, 1 seed)",
+ "n_cases": 94,
+ "z0_s5_c5": {
+  "means": {
+   "i2v_subject": 0.9765970554662511,
+   "i2v_background": 0.981367381928449,
+   "subject_consistency": 0.9280059008674154,
+   "background_consistency": 0.9473624696122839,
+   "motion_smoothness": 0.9895242278147763,
+   "dynamic_degree": 0.5851063829787234,
+   "aesthetic_quality": 0.4835707171166197,
+   "imaging_quality": 0.6674512423013412,
+   "dreamsim": 0.15778354307015738,
+   "dreamsim_last": 0.18526358617112992,
+   "motion_ratio": 0.8107006187927952,
+   "total": 0.8741685327927541
+  },
+  "delta_vs_default": {
+   "i2v_subject": -0.0004558674737494828,
+   "i2v_background": -0.0006756033431342123,
+   "subject_consistency": 1.730545232370151e-05,
+   "background_consistency": -0.0005223375685672327,
+   "motion_smoothness": -0.00010159766614514787,
+   "dynamic_degree": 0.010638297872340385,
+   "aesthetic_quality": -0.00067102306700767,
+   "imaging_quality": -0.0011534376196393747,
+   "dreamsim": -0.001342239954792851,
+   "dreamsim_last": -0.0020490016074890816,
+   "motion_ratio": -0.006903235617996661,
+   "total": -0.00013863283334381027
+  },
+  "guards": {
+   "motion_smoothness": true,
+   "subject_consistency": true,
+   "dreamsim": true,
+   "motion_ratio": true
+  },
+  "total_star": [
+   0.874168532792754,
+   0.9736796540888106,
+   0.7746574114966972
+  ]
+ },
+ "z2_s5_c5": {
+  "means": {
+   "i2v_subject": 0.978667422482308,
+   "i2v_background": 0.9826918683343745,
+   "subject_consistency": 0.9222467559356744,
+   "background_consistency": 0.9428143873282359,
+   "motion_smoothness": 0.9913109629810969,
+   "dynamic_degree": 0.5531914893617021,
+   "aesthetic_quality": 0.48808224689453206,
+   "imaging_quality": 0.685701602729863,
+   "dreamsim": 0.1772272805584238,
+   "dreamsim_last": 0.20058286253442156,
+   "motion_ratio": 0.7455057624885263,
+   "total": 0.8752258559747816
+  },
+  "delta_vs_default": {
+   "i2v_subject": 0.0016144995423074127,
+   "i2v_background": 0.0006488830627913167,
+   "subject_consistency": -0.00574183947941731,
+   "background_consistency": -0.005070419852615249,
+   "motion_smoothness": 0.0016851375001754043,
+   "dynamic_degree": -0.021276595744680882,
+   "aesthetic_quality": 0.0038405067109046898,
+   "imaging_quality": 0.01709692280888242,
+   "dreamsim": 0.018101497533473565,
+   "dreamsim_last": 0.013270274755802558,
+   "motion_ratio": -0.07209809192226557,
+   "total": 0.0009186903486837483
+  },
+  "guards": {
+   "motion_smoothness": true,
+   "subject_consistency": true,
+   "dreamsim": false,
+   "motion_ratio": true
+  },
+  "total_star": [
+   0.8752258559747819,
+   0.9757888376731445,
+   0.7746628742764191
+  ]
+ }
+}

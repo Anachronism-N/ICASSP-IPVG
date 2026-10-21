@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "fcd1387bd79843afd8db811d44e5dc958167139d792d860f21078f6d2627b16f",
-      "snapshot_sha256": "fcd1387bd79843afd8db811d44e5dc958167139d792d860f21078f6d2627b16f"
+      "source_sha256": "2023b88f4444edfea0c00572c2de8b72f7026387e9bf1324f8bdc4293a913c5b",
+      "snapshot_sha256": "2023b88f4444edfea0c00572c2de8b72f7026387e9bf1324f8bdc4293a913c5b"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -254,8 +254,8 @@
     },
     {
       "path": "tests/test_export_experiment_snapshot.py",
-      "source_sha256": "d16807aa5fde1fbc0cbb1374f62236297748a4c5cfe0d41be1fd993291cf9ff9",
-      "snapshot_sha256": "d16807aa5fde1fbc0cbb1374f62236297748a4c5cfe0d41be1fd993291cf9ff9"
+      "source_sha256": "6196c35e87c918dc3622bf458b0113e66a33270f31499723a328fc9d308606e1",
+      "snapshot_sha256": "6196c35e87c918dc3622bf458b0113e66a33270f31499723a328fc9d308606e1"
     },
     {
       "path": "eval/diag/ft2_paired_bootstrap.json",
@@ -641,6 +641,21 @@
       "path": "tests/test_e1_score.py",
       "source_sha256": "2d0d805e33255f3208c08681f08b5b04e99bb6300018f13aeb575d088ecdce6a",
       "snapshot_sha256": "2d0d805e33255f3208c08681f08b5b04e99bb6300018f13aeb575d088ecdce6a"
+    },
+    {
+      "path": "eval/diag/teacher_e1_devset_public_summary_20261021.json",
+      "source_sha256": "803e8e08329ebd49dd2b98e97d3542b7e90ae7ddbf390c2b482912a1f4d6c738",
+      "snapshot_sha256": "803e8e08329ebd49dd2b98e97d3542b7e90ae7ddbf390c2b482912a1f4d6c738"
+    },
+    {
+      "path": "eval/diag/teacher_e1b_cfgzero_public_summary_20261021.json",
+      "source_sha256": "f486e1b4ba5fbb9ad2fcdaae6f046b4d597f2e8a738daaee120571f2ca699c20",
+      "snapshot_sha256": "f486e1b4ba5fbb9ad2fcdaae6f046b4d597f2e8a738daaee120571f2ca699c20"
+    },
+    {
+      "path": "eval/e1_devset_20261021/e1b_summary.json",
+      "source_sha256": "ee1eaa3064eb1565431eddfb8dc30b4f5bda946b0dfc72f1edbee22278381c42",
+      "snapshot_sha256": "ee1eaa3064eb1565431eddfb8dc30b4f5bda946b0dfc72f1edbee22278381c42"
     }
   ],
   "experiment_progress": {
@@ -771,5 +786,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "E1 dev-set inference ablation code/tests and launch record; no media, no results yet"
+  "latest_increment_scope": "E1 dev-set ablation results (s12_c5 selected) and E1b CFG-Zero* conclusion; de-identified aggregates only"
 }
