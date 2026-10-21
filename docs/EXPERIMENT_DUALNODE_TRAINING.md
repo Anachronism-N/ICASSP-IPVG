@@ -65,3 +65,13 @@ PYTHONPATH=src python scripts/analyze_real_training.py --runs-dir runs --scores-
 ```
 
 数据许可与InsightFace非商业研究权重分开；caption视觉内容未人工核真，train/dev同为CREMA-D辅助域，holdout未使用。Cur/GME/Story/人工与完整官方MM2026总分仍缺，Track2真实event训练尚未开展；没有KeyID整体优化、广动作泛化或SOTA声明。下一步需独立动作/伪影人工诊断与更广许可兼容数据，不能仅靠身份分选择更高LR。
+
+## 2026-10-21预注册：固定checkpoint融合强度
+
+只改变LR5e-5训练step64的原生融合alpha=1/.5/.25，不新增训练，不声称LoRA优于全量。原生W+=alphaBA，每arm新进程、新官方底座；同16dev/8演员、480×35249帧16fps20steps/CFG5、原prompt/reference/seed42派生ID种子。先alpha1/.5各1视频600s pilot，再freshalpha1完整16条及历史baseline/alpha1共同评分48；重复一致性通过才两节点各1GPU跑.5/.25各16条并评分32。共50新视频，pilot不混方法统计，推理预留2.333GPUh、质量1GPUh，新增硬上限4，历史51.5不增加，无retry。
+
+repeat优先报告媒体hash精确复现率；非逐位一致时身份均值差≤.02、MUSIQ差≤.01、CLIP差≤.005、灰度motion比.9–1.1，coverage/≥7有效身份帧视频数不下降。repeat失败则停止候选与因果claim。freshalpha1对baseline等演员身份增益须>0。
+
+.5/.25候选同时满足：16完整输出/100%身份coverage/≥7帧视频无下降、等演员身份增益≥freshalpha1的60%且描述性bootstrap下界>0/P10delta≥0、灰度motionratio≥.8、口部全量above-control视频率下降≤.05（baseline16/16故须16/16）、口部paircoverage≥.95及共同flowratio≥.8、MUSIQ下降≤.01、CLIP下降≤.005。两方均通过取身份收益较高者；全是本轮开发参考门槛，不是官方或人工动作真值。未达则结束假设不扩搜索。原ArcFace/CLIP/mouth/VBench协议与阈值不改，保留缺脸和所有失败。
+
+全量训练另区分VACE模块全量（已有mode=adapter，仅--trainable_models vace）与生成主干+VACE联合全量（当前导出/回载和显存未验）。32train小域不是全量优劣证据；后续同曝光真实对照及更广数据独立冻结，不与本轮融合因素混改。当前新增alpha接线与CPU真实固定GeneralLoRALoader已验，GPU结果随后按实证追加。

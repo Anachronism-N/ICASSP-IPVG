@@ -5,7 +5,7 @@ import os
 import sys
 import time
 from pathlib import Path
-from ipvg.common import load_json, resolve_path, write_json, sha256_file
+from ipvg.common import load_json, resolve_path, write_json, sha256_file, positive
 from ipvg.upstream import check_upstream, local_model_paths, video_parameters
 
 
@@ -15,6 +15,11 @@ def main():
     args = parser.parse_args()
     request = load_json(args.request)
     parameters, root = request["parameters"], request["repo_root"]
+    alpha = positive(parameters.get("lora_alpha", 1), "lora_alpha")
+    if alpha > 1 or ("lora_alpha" in parameters and not parameters.get("lora_path")):
+        raise ValueError("lora_alpha requires lora_path and 0 < lora_alpha <= 1")
+    if parameters.get("lora_path") and parameters.get("adapter_checkpoint"):
+        raise ValueError("Choose one trained LoRA or adapter checkpoint")
     if request.get("task") != "inference":
         raise ValueError("VACE reference adapter only supports inference")
     if request.get("resources", {}).get("gpus",1) != 1:
@@ -56,8 +61,6 @@ def main():
         condition_calls.append({"context_shape": list(inputs[1].shape),
                                 "context_nonzero": bool(torch.count_nonzero(inputs[1]).item())})
     condition_hook = pipe.vace.register_forward_pre_hook(observe_condition)
-    if parameters.get("lora_path") and parameters.get("adapter_checkpoint"):
-        raise ValueError("Choose one trained LoRA or adapter checkpoint")
     if parameters.get("lora_path"):
         from diffsynth.core import load_state_dict
         lora_path = resolve_path(parameters["lora_path"],root)
@@ -76,10 +79,10 @@ def main():
             if not torch.isfinite(a).all() or not torch.isfinite(b).all():
                 raise ValueError("LoRA checkpoint contains nonfinite parameters")
             snapshots[name] = module.weight.detach().cpu().clone()
-        pipe.load_lora(pipe.vace, str(lora_path), alpha=1)
+        pipe.load_lora(pipe.vace, str(lora_path), alpha=alpha)
         changed = sum(not torch.equal(before, pipe.vace.get_submodule(name).weight.detach().cpu())
                       for name,before in snapshots.items())
-        profile["lora_reload"] = {"checkpoint_sha256":sha256_file(lora_path),
+        profile["lora_reload"] = {"checkpoint_sha256":sha256_file(lora_path), "alpha":alpha,
                                   "matched_pairs":len(pairs),"changed_base_tensors":changed}
         if not changed:
             raise RuntimeError("LoRA reload produced no measurable base-weight change")
