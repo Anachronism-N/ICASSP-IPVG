@@ -31,6 +31,23 @@ def test_temporal_difference_mean_prefix_and_gradient():
     assert torch.isfinite(ref.grad).all() and ref.grad.abs().sum() > 0
 
 
+def test_bfloat16_shared_routing_mean_error_is_bounded_by_rounding():
+    torch.manual_seed(42)
+    a = torch.randn(2, 14 * 3, 4, dtype=torch.bfloat16)
+    b = torch.randn_like(a)
+    output, metrics = module.route_hints((a,), (b,), (14, 1, 3), 0)
+    left = a.reshape(2, 14, 3, 4)
+    right = b.reshape_as(left)
+    difference = left[:, 1:].float() - right[:, 1:].float()
+    ideal = left[:, 1:].float() - (difference - difference.mean(dim=1, keepdim=True))
+    actual = output[0].reshape_as(left)[:, 1:].float()
+    assert torch.equal(actual, ideal.to(torch.bfloat16).float())
+    rounding_bound = torch.finfo(torch.bfloat16).eps * ideal.abs().amax(dim=1) + torch.finfo(torch.bfloat16).tiny
+    error = (actual - left[:, 1:].float()).mean(dim=1).abs()
+    assert torch.all(error <= rounding_bound)
+    assert metrics['reference_prefix_exact']
+
+
 def test_control_is_original_tensor_not_numerical_roundtrip():
     a = torch.randn(2, 8, 3, dtype=torch.bfloat16)
     b = torch.randn_like(a)

@@ -108,4 +108,24 @@ repeat优先报告媒体hash精确复现率；非逐位一致时身份均值差�
 
 g0候选要求完整16video/8actor身份配对与100%coverage、保留g1身份增益≥60%/actorCI lower>0/P10≥0，graymotion相对未训练baseline≥.8、mouth活动16/16/paircoverage≥.95/共同flow≥.8，MUSIQ下降≤.01、CLIP下降≤.005。全部为开发proxy，非官方/自然动作真值；失败则终止此假设。若有效，下一阶段才注册15层可学习gate、初始化g1并实际训练/保存/回载；本轮固定gate不冒称训练策略收益。全VACE与主干联合微调独立冻结，不与结构门控同时改变。
 
-结构数学/参考prefix/时间均值/批次隔离/autograd/两原生calls及finally恢复43项相关CPU测试通过，实际GPU和效果结果随后按实证追加。
+结构数学/参考prefix/时间均值/批次隔离/autograd/两原生calls及finally恢复43项相关CPU测试通过；新增BF16均值舍入界回归，不把cast后的均值称精确保持。
+
+### 结构实测完成：不是参数缩放，但未解决动态取舍
+
+四个结构run均completed：两pilot+两完整16dev共34新视频，64视频原AMT/MUSIQ共评及新两arm ArcFace/CLIP/mouth已结束。g1控制16/16媒体SHA精确复现原alpha1，说明增加等调用null分支未改变控制输出。g0每视频真实40outer/80native/15hint，参考prefix逐位不变，实际body变化最大.265625；输出视频hint时间均值误差最大.001803来自FP32分解后BF16舍入，数学共享不等于编码数值精确共享。原checkpoint/source/input/hash/seed均核，未训练新gate。
+
+| 指标 | 未训练baseline | 原结构g1 | 共享参考差分g0 |
+|---|---:|---:|---:|
+| 身份余弦均值 | .238796 | .672639 | .666769 |
+| 相对baseline等演员身份增益 | — | .433843 | .427973 |
+| 灰度motion比baseline | 1 | .518992 | .532801 |
+| above-control口部活动 | 16/16 | 15/16 | 15/16 |
+| MUSIQ ImagingQuality | .731272 | .741597 | .740859 |
+| AMT MotionSmoothness | .992506 | .995406 | .995375 |
+| 原prompt CLIP余弦 | .266221 | .270089 | .270675 |
+
+身份coverage和口部paircoverage均100%，16视频/8actor配对完整；g0保留98.65%g1身份收益，baseline配对delta+.427973、CI95[.378121,.476687]，相对g1identitydelta−.005870、CI95[−.010377,−.001227]、P10delta−.011307。g0整体motion对g1仅恢复2.66%，仍只有未训练baseline53.28%，口部活动仍15/16；失败gray>=.8与口部全量保护门槛。其余门槛通过，不以略高CLIP或身份近似保留宣称整体优化。
+
+结论`reference_routing_not_promoted`：完成真实结构实现和可证伪消融，但没有有效多维改善；简单把参考差分时间共享不足以修复主要运动收缩，不追加中间g搜索或把常数门控称训练成果。null参考可能OOD，差分非纯身份；更广动作/人工自然性未验证。后续训练可学习门控需新假设和真实训练/保存回载，并非本轮结构获胜后自然晋级。
+
+四生成controllerGPUh合计.314951662，两个质量命令完整墙钟(74.497313+46.622482)/3600=.033644388，总.348596049≤4，原51.5硬上限未增加，无retry/遗留GPU任务。独立CPU重算数值一致；完整环境374passed，干净控制134passed/31skipped，CPU烟测passed。公共分析`scripts/analyze_reference_structure.py`复核结构calls/prefix/实际body变化、原checkpoint回载、全视频解码及scores/mediahash/actor映射、冻结原VBench权重和开发门槛。公共证据`resources/reference_structure_result.json`、四份`configs/experiments/reference_{pilot1,pilot0,gate1,gate0}.json`。原图/视频/个体caption/embedding/checkpoint/内部地址不发布。

@@ -94,6 +94,10 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 `scripts/analyze_lora_alpha.py`按冻结ledger复核alpha1重复一致性与alpha.5/.25候选、实际checkpoint融合和50新输出，stage1/stage2共同原AMT/MUSIQ80评分记录（含历史与重复）分开计生成成本。身份要求完整16视频/8演员共同帧与原anchor，mouth全量视频分母不删失败；预注册60%身份收益保留与动态保护均保留，两个候选未整体晋级。纯融合强度不是结构/训练策略改善，结果见[训练与融合报告](EXPERIMENT_DUALNODE_TRAINING.md)。
 
+## 参考差分结构评价
+
+`scripts/analyze_reference_structure.py`独立核验同checkpoint、原reference/seed、两原生VACE分支/每视频80calls、15层hint/prefixexact/实际body变化与BF16均值误差，64共同质量records不当作64新生成。身份16视频/8actor全部配对、原scorer权重阈值固定，口部16完整可评分/共同pair视频是保护边界。g1控制需精确复现或通过预定义漂移门槛，g0仅保留身份而无充分动态恢复，未晋级；灰度/mouth不是动作自然性真值。完整结果见[结构报告](EXPERIMENT_DUALNODE_TRAINING.md)。
+
 ## 冻结协议与复现记录
 
 每个run旁保留`metric_protocol.json`或等价文档，至少记录：

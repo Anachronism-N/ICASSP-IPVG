@@ -1,0 +1,1163 @@
+{
+  "status": "completed",
+  "decision": "reference_routing_not_promoted",
+  "repeat": {
+    "passed": true,
+    "exact_video_hash_matches": 16,
+    "total_videos": 16,
+    "checks": {
+      "coverage_not_down": true,
+      "seven_frame_videos_not_down": true,
+      "identity_mean_stable": true,
+      "imaging_stable": true,
+      "clip_stable": true,
+      "gray_motion_stable": true
+    },
+    "identity_comparison": {
+      "narrow": {
+        "videos": 16,
+        "scoreable_videos": 16,
+        "videos_at_least_seven_frames": 16,
+        "identity_coverage": 1.0,
+        "valid_video_identity_mean": 0.6726390682160854,
+        "motion_mean": 3.412947654724121,
+        "static_fraction": 0.0
+      },
+      "wide": {
+        "videos": 16,
+        "scoreable_videos": 16,
+        "videos_at_least_seven_frames": 16,
+        "identity_coverage": 1.0,
+        "valid_video_identity_mean": 0.6726390682160854,
+        "motion_mean": 3.412947654724121,
+        "static_fraction": 0.0
+      },
+      "paired_videos": 16,
+      "paired_actors": 8,
+      "identity_actor_mean_delta": 0.0,
+      "identity_actor_bootstrap_ci95": [
+        0.0,
+        0.0
+      ],
+      "identity_p10_actor_delta": 0.0,
+      "coverage_delta": 0.0,
+      "motion_ratio": 1.0,
+      "static_fraction_delta": 0.0,
+      "recovered_seven_frame_videos": 0,
+      "lost_seven_frame_videos": 0
+    }
+  },
+  "checks": {
+    "identity_coverage_complete": true,
+    "seven_frame_videos_not_down": true,
+    "eight_paired_actors": true,
+    "sixteen_paired_videos": true,
+    "retain_60percent_full_identity_gain": true,
+    "identity_ci_lower_positive": true,
+    "identity_p10_not_down": true,
+    "gray_motion_retained": false,
+    "mouth_activity_retained": false,
+    "mouth_paircoverage_retained": true,
+    "mouth_flow_retained": true,
+    "imaging_not_degraded": true,
+    "clip_not_degraded": true,
+    "sixteen_scoreable_mouth_videos": true,
+    "sixteen_paired_mouth_videos": true
+  },
+  "quality_panel": {
+    "baseline": {
+      "imaging_quality": 0.731272310675407,
+      "motion_smoothness": 0.9925058196157153,
+      "clip_frame_text_cosine_mean": 0.2662207577377558
+    },
+    "historical1": {
+      "imaging_quality": 0.741597158568246,
+      "motion_smoothness": 0.9954058805855932,
+      "clip_frame_text_cosine_mean": 0.2700889864936471
+    },
+    "gate1": {
+      "imaging_quality": 0.741597158568246,
+      "motion_smoothness": 0.9954058799207223,
+      "clip_frame_text_cosine_mean": 0.2700889864936471
+    },
+    "gate0": {
+      "imaging_quality": 0.7408586809586506,
+      "motion_smoothness": 0.9953754054786208,
+      "clip_frame_text_cosine_mean": 0.2706750174984336
+    }
+  },
+  "identity_comparisons": {
+    "gate1": {
+      "narrow": {
+        "videos": 16,
+        "scoreable_videos": 16,
+        "videos_at_least_seven_frames": 16,
+        "identity_coverage": 1.0,
+        "valid_video_identity_mean": 0.2387964430381544,
+        "motion_mean": 6.576112866401672,
+        "static_fraction": 0.0
+      },
+      "wide": {
+        "videos": 16,
+        "scoreable_videos": 16,
+        "videos_at_least_seven_frames": 16,
+        "identity_coverage": 1.0,
+        "valid_video_identity_mean": 0.6726390682160854,
+        "motion_mean": 3.412947654724121,
+        "static_fraction": 0.0
+      },
+      "paired_videos": 16,
+      "paired_actors": 8,
+      "identity_actor_mean_delta": 0.43384262517793104,
+      "identity_actor_bootstrap_ci95": [
+        0.385491445371008,
+        0.48292119904363057
+      ],
+      "identity_p10_actor_delta": 0.4309119050391018,
+      "coverage_delta": 0.0,
+      "motion_ratio": 0.5189916481150092,
+      "static_fraction_delta": 0.0,
+      "recovered_seven_frame_videos": 0,
+      "lost_seven_frame_videos": 0
+    },
+    "gate0": {
+      "narrow": {
+        "videos": 16,
+        "scoreable_videos": 16,
+        "videos_at_least_seven_frames": 16,
+        "identity_coverage": 1.0,
+        "valid_video_identity_mean": 0.2387964430381544,
+        "motion_mean": 6.576112866401672,
+        "static_fraction": 0.0
+      },
+      "wide": {
+        "videos": 16,
+        "scoreable_videos": 16,
+        "videos_at_least_seven_frames": 16,
+        "identity_coverage": 1.0,
+        "valid_video_identity_mean": 0.6667689534369856,
+        "motion_mean": 3.5037605315446854,
+        "static_fraction": 0.0
+      },
+      "paired_videos": 16,
+      "paired_actors": 8,
+      "identity_actor_mean_delta": 0.4279725103988312,
+      "identity_actor_bootstrap_ci95": [
+        0.37812128949881296,
+        0.4766868003236595
+      ],
+      "identity_p10_actor_delta": 0.4196046511642635,
+      "coverage_delta": 0.0,
+      "motion_ratio": 0.5328011551392181,
+      "static_fraction_delta": 0.0,
+      "recovered_seven_frame_videos": 0,
+      "lost_seven_frame_videos": 0
+    },
+    "gate0_vs_gate1": {
+      "narrow": {
+        "videos": 16,
+        "scoreable_videos": 16,
+        "videos_at_least_seven_frames": 16,
+        "identity_coverage": 1.0,
+        "valid_video_identity_mean": 0.6726390682160854,
+        "motion_mean": 3.412947654724121,
+        "static_fraction": 0.0
+      },
+      "wide": {
+        "videos": 16,
+        "scoreable_videos": 16,
+        "videos_at_least_seven_frames": 16,
+        "identity_coverage": 1.0,
+        "valid_video_identity_mean": 0.6667689534369856,
+        "motion_mean": 3.5037605315446854,
+        "static_fraction": 0.0
+      },
+      "paired_videos": 16,
+      "paired_actors": 8,
+      "identity_actor_mean_delta": -0.005870114779099822,
+      "identity_actor_bootstrap_ci95": [
+        -0.010377261531539261,
+        -0.0012272773310542107
+      ],
+      "identity_p10_actor_delta": -0.011307253874838344,
+      "coverage_delta": 0.0,
+      "motion_ratio": 1.026608341529898,
+      "static_fraction_delta": 0.0,
+      "recovered_seven_frame_videos": 0,
+      "lost_seven_frame_videos": 0
+    }
+  },
+  "gate0_mouth_comparison": {
+    "single": {
+      "videos": 16,
+      "scoreable_videos": 16,
+      "mean_pair_coverage": 1.0,
+      "above_control_videos": 16,
+      "activity_video_rate_all": 1.0
+    },
+    "dual": {
+      "videos": 16,
+      "scoreable_videos": 16,
+      "mean_pair_coverage": 1.0,
+      "above_control_videos": 15,
+      "activity_video_rate_all": 0.9375
+    },
+    "paired_videos": 16,
+    "paired_flow_ratio": 1.054507649070374
+  },
+  "quality_deltas_vs_baseline": {
+    "imaging_quality": 0.009586370283243606,
+    "motion_smoothness": 0.0028695858629055326,
+    "clip_frame_text_cosine_mean": 0.0044542597606778145
+  },
+  "runs": [
+    {
+      "run_id": "reference_gate1_20261021_r001",
+      "status": "completed",
+      "code_commit": "ccd699e7b059384f7b36998c1fa44085236a1c25",
+      "source_sha256": "f05cf99c2ad120b42edc7b60e2792770e216a19181e8a1de0f92508a09422fad",
+      "actual_gpu_hours": 0.14244232619828026,
+      "reload": {
+        "checkpoint_sha256": "dc2d0ecffa2a67f48119b742293d951ad8803fe709c8250937542f9d536a09b1",
+        "alpha": 1,
+        "matched_pairs": 150,
+        "changed_base_tensors": 150
+      },
+      "routing_observations": [
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.2649700343608856,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.233989417552948,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.22026297450065613,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.21966083347797394,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.18684768676757812,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.20691856741905212,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.2215951830148697,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.19618108868598938,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.20125168561935425,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.23331069946289062,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.21354323625564575,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.18790847063064575,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.265305757522583,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.211578369140625,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.24694354832172394,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 1,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.0,
+          "reference_temporal_centered_max_abs": 0.2142333984375,
+          "body_temporal_mean_max_abs_error": 0.0,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "reference_gate0_20261021_r001",
+      "status": "completed",
+      "code_commit": "ccd699e7b059384f7b36998c1fa44085236a1c25",
+      "source_sha256": "f05cf99c2ad120b42edc7b60e2792770e216a19181e8a1de0f92508a09422fad",
+      "actual_gpu_hours": 0.14146027501970013,
+      "reload": {
+        "checkpoint_sha256": "dc2d0ecffa2a67f48119b742293d951ad8803fe709c8250937542f9d536a09b1",
+        "alpha": 1,
+        "matched_pairs": 150,
+        "changed_base_tensors": 150
+      },
+      "routing_observations": [
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.265625,
+          "reference_temporal_centered_max_abs": 0.2649700343608856,
+          "body_temporal_mean_max_abs_error": 0.0012019231216982007,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.234375,
+          "reference_temporal_centered_max_abs": 0.233989417552948,
+          "body_temporal_mean_max_abs_error": 0.001802884740754962,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.220703125,
+          "reference_temporal_centered_max_abs": 0.22026297450065613,
+          "body_temporal_mean_max_abs_error": 0.001802884740754962,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.21875,
+          "reference_temporal_centered_max_abs": 0.21966083347797394,
+          "body_temporal_mean_max_abs_error": 0.001802884740754962,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.1875,
+          "reference_temporal_centered_max_abs": 0.18684768676757812,
+          "body_temporal_mean_max_abs_error": 0.001802884740754962,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.20703125,
+          "reference_temporal_centered_max_abs": 0.20691856741905212,
+          "body_temporal_mean_max_abs_error": 0.001802884740754962,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.2216796875,
+          "reference_temporal_centered_max_abs": 0.2215951830148697,
+          "body_temporal_mean_max_abs_error": 0.001802884740754962,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.1962890625,
+          "reference_temporal_centered_max_abs": 0.19618108868598938,
+          "body_temporal_mean_max_abs_error": 0.001802884740754962,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.201171875,
+          "reference_temporal_centered_max_abs": 0.20125168561935425,
+          "body_temporal_mean_max_abs_error": 0.001802884740754962,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.232421875,
+          "reference_temporal_centered_max_abs": 0.23331069946289062,
+          "body_temporal_mean_max_abs_error": 0.001802884740754962,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.212890625,
+          "reference_temporal_centered_max_abs": 0.21354323625564575,
+          "body_temporal_mean_max_abs_error": 0.001802884740754962,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.1875,
+          "reference_temporal_centered_max_abs": 0.18790847063064575,
+          "body_temporal_mean_max_abs_error": 0.0016526442486792803,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.265625,
+          "reference_temporal_centered_max_abs": 0.265305757522583,
+          "body_temporal_mean_max_abs_error": 0.001802884740754962,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.252197265625,
+          "reference_temporal_centered_max_abs": 0.25198835134506226,
+          "body_temporal_mean_max_abs_error": 0.001802884740754962,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.2470703125,
+          "reference_temporal_centered_max_abs": 0.24694354832172394,
+          "body_temporal_mean_max_abs_error": 0.001802884740754962,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        },
+        {
+          "mode": "reference_difference_temporal_v1",
+          "gate": 0,
+          "reference_frames": 1,
+          "outer_calls": 40,
+          "native_calls": 80,
+          "hint_layers": 15,
+          "body_max_abs_change": 0.21435546875,
+          "reference_temporal_centered_max_abs": 0.2142333984375,
+          "body_temporal_mean_max_abs_error": 0.001802884740754962,
+          "reference_prefix_exact": true,
+          "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+          "grid": [
+            14,
+            22,
+            30
+          ],
+          "context_shape": [
+            1,
+            96,
+            14,
+            44,
+            60
+          ]
+        }
+      ]
+    }
+  ],
+  "pilots": [
+    {
+      "run_id": "reference_pilot1_20261021_r001",
+      "status": "completed",
+      "actual_gpu_hours": 0.015844648194163004,
+      "routing": {
+        "mode": "reference_difference_temporal_v1",
+        "gate": 1,
+        "reference_frames": 1,
+        "outer_calls": 40,
+        "native_calls": 80,
+        "hint_layers": 15,
+        "body_max_abs_change": 0.0,
+        "reference_temporal_centered_max_abs": 0.2649700343608856,
+        "body_temporal_mean_max_abs_error": 0.0,
+        "reference_prefix_exact": true,
+        "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+        "grid": [
+          14,
+          22,
+          30
+        ],
+        "context_shape": [
+          1,
+          96,
+          14,
+          44,
+          60
+        ]
+      }
+    },
+    {
+      "run_id": "reference_pilot0_20261021_r001",
+      "status": "completed",
+      "actual_gpu_hours": 0.015204412309944423,
+      "routing": {
+        "mode": "reference_difference_temporal_v1",
+        "gate": 0,
+        "reference_frames": 1,
+        "outer_calls": 40,
+        "native_calls": 80,
+        "hint_layers": 15,
+        "body_max_abs_change": 0.265625,
+        "reference_temporal_centered_max_abs": 0.2649700343608856,
+        "body_temporal_mean_max_abs_error": 0.0012019231216982007,
+        "reference_prefix_exact": true,
+        "null_scope": "only first16channels of one reference-prefix latent frame zeroed",
+        "grid": [
+          14,
+          22,
+          30
+        ],
+        "context_shape": [
+          1,
+          96,
+          14,
+          44,
+          60
+        ]
+      }
+    }
+  ],
+  "actual_new_gpu_hours": 0.3485960492503363,
+  "checkpoint_sha256": "dc2d0ecffa2a67f48119b742293d951ad8803fe709c8250937542f9d536a09b1",
+  "eval_manifest_sha256": "9642d924ba84549930c26e3bc852eb39b7832e345e15810aeae58b523520cf7c",
+  "thresholds": {
+    "gain_retention": 0.6,
+    "gray_motion_min": 0.8,
+    "mouth_rate_drop_max": 0.05,
+    "mouth_paircoverage_min": 0.95,
+    "mouth_flow_min": 0.8,
+    "imaging_drop_max": 0.01,
+    "clip_drop_max": 0.005,
+    "repeat_identity_max": 0.02,
+    "repeat_imaging_max": 0.01,
+    "repeat_clip_max": 0.005,
+    "repeat_motion_min": 0.9,
+    "repeat_motion_max": 1.1
+  },
+  "official_score": null,
+  "holdout_used": false,
+  "human_action_validation": false,
+  "quality_protocol": {
+    "version": "vbench_mm26_quality_v1",
+    "vbench_revision": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+    "motion_smoothness": "original AMT-S odd-frame reconstruction, 1-MAE/255, all decoded frames",
+    "imaging_quality": "original MUSIQ-SPAQ all-frame mean MOS/100, longer-side preprocessing<=512",
+    "precision": "float32, single CUDA device",
+    "aggregation": "video equal weight; normalized per-video dimensions",
+    "official_final_score": null,
+    "human_score": null,
+    "missing_components": [
+      "CurricularFace author checkpoint",
+      "GME",
+      "StoryScore",
+      "official human evaluation"
+    ],
+    "warning": "Named paper-related dimensions, not exact KeyID face/text protocol or official challenge score."
+  },
+  "limitations": [
+    "Fixed inference residual architecture, not trained gate or pure identity disentanglement.",
+    "Null-reference condition may be out of distribution; mean-sharing can suppress necessary action.",
+    "Small talking-head cohort/one seed, gray and mouth diagnostics are not natural-action truth.",
+    "CurricularFace/GME/Story/human/full official MM2026 score remain missing."
+  ],
+  "execution": {
+    "new_generated_videos": 34,
+    "quality_records": 64,
+    "code_commit": "ccd699e7b059384f7b36998c1fa44085236a1c25",
+    "source_sha256": "f05cf99c2ad120b42edc7b60e2792770e216a19181e8a1de0f92508a09422fad",
+    "full_cpu_tests": 374,
+    "independent_cpu_recalculation": "All reported numerical fields matched; primary audit rehashed and decoded output media",
+    "new_hard_cap_gpu_hours": 4,
+    "original_overall_hard_cap_gpu_hours": 51.5,
+    "retry_count": 0,
+    "mean_preservation": "Exact in float32 algebra; observed bfloat16 cast error reported, not claimed exact",
+    "training_performed_this_stage": false
+  }
+}

@@ -59,6 +59,10 @@ KeyID-inspired仅改固定事件分段内内容自适应选锚，不含身份编
 
 alpha1/.5/.25五run（两pilot+三16视频arm）50新视频、原AMT/MUSIQ共评48+32记录均完成。alpha1新16/16媒体SHA精确复现旧结果；各alpha实际150LoRA pairs/150base tensor融合核验，原评测anchor/prompt/seed未变。身份均值.672639/.396907/.271487，motion相对未训练baseline比.518992/.722036/.893224，口部活动15/15/16（各16视频），coverage均100%。.5仅保留36.44%原身份收益且动态门槛未过；.25虽保动态却仅保留7.54%身份收益。`fusion_strength_not_promoted`，不扩alpha搜索。实际新增.394149799GPUh≤4，完整349CPUtests通过，独立复算一致，所有GPUrun结束。完整预注册/正负结论见[真实训练报告](EXPERIMENT_DUALNODE_TRAINING.md)及`resources/lora_alpha_result.json`；不是结构优化或全量训练胜负证据。下一阶段转参考条件/时序残差结构分离，未完成不称成功。
 
+## 参考差分时序路由结构实测完成（2026-10-21，不晋级）
+
+新增结构不是LoRA缩放：同权重两原生VACE分支，有参考减null参考，只在视频body调整参考差分的时变成分，保留prefix/RoPE及null分支动态。g1控制40outer80nativecalls，16/16媒体SHA精确复现旧alpha1；g0真实改15层hint，prefixexact、BF16时间均值误差最大.001803如实记录。两pilot+两16视频arm共34新视频、64原AMT/MUSIQ共评及新ArcFace/CLIP/mouth均完成。身份.672639→.666769，保留98.65%原身份增益，motion对原结构仅+2.66%、相对未训练baseline仅.532801，mouth活动仍15/16；失败整体motion/口部保护。`reference_routing_not_promoted`，不继续常数g盲搜或称已训练门控。真实结构功能验收不等于效果优化成功。新增.348596049GPUh≤4，完整374CPUtests与独立复算通过，所有GPUrun结束；完整方案正负结果见[结构报告](EXPERIMENT_DUALNODE_TRAINING.md)、`resources/reference_structure_result.json`。后续需更针对性的训练目标/时空身份路径与更广动作数据，当前不宣称泛化或完整MM2026成绩。
+
 ## 当前实验与限制
 
 唯一H1对照是参考人脸bbox扩边.3的正方形裁剪，原参考仍作身份评价anchor。模型、prompt、sample_id/seed、采样步和候选数固定，不训练新LoRA。实验预注册及聚合结果见 [CREMA-D H1](EXPERIMENT_CREMA_D_H1.md)。crop64/64条完整解码；63样本/32演员共同帧配对，原基线身份均值0.143337、crop0.349797，配对提升+0.205661，演员bootstrap95%区间[0.168833,0.245416]。身份P10提升+0.192157、coverage+0.007813、灰度运动proxy比1.029227、静态比例无变化。新生成耗费0.602265GPU小时，所有任务正常退出。只在该单种子说话头部dev上支持H1，不是完整动作/人工/holdout/SOTA结论。
