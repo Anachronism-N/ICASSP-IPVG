@@ -97,3 +97,15 @@ repeat优先报告媒体hash精确复现率；非逐位一致时身份均值差�
 公共证据`resources/lora_alpha_result.json`、五份`configs/experiments/lora_{pilot1,pilot05,alpha1,alpha05,alpha025}.json`。`scripts/analyze_lora_alpha.py`接受冻结本地ledger、runs-dir、scores-dir与stage=repeat/final，拒错误alpha/checkpoint、输入漂移、重复/非有限分数、缺视频、actor错配或预算不自洽。ledger含真实路径只留本地，换路径需重新冻结，不用便携模板的SHA冒充原执行SHA。
 
 下一步改参考条件残差的结构路由，而不是继续缩放整套LoRA：先区分参考条件带来的时间共享成分与时变成分，保留主干动态路径及参考prefix/RoPE；结构假设、固定门控消融与后续可学习门控训练独立执行，未验证前不声称纯身份解耦或效果成功。
+
+## 2026-10-21预注册：参考差分条件的时序路由结构
+
+现VACE在base第0/2/.../28层注入15个[B,N,1536]hint，参考/视频token混合，不是纯身份通道。本轮不训练或缩放LoRA，保持LR5step64/alpha1权重；原生VACE同x/text/timestep/RoPE分别算有参考H_ref和null参考H_null（仅96ch条件的首个参考latent前16ch置零，其他不变）。输出视频段Q=H_ref−H_null、D=Q−mean_time(Q)，新hint=H_ref+(g−1)D，参考prefix保持H_ref原样。g1返回原hint、g0将参考差分时间共享，同时保留H_null的逐时路径。null参考可能OOD、共享可能伤动作，因此只是结构假设，不能称纯身份编码或学习门控。
+
+两arm每视频均40outer/80native VACE calls，固定49帧480×35216fps20steps/CFG5/原prompt/ref/seed，1参考latent+13视频latent、grid14×22×30/N9240、15hints。严格拒其他shape、control/分片/不同参考数，wrapper异常还原forward；不改底座源码、referenceprefix噪音或RoPE。g0要有实际body变化，g1零变化，FP32分解后BF16注入的mean误差如实记录。
+
+两节点各1健康GPU：g1/g0单视频pilot各600s，通过后各16完整dev（3000s/arm），总34新视频；旧未训练baseline/旧alpha1与新g1/g0共同64视频原AMT/MUSIQ共评，两节点32各1800s。推理预留2GPUh+评价1，新增硬上限4，旧51.5总上限不加，无retry/额外g搜索。g1须复现旧alpha1媒体；否则使用已冻结identity差≤.02、MUSIQ≤.01、CLIP≤.005、graymotion比.9–1.1/coverage不下降，超界停止归因。
+
+g0候选要求完整16video/8actor身份配对与100%coverage、保留g1身份增益≥60%/actorCI lower>0/P10≥0，graymotion相对未训练baseline≥.8、mouth活动16/16/paircoverage≥.95/共同flow≥.8，MUSIQ下降≤.01、CLIP下降≤.005。全部为开发proxy，非官方/自然动作真值；失败则终止此假设。若有效，下一阶段才注册15层可学习gate、初始化g1并实际训练/保存/回载；本轮固定gate不冒称训练策略收益。全VACE与主干联合微调独立冻结，不与结构门控同时改变。
+
+结构数学/参考prefix/时间均值/批次隔离/autograd/两原生calls及finally恢复43项相关CPU测试通过，实际GPU和效果结果随后按实证追加。

@@ -1,5 +1,6 @@
 """Single-GPU local VACE reference inference. GPU behavior requires a server pilot."""
 import argparse
+from contextlib import nullcontext
 import hashlib
 import os
 import sys
@@ -28,6 +29,19 @@ def main():
         raise ValueError("This reference-only adapter does not consume control_video_path; use a separately validated control-video backend")
     if any(row["track"] == 2 for row in request["samples"]) and parameters.get("timeline_mode") != "flatten":
         raise ValueError("This baseline requires explicit timeline_mode=flatten for Track 2; structured timing is not implemented")
+    routing_enabled = parameters.get("reference_routing", False)
+    if not isinstance(routing_enabled, bool):
+        raise ValueError("reference_routing must be boolean")
+    gate = parameters.get("reference_temporal_gate", 1)
+    if "reference_temporal_gate" in parameters and not routing_enabled:
+        raise ValueError("reference_temporal_gate requires reference_routing")
+    if routing_enabled:
+        if isinstance(gate, bool) or not isinstance(gate, (int, float)) or gate not in (0, 1):
+            raise ValueError("reference_temporal_gate must be0or1")
+        if (not parameters.get("lora_path") or alpha != 1 or parameters.get("adapter_checkpoint")
+                or any(r["track"] != 1 or len(r["reference_images"]) != 1 for r in request["samples"])
+                or any(parameters.get(k) != v for k, v in (("width", 480), ("height", 352), ("num_frames", 49), ("num_inference_steps", 20)))):
+            raise ValueError("Reference routing requires fixed single-reference Track1 VACE LoRAalpha1 specification")
     model_paths, tokenizer = local_model_paths(parameters, root)
     upstream = check_upstream(parameters, root)
     video_parameters(parameters)
@@ -108,12 +122,22 @@ def main():
         torch.cuda.reset_peak_memory_stats()
         torch.cuda.synchronize()
         started = time.monotonic()
-        video = pipe(prompt=prompt, negative_prompt=parameters.get("negative_prompt",""),
-                     vace_reference_image=reference, seed=seed, tiled=True,
-                     height=parameters.get("height",480), width=parameters.get("width",832),
-                     num_frames=parameters.get("num_frames",49),
-                     num_inference_steps=parameters.get("num_inference_steps",30),
-                     cfg_scale=parameters.get("cfg_scale",5.0))
+        routing_context = nullcontext(None)
+        if routing_enabled:
+            from vace_reference_routing import reference_routing
+            routing_context = reference_routing(pipe.vace, gate, reference_frames=1)
+        with routing_context as routing_observation:
+            video = pipe(prompt=prompt, negative_prompt=parameters.get("negative_prompt",""),
+                         vace_reference_image=reference, seed=seed, tiled=True,
+                         height=parameters.get("height",480), width=parameters.get("width",832),
+                         num_frames=parameters.get("num_frames",49),
+                         num_inference_steps=parameters.get("num_inference_steps",30),
+                         cfg_scale=parameters.get("cfg_scale",5.0))
+        if routing_observation is not None:
+            if (routing_observation["outer_calls"] != 40 or routing_observation["native_calls"] != 80
+                    or not routing_observation["reference_prefix_exact"]
+                    or (gate == 0 and routing_observation["body_max_abs_change"] <= 0)):
+                raise RuntimeError("Reference routing actual calls or structural-change evidence failed")
         torch.cuda.synchronize()
         seconds = time.monotonic()-started
         if not condition_calls or not any(call["context_nonzero"] for call in condition_calls):
@@ -125,6 +149,7 @@ def main():
                         "reference_index":index,"reference_pixels_sha256":hashlib.sha256(reference.tobytes()).hexdigest(),
                         "vace_forward_calls":len(condition_calls),"vace_context_shape":condition_calls[0]["context_shape"],
                         "generated_frames":len(video),
+                        "reference_routing":routing_observation,
                         "peak_allocated_vram_gb":torch.cuda.max_memory_allocated()/1e9,
                         "peak_reserved_vram_gb":torch.cuda.max_memory_reserved()/1e9})
         write_json(metrics_path, profile)
