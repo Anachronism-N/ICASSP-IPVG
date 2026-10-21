@@ -174,9 +174,18 @@
     "Original Gemini Story captioner and official human component; local Story substitute cannot be inserted into original weighted score"
   ],
   "evaluation_gate": {
-    "pause_model_generation_and_training": true,
+    "comparative_protocol": "ipvg_cross_model_comparison_v1",
+    "comparable_evaluation_ready": true,
+    "strong_baseline_benchmark_permitted": true,
+    "method_optimization_requires_baseline_comparison": true,
+    "core_metrics": ["cur_score", "arc_score", "gme_aesr", "motion_smoothness", "imaging_quality"],
+    "diagnostic_only": ["local_story_similarity", "overall_consistency"],
+    "combined_score": null,
+    "action_naturalness_verified": false,
+    "human_review_required_for_all_automatic_benchmarks": false,
+    "scope_decision": "User requests a horizontally comparable evaluation scheme; unknown official/human components stay missing, not an indefinite barrier to automatic baseline comparisons.",
     "next_order": [
-      "finish_frozen_evaluation_and_action_validation",
+      "freeze_comparable_native_evaluation",
       "stronger_baseline_same_protocol",
       "method_optimization_on_selected_baseline"
     ]

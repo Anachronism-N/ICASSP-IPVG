@@ -113,7 +113,7 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 ## 2026-10-21评测优先补齐（先验收，再选强基线）
 
-后续顺序严格固定：评分器/控制校准与冻结面板完成→同集强基线→基线上的方法优化。现阶段暂停生成模型下载、训练和结构搜索。保留原strict8frame ArcFace/CLIP/mouth/原AMT/MUSIQ；不能用我们小CREMA-D身份均值直接减KeyID VIP-200K论文分数或官方排行榜总分。
+后续顺序严格固定：评分器/控制校准与冻结面板完成→同集强基线→基线上的方法优化。用户随后明确要求选择一个可横向比较的方案即可；因此采用下述固定自动比较协议，不等待完整官方总分或人工标签才开始基线benchmark，仍禁止把自动比较等同自然性/官方评分。保留原strict8frame ArcFace/CLIP/mouth/原AMT/MUSIQ；不能用我们小CREMA-D身份均值直接减KeyID VIP-200K论文分数或官方排行榜总分。
 
 新增`scripts/gme_text_eval.py`调用固定GME7B原生embedding，GPUFP16/SDPA、最多81floorlinspace帧（现49帧全部）、原prompt instruction `Find frames that match the given text description.`、原归一化embedding dot均值无×100。GME原生processor截断max1800tokens明确记录，模型源码/config/tokenizer/九shards全SHA；仅本地PIL，禁联网下载。原类不用`lm_head.weight`输出投影为正常embedding路径，不表示识别encoder缺权重。第一次pilot因transformers懒加载DeepSpeed→cpuinfo本机file命令被Popen守卫误拦失败；预初始化本机依赖后唯一r002修复通过，没有放开模型联网。
 
@@ -133,7 +133,15 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 19GPU评分作业17completed/2failed均结束，原GME32s失败与worker旧上游删减目录拒绝2s保留，旧workerquality已完成但从最终结果排除并在独立clean fd18源码r002重评；原权重/公式未变。总实际allocatedGPUh=.667025325≤12，含所有失败/排除成本，不按工具延迟通知计时，无新模型生成/训练。完整525passed/7skipped，干净187passed/37skipped、CPU烟测passed，独立CPU复算126groupcells完全一致。结果`resources/evaluation_panel_result.json`。
 
-`scripts/prepare_blind_review.py`已准备本地80对neutral-name比较，身份/动作完成/自然运动/伪影/偏好与置信度分列。所有人工值未填，媒体与method key只在本地，不进Git/外部API；需要实际独立人类审核，agent不能代称已完成人工评测。原GeminiStory/官方human/完整finalscore仍null。下一步先补动作判定与人工边界，再同一冻结panel验证强基线，然后才研究结构/损失；本轮完成的是可复现自动面板和缺陷诊断，不是完整官方评测。
+`scripts/prepare_blind_review.py`已准备本地80对neutral-name比较，身份/动作完成/自然运动/伪影/偏好与置信度分列。所有人工值未填，媒体与method key只在本地，不进Git/外部API；需要实际独立人类审核，agent不能代称已完成人工评测。原GeminiStory/官方human/完整finalscore仍null。这仍不构成完整官方评测。按用户最新决定，固定可比自动协议即可进入同集强基线比较；动作与人工边界继续单列，不再设为所有自动benchmark的先决条件。完成强基线比较后才研究结构/损失。
+
+## 横向比较定版：ipvg_cross_model_comparison_v1
+
+核心分别报告Cur16、Arc16、GME7B帧文本匹配、AMT运动平滑、MUSIQ成像，不拼自定义总分。辅助报告脸部检测/识别coverage、RAFT动态、美学、主体/背景一致性及实际成本；localStory/ViCLIP因已知顺序局限只留diagnostic。人工/官方总分仍null，动作自然性仍未验证，但不是所有基线benchmark的唯一前置条件。
+
+同cohort逐`base_sample_id`要求原prompt/reference SHA/actor一致，视频480×352（主集）或480平方（历史）、49帧16fps49/16秒一致；所有输入都评分，不只留下最像参考的候选。评分协议/模型文件SHA/native源码和FP16/FP32等实际精度共同固定，任一分片漂移即拒绝配对。96主集以未训练baseline为对照，24历史平方只在8共同输入上以VACE-H1为对照，禁止跨cohort混池。每核心metric输出baseline/candidate均值、coverage、有效配对数/缺失数、等视频delta与等actor delta。缺失不补0（Cur作者式全missing-video原约定单列保持），不能将可用子集提升说成整体提升。
+
+`scripts/evaluation_panel_report.py`已在120旧媒体与已完成评分上重新执行纯CPUhash/解码/配对检查，原评分与原GPU成本不变、没有新模型输出或新GPU实验。19项定向测试、完整541passed/7skip、干净203passed/37skip和CPU烟测通过；独立从原评分JSON重算45个group×核心指标配对差，全部一致。`resources/cross_model_comparison_result.json`记录协议和实际配对结果，`comparable_evaluation_ready=true`表示本地自动比较可开始，不是官方全套、自然动作验证或SOTA。下一阶段独立验证Stand-In/Wan14B及已有AnyID5B等原生强基线，共同输入/输出规格/评价不变，原生采样器参数与实际预算差异显式记录；不假设同seed意味着不同模型使用相同噪声。
 
 ## 人工抽样与同预算对照
 

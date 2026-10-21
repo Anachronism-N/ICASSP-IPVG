@@ -1,0 +1,975 @@
+{
+  "protocol": {
+    "version": "ipvg_cross_model_comparison_v1",
+    "core_metrics": [
+      "cur_score",
+      "arc_score",
+      "gme_aesr",
+      "motion_smoothness",
+      "imaging_quality"
+    ],
+    "auxiliary_metrics": [
+      "face_detection_coverage",
+      "cur_scoring_coverage",
+      "arc_scoring_coverage",
+      "dynamic_degree",
+      "aesthetic_quality",
+      "subject_consistency",
+      "background_consistency"
+    ],
+    "diagnostic_only": [
+      "local_story_similarity",
+      "overall_consistency"
+    ],
+    "paired_inputs": "Same base_sample_id, original prompt/reference/actor, decoded output dimensions/frames/fps/duration within cohort",
+    "aggregation": "Video-equal means plus paired deltas; paired actor-equal delta and explicit missing denominators",
+    "combined_score": null,
+    "official_final_score": null,
+    "action_naturalness_verified": false,
+    "readiness": "Audited comparable automatic metrics permit baseline benchmarking, not official ranking or natural-action claims"
+  },
+  "scorer_signatures_sha256": "42a1ae0b82ebf8bcd64862a9eedfef84b223c5610ce6310bae09b3bee3431474",
+  "comparable_evaluation_ready": true,
+  "comparisons": {
+    "main_same_input": {
+      "baseline_group": "baseline",
+      "groups": {
+        "baseline": {
+          "input_videos": 16,
+          "core_metrics": {
+            "cur_score": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.2634677691530669,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.2634677691530669,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.0
+            },
+            "arc_score": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.23978126300789881,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.23978126300789881,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.0
+            },
+            "gme_aesr": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.5546776298433542,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.5546776298433542,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.0
+            },
+            "motion_smoothness": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.99250581814494,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.99250581814494,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.0
+            },
+            "imaging_quality": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.731272310675407,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.731272310675407,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.0
+            }
+          }
+        },
+        "lr1": {
+          "input_videos": 16,
+          "core_metrics": {
+            "cur_score": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.2634677691530669,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.43631355819525197,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.17284578904218506,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.17284578904218506
+            },
+            "arc_score": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.23978126300789881,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.422514029283775,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.1827327662758762,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.1827327662758762
+            },
+            "gme_aesr": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.5546776298433542,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.554294815286994,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": -0.00038281455636024475,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": -0.00038281455636024475
+            },
+            "motion_smoothness": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.99250581814494,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.9940080977981536,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0015022796532136104,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.0015022796532136104
+            },
+            "imaging_quality": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.731272310675407,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.738241004165338,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.00696869348993108,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.00696869348993108
+            }
+          }
+        },
+        "lr5": {
+          "input_videos": 16,
+          "core_metrics": {
+            "cur_score": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.2634677691530669,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.6818276653066278,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.41835989615356084,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.41835989615356084
+            },
+            "arc_score": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.23978126300789881,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.6716209421865642,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.4318396791786654,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.4318396791786654
+            },
+            "gme_aesr": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.5546776298433542,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.5277200136333704,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": -0.026957616209983826,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": -0.026957616209983826
+            },
+            "motion_smoothness": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.99250581814494,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.9954058878185836,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0029000696736436113,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.0029000696736436113
+            },
+            "imaging_quality": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.731272310675407,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.741597158568246,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.010324847892839072,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.010324847892839072
+            }
+          }
+        },
+        "alpha05": {
+          "input_videos": 16,
+          "core_metrics": {
+            "cur_score": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.2634677691530669,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.41696478848461993,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.15349701933155302,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.15349701933155302
+            },
+            "arc_score": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.23978126300789881,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.3962157034839038,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.15643444047600497,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.15643444047600497
+            },
+            "gme_aesr": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.5546776298433542,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.5561289545148611,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0014513246715068817,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.0014513246715068817
+            },
+            "motion_smoothness": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.99250581814494,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.9941220512851013,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0016162331401613217,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.0016162331401613217
+            },
+            "imaging_quality": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.731272310675407,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.7362551096507481,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0049827989753411725,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.0049827989753411725
+            }
+          }
+        },
+        "alpha025": {
+          "input_videos": 16,
+          "core_metrics": {
+            "cur_score": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.2634677691530669,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.2865672105108388,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.023099441357771866,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.023099441357771866
+            },
+            "arc_score": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.23978126300789881,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.27139718961552717,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.03161592660762835,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.03161592660762835
+            },
+            "gme_aesr": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.5546776298433542,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.5567176099866629,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0020399801433086395,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.0020399801433086395
+            },
+            "motion_smoothness": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.99250581814494,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.9929935932870886,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0004877751421486082,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.0004877751421486082
+            },
+            "imaging_quality": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.731272310675407,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.7359859314256785,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.004713620750271562,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.004713620750271562
+            }
+          }
+        },
+        "structure0": {
+          "input_videos": 16,
+          "core_metrics": {
+            "cur_score": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.2634677691530669,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.6774771069176495,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.4140093377645826,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.4140093377645826
+            },
+            "arc_score": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.23978126300789881,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.6642319416860119,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.42445067867811304,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.42445067867811304
+            },
+            "gme_aesr": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.5546776298433542,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.5310473311692476,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": -0.023630298674106598,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": -0.023630298674106598
+            },
+            "motion_smoothness": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.99250581814494,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.9953753970770692,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.002869578932129184,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.002869578932129184
+            },
+            "imaging_quality": {
+              "baseline": {
+                "count": 16,
+                "mean": 0.731272310675407,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 16,
+                "mean": 0.7408586809586506,
+                "coverage": 1.0
+              },
+              "paired_videos": 16,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.009586370283243599,
+              "paired_actors": 8,
+              "paired_actor_mean_delta": 0.009586370283243599
+            }
+          }
+        }
+      },
+      "cross_cohort_comparison_permitted": false
+    },
+    "historical_480square_not_main_comparison": {
+      "baseline_group": "archive_vace_h1",
+      "groups": {
+        "archive_vace_h1": {
+          "input_videos": 8,
+          "core_metrics": {
+            "cur_score": {
+              "baseline": {
+                "count": 8,
+                "mean": 0.4976008136291057,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 8,
+                "mean": 0.4976008136291057,
+                "coverage": 1.0
+              },
+              "paired_videos": 8,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0,
+              "paired_actors": 4,
+              "paired_actor_mean_delta": 0.0
+            },
+            "arc_score": {
+              "baseline": {
+                "count": 8,
+                "mean": 0.47551465639844537,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 8,
+                "mean": 0.47551465639844537,
+                "coverage": 1.0
+              },
+              "paired_videos": 8,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0,
+              "paired_actors": 4,
+              "paired_actor_mean_delta": 0.0
+            },
+            "gme_aesr": {
+              "baseline": {
+                "count": 8,
+                "mean": 0.622177816927433,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 8,
+                "mean": 0.622177816927433,
+                "coverage": 1.0
+              },
+              "paired_videos": 8,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0,
+              "paired_actors": 4,
+              "paired_actor_mean_delta": 0.0
+            },
+            "motion_smoothness": {
+              "baseline": {
+                "count": 8,
+                "mean": 0.9934275694574464,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 8,
+                "mean": 0.9934275694574464,
+                "coverage": 1.0
+              },
+              "paired_videos": 8,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0,
+              "paired_actors": 4,
+              "paired_actor_mean_delta": 0.0
+            },
+            "imaging_quality": {
+              "baseline": {
+                "count": 8,
+                "mean": 0.6990444977429449,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 8,
+                "mean": 0.6990444977429449,
+                "coverage": 1.0
+              },
+              "paired_videos": 8,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.0,
+              "paired_actors": 4,
+              "paired_actor_mean_delta": 0.0
+            }
+          }
+        },
+        "archive_anyid_single": {
+          "input_videos": 8,
+          "core_metrics": {
+            "cur_score": {
+              "baseline": {
+                "count": 8,
+                "mean": 0.4976008136291057,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 8,
+                "mean": 0.8770219571888447,
+                "coverage": 1.0
+              },
+              "paired_videos": 8,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.379421143559739,
+              "paired_actors": 4,
+              "paired_actor_mean_delta": 0.379421143559739
+            },
+            "arc_score": {
+              "baseline": {
+                "count": 8,
+                "mean": 0.47551465639844537,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 8,
+                "mean": 0.8536321152932942,
+                "coverage": 1.0
+              },
+              "paired_videos": 8,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.3781174588948488,
+              "paired_actors": 4,
+              "paired_actor_mean_delta": 0.3781174588948488
+            },
+            "gme_aesr": {
+              "baseline": {
+                "count": 8,
+                "mean": 0.622177816927433,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 8,
+                "mean": 0.520368654280901,
+                "coverage": 1.0
+              },
+              "paired_videos": 8,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": -0.10180916264653206,
+              "paired_actors": 4,
+              "paired_actor_mean_delta": -0.10180916264653206
+            },
+            "motion_smoothness": {
+              "baseline": {
+                "count": 8,
+                "mean": 0.9934275694574464,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 8,
+                "mean": 0.9923800202487196,
+                "coverage": 1.0
+              },
+              "paired_videos": 8,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": -0.0010475492087267252,
+              "paired_actors": 4,
+              "paired_actor_mean_delta": -0.0010475492087267252
+            },
+            "imaging_quality": {
+              "baseline": {
+                "count": 8,
+                "mean": 0.6990444977429449,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 8,
+                "mean": 0.5665254596788056,
+                "coverage": 1.0
+              },
+              "paired_videos": 8,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": -0.1325190380641392,
+              "paired_actors": 4,
+              "paired_actor_mean_delta": -0.1325190380641392
+            }
+          }
+        },
+        "archive_anyid_dual": {
+          "input_videos": 8,
+          "core_metrics": {
+            "cur_score": {
+              "baseline": {
+                "count": 8,
+                "mean": 0.4976008136291057,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 8,
+                "mean": 0.8991084839217365,
+                "coverage": 1.0
+              },
+              "paired_videos": 8,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.4015076702926308,
+              "paired_actors": 4,
+              "paired_actor_mean_delta": 0.4015076702926308
+            },
+            "arc_score": {
+              "baseline": {
+                "count": 8,
+                "mean": 0.47551465639844537,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 8,
+                "mean": 0.8773945472203195,
+                "coverage": 1.0
+              },
+              "paired_videos": 8,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": 0.40187989082187414,
+              "paired_actors": 4,
+              "paired_actor_mean_delta": 0.40187989082187414
+            },
+            "gme_aesr": {
+              "baseline": {
+                "count": 8,
+                "mean": 0.622177816927433,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 8,
+                "mean": 0.5198589377105236,
+                "coverage": 1.0
+              },
+              "paired_videos": 8,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": -0.10231887921690941,
+              "paired_actors": 4,
+              "paired_actor_mean_delta": -0.10231887921690941
+            },
+            "motion_smoothness": {
+              "baseline": {
+                "count": 8,
+                "mean": 0.9934275694574464,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 8,
+                "mean": 0.9933444392495858,
+                "coverage": 1.0
+              },
+              "paired_videos": 8,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": -8.31302078605628e-05,
+              "paired_actors": 4,
+              "paired_actor_mean_delta": -8.31302078605628e-05
+            },
+            "imaging_quality": {
+              "baseline": {
+                "count": 8,
+                "mean": 0.6990444977429449,
+                "coverage": 1.0
+              },
+              "candidate": {
+                "count": 8,
+                "mean": 0.599807211914841,
+                "coverage": 1.0
+              },
+              "paired_videos": 8,
+              "unpaired_videos": 0,
+              "paired_video_mean_delta": -0.09923728582810382,
+              "paired_actors": 4,
+              "paired_actor_mean_delta": -0.09923728582810382
+            }
+          }
+        }
+      },
+      "cross_cohort_comparison_permitted": false
+    }
+  },
+  "official_evaluation_complete": false,
+  "action_naturalness_verified": false,
+  "automatic_winner_selected": null,
+  "source_panel_manifest_sha256": "6760385f1b8b867038b2afdd414a2f6c39c40234b25821148784ac15ce55e4fd",
+  "source_prior_evaluation_result_sha256": "f108720fedccda9ffd2a82b9f69dad44b745b5b4ccd491dea1582f47d80c2c04",
+  "raw_score_protocols": {
+    "gme": {
+      "version": "native_gme7b_aesr_v1",
+      "model": "Alibaba-NLP/gme-Qwen2-VL-7B-Instruct",
+      "model_revision": "e54cb53a76dba4895a7a2f88fc8021f3679ed4f1",
+      "sampling": "all frames up to 81; otherwise np.linspace(0, count-1, 81, dtype=int)",
+      "images": "native embed with local full-frame RGB PIL images, texts=None, is_query=False",
+      "image_default_instruction": "You are a helpful assistant.",
+      "normalization": "native model.normalize=True; verify finite/unit norm without evaluator renormalization",
+      "text": "exact frozen prompt passed unchanged to native embed with image=None and the fixed instruction",
+      "native_text_processing": "native processor truncation=True, max_length from native config (default 1800)",
+      "text_instruction": "Find frames that match the given text description.",
+      "aggregation": "arithmetic mean of raw unit-embedding dot products; no x100 or logit scale",
+      "embedding_unit_norm_tolerance": 0.01,
+      "implementation": "independent published frame/text AESR algorithm, no AESR source reuse",
+      "official_final_score": null,
+      "limitations": [
+        "Frame similarity alone does not verify action timing, speech or human quality."
+      ]
+    },
+    "cur": {
+      "version": "consisid_cur_arc_author_style_cpu_detector_v1",
+      "frames": 16,
+      "frame_sampling": "floor linspace indices including endpoints; repeat indices for short videos",
+      "det_size": [
+        320,
+        320
+      ],
+      "det_threshold": 0.5,
+      "multi_face_policy": "largest bbox area; last detection breaks ties as native stable sort; never identity matching",
+      "padding_retry": "only if no faces; 0.25 of each dimension per edge, gray 128; subtract keypoint offsets",
+      "identity_anchor": "original manifest reference_image, never candidate conditioning crop",
+      "cur_alignment": "InsightFace norm_crop 224 BGR; RGB; OpenCV linear resize 112; CHW float32 /127.5-1",
+      "arc_alignment": "InsightFace norm_crop 112 BGR; native ArcFaceONNX.get_feat; padded detection image on retry",
+      "aggregation": "mean max(0, cosine) over valid frames; no per-frame zero imputation",
+      "missing_reference": "scores null with explicit cause, including all-missing videos",
+      "detector_provider": "CPUExecutionProvider; author-style provider equivalent, not an official scorer",
+      "ort_intra_op_threads": 4,
+      "ort_inter_op_threads": 1,
+      "torch_threads": 4,
+      "cur_model": "native ConsisID IR_101([112,112]), Backbone num_layers=100",
+      "arc_model": "buffalo_l/w600k_r50",
+      "score_kind": "local_proxy",
+      "official_score": null,
+      "missing_policy": "author_all_missing_video_zero"
+    },
+    "story": {
+      "version": "local_story_similarity_v1",
+      "caption_model": "Qwen2.5-VL-7B-Instruct",
+      "caption_frames": 8,
+      "frame_sampling": "rounded linspace including endpoints",
+      "caption_instruction": "Give a detailed video caption of the input video. Describe characters, environments, dynamics, camera movement, and fine-grained element interactions. Output150-250words, only visibly supported observations in beginning-middle-end order. Do not infer names, audio, dialogue or hidden intent.",
+      "caption_max_new_tokens": 512,
+      "caption_do_sample": false,
+      "embedding_model": "HIT-TMG/KaLM-embedding-multilingual-mini-instruct-v2",
+      "embedding_revision": "348e90d4084c1e2fbaac61f16a2d8c636192352a",
+      "embedding_max_tokens": 512,
+      "score": "dot product of normalized exact prompt and local video-caption embeddings",
+      "official_story_score": null,
+      "official_final_score": null,
+      "warning": "Local captioner substitution is not MSVBench/AESR Gemini StoryScore or human action truth."
+    },
+    "vbench": {
+      "version": "vbench_extended_native_v1",
+      "vbench_revision": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+      "dimensions": {
+        "dynamic_degree": "Native RAFT FP32 boolean; interval=max(1,round(fps/8)); adaptive movement thresholds, not smoothness or semantic correctness",
+        "subject_consistency": "DINO ViT-B/16 all decoded frames; mean nonnegative first/previous-frame cosines per video",
+        "background_consistency": "CLIP ViT-B/32 all decoded frames; mean nonnegative first/previous-frame cosines per video",
+        "aesthetic_quality": "CLIP ViT-L/14 and LAION linear head; native all-frame mean prediction/10, no extra normalization or clipping",
+        "overall_consistency": "ViCLIP InternVid-10M-FLT; native 8 uniform-middle frames and original prompt; raw unit cosine including negatives"
+      },
+      "aggregation": "Equal video weight within each dimension; upstream aggregate retained separately (subject/background are frame-transition weighted)",
+      "precision": "FP32 DINO/RAFT/ViCLIP/aesthetic head; native clip.load CUDA precision for CLIP image encoders; actual parameter dtypes recorded",
+      "prompt_policy": "Original manifest prompt, no prompt refinement; SHA256 only in output. Native ViCLIP tokenizer context=32, truncate=True; token overflow recorded",
+      "temporal_flickering": "Excluded: assumes static content, not a moving-video quality metric",
+      "official_final_score": null,
+      "human_score": null,
+      "warning": "Native named dimensions on custom frozen media, not the official VBench benchmark or challenge final score"
+    },
+    "quality": {
+      "version": "vbench_mm26_quality_v1",
+      "vbench_revision": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+      "motion_smoothness": "original AMT-S odd-frame reconstruction, 1-MAE/255, all decoded frames",
+      "imaging_quality": "original MUSIQ-SPAQ all-frame mean MOS/100, longer-side preprocessing<=512",
+      "precision": "float32, single CUDA device",
+      "aggregation": "video equal weight; normalized per-video dimensions",
+      "official_final_score": null,
+      "human_score": null,
+      "missing_components": [
+        "CurricularFace author checkpoint",
+        "GME",
+        "StoryScore",
+        "official human evaluation"
+      ],
+      "warning": "Named paper-related dimensions, not exact KeyID face/text protocol or official challenge score."
+    }
+  },
+  "original_gpu_scoring_hours": 0.6670253248144096,
+  "new_gpu_scoring_runs": 0,
+  "new_model_generation_runs": 0,
+  "original_scores_unchanged": true,
+  "full_cpu_tests": 541,
+  "clean_cpu_tests": 203,
+  "clean_skipped": 37,
+  "official_final_score": null,
+  "human_scores_generated": false,
+  "limitations": [
+    "Small local cohorts, one seed; not an official leaderboard or gap-to-top estimate.",
+    "Local Story/ViCLIP diagnostic scores do not validate action order or naturalness.",
+    "Core metric tradeoffs remain separate; no partial weighted score, automatic winner or SOTA claim.",
+    "Cross-cohort comparisons forbidden; models may require different native sampling settings and costs."
+  ]
+}
