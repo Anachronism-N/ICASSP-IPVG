@@ -1,0 +1,20 @@
+{
+ "protocol": "E2 full-benchmark single run with E1-selected config (docs/43 section 4)",
+ "config": {
+  "shift": 12.0,
+  "cfg": 5.0,
+  "steps": 50,
+  "seed": 0
+ },
+ "suites": {
+  "vbench": 355,
+  "wm": 108,
+  "physiq": 198,
+  "wmb": 350
+ },
+ "total_jobs": 1011,
+ "generation_budget_gpuh_cap": 90,
+ "scoring_budget_gpuh_cap": 30,
+ "pairing": "identical image/prompt/seed as historical base runs; only sigma_shift 5->12 differs; raw prompts only",
+ "no_rescanning": "single frozen run; no parameter iteration on public benchmarks"
+}

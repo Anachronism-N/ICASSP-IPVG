@@ -37,6 +37,8 @@ FILES = [
     "eval/e1_devset_20261021/e1b_summary.json",
     "eval/diag/teacher_e1_devset_public_summary_20261021.json",
     "eval/diag/teacher_e1b_cfgzero_public_summary_20261021.json",
+    "docs/46_E2完整基准结论.md",
+    "eval/e2_s12c5_20261021/plan.json",
     "training_metadata/teacher_namespace_candidates_20261020_v1/eligibility_summary.json",
     "eval/diag/namespace_inventory_public_summary_20261020.json",
     "eval/diag/window_caption_chain_public_summary_20261020.json",

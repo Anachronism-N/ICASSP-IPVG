@@ -36,6 +36,8 @@ class PublicationAllowlistTests(unittest.TestCase):
                     "eval/e1_devset_20261021/e1b_summary.json",
                     "eval/diag/teacher_e1_devset_public_summary_20261021.json",
                     "eval/diag/teacher_e1b_cfgzero_public_summary_20261021.json",
+                    "docs/46_E2完整基准结论.md",
+                    "eval/e2_s12c5_20261021/plan.json",
                     "scripts/run_teacher_training_smoke.py", "tests/test_teacher_training_smoke.py",
                     "scripts/serve_label_review.py", "tests/test_serve_label_review.py",
                     "scripts/prepare_e1_devset.py", "scripts/build_e1_jobs.py", "scripts/score_e1.py",

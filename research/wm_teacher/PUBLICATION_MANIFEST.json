@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "2023b88f4444edfea0c00572c2de8b72f7026387e9bf1324f8bdc4293a913c5b",
-      "snapshot_sha256": "2023b88f4444edfea0c00572c2de8b72f7026387e9bf1324f8bdc4293a913c5b"
+      "source_sha256": "a96697643208c7c433aa379bf00e3a1416b71bbba039dd99ca771843ad5cef5b",
+      "snapshot_sha256": "a96697643208c7c433aa379bf00e3a1416b71bbba039dd99ca771843ad5cef5b"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -254,8 +254,8 @@
     },
     {
       "path": "tests/test_export_experiment_snapshot.py",
-      "source_sha256": "6196c35e87c918dc3622bf458b0113e66a33270f31499723a328fc9d308606e1",
-      "snapshot_sha256": "6196c35e87c918dc3622bf458b0113e66a33270f31499723a328fc9d308606e1"
+      "source_sha256": "2907ef05bc8cb81c404ba99441931c5e78aa734b4fa0be0eeefa0bb0932e9cb0",
+      "snapshot_sha256": "2907ef05bc8cb81c404ba99441931c5e78aa734b4fa0be0eeefa0bb0932e9cb0"
     },
     {
       "path": "eval/diag/ft2_paired_bootstrap.json",
@@ -656,6 +656,16 @@
       "path": "eval/e1_devset_20261021/e1b_summary.json",
       "source_sha256": "ee1eaa3064eb1565431eddfb8dc30b4f5bda946b0dfc72f1edbee22278381c42",
       "snapshot_sha256": "ee1eaa3064eb1565431eddfb8dc30b4f5bda946b0dfc72f1edbee22278381c42"
+    },
+    {
+      "path": "docs/46_E2完整基准结论.md",
+      "source_sha256": "28195a70421ec195fafd7ac843b6c48f1d54150f48f5657cc84129ff031bd86a",
+      "snapshot_sha256": "28195a70421ec195fafd7ac843b6c48f1d54150f48f5657cc84129ff031bd86a"
+    },
+    {
+      "path": "eval/e2_s12c5_20261021/plan.json",
+      "source_sha256": "899af881eb0911376c9b6b0597cb6a07eccfc159963da002122a274595d387c8",
+      "snapshot_sha256": "899af881eb0911376c9b6b0597cb6a07eccfc159963da002122a274595d387c8"
     }
   ],
   "experiment_progress": {
@@ -786,5 +796,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "E1 dev-set ablation results (s12_c5 selected) and E1b CFG-Zero* conclusion; de-identified aggregates only"
+  "latest_increment_scope": "E2 frozen single full-benchmark run of s12_c5 vs base; NOT promoted (subject_consistency regression, no dynamic transfer)"
 }
