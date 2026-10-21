@@ -1,0 +1,422 @@
+{
+  "status": "completed",
+  "stage": "final",
+  "decision": "fusion_strength_not_promoted",
+  "selected_candidate": null,
+  "repeat": {
+    "passed": true,
+    "exact_video_hash_matches": 16,
+    "total_videos": 16,
+    "checks": {
+      "coverage_not_down": true,
+      "seven_frame_videos_not_down": true,
+      "identity_mean_stable": true,
+      "imaging_stable": true,
+      "clip_stable": true,
+      "gray_motion_stable": true
+    },
+    "identity_comparison": {
+      "narrow": {
+        "videos": 16,
+        "scoreable_videos": 16,
+        "videos_at_least_seven_frames": 16,
+        "identity_coverage": 1.0,
+        "valid_video_identity_mean": 0.6726390682160854,
+        "motion_mean": 3.412947654724121,
+        "static_fraction": 0.0
+      },
+      "wide": {
+        "videos": 16,
+        "scoreable_videos": 16,
+        "videos_at_least_seven_frames": 16,
+        "identity_coverage": 1.0,
+        "valid_video_identity_mean": 0.6726390682160854,
+        "motion_mean": 3.412947654724121,
+        "static_fraction": 0.0
+      },
+      "paired_videos": 16,
+      "paired_actors": 8,
+      "identity_actor_mean_delta": 0.0,
+      "identity_actor_bootstrap_ci95": [
+        0.0,
+        0.0
+      ],
+      "identity_p10_actor_delta": 0.0,
+      "coverage_delta": 0.0,
+      "motion_ratio": 1.0,
+      "static_fraction_delta": 0.0,
+      "recovered_seven_frame_videos": 0,
+      "lost_seven_frame_videos": 0
+    },
+    "positive_full_identity_gain": true
+  },
+  "quality_panel": {
+    "baseline": {
+      "imaging_quality": 0.731272310675407,
+      "motion_smoothness": 0.9925058265263439,
+      "clip_frame_text_cosine_mean": 0.2662207577377558
+    },
+    "historical1": {
+      "imaging_quality": 0.741597158568246,
+      "motion_smoothness": 0.9954058820160732,
+      "clip_frame_text_cosine_mean": 0.2700889864936471
+    },
+    "alpha1": {
+      "imaging_quality": 0.741597158568246,
+      "motion_smoothness": 0.9954058779059616,
+      "clip_frame_text_cosine_mean": 0.2700889864936471
+    },
+    "alpha05": {
+      "imaging_quality": 0.7362551096507481,
+      "motion_smoothness": 0.994122054468423,
+      "clip_frame_text_cosine_mean": 0.2681970838457346
+    },
+    "alpha025": {
+      "imaging_quality": 0.7359859314256786,
+      "motion_smoothness": 0.9929935855101129,
+      "clip_frame_text_cosine_mean": 0.2662119437009096
+    }
+  },
+  "comparisons": {
+    "alpha1": {
+      "identity": {
+        "narrow": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "videos_at_least_seven_frames": 16,
+          "identity_coverage": 1.0,
+          "valid_video_identity_mean": 0.2387964430381544,
+          "motion_mean": 6.576112866401672,
+          "static_fraction": 0.0
+        },
+        "wide": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "videos_at_least_seven_frames": 16,
+          "identity_coverage": 1.0,
+          "valid_video_identity_mean": 0.6726390682160854,
+          "motion_mean": 3.412947654724121,
+          "static_fraction": 0.0
+        },
+        "paired_videos": 16,
+        "paired_actors": 8,
+        "identity_actor_mean_delta": 0.43384262517793104,
+        "identity_actor_bootstrap_ci95": [
+          0.385491445371008,
+          0.48292119904363057
+        ],
+        "identity_p10_actor_delta": 0.4309119050391018,
+        "coverage_delta": 0.0,
+        "motion_ratio": 0.5189916481150092,
+        "static_fraction_delta": 0.0,
+        "recovered_seven_frame_videos": 0,
+        "lost_seven_frame_videos": 0
+      },
+      "mouth": {
+        "single": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "mean_pair_coverage": 1.0,
+          "above_control_videos": 16,
+          "activity_video_rate_all": 1.0
+        },
+        "dual": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "mean_pair_coverage": 1.0,
+          "above_control_videos": 15,
+          "activity_video_rate_all": 0.9375
+        },
+        "paired_videos": 16,
+        "paired_flow_ratio": 1.070636442280505
+      },
+      "quality_deltas": {
+        "imaging_quality": 0.01032484789283905,
+        "motion_smoothness": 0.0029000513796176852,
+        "clip_frame_text_cosine_mean": 0.003868228755891323
+      },
+      "checks": {
+        "identity_coverage_complete": true,
+        "seven_frame_videos_not_down": true,
+        "eight_paired_actors": true,
+        "sixteen_paired_videos": true,
+        "retain_60percent_full_identity_gain": true,
+        "identity_ci_lower_positive": true,
+        "identity_p10_not_down": true,
+        "gray_motion_retained": false,
+        "mouth_activity_retained": false,
+        "mouth_paircoverage_retained": true,
+        "mouth_flow_retained": true,
+        "imaging_not_degraded": true,
+        "clip_not_degraded": true
+      },
+      "passes_local_candidate_checks": false
+    },
+    "alpha05": {
+      "identity": {
+        "narrow": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "videos_at_least_seven_frames": 16,
+          "identity_coverage": 1.0,
+          "valid_video_identity_mean": 0.2387964430381544,
+          "motion_mean": 6.576112866401672,
+          "static_fraction": 0.0
+        },
+        "wide": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "videos_at_least_seven_frames": 16,
+          "identity_coverage": 1.0,
+          "valid_video_identity_mean": 0.39690731588052586,
+          "motion_mean": 4.748192012310028,
+          "static_fraction": 0.0
+        },
+        "paired_videos": 16,
+        "paired_actors": 8,
+        "identity_actor_mean_delta": 0.15811087284237146,
+        "identity_actor_bootstrap_ci95": [
+          0.11598452495527453,
+          0.19921583175746488
+        ],
+        "identity_p10_actor_delta": 0.1546865476295352,
+        "coverage_delta": 0.0,
+        "motion_ratio": 0.7220362710879309,
+        "static_fraction_delta": 0.0,
+        "recovered_seven_frame_videos": 0,
+        "lost_seven_frame_videos": 0
+      },
+      "mouth": {
+        "single": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "mean_pair_coverage": 1.0,
+          "above_control_videos": 16,
+          "activity_video_rate_all": 1.0
+        },
+        "dual": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "mean_pair_coverage": 1.0,
+          "above_control_videos": 15,
+          "activity_video_rate_all": 0.9375
+        },
+        "paired_videos": 16,
+        "paired_flow_ratio": 0.9267518301419179
+      },
+      "quality_deltas": {
+        "imaging_quality": 0.004982798975341152,
+        "motion_smoothness": 0.0016162279420791625,
+        "clip_frame_text_cosine_mean": 0.001976326107978821
+      },
+      "checks": {
+        "identity_coverage_complete": true,
+        "seven_frame_videos_not_down": true,
+        "eight_paired_actors": true,
+        "sixteen_paired_videos": true,
+        "retain_60percent_full_identity_gain": false,
+        "identity_ci_lower_positive": true,
+        "identity_p10_not_down": true,
+        "gray_motion_retained": false,
+        "mouth_activity_retained": false,
+        "mouth_paircoverage_retained": true,
+        "mouth_flow_retained": true,
+        "imaging_not_degraded": true,
+        "clip_not_degraded": true
+      },
+      "passes_local_candidate_checks": false
+    },
+    "alpha025": {
+      "identity": {
+        "narrow": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "videos_at_least_seven_frames": 16,
+          "identity_coverage": 1.0,
+          "valid_video_identity_mean": 0.2387964430381544,
+          "motion_mean": 6.576112866401672,
+          "static_fraction": 0.0
+        },
+        "wide": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "videos_at_least_seven_frames": 16,
+          "identity_coverage": 1.0,
+          "valid_video_identity_mean": 0.2714869823976187,
+          "motion_mean": 5.873942881822586,
+          "static_fraction": 0.0
+        },
+        "paired_videos": 16,
+        "paired_actors": 8,
+        "identity_actor_mean_delta": 0.03269053935946431,
+        "identity_actor_bootstrap_ci95": [
+          0.017129273558384738,
+          0.04915362008468946
+        ],
+        "identity_p10_actor_delta": 0.033853821048978716,
+        "coverage_delta": 0.0,
+        "motion_ratio": 0.893224158580584,
+        "static_fraction_delta": 0.0,
+        "recovered_seven_frame_videos": 0,
+        "lost_seven_frame_videos": 0
+      },
+      "mouth": {
+        "single": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "mean_pair_coverage": 1.0,
+          "above_control_videos": 16,
+          "activity_video_rate_all": 1.0
+        },
+        "dual": {
+          "videos": 16,
+          "scoreable_videos": 16,
+          "mean_pair_coverage": 1.0,
+          "above_control_videos": 16,
+          "activity_video_rate_all": 1.0
+        },
+        "paired_videos": 16,
+        "paired_flow_ratio": 1.0139313565717543
+      },
+      "quality_deltas": {
+        "imaging_quality": 0.0047136207502715965,
+        "motion_smoothness": 0.00048775898376896,
+        "clip_frame_text_cosine_mean": -8.814036846160889e-06
+      },
+      "checks": {
+        "identity_coverage_complete": true,
+        "seven_frame_videos_not_down": true,
+        "eight_paired_actors": true,
+        "sixteen_paired_videos": true,
+        "retain_60percent_full_identity_gain": false,
+        "identity_ci_lower_positive": true,
+        "identity_p10_not_down": true,
+        "gray_motion_retained": true,
+        "mouth_activity_retained": true,
+        "mouth_paircoverage_retained": true,
+        "mouth_flow_retained": true,
+        "imaging_not_degraded": true,
+        "clip_not_degraded": true
+      },
+      "passes_local_candidate_checks": false
+    }
+  },
+  "pilots": [
+    {
+      "run_id": "lora_pilot1_20261021_r001",
+      "reload": {
+        "checkpoint_sha256": "dc2d0ecffa2a67f48119b742293d951ad8803fe709c8250937542f9d536a09b1",
+        "alpha": 1,
+        "matched_pairs": 150,
+        "changed_base_tensors": 150
+      },
+      "gpu_hours": 0.013857253869710904
+    },
+    {
+      "run_id": "lora_pilot05_20261021_r001",
+      "reload": {
+        "checkpoint_sha256": "dc2d0ecffa2a67f48119b742293d951ad8803fe709c8250937542f9d536a09b1",
+        "alpha": 0.5,
+        "matched_pairs": 150,
+        "changed_base_tensors": 150
+      },
+      "gpu_hours": 0.014066977970327976
+    }
+  ],
+  "thresholds": {
+    "gain_retention": 0.6,
+    "gray_motion_min": 0.8,
+    "mouth_rate_drop_max": 0.05,
+    "mouth_paircoverage_min": 0.95,
+    "mouth_flow_min": 0.8,
+    "imaging_drop_max": 0.01,
+    "clip_drop_max": 0.005,
+    "repeat_identity_max": 0.02,
+    "repeat_imaging_max": 0.01,
+    "repeat_clip_max": 0.005,
+    "repeat_motion_min": 0.9,
+    "repeat_motion_max": 1.1
+  },
+  "checkpoint_sha256": "dc2d0ecffa2a67f48119b742293d951ad8803fe709c8250937542f9d536a09b1",
+  "eval_manifest_sha256": "9642d924ba84549930c26e3bc852eb39b7832e345e15810aeae58b523520cf7c",
+  "actual_new_gpu_hours": 0.39414979851998694,
+  "new_hard_cap_gpu_hours": 4,
+  "official_score": null,
+  "holdout_used": false,
+  "human_action_validation": false,
+  "quality_protocol": {
+    "version": "vbench_mm26_quality_v1",
+    "vbench_revision": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+    "motion_smoothness": "original AMT-S odd-frame reconstruction, 1-MAE/255, all decoded frames",
+    "imaging_quality": "original MUSIQ-SPAQ all-frame mean MOS/100, longer-side preprocessing<=512",
+    "precision": "float32, single CUDA device",
+    "aggregation": "video equal weight; normalized per-video dimensions",
+    "official_final_score": null,
+    "human_score": null,
+    "missing_components": [
+      "CurricularFace author checkpoint",
+      "GME",
+      "StoryScore",
+      "official human evaluation"
+    ],
+    "warning": "Named paper-related dimensions, not exact KeyID face/text protocol or official challenge score."
+  },
+  "limitations": [
+    "One seed, eight dev actors in acted talking-head domain; not SOTA or final base.",
+    "Gray motion and local mouth flow do not prove speech, expressions or natural action.",
+    "Native fusion strength, not new training or LoRA versus full-finetune comparison.",
+    "Missing CurricularFace/GME/Story/human and complete official MM2026 scorer."
+  ],
+  "execution": {
+    "code_commit": "bcb5c5e0051d228c8560e34c47e91d8e04da32e0",
+    "source_sha256": "fa63ef6ec382c530de0654a9baca81270d84d9d090a85e41d8a72f3efab594f4",
+    "new_generated_videos": 50,
+    "quality_records": 80,
+    "unique_method_videos": 64,
+    "independent_cpu_recalculation": "matched aggregates; media/checkpoint rehash and decode performed by primary audit",
+    "complete_environment_tests": 349,
+    "retry_count": 0
+  },
+  "inference_runs": [
+    {
+      "run_id": "lora_pilot1_20261021_r001",
+      "status": "completed",
+      "code_commit": "bcb5c5e0051d228c8560e34c47e91d8e04da32e0",
+      "source_sha256": "fa63ef6ec382c530de0654a9baca81270d84d9d090a85e41d8a72f3efab594f4",
+      "backend_elapsed_seconds": 49.886113930959255,
+      "estimated_backend_gpu_hours": 0.013857253869710904
+    },
+    {
+      "run_id": "lora_pilot05_20261021_r001",
+      "status": "completed",
+      "code_commit": "bcb5c5e0051d228c8560e34c47e91d8e04da32e0",
+      "source_sha256": "fa63ef6ec382c530de0654a9baca81270d84d9d090a85e41d8a72f3efab594f4",
+      "backend_elapsed_seconds": 50.64112069318071,
+      "estimated_backend_gpu_hours": 0.014066977970327976
+    },
+    {
+      "run_id": "lora_alpha1_20261021_r001",
+      "status": "completed",
+      "code_commit": "bcb5c5e0051d228c8560e34c47e91d8e04da32e0",
+      "source_sha256": "fa63ef6ec382c530de0654a9baca81270d84d9d090a85e41d8a72f3efab594f4",
+      "backend_elapsed_seconds": 402.3533615670167,
+      "estimated_backend_gpu_hours": 0.11176482265750463
+    },
+    {
+      "run_id": "lora_alpha05_20261021_r001",
+      "status": "completed",
+      "code_commit": "bcb5c5e0051d228c8560e34c47e91d8e04da32e0",
+      "source_sha256": "fa63ef6ec382c530de0654a9baca81270d84d9d090a85e41d8a72f3efab594f4",
+      "backend_elapsed_seconds": 398.03233339311555,
+      "estimated_backend_gpu_hours": 0.1105645370536432
+    },
+    {
+      "run_id": "lora_alpha025_20261021_r001",
+      "status": "completed",
+      "code_commit": "bcb5c5e0051d228c8560e34c47e91d8e04da32e0",
+      "source_sha256": "fa63ef6ec382c530de0654a9baca81270d84d9d090a85e41d8a72f3efab594f4",
+      "backend_elapsed_seconds": 393.4153703469783,
+      "estimated_backend_gpu_hours": 0.10928204731860508
+    }
+  ]
+}

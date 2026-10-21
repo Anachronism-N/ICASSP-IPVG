@@ -74,4 +74,26 @@ repeat优先报告媒体hash精确复现率；非逐位一致时身份均值差�
 
 .5/.25候选同时满足：16完整输出/100%身份coverage/≥7帧视频无下降、等演员身份增益≥freshalpha1的60%且描述性bootstrap下界>0/P10delta≥0、灰度motionratio≥.8、口部全量above-control视频率下降≤.05（baseline16/16故须16/16）、口部paircoverage≥.95及共同flowratio≥.8、MUSIQ下降≤.01、CLIP下降≤.005。两方均通过取身份收益较高者；全是本轮开发参考门槛，不是官方或人工动作真值。未达则结束假设不扩搜索。原ArcFace/CLIP/mouth/VBench协议与阈值不改，保留缺脸和所有失败。
 
-全量训练另区分VACE模块全量（已有mode=adapter，仅--trainable_models vace）与生成主干+VACE联合全量（当前导出/回载和显存未验）。32train小域不是全量优劣证据；后续同曝光真实对照及更广数据独立冻结，不与本轮融合因素混改。当前新增alpha接线与CPU真实固定GeneralLoRALoader已验，GPU结果随后按实证追加。
+全量训练另区分VACE模块全量（已有mode=adapter，仅--trainable_models vace）与生成主干+VACE联合全量（当前导出/回载和显存未验）。32train小域不是全量优劣证据；后续同曝光真实对照及更广数据独立冻结，不与本轮融合因素混改。本轮alpha接线、CPU真实固定GeneralLoRALoader及GPU实际150pairs融合均已验。
+
+### 2026-10-21结果：融合强度不能解决身份与动态取舍
+
+五run全部completed，50新视频完整，无工程retry。freshalpha1的16/16媒体SHA与历史alpha1逐位一致，新增原AMT/MUSIQ共评stage1 48+stage2 32=80记录（含历史对照/重复，不等于80新生成），ArcFace/CLIP/mouth原协议不变。微小AMT重复分差约4e-9属数值漂移，不改结论。
+
+| 指标 | baseline | alpha1 | alpha.5 | alpha.25 |
+|---|---:|---:|---:|---:|
+| 身份余弦均值 | .238796 | .672639 | .396907 | .271487 |
+| 相对baseline等演员身份增益 | — | .433843 | .158111 | .032691 |
+| 保留alpha1身份增益 | — | 100% | 36.44% | 7.54% |
+| 灰度motion比baseline | 1 | .518992 | .722036 | .893224 |
+| 口部above-control活动 | 16/16 | 15/16 | 15/16 | 16/16 |
+| MUSIQ ImagingQuality | .731272 | .741597 | .736255 | .735986 |
+| 原prompt CLIP余弦 | .266221 | .270089 | .268197 | .266212 |
+
+所有身份帧coverage均100%、16视频/8actor配对完整。.5身份delta CI95[.115985,.199216]，.25为[.017129,.049154]；仅本域单seed描述性bootstrap。.5同时失败60%收益保留、motion>=.8与口部活动保护；.25通过动态参考门槛，却仅保留7.54%身份收益。因此`fusion_strength_not_promoted`，不追加更密alpha搜索，不能称结构优化或全量训练比较。
+
+实际五生成controller0.359535639GPUh，原质量共评含预检墙钟(78.502859+46.108116)/3600=.034614160，总.394149799≤4GPUh；原总51.5hardcap不变，不按工具延迟通知时长计费。实际checkpoint/media SHA、全49帧解码、sample seed/reference像素、scorer样本/actor/hash与固定阈值均由公共分析脚本复核；独立CPU复算数值一致。完整环境349passed，纯控制环境134passed/29skipped，CPU烟测passed。所有已启动GPU作业已结束。
+
+公共证据`resources/lora_alpha_result.json`、五份`configs/experiments/lora_{pilot1,pilot05,alpha1,alpha05,alpha025}.json`。`scripts/analyze_lora_alpha.py`接受冻结本地ledger、runs-dir、scores-dir与stage=repeat/final，拒错误alpha/checkpoint、输入漂移、重复/非有限分数、缺视频、actor错配或预算不自洽。ledger含真实路径只留本地，换路径需重新冻结，不用便携模板的SHA冒充原执行SHA。
+
+下一步改参考条件残差的结构路由，而不是继续缩放整套LoRA：先区分参考条件带来的时间共享成分与时变成分，保留主干动态路径及参考prefix/RoPE；结构假设、固定门控消融与后续可学习门控训练独立执行，未验证前不声称纯身份解耦或效果成功。

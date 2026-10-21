@@ -90,6 +90,10 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 此轮身份收益但全局motion减少，口部活动16→15/16，保留不晋级结论。完整结果见[真实训练报告](EXPERIMENT_DUALNODE_TRAINING.md)。灰度motion不等价动作质量，AMT高平滑分可能伴随较小运动；必须独立补动作/伪影人工诊断，缺项官方总分仍null。
 
+## 固定融合强度评价
+
+`scripts/analyze_lora_alpha.py`按冻结ledger复核alpha1重复一致性与alpha.5/.25候选、实际checkpoint融合和50新输出，stage1/stage2共同原AMT/MUSIQ80评分记录（含历史与重复）分开计生成成本。身份要求完整16视频/8演员共同帧与原anchor，mouth全量视频分母不删失败；预注册60%身份收益保留与动态保护均保留，两个候选未整体晋级。纯融合强度不是结构/训练策略改善，结果见[训练与融合报告](EXPERIMENT_DUALNODE_TRAINING.md)。
+
 ## 冻结协议与复现记录
 
 每个run旁保留`metric_protocol.json`或等价文档，至少记录：

@@ -55,6 +55,10 @@ KeyID-inspired仅改固定事件分段内内容自适应选锚，不含身份编
 
 结论`identity_gain_with_motion_tradeoff_not_promoted`：真实身份小域收益，整体不晋级或继续堆epoch；不是完整KeyID/AnyID训练、广动作或SOTA。五训练controller0.758255GPUh、三生成0.330425；quality profile0.020070，含启动预检命令取整上界0.025833；caption最终用预留上界保守计阶段≤1.944791GPUh，不用通知延迟时间当算力成本。已启动GPU作业均结束，两节点显存0。完整CPU回归314passed，强化分析复算一致；八份便携配置、聚合资源/真实正负结论见[真实训练报告](EXPERIMENT_DUALNODE_TRAINING.md)、`resources/real_vace_training_result.json`，无真实媒体/caption/节点信息发布。
 
+## 固定LoRA融合强度实验完成（2026-10-21，不晋级）
+
+alpha1/.5/.25五run（两pilot+三16视频arm）50新视频、原AMT/MUSIQ共评48+32记录均完成。alpha1新16/16媒体SHA精确复现旧结果；各alpha实际150LoRA pairs/150base tensor融合核验，原评测anchor/prompt/seed未变。身份均值.672639/.396907/.271487，motion相对未训练baseline比.518992/.722036/.893224，口部活动15/15/16（各16视频），coverage均100%。.5仅保留36.44%原身份收益且动态门槛未过；.25虽保动态却仅保留7.54%身份收益。`fusion_strength_not_promoted`，不扩alpha搜索。实际新增.394149799GPUh≤4，完整349CPUtests通过，独立复算一致，所有GPUrun结束。完整预注册/正负结论见[真实训练报告](EXPERIMENT_DUALNODE_TRAINING.md)及`resources/lora_alpha_result.json`；不是结构优化或全量训练胜负证据。下一阶段转参考条件/时序残差结构分离，未完成不称成功。
+
 ## 当前实验与限制
 
 唯一H1对照是参考人脸bbox扩边.3的正方形裁剪，原参考仍作身份评价anchor。模型、prompt、sample_id/seed、采样步和候选数固定，不训练新LoRA。实验预注册及聚合结果见 [CREMA-D H1](EXPERIMENT_CREMA_D_H1.md)。crop64/64条完整解码；63样本/32演员共同帧配对，原基线身份均值0.143337、crop0.349797，配对提升+0.205661，演员bootstrap95%区间[0.168833,0.245416]。身份P10提升+0.192157、coverage+0.007813、灰度运动proxy比1.029227、静态比例无变化。新生成耗费0.602265GPU小时，所有任务正常退出。只在该单种子说话头部dev上支持H1，不是完整动作/人工/holdout/SOTA结论。
