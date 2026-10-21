@@ -63,6 +63,12 @@ alpha1/.5/.25五run（两pilot+三16视频arm）50新视频、原AMT/MUSIQ共评
 
 新增结构不是LoRA缩放：同权重两原生VACE分支，有参考减null参考，只在视频body调整参考差分的时变成分，保留prefix/RoPE及null分支动态。g1控制40outer80nativecalls，16/16媒体SHA精确复现旧alpha1；g0真实改15层hint，prefixexact、BF16时间均值误差最大.001803如实记录。两pilot+两16视频arm共34新视频、64原AMT/MUSIQ共评及新ArcFace/CLIP/mouth均完成。身份.672639→.666769，保留98.65%原身份增益，motion对原结构仅+2.66%、相对未训练baseline仅.532801，mouth活动仍15/16；失败整体motion/口部保护。`reference_routing_not_promoted`，不继续常数g盲搜或称已训练门控。真实结构功能验收不等于效果优化成功。新增.348596049GPUh≤4，完整374CPUtests与独立复算通过，所有GPUrun结束；完整方案正负结果见[结构报告](EXPERIMENT_DUALNODE_TRAINING.md)、`resources/reference_structure_result.json`。后续需更针对性的训练目标/时空身份路径与更广动作数据，当前不宣称泛化或完整MM2026成绩。
 
+## 评测优先阶段（2026-10-21，暂停新基线/方法）
+
+按用户纠正，顺序调整为先补评测→同集强基线→方法优化。固定评分GME7B/Cur单权重/KaLM0.5B已获得并SHA验证，独立env部署；新增GME原协议、ConsisID-style Cur/Arc16、本地caption+KaLMStoryproxy与原VBench扩展五维均完成真实控制。Cur64源校准AUC1/EER0、valFAR.008333/TPR1、阈值.20226049；GME首次懒加载CPU探测误拦失败，唯一修复r002完成。控制揭示GMEframe平均顺序盲、冻结可高分，本地Story和ViCLIP对动作顺序也不可靠，不能据其做自然动作晋级。原GeminiStory/人工/官方完整总分仍null，不能把local替代塞入作者组合分。
+
+现在仅重评120已有视频（96同规格六arm+24历史异规格单列），不新增模型生成/训练/结构。权重/协议/控制边界详见[评价协议](METRICS.md)、`resources/evaluation_panel.lock.json`；当前完整CPU回归523passed/7skipped，实际完整面板与独立审计随后报告。下一步强基线必须等冻结评价和动作判断边界核清，不再以1.3B局部改善认定接近头部。
+
 ## 当前实验与限制
 
 唯一H1对照是参考人脸bbox扩边.3的正方形裁剪，原参考仍作身份评价anchor。模型、prompt、sample_id/seed、采样步和候选数固定，不训练新LoRA。实验预注册及聚合结果见 [CREMA-D H1](EXPERIMENT_CREMA_D_H1.md)。crop64/64条完整解码；63样本/32演员共同帧配对，原基线身份均值0.143337、crop0.349797，配对提升+0.205661，演员bootstrap95%区间[0.168833,0.245416]。身份P10提升+0.192157、coverage+0.007813、灰度运动proxy比1.029227、静态比例无变化。新生成耗费0.602265GPU小时，所有任务正常退出。只在该单种子说话头部dev上支持H1，不是完整动作/人工/holdout/SOTA结论。

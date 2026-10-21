@@ -1,0 +1,190 @@
+{
+  "as_of": "2026-10-21",
+  "scope": "evaluator_first_no_new_generation_or_training",
+  "gme": {
+    "revision": "e54cb53a76dba4895a7a2f88fc8021f3679ed4f1",
+    "files": {
+      "README.md": "ae511f81d69bab664f04cb03338885c42141c508c27cb7805f0ea3ce37cd2d7e",
+      "added_tokens.json": "7fa54985b58718a8fdb4f4d97484c4bd908db114847675e4bf3afe3e1d5d7bd4",
+      "chat_template.json": "ad60d90252ed0b0705ba14e2d0ad0fec0beac1ea955642b54059b36052d8bc96",
+      "config.json": "ff6d9c21e3da8d53f5644e7e184fb5ca327a05d17bfebfc32f01fa70f895f3ef",
+      "generation_config.json": "34fe059b8ec90ee2cecb45d4ff0db005647143dc1165495f51b535527d53bd82",
+      "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+      "model-00001-of-00009.safetensors": "334ad0fd71d668135c344d62536c9dfb2beb70eaf31d09ff5e5e036b2bc61af6",
+      "model-00002-of-00009.safetensors": "eb8884d4887b29550099f9f9f0a709f24aea0d3d1196f3f7182bb3194e7fd763",
+      "model-00003-of-00009.safetensors": "6e3464e772389e31a2fc3ed019b20234a2ce59ecca218afdbe2c1b461d7cdc43",
+      "model-00004-of-00009.safetensors": "2938a6a48a61e6c02d5bea812919d24d479207e1a2c6e686489e5d7641f91ba3",
+      "model-00005-of-00009.safetensors": "80bccbe372e233c5e6dd1e720a135fa5ad676a73bca99a59aab23e44b79da91a",
+      "model-00006-of-00009.safetensors": "c494191f68029820aba82a39b60f027531e74ab4738229fdd1ca0d0721d6edbc",
+      "model-00007-of-00009.safetensors": "5ec70f11b6184e1f981b954746ef435e7067d399eee097c7096e3b11c881c556",
+      "model-00008-of-00009.safetensors": "7e171cb9be36ffe532c709e321149c26c259348e046341f43dbe62bb5d896931",
+      "model-00009-of-00009.safetensors": "9622a9474f974a77ff85f2fd5c8ecd4eb85815a4644af58546baf2124e1b3eab",
+      "model.safetensors.index.json": "3a78dc5c8c4ca8359fadab70d9c732c714a1e948350b33aa1067861e2db86316",
+      "modeling_gme_qwen2vl.py": "b21b5071fcbba5ab71bfa2667c82f446c32d7d27b42148c7571c5d59f940e8c4",
+      "preprocessor_config.json": "b5eaad0c2815f07631535dcc58f3c462b0d73693638ad21d19f3c50820eae1cc",
+      "special_tokens_map.json": "76862e765266b85aa9459767e33cbaf13970f327a0e88d1c65846c2ddd3a1ecd",
+      "tokenizer.json": "0b233397aeabcb441562b9186b921d6449dfc5f7bc567880400dc3662d264f02",
+      "tokenizer_config.json": "c715bebf439296530bc63ac45461f3f70d6e45b561ebf02d3a21091e07b698a1",
+      "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    },
+    "license_metadata": "apache-2.0",
+    "model": "Alibaba-NLP/gme-Qwen2-VL-7B-Instruct",
+    "model_usage_notice": "Built with GME; README requires GME prefix for released models developed/improved using model outputs. No model development performed in this evaluation stage.",
+    "unused_weight": "lm_head.weight is intentionally absent from native embedding class; not a missing encoder weight"
+  },
+  "cur": {
+    "upstream_commit": "60429e4b0d24d36ce8df7fb58f7ab42b86e2b70e",
+    "files": {
+      "det_10g.onnx": "5838f7fe053675b1c7a08b633df49e7af5495cee0493c7dcf6697200b85b5b91",
+      "w600k_r50.onnx": "4c06341c33c2ca1f86781dab0e829f88ad5b64be9fba56e56bc9ebdefc619e43",
+      "glint360k_curricular_face_r101_backbone.bin": "aa54ae6dc9f7ac6e262809f1a81d6108e221952bf836aee4cb677ef19246c6ec"
+    },
+    "source_files": {
+      "util/on_going_module/curricularface/__init__.py": "d15221df3b3a1f32fdeace709a9d52426372364b0c39d4198e2cf6bd99336c96",
+      "util/on_going_module/curricularface/common.py": "2c4c5d0bbd66aa7e4193945b8d863a8ac812436070c78cdce5356a267d750806",
+      "util/on_going_module/curricularface/model_irse.py": "2be54709dae2612bc298ead4ae5b5d3332c99682025c3ad1454dd701c1832b6a",
+      "util/on_going_module/curricularface/model_resnet.py": "299bad0dbb92622a9c0f1a5f898217caf5c45755facc9b624e5cca84544b8280"
+    },
+    "model_repository": "BestWishYsh/ConsisID-preview",
+    "weights_revision": "950bc3f0902db44799e223a12ad972f9c52b341d",
+    "license_notice": "Native backbone TFace/ConsisID Apache; checkpoint/data/face-encoder conditions remain separately checked; public research evaluation only."
+  },
+  "kalm": {
+    "revision": "348e90d4084c1e2fbaac61f16a2d8c636192352a",
+    "files": {
+      "1_Pooling/config.json": "381ed8ef7212dbb5063f51c034a28eadf1551bcfe701d884f03b1e989a8078f1",
+      "README.md": "b7ecbd4dd85ccd2898739a2aa6d9fc97e4f4f7b301226ea736b9dddd9ae84895",
+      "added_tokens.json": "6a475432c61f8d6154d10d28c37671a36e5717daf3d15002a988968fee54a500",
+      "config.json": "0a24fd740370fafcd46305a01f94cce04ed0cc810dc6be01b7e637dc9905f937",
+      "config_sentence_transformers.json": "701518545f495eaa32829045248c054e27fa3638e4471ef863d524e6010f0005",
+      "merges.txt": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+      "model.safetensors": "efdb9d4ab091eb6113cdceb58c3811eb133cab539d1450f2c419f48910254c68",
+      "modeling.py": "00dfb90307df8521ac199d7f2ed3646e92822d60c0da366f293ea6daa13d3239",
+      "modules.json": "84e40c8e006c9b1d6c122e02cba9b02458120b5fb0c87b746c41e0207cf642cf",
+      "sentence_bert_config.json": "0b1d25d4d13c72c255a7eaaf8921ca481c4cd61ad894e7209c52dc5e1ac3f3bd",
+      "special_tokens_map.json": "daf48284de8f4779b1dbf20963a68180002fba2a34a5da72292380c5d9fb6af2",
+      "tokenizer.json": "2f79052deba517b0663d877714e117a31a4a6243cddb85fc4443c80a2fa65a20",
+      "tokenizer_config.json": "0d7804e61ef9bf599fda291a489e3acfd8f7822e0952d47d599943d59594e1f3",
+      "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    },
+    "license_metadata": "MIT model card; custom modeling source retains Apache notices",
+    "model": "HIT-TMG/KaLM-embedding-multilingual-mini-instruct-v2"
+  },
+  "vbench_extended": {
+    "vbench_revision": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+    "files": {
+      "raft_model/models/raft-things.pth": "fcfa4125d6418f4de95d84aec20a3c5f4e205101715a79f193243c186ac9a7e1",
+      "dino_model/dino_vitbase16_pretrain.pth": "bf34ad0f424b9029b593e8dc3ed553bf26e88bcba0d32bf3e62a6209cb64c85e",
+      "clip_model/ViT-B-32.pt": "40d365715913c9da98579312b702a82c18be219cc2a73407c4526f58eba950af",
+      "clip_model/ViT-L-14.pt": "b8cca3fd41ae0c99ba7e8951adf17d267cdb84cd88be6f7c2e0eca1737a03836",
+      "aesthetic_model/emb_reader/sa_0_4_vit_l_14_linear.pth": "2cd4e60f4f24ae3bcd57b847b13c1f3ba27edc28cc1a7f9ce74ee9f421243cba",
+      "ViCLIP/ViClip-InternVid-10M-FLT.pth": "7a4d6ad6eac6632db3693f4b97f9f8f6445b65b1e139a6fc6686150522238c56",
+      "ViCLIP/bpe_simple_vocab_16e6.txt.gz": "924691ac288e54409236115652ad4aa250f48203de50a9e4722a6ecd48d6804a"
+    },
+    "dino_source": {
+      "vision_transformer.py": "b1f998d5f49ab43666b9fc6d007c5f6540c3ead2e8645e144f74045f63ff44d7",
+      "video_generation.py": "26a02a7c52f9ddd47c1f4516426426c73d35a8fbaf0c26417ebc6b0d6a1c433c",
+      "eval_video_segmentation.py": "f17eb52954b89e3bc5cef99186fafe23826bd97810c9de6953715832b94b1d67",
+      "hubconf.py": "fa80babf82c71d2123e23b05061eb1991a1fbc9877238f250b2a25023e910f72",
+      "eval_image_retrieval.py": "5a8d661ec0b3b6384a8cffc8970835a038b09d162a77eaf3f42a10b6c5586f8f",
+      "main_dino.py": "74ef2afb9e16ab859370e1eb18455de0797d1202851c92d8191f06ccc05b28c7",
+      "eval_knn.py": "b23ec5ca3cb64b1453be8e4dacdc41b24e035a98e081e707aacbcc650d6b3d0e",
+      "eval_linear.py": "747e8a8861d65fc675d4d382f48678febd352e2ddaa07c1bd91eef53c176884b",
+      "utils.py": "962a97e1acda1c986dfd921275325e4083f9016dddadcf018f1ccf03fa600eab",
+      "eval_copy_detection.py": "77b44b8a82114c156dc945b4aa77157ff5582ec35736e552299e4cb03b12898c",
+      "run_with_submitit.py": "fb14a2c6e90702f768fa7d70c63688c7c7d05ec3fcb2e2a4002ca5daa800e104",
+      "visualize_attention.py": "f908e5c1857ef36d7f24c86a9c5a22dae2628bf1b6c46af4b9f608f839a7d6c1"
+    },
+    "dino_repo_relative_cache": "dino_model/facebookresearch_dino_main"
+  },
+  "local_story": {
+    "caption_model": "Qwen2.5-VL-7B-Instruct",
+    "caption_model_sha256": {
+      "model-00004-of-00005.safetensors": "ef47f634fa57d46ee134edcc09f34085a47da1e16c12a2abe0d67118be6d72ed",
+      "model-00002-of-00005.safetensors": "a9a300a43b4724eee2abe7c18ceb26768d0ab011eb0cad19d9bfd2476a24d024",
+      "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+      "tokenizer_config.json": "4abd3520120e266da84c0864fee064d1fb10806f02225911a47253dd38dc5f56",
+      "model-00001-of-00005.safetensors": "e97b877e47fde53a6c6e77aafb36e58e91ee9d95c4a3eeac6f1b5c0e6a1c986e",
+      "chat_template.json": "ad60d90252ed0b0705ba14e2d0ad0fec0beac1ea955642b54059b36052d8bc96",
+      "model-00003-of-00005.safetensors": "111223d173e00bbee81cba1216fad28668df3476706b7fd26f4d5b50f8b3a507",
+      "configuration.json": "4d48781a5e83989d77ec96075741c402903a81ceffbb6a265e29caec3ea1ab6d",
+      "generation_config.json": "0a3aea82869fe29f20dc95ccf3e2bcff380eca1f5ad6447a4a4b37110b08e43e",
+      "preprocessor_config.json": "f2058c716eef96ccaed1cc1e2d0c08306b62586d535b28d9d08e691b2fab7ca0",
+      ".mv": "b683d207fb480705c26e38142887c6e76de338a35767f6bc355488c2ec58999f",
+      "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+      "config.json": "77d9ec7321cc572e3579e2c84799c9cadaded63c49ce93b101733349fc330c43",
+      "model-00005-of-00005.safetensors": "0c859795ad3a627a9b95bcb762e059d5b768a4a36fdd4affeff269d93fdecc67",
+      "tokenizer.json": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+      "model.safetensors.index.json": "73b333b0b16e5286ddba615d2caebcd495cf7e616f52eb217a81781393d79de9",
+      ".msc": "ff5c7343e83552356d1a045cc35ecb1caed1cdfab7d31848191c8a51991d4bd8",
+      "README.md": "1fa65dbb08bc9ffe0b020409c8686f08b23008c5a68554353305fd2de6f2b81e"
+    },
+    "protocol": "local_story_similarity_v1",
+    "not_author_gemini_story": true,
+    "caption_manual_verification": false,
+    "control_limitations": "Control captions64-197words despite150-250instruction; no length padding/rewriting. Freeze/reverse can score higher than true motion, not validated action metric."
+  },
+  "cur_source_calibration": {
+    "status": "passed_source_identity_controls",
+    "calibration": {
+      "auc": 1.0,
+      "eer": 0.0,
+      "positive_pairs": 32,
+      "negative_pairs": 480,
+      "actors": 16,
+      "valid_actors": 16,
+      "auc_actor_bootstrap_ci95": [
+        0.9999999999999999,
+        1.0
+      ],
+      "threshold": 0.20226048992404938,
+      "empirical_far": 0.008333333333333333
+    },
+    "validation": {
+      "auc": 1.0,
+      "eer": 0.0,
+      "positive_pairs": 32,
+      "negative_pairs": 480,
+      "actors": 16,
+      "valid_actors": 16,
+      "auc_actor_bootstrap_ci95": [
+        0.9999999999999999,
+        1.0
+      ],
+      "frozen_threshold": 0.20226048992404938,
+      "empirical_far": 0.008333333333333333,
+      "tpr": 1.0
+    },
+    "checks": {
+      "source_pairs_complete": true,
+      "calibration_discrimination": true,
+      "validation_discrimination": true,
+      "validation_far_tpr": true,
+      "self_similarity": true,
+      "repeat_embedding": true
+    },
+    "self_similarity_max_error": 1.1920928955078125e-07,
+    "repeat_embedding_max_abs_error": 0.0
+  },
+  "official_scorer_verified": false,
+  "official_final_score": null,
+  "official_human_score": null,
+  "official_story_score": null,
+  "missing_for_complete_aesr_panel": [
+    "Original Gemini Story captioner and official human component; local Story substitute cannot be inserted into original weighted score"
+  ],
+  "evaluation_gate": {
+    "pause_model_generation_and_training": true,
+    "next_order": [
+      "finish_frozen_evaluation_and_action_validation",
+      "stronger_baseline_same_protocol",
+      "method_optimization_on_selected_baseline"
+    ]
+  },
+  "resource_limits": {
+    "download_white_list_bytes": 34442489351,
+    "download_cap_bytes": 36000000000,
+    "new_compute_hard_cap_gpu_hours": 12,
+    "overall_original_cap_gpu_hours": 51.5
+  }
+}

@@ -111,6 +111,20 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 固定权重和依赖后在服务器离线评分，避免`latest`或自动下载悄悄改变评分器。新增评分器或改变采样/阈值时提升协议版本，并用同一新协议重算所有对照；不能只重算改进模型。评价代码、权重、受限数据与衍生素材分别保留自己的许可，不因为汇总器开源就获得额外权利。
 
+## 2026-10-21评测优先补齐（先验收，再选强基线）
+
+后续顺序严格固定：评分器/控制校准与冻结面板完成→同集强基线→基线上的方法优化。现阶段暂停生成模型下载、训练和结构搜索。保留原strict8frame ArcFace/CLIP/mouth/原AMT/MUSIQ；不能用我们小CREMA-D身份均值直接减KeyID VIP-200K论文分数或官方排行榜总分。
+
+新增`scripts/gme_text_eval.py`调用固定GME7B原生embedding，GPUFP16/SDPA、最多81floorlinspace帧（现49帧全部）、原prompt instruction `Find frames that match the given text description.`、原归一化embedding dot均值无×100。GME原生processor截断max1800tokens明确记录，模型源码/config/tokenizer/九shards全SHA；仅本地PIL，禁联网下载。原类不用`lm_head.weight`输出投影为正常embedding路径，不表示识别encoder缺权重。第一次pilot因transformers懒加载DeepSpeed→cpuinfo本机file命令被Popen守卫误拦失败；预初始化本机依赖后唯一r002修复通过，没有放开模型联网。
+
+新增`scripts/curricularface_eval.py`用固定ConsisID原生IR_101（实际100层）和公开glint360k权重，CurFP32，det/Arc CPUORT3204/1线程。作者式16floor采样/最大bbox（平面积last tie）/灰边25%pad重检/Cur224RGB再112归一、Arc112crop、cos裁0/validframe均值；完全missing视频0是显式作者约定，缺reference始终null。它与strict8frame missing协议并列，不能替换刷分。`scripts/calibrate_evaluation_panel.py`在64dev原source/32演员独立参考上hash-split16cal16validation，各32正480负，AUC1/EER0，阈值.20226049仅cal冻结，valFAR.008333/TPR1；self误差1.19e-7、重复embedding误差0。小域源控制不是官方FAR保证。
+
+新增`scripts/vbench_extended_eval.py`直调固定原RAFT dynamic_degree、DINO主体一致性、CLIP背景一致性、LAION美学及ViCLIP overall；本地7资产和DINO源码SHA，禁自动init_submodules/URLloader，逐视频equalweight与原帧加权aggregate分开。ViCLIP原promptcontext32的截断逐项记录，不评测时改写prompt；移动视频不套static-only temporal_flickering。
+
+新增`scripts/local_story_eval.py`用已核原Qwen2.5VL7B看8实际时点生成caption、KaLM0.5B原embedding，独立命名`local_story_similarity_v1`，不是作者Gemini StoryScore。13控制证明RAFT能区分明显位移/冻结，GME能区分红球与错蓝方块描述（.673484 vs .404795），但GME倒序完全同分、冻结反而.685463；localStory/ViCLIP也不能稳定分辨倒序/冻结。此能力必须降级为内容诊断，不是动作/时间完成指标；不能用高平滑/高一致性给静止片晋级。没有调用Gemini或外发人脸，没有人工分数造假。
+
+将120已有视频同协议重评：96同480×352同16dev的六方法，24历史480平方三方法单列；不再生成新视频，不用holdout。新计算硬上限12GPUh/白名单下载36GB，原51.5硬上限不增加。`resources/evaluation_panel.lock.json`锁权重/代码/许可与源校准；GME README带`Built with GME`及使用outputs改善公开模型的命名要求，不能仅凭Apache YAML忽略。官方完整scorer、原GeminiStory与人工仍缺，合成总分保持null；全部自动实现通过也不能声称完整官方评测。
+
 ## 人工抽样与同预算对照
 
 先固定按身份及源视频隔离的dev与holdout；holdout不参与agent逐轮选型。人工审核预先抽定的正常样本，再加入固定规则选择的高分、低分和失败样本；后者属于诊断集，应与随机样本结论分开。比较视频时隐藏模型名、随机左右顺序，分别记录身份、动作完成、时间对齐、可见伪影及整体偏好。
