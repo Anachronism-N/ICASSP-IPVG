@@ -21,7 +21,7 @@ ICASSP 2027 身份保持视频生成比赛工程。优先完成 Track 1 的可�
 | 服务器安装、数据准备、运行命令 | [服务器手册](docs/SERVER_RUNBOOK.md) |
 | 模型安装、输入契约、训练回载 | [上游模型接入](docs/UPSTREAM_INTEGRATION.md) |
 | AI迭代职责、预算和实验决策 | [自动化协议](docs/AUTOMATION.md) |
-| 本地评价与人工抽查 | [评价协议](docs/METRICS.md) |
+| 评测优先：GME/Cur/原VBench共评、语义控制与未补齐人工门槛 | [评价协议](docs/METRICS.md) |
 | 规则、授权、数据规模、未确认事项 | [比赛与数据](docs/RULES_AND_DATA.md) |
 | 已验证与待完成事项 | [项目状态](docs/STATUS.md) |
 

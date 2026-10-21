@@ -47,6 +47,7 @@ def offline_only():
 def validate_local(vbench,amt,musiq=None):
     revision=subprocess.run(['git','-C',str(vbench),'rev-parse','HEAD'],check=True,capture_output=True,text=True).stdout.strip()
     if revision!=VBENCH_REVISION:raise ValueError('VBench revision differs')
+    subprocess.run(['git','-C',str(vbench),'diff','--quiet','HEAD','--','vbench'],check=True)
     if not amt.is_file() or sha256_file(amt)!=AMT_SHA256:raise ValueError('Local AMT weight mismatch')
     if musiq is not None and (not musiq.is_file() or sha256_file(musiq)!=MUSIQ_SHA256):raise ValueError('Local MUSIQ weight mismatch')
     return vbench/'vbench/third_party/amt/cfgs/AMT-S.yaml'

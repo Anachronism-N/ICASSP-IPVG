@@ -23,6 +23,19 @@ def test_network_and_subprocess_blocked_and_restored():
     assert (socket.create_connection,urllib.request.urlopen,subprocess.Popen)==original
 
 
+def test_dirty_upstream_rejected_before_model_reads(monkeypatch,tmp_path):
+    calls=[]
+    def run(command, **kwargs):
+        calls.append(command)
+        if 'diff' in command:
+            raise subprocess.CalledProcessError(1,command)
+        return type('Result',(),{'stdout':module.VBENCH_REVISION+'\n'})()
+    monkeypatch.setattr(module.subprocess,'run',run)
+    with pytest.raises(subprocess.CalledProcessError):
+        module.validate_local(tmp_path,tmp_path/'missing.pth')
+    assert any('diff' in command for command in calls)
+
+
 def test_offline_restored_on_error():
     original=socket.socket.connect
     with pytest.raises(ValueError):

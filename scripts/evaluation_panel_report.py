@@ -3,6 +3,7 @@ import argparse
 from collections import defaultdict
 from pathlib import Path
 import math
+import hashlib
 from ipvg.common import load_json, write_json, sha256_file
 
 METRICS=('gme','cur','story','vbench','quality')
@@ -50,8 +51,11 @@ def main():
     for metric in METRICS:
         seen=set()
         for shard in (0,1):
-            folder=args.jobs_root/f'panel_{metric}_shard{shard}_r001'
+            revision = 'r002' if shard == 1 and metric in ('vbench','quality') else 'r001'
+            folder=args.jobs_root/f'panel_{metric}_shard{shard}_{revision}'
             result,report=job(folder);hours+=result['allocated_gpu_hours']
+            if report['manifest_sha256'] != result['manifest_sha256']:
+                raise ValueError('Scorer and controller input manifest hashes differ')
             if metric in protocols and protocols[metric]!=report['protocol']:raise ValueError('Metric protocol differs between shards')
             protocols[metric]=report['protocol']
             all_job_summaries.append({k:result[k] for k in ('run_id','status','manifest_sha256','score_sha256','allocated_gpu_hours')})
@@ -60,6 +64,10 @@ def main():
                 if sid in seen or sid not in ids:raise ValueError('Missing/duplicate/unknown metric record')
                 if row['video_sha256']!=ids[sid]['video_sha256'] or sha256_file(ids[sid]['video_path'])!=row['video_sha256']:
                     raise ValueError('Panel media/scorer hashes differ')
+                if metric in ('gme','story','vbench') and row['prompt_sha256'] != hashlib.sha256(ids[sid]['prompt'].encode()).hexdigest():
+                    raise ValueError('Exact scoring prompt differs from frozen panel')
+                if metric == 'cur' and row['reference_sha256'] != ids[sid]['reference_sha256']:
+                    raise ValueError('Scoring reference differs from frozen panel')
                 seen.add(sid)
                 for name,value in scores.items():
                     finite_values([value]);metrics_by_id[sid][name]=value
@@ -81,6 +89,12 @@ def main():
     # Retain the first failed integration attempt in the allocation audit.
     failed=args.jobs_root/'controls_gme_shard0_r001/result.json'
     failed_record=load_json(failed);hours+=failed_record['allocated_gpu_hours']
+    excluded_jobs = []
+    for name in ('panel_vbench_shard1_r001','panel_quality_shard1_r001'):
+        record = load_json(args.jobs_root/name/'result.json')
+        hours += record['allocated_gpu_hours']
+        excluded_jobs.append({'run_id':name,'status':record['status'],'allocated_gpu_hours':record['allocated_gpu_hours'],
+                              'reason':'Old worker upstream had pruned tracked unused model directories; rerun on clean pinned snapshot, no score formula changes.'})
     c=control_scores
     semantic={'gme_color_object_contrast':c['gme']['ball_source']['gme_aesr']-c['gme']['ball_wrong_prompt']['gme_aesr'],
               'gme_reverse_delta':c['gme']['ball_reverse']['gme_aesr']-c['gme']['ball_source']['gme_aesr'],
@@ -105,7 +119,7 @@ def main():
             'official_story_score':None,'official_human_score':None,'official_final_score':None,
             'stable_task_action_evaluator_verified':all(action_checks.values()),
             'actual_allocated_gpu_hours_including_failed_pilot':hours,
-            'max_new_gpu_hours':12,'panel_manifest_sha256':sha256_file(args.panel),'effective_controls_sha256':sha256_file(args.controls),
+            'excluded_previous_jobs':excluded_jobs,'max_new_gpu_hours':12,'panel_manifest_sha256':sha256_file(args.panel),'effective_controls_sha256':sha256_file(args.controls),
             'cohorts':{'main_same_input':96,'archival_other_specification':24},
             'limitations':['96 same-specification videos and24 archival videos are stratified, never pooled for causal claims.',
               'Cur16 author-style zero for all-missing video is separate from strict ArcFace8 missing-score protocol.',

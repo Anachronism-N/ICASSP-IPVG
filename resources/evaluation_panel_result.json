@@ -1,0 +1,1286 @@
+{
+  "status": "completed_local_evaluation_panel",
+  "groups": {
+    "baseline": {
+      "videos": 16,
+      "scores": {
+        "aesthetic_quality": {
+          "count": 16,
+          "mean": 0.5006428025662899,
+          "coverage": 1.0
+        },
+        "arc_score": {
+          "count": 16,
+          "mean": 0.23978126300789881,
+          "coverage": 1.0
+        },
+        "arc_scoring_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "background_consistency": {
+          "count": 16,
+          "mean": 0.9654175440470377,
+          "coverage": 1.0
+        },
+        "cur_score": {
+          "count": 16,
+          "mean": 0.2634677691530669,
+          "coverage": 1.0
+        },
+        "cur_scoring_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "dynamic_degree": {
+          "count": 16,
+          "mean": 0.1875,
+          "coverage": 1.0
+        },
+        "face_detection_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "gme_aesr": {
+          "count": 16,
+          "mean": 0.5546776298433542,
+          "coverage": 1.0
+        },
+        "imaging_quality": {
+          "count": 16,
+          "mean": 0.731272310675407,
+          "coverage": 1.0
+        },
+        "local_story_similarity": {
+          "count": 16,
+          "mean": 0.8621657006442547,
+          "coverage": 1.0
+        },
+        "motion_smoothness": {
+          "count": 16,
+          "mean": 0.99250581814494,
+          "coverage": 1.0
+        },
+        "overall_consistency": {
+          "count": 16,
+          "mean": 0.18188809230923653,
+          "coverage": 1.0
+        },
+        "subject_consistency": {
+          "count": 16,
+          "mean": 0.9875506905761237,
+          "coverage": 1.0
+        }
+      }
+    },
+    "lr1": {
+      "videos": 16,
+      "scores": {
+        "aesthetic_quality": {
+          "count": 16,
+          "mean": 0.5386222153902054,
+          "coverage": 1.0
+        },
+        "arc_score": {
+          "count": 16,
+          "mean": 0.422514029283775,
+          "coverage": 1.0
+        },
+        "arc_scoring_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "background_consistency": {
+          "count": 16,
+          "mean": 0.9720919926961263,
+          "coverage": 1.0
+        },
+        "cur_score": {
+          "count": 16,
+          "mean": 0.43631355819525197,
+          "coverage": 1.0
+        },
+        "cur_scoring_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "dynamic_degree": {
+          "count": 16,
+          "mean": 0.0625,
+          "coverage": 1.0
+        },
+        "face_detection_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "gme_aesr": {
+          "count": 16,
+          "mean": 0.554294815286994,
+          "coverage": 1.0
+        },
+        "imaging_quality": {
+          "count": 16,
+          "mean": 0.738241004165338,
+          "coverage": 1.0
+        },
+        "local_story_similarity": {
+          "count": 16,
+          "mean": 0.8526020459830761,
+          "coverage": 1.0
+        },
+        "motion_smoothness": {
+          "count": 16,
+          "mean": 0.9940080977981536,
+          "coverage": 1.0
+        },
+        "overall_consistency": {
+          "count": 16,
+          "mean": 0.18292632419615984,
+          "coverage": 1.0
+        },
+        "subject_consistency": {
+          "count": 16,
+          "mean": 0.9887605385156348,
+          "coverage": 1.0
+        }
+      }
+    },
+    "lr5": {
+      "videos": 16,
+      "scores": {
+        "aesthetic_quality": {
+          "count": 16,
+          "mean": 0.5666849799454212,
+          "coverage": 1.0
+        },
+        "arc_score": {
+          "count": 16,
+          "mean": 0.6716209421865642,
+          "coverage": 1.0
+        },
+        "arc_scoring_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "background_consistency": {
+          "count": 16,
+          "mean": 0.9701487223307291,
+          "coverage": 1.0
+        },
+        "cur_score": {
+          "count": 16,
+          "mean": 0.6818276653066278,
+          "coverage": 1.0
+        },
+        "cur_scoring_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "dynamic_degree": {
+          "count": 16,
+          "mean": 0.0,
+          "coverage": 1.0
+        },
+        "face_detection_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "gme_aesr": {
+          "count": 16,
+          "mean": 0.5277200136333704,
+          "coverage": 1.0
+        },
+        "imaging_quality": {
+          "count": 16,
+          "mean": 0.741597158568246,
+          "coverage": 1.0
+        },
+        "local_story_similarity": {
+          "count": 16,
+          "mean": 0.862788412719965,
+          "coverage": 1.0
+        },
+        "motion_smoothness": {
+          "count": 16,
+          "mean": 0.9954058878185836,
+          "coverage": 1.0
+        },
+        "overall_consistency": {
+          "count": 16,
+          "mean": 0.15321312844753265,
+          "coverage": 1.0
+        },
+        "subject_consistency": {
+          "count": 16,
+          "mean": 0.9866387364842618,
+          "coverage": 1.0
+        }
+      }
+    },
+    "alpha05": {
+      "videos": 16,
+      "scores": {
+        "aesthetic_quality": {
+          "count": 16,
+          "mean": 0.5452412515878677,
+          "coverage": 1.0
+        },
+        "arc_score": {
+          "count": 16,
+          "mean": 0.3962157034839038,
+          "coverage": 1.0
+        },
+        "arc_scoring_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "background_consistency": {
+          "count": 16,
+          "mean": 0.9698651631673177,
+          "coverage": 1.0
+        },
+        "cur_score": {
+          "count": 16,
+          "mean": 0.41696478848461993,
+          "coverage": 1.0
+        },
+        "cur_scoring_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "dynamic_degree": {
+          "count": 16,
+          "mean": 0.0,
+          "coverage": 1.0
+        },
+        "face_detection_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "gme_aesr": {
+          "count": 16,
+          "mean": 0.5561289545148611,
+          "coverage": 1.0
+        },
+        "imaging_quality": {
+          "count": 16,
+          "mean": 0.7362551096507481,
+          "coverage": 1.0
+        },
+        "local_story_similarity": {
+          "count": 16,
+          "mean": 0.8601941615343094,
+          "coverage": 1.0
+        },
+        "motion_smoothness": {
+          "count": 16,
+          "mean": 0.9941220512851013,
+          "coverage": 1.0
+        },
+        "overall_consistency": {
+          "count": 16,
+          "mean": 0.1822012448683381,
+          "coverage": 1.0
+        },
+        "subject_consistency": {
+          "count": 16,
+          "mean": 0.9885113641697293,
+          "coverage": 1.0
+        }
+      }
+    },
+    "alpha025": {
+      "videos": 16,
+      "scores": {
+        "aesthetic_quality": {
+          "count": 16,
+          "mean": 0.4995022565126419,
+          "coverage": 1.0
+        },
+        "arc_score": {
+          "count": 16,
+          "mean": 0.27139718961552717,
+          "coverage": 1.0
+        },
+        "arc_scoring_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "background_consistency": {
+          "count": 16,
+          "mean": 0.9657500584920248,
+          "coverage": 1.0
+        },
+        "cur_score": {
+          "count": 16,
+          "mean": 0.2865672105108388,
+          "coverage": 1.0
+        },
+        "cur_scoring_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "dynamic_degree": {
+          "count": 16,
+          "mean": 0.125,
+          "coverage": 1.0
+        },
+        "face_detection_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "gme_aesr": {
+          "count": 16,
+          "mean": 0.5567176099866629,
+          "coverage": 1.0
+        },
+        "imaging_quality": {
+          "count": 16,
+          "mean": 0.7359859314256785,
+          "coverage": 1.0
+        },
+        "local_story_similarity": {
+          "count": 16,
+          "mean": 0.8606653101742268,
+          "coverage": 1.0
+        },
+        "motion_smoothness": {
+          "count": 16,
+          "mean": 0.9929935932870886,
+          "coverage": 1.0
+        },
+        "overall_consistency": {
+          "count": 16,
+          "mean": 0.18240098282694817,
+          "coverage": 1.0
+        },
+        "subject_consistency": {
+          "count": 16,
+          "mean": 0.9871412110514939,
+          "coverage": 1.0
+        }
+      }
+    },
+    "structure0": {
+      "videos": 16,
+      "scores": {
+        "aesthetic_quality": {
+          "count": 16,
+          "mean": 0.5692419037222862,
+          "coverage": 1.0
+        },
+        "arc_score": {
+          "count": 16,
+          "mean": 0.6642319416860119,
+          "coverage": 1.0
+        },
+        "arc_scoring_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "background_consistency": {
+          "count": 16,
+          "mean": 0.9716300964355469,
+          "coverage": 1.0
+        },
+        "cur_score": {
+          "count": 16,
+          "mean": 0.6774771069176495,
+          "coverage": 1.0
+        },
+        "cur_scoring_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "dynamic_degree": {
+          "count": 16,
+          "mean": 0.0,
+          "coverage": 1.0
+        },
+        "face_detection_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "gme_aesr": {
+          "count": 16,
+          "mean": 0.5310473311692476,
+          "coverage": 1.0
+        },
+        "imaging_quality": {
+          "count": 16,
+          "mean": 0.7408586809586506,
+          "coverage": 1.0
+        },
+        "local_story_similarity": {
+          "count": 16,
+          "mean": 0.8635227978229523,
+          "coverage": 1.0
+        },
+        "motion_smoothness": {
+          "count": 16,
+          "mean": 0.9953753970770692,
+          "coverage": 1.0
+        },
+        "overall_consistency": {
+          "count": 16,
+          "mean": 0.15291805751621723,
+          "coverage": 1.0
+        },
+        "subject_consistency": {
+          "count": 16,
+          "mean": 0.9861133121497309,
+          "coverage": 1.0
+        }
+      }
+    },
+    "archive_vace_h1": {
+      "videos": 8,
+      "scores": {
+        "aesthetic_quality": {
+          "count": 8,
+          "mean": 0.48030106350779533,
+          "coverage": 1.0
+        },
+        "arc_score": {
+          "count": 8,
+          "mean": 0.47551465639844537,
+          "coverage": 1.0
+        },
+        "arc_scoring_coverage": {
+          "count": 8,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "background_consistency": {
+          "count": 8,
+          "mean": 0.9580637613932291,
+          "coverage": 1.0
+        },
+        "cur_score": {
+          "count": 8,
+          "mean": 0.4976008136291057,
+          "coverage": 1.0
+        },
+        "cur_scoring_coverage": {
+          "count": 8,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "dynamic_degree": {
+          "count": 8,
+          "mean": 0.125,
+          "coverage": 1.0
+        },
+        "face_detection_coverage": {
+          "count": 8,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "gme_aesr": {
+          "count": 8,
+          "mean": 0.622177816927433,
+          "coverage": 1.0
+        },
+        "imaging_quality": {
+          "count": 8,
+          "mean": 0.6990444977429449,
+          "coverage": 1.0
+        },
+        "local_story_similarity": {
+          "count": 8,
+          "mean": 0.861426554620266,
+          "coverage": 1.0
+        },
+        "motion_smoothness": {
+          "count": 8,
+          "mean": 0.9934275694574464,
+          "coverage": 1.0
+        },
+        "overall_consistency": {
+          "count": 8,
+          "mean": 0.19606616720557213,
+          "coverage": 1.0
+        },
+        "subject_consistency": {
+          "count": 8,
+          "mean": 0.9879511009591321,
+          "coverage": 1.0
+        }
+      }
+    },
+    "archive_anyid_single": {
+      "videos": 8,
+      "scores": {
+        "aesthetic_quality": {
+          "count": 8,
+          "mean": 0.5286697410047054,
+          "coverage": 1.0
+        },
+        "arc_score": {
+          "count": 8,
+          "mean": 0.8536321152932942,
+          "coverage": 1.0
+        },
+        "arc_scoring_coverage": {
+          "count": 8,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "background_consistency": {
+          "count": 8,
+          "mean": 0.9613049825032552,
+          "coverage": 1.0
+        },
+        "cur_score": {
+          "count": 8,
+          "mean": 0.8770219571888447,
+          "coverage": 1.0
+        },
+        "cur_scoring_coverage": {
+          "count": 8,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "dynamic_degree": {
+          "count": 8,
+          "mean": 0.0,
+          "coverage": 1.0
+        },
+        "face_detection_coverage": {
+          "count": 8,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "gme_aesr": {
+          "count": 8,
+          "mean": 0.520368654280901,
+          "coverage": 1.0
+        },
+        "imaging_quality": {
+          "count": 8,
+          "mean": 0.5665254596788056,
+          "coverage": 1.0
+        },
+        "local_story_similarity": {
+          "count": 8,
+          "mean": 0.8640198782086372,
+          "coverage": 1.0
+        },
+        "motion_smoothness": {
+          "count": 8,
+          "mean": 0.9923800202487196,
+          "coverage": 1.0
+        },
+        "overall_consistency": {
+          "count": 8,
+          "mean": 0.13663274701684713,
+          "coverage": 1.0
+        },
+        "subject_consistency": {
+          "count": 8,
+          "mean": 0.9498501874040812,
+          "coverage": 1.0
+        }
+      }
+    },
+    "archive_anyid_dual": {
+      "videos": 8,
+      "scores": {
+        "aesthetic_quality": {
+          "count": 8,
+          "mean": 0.5261161923408508,
+          "coverage": 1.0
+        },
+        "arc_score": {
+          "count": 8,
+          "mean": 0.8773945472203195,
+          "coverage": 1.0
+        },
+        "arc_scoring_coverage": {
+          "count": 8,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "background_consistency": {
+          "count": 8,
+          "mean": 0.966888427734375,
+          "coverage": 1.0
+        },
+        "cur_score": {
+          "count": 8,
+          "mean": 0.8991084839217365,
+          "coverage": 1.0
+        },
+        "cur_scoring_coverage": {
+          "count": 8,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "dynamic_degree": {
+          "count": 8,
+          "mean": 0.0,
+          "coverage": 1.0
+        },
+        "face_detection_coverage": {
+          "count": 8,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "gme_aesr": {
+          "count": 8,
+          "mean": 0.5198589377105236,
+          "coverage": 1.0
+        },
+        "imaging_quality": {
+          "count": 8,
+          "mean": 0.599807211914841,
+          "coverage": 1.0
+        },
+        "local_story_similarity": {
+          "count": 8,
+          "mean": 0.8645972982048988,
+          "coverage": 1.0
+        },
+        "motion_smoothness": {
+          "count": 8,
+          "mean": 0.9933444392495858,
+          "coverage": 1.0
+        },
+        "overall_consistency": {
+          "count": 8,
+          "mean": 0.132385877892375,
+          "coverage": 1.0
+        },
+        "subject_consistency": {
+          "count": 8,
+          "mean": 0.9557770580674211,
+          "coverage": 1.0
+        }
+      }
+    }
+  },
+  "protocols": {
+    "gme": {
+      "version": "native_gme7b_aesr_v1",
+      "model": "Alibaba-NLP/gme-Qwen2-VL-7B-Instruct",
+      "model_revision": "e54cb53a76dba4895a7a2f88fc8021f3679ed4f1",
+      "sampling": "all frames up to 81; otherwise np.linspace(0, count-1, 81, dtype=int)",
+      "images": "native embed with local full-frame RGB PIL images, texts=None, is_query=False",
+      "image_default_instruction": "You are a helpful assistant.",
+      "normalization": "native model.normalize=True; verify finite/unit norm without evaluator renormalization",
+      "text": "exact frozen prompt passed unchanged to native embed with image=None and the fixed instruction",
+      "native_text_processing": "native processor truncation=True, max_length from native config (default 1800)",
+      "text_instruction": "Find frames that match the given text description.",
+      "aggregation": "arithmetic mean of raw unit-embedding dot products; no x100 or logit scale",
+      "embedding_unit_norm_tolerance": 0.01,
+      "implementation": "independent published frame/text AESR algorithm, no AESR source reuse",
+      "official_final_score": null,
+      "limitations": [
+        "Frame similarity alone does not verify action timing, speech or human quality."
+      ]
+    },
+    "cur": {
+      "version": "consisid_cur_arc_author_style_cpu_detector_v1",
+      "frames": 16,
+      "frame_sampling": "floor linspace indices including endpoints; repeat indices for short videos",
+      "det_size": [
+        320,
+        320
+      ],
+      "det_threshold": 0.5,
+      "multi_face_policy": "largest bbox area; last detection breaks ties as native stable sort; never identity matching",
+      "padding_retry": "only if no faces; 0.25 of each dimension per edge, gray 128; subtract keypoint offsets",
+      "identity_anchor": "original manifest reference_image, never candidate conditioning crop",
+      "cur_alignment": "InsightFace norm_crop 224 BGR; RGB; OpenCV linear resize 112; CHW float32 /127.5-1",
+      "arc_alignment": "InsightFace norm_crop 112 BGR; native ArcFaceONNX.get_feat; padded detection image on retry",
+      "aggregation": "mean max(0, cosine) over valid frames; no per-frame zero imputation",
+      "missing_reference": "scores null with explicit cause, including all-missing videos",
+      "detector_provider": "CPUExecutionProvider; author-style provider equivalent, not an official scorer",
+      "ort_intra_op_threads": 4,
+      "ort_inter_op_threads": 1,
+      "torch_threads": 4,
+      "cur_model": "native ConsisID IR_101([112,112]), Backbone num_layers=100",
+      "arc_model": "buffalo_l/w600k_r50",
+      "score_kind": "local_proxy",
+      "official_score": null,
+      "missing_policy": "author_all_missing_video_zero"
+    },
+    "story": {
+      "version": "local_story_similarity_v1",
+      "caption_model": "Qwen2.5-VL-7B-Instruct",
+      "caption_frames": 8,
+      "frame_sampling": "rounded linspace including endpoints",
+      "caption_instruction": "Give a detailed video caption of the input video. Describe characters, environments, dynamics, camera movement, and fine-grained element interactions. Output150-250words, only visibly supported observations in beginning-middle-end order. Do not infer names, audio, dialogue or hidden intent.",
+      "caption_max_new_tokens": 512,
+      "caption_do_sample": false,
+      "embedding_model": "HIT-TMG/KaLM-embedding-multilingual-mini-instruct-v2",
+      "embedding_revision": "348e90d4084c1e2fbaac61f16a2d8c636192352a",
+      "embedding_max_tokens": 512,
+      "score": "dot product of normalized exact prompt and local video-caption embeddings",
+      "official_story_score": null,
+      "official_final_score": null,
+      "warning": "Local captioner substitution is not MSVBench/AESR Gemini StoryScore or human action truth."
+    },
+    "vbench": {
+      "version": "vbench_extended_native_v1",
+      "vbench_revision": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+      "dimensions": {
+        "dynamic_degree": "Native RAFT FP32 boolean; interval=max(1,round(fps/8)); adaptive movement thresholds, not smoothness or semantic correctness",
+        "subject_consistency": "DINO ViT-B/16 all decoded frames; mean nonnegative first/previous-frame cosines per video",
+        "background_consistency": "CLIP ViT-B/32 all decoded frames; mean nonnegative first/previous-frame cosines per video",
+        "aesthetic_quality": "CLIP ViT-L/14 and LAION linear head; native all-frame mean prediction/10, no extra normalization or clipping",
+        "overall_consistency": "ViCLIP InternVid-10M-FLT; native 8 uniform-middle frames and original prompt; raw unit cosine including negatives"
+      },
+      "aggregation": "Equal video weight within each dimension; upstream aggregate retained separately (subject/background are frame-transition weighted)",
+      "precision": "FP32 DINO/RAFT/ViCLIP/aesthetic head; native clip.load CUDA precision for CLIP image encoders; actual parameter dtypes recorded",
+      "prompt_policy": "Original manifest prompt, no prompt refinement; SHA256 only in output. Native ViCLIP tokenizer context=32, truncate=True; token overflow recorded",
+      "temporal_flickering": "Excluded: assumes static content, not a moving-video quality metric",
+      "official_final_score": null,
+      "human_score": null,
+      "warning": "Native named dimensions on custom frozen media, not the official VBench benchmark or challenge final score"
+    },
+    "quality": {
+      "version": "vbench_mm26_quality_v1",
+      "vbench_revision": "fd18b3d055cb0fc6f066ca90fe2c3c8cbb698490",
+      "motion_smoothness": "original AMT-S odd-frame reconstruction, 1-MAE/255, all decoded frames",
+      "imaging_quality": "original MUSIQ-SPAQ all-frame mean MOS/100, longer-side preprocessing<=512",
+      "precision": "float32, single CUDA device",
+      "aggregation": "video equal weight; normalized per-video dimensions",
+      "official_final_score": null,
+      "human_score": null,
+      "missing_components": [
+        "CurricularFace author checkpoint",
+        "GME",
+        "StoryScore",
+        "official human evaluation"
+      ],
+      "warning": "Named paper-related dimensions, not exact KeyID face/text protocol or official challenge score."
+    }
+  },
+  "jobs": [
+    {
+      "run_id": "panel_gme_shard0_r001",
+      "status": "completed",
+      "manifest_sha256": "1f16e7b423a57e81c117993057884695789385b0c81609514a6909d2b6e2810b",
+      "score_sha256": "b9acac0ab62b28ad52fbad7a86cadda0b76e5ccd78374a087556491787d9a9de",
+      "allocated_gpu_hours": 0.07697165389584067
+    },
+    {
+      "run_id": "panel_gme_shard1_r001",
+      "status": "completed",
+      "manifest_sha256": "aa8b2604c8ca6f2c13e2bc23a8c4dcff6d7a742103c3f4cc558c2a87255d8619",
+      "score_sha256": "943c898c4ad33f39ab4aacf2a6616f3a97b1b3bb075636c28718f7e6c2e175fd",
+      "allocated_gpu_hours": 0.07532342545752828
+    },
+    {
+      "run_id": "panel_cur_shard0_r001",
+      "status": "completed",
+      "manifest_sha256": "1f16e7b423a57e81c117993057884695789385b0c81609514a6909d2b6e2810b",
+      "score_sha256": "ee72dae9461cac5c75c7590acc989425d00538bb51f64c3a0e97ac442b2ed35e",
+      "allocated_gpu_hours": 0.02982256854004744
+    },
+    {
+      "run_id": "panel_cur_shard1_r001",
+      "status": "completed",
+      "manifest_sha256": "aa8b2604c8ca6f2c13e2bc23a8c4dcff6d7a742103c3f4cc558c2a87255d8619",
+      "score_sha256": "d404df9a6006005457fb51fd2d02cf3362784743c42058f95e4963356494ac05",
+      "allocated_gpu_hours": 0.029166187460327314
+    },
+    {
+      "run_id": "panel_story_shard0_r001",
+      "status": "completed",
+      "manifest_sha256": "1f16e7b423a57e81c117993057884695789385b0c81609514a6909d2b6e2810b",
+      "score_sha256": "771a31d84b3f29604d7a3ad346d0fd3804979bc06e38048596a20a87d598aa7a",
+      "allocated_gpu_hours": 0.07219541039744702
+    },
+    {
+      "run_id": "panel_story_shard1_r001",
+      "status": "completed",
+      "manifest_sha256": "aa8b2604c8ca6f2c13e2bc23a8c4dcff6d7a742103c3f4cc558c2a87255d8619",
+      "score_sha256": "5dc15290a1bf50c6dbef185a74daa9def5c77aa10672900ba5443a5497363d2c",
+      "allocated_gpu_hours": 0.06600606544396012
+    },
+    {
+      "run_id": "panel_vbench_shard0_r001",
+      "status": "completed",
+      "manifest_sha256": "1f16e7b423a57e81c117993057884695789385b0c81609514a6909d2b6e2810b",
+      "score_sha256": "2ef0286fe50538a195335a6b497cff92065e391ae51db3f694c28acc59a62c18",
+      "allocated_gpu_hours": 0.06107421943697975
+    },
+    {
+      "run_id": "panel_vbench_shard1_r002",
+      "status": "completed",
+      "manifest_sha256": "aa8b2604c8ca6f2c13e2bc23a8c4dcff6d7a742103c3f4cc558c2a87255d8619",
+      "score_sha256": "337381f8926e6a85733b5e413a00307e3a9f9d2ce34d3b9417c889250fffc0a8",
+      "allocated_gpu_hours": 0.051931464373936045
+    },
+    {
+      "run_id": "panel_quality_shard0_r001",
+      "status": "completed",
+      "manifest_sha256": "1f16e7b423a57e81c117993057884695789385b0c81609514a6909d2b6e2810b",
+      "score_sha256": "f5c38d0f11a4f2084c8834dc2bdfaf723a7ec5301715e95c1a10ed023c3ec392",
+      "allocated_gpu_hours": 0.023313637209098993
+    },
+    {
+      "run_id": "panel_quality_shard1_r002",
+      "status": "completed",
+      "manifest_sha256": "aa8b2604c8ca6f2c13e2bc23a8c4dcff6d7a742103c3f4cc558c2a87255d8619",
+      "score_sha256": "5a45805cf24dbe5479798890f2d1be2f6425cb8984387b479f0841f8c3ad31a1",
+      "allocated_gpu_hours": 0.02317298637379685
+    }
+  ],
+  "source_identity_calibration": {
+    "status": "passed_source_identity_controls",
+    "calibration": {
+      "auc": 1.0,
+      "eer": 0.0,
+      "positive_pairs": 32,
+      "negative_pairs": 480,
+      "actors": 16,
+      "valid_actors": 16,
+      "auc_actor_bootstrap_ci95": [
+        0.9999999999999999,
+        1.0
+      ],
+      "threshold": 0.20226048992404938,
+      "empirical_far": 0.008333333333333333
+    },
+    "validation": {
+      "auc": 1.0,
+      "eer": 0.0,
+      "positive_pairs": 32,
+      "negative_pairs": 480,
+      "actors": 16,
+      "valid_actors": 16,
+      "auc_actor_bootstrap_ci95": [
+        0.9999999999999999,
+        1.0
+      ],
+      "frozen_threshold": 0.20226048992404938,
+      "empirical_far": 0.008333333333333333,
+      "tpr": 1.0
+    },
+    "checks": {
+      "source_pairs_complete": true,
+      "calibration_discrimination": true,
+      "validation_discrimination": true,
+      "validation_far_tpr": true,
+      "self_similarity": true,
+      "repeat_embedding": true
+    },
+    "self_similarity_max_error": 1.1920928955078125e-07,
+    "repeat_embedding_max_abs_error": 0.0
+  },
+  "control_scores": {
+    "gme": {
+      "ball_source": {
+        "gme_aesr": 0.6734840273857117
+      },
+      "ball_reverse": {
+        "gme_aesr": 0.6734840273857117
+      },
+      "ball_freeze": {
+        "gme_aesr": 0.685463011264801
+      },
+      "ball_jitter": {
+        "gme_aesr": 0.6776805520057678
+      },
+      "ball_wrong_prompt": {
+        "gme_aesr": 0.40479496121406555
+      }
+    },
+    "cur": {
+      "ball_source": {
+        "cur_score": null,
+        "arc_score": null,
+        "face_detection_coverage": 0.0,
+        "cur_scoring_coverage": 0.0,
+        "arc_scoring_coverage": 0.0
+      }
+    },
+    "story": {
+      "ball_source": {
+        "local_story_similarity": 0.8333257436752319
+      },
+      "ball_reverse": {
+        "local_story_similarity": 0.8356838226318359
+      },
+      "ball_freeze": {
+        "local_story_similarity": 0.8443819284439087
+      },
+      "ball_jitter": {
+        "local_story_similarity": 0.8478610515594482
+      },
+      "ball_wrong_prompt": {
+        "local_story_similarity": 0.8057456016540527
+      }
+    },
+    "vbench": {
+      "ball_source": {
+        "dynamic_degree": 1.0,
+        "subject_consistency": 0.9902376066893339,
+        "background_consistency": 0.977325439453125,
+        "aesthetic_quality": 0.4091849625110626,
+        "overall_consistency": 0.23336973786354065
+      },
+      "ball_reverse": {
+        "dynamic_degree": 1.0,
+        "subject_consistency": 0.988056180998683,
+        "background_consistency": 0.9849853515625,
+        "aesthetic_quality": 0.4091578423976898,
+        "overall_consistency": 0.24040821194648743
+      },
+      "ball_freeze": {
+        "dynamic_degree": 0.0,
+        "subject_consistency": 1.0,
+        "background_consistency": 1.0,
+        "aesthetic_quality": 0.3710978925228119,
+        "overall_consistency": 0.23581120371818542
+      },
+      "ball_jitter": {
+        "dynamic_degree": 0.0,
+        "subject_consistency": 0.9976205229759216,
+        "background_consistency": 0.969482421875,
+        "aesthetic_quality": 0.3665884733200073,
+        "overall_consistency": 0.23120950162410736
+      },
+      "ball_wrong_prompt": {
+        "dynamic_degree": 1.0,
+        "subject_consistency": 0.9902376066893339,
+        "background_consistency": 0.977325439453125,
+        "aesthetic_quality": 0.4091849625110626,
+        "overall_consistency": 0.12422992289066315
+      }
+    },
+    "quality": {
+      "ball_source": {
+        "motion_smoothness": 0.9895792963979047,
+        "imaging_quality": 0.37317769498241193
+      },
+      "ball_reverse": {
+        "motion_smoothness": 0.98960847593325,
+        "imaging_quality": 0.37317769498241193
+      },
+      "ball_freeze": {
+        "motion_smoothness": 0.9957544675461725,
+        "imaging_quality": 0.37324886322021483
+      },
+      "ball_jitter": {
+        "motion_smoothness": 0.7807537870406476,
+        "imaging_quality": 0.3721247824844049
+      },
+      "ball_wrong_prompt": {
+        "motion_smoothness": 0.9895790078841933,
+        "imaging_quality": 0.37317769498241193
+      }
+    }
+  },
+  "semantic_control_deltas": {
+    "gme_color_object_contrast": 0.2686890661716461,
+    "gme_reverse_delta": 0.0,
+    "story_color_object_contrast": 0.0275801420211792,
+    "story_motion_vs_freeze_delta": -0.011056184768676758,
+    "story_original_vs_reverse_delta": -0.002358078956604004,
+    "viclip_original_vs_reverse_delta": -0.007038474082946777
+  },
+  "local_engineering_checks": {
+    "cur_source_calibration_passed": true,
+    "gme_content_contrast_positive": true,
+    "raft_detects_known_motion": true,
+    "raft_rejects_frozen_motion": true,
+    "all120_metric_records_complete": true
+  },
+  "action_semantic_control_checks": {
+    "local_story_distinguishes_motion_from_freeze": false,
+    "local_story_distinguishes_correct_order": false,
+    "viclip_distinguishes_correct_order": false
+  },
+  "local_automatic_panel_passed": true,
+  "official_evaluation_complete": false,
+  "official_story_score": null,
+  "official_human_score": null,
+  "official_final_score": null,
+  "stable_task_action_evaluator_verified": false,
+  "actual_allocated_gpu_hours_including_failed_pilot": 0.6670253248144096,
+  "excluded_previous_jobs": [
+    {
+      "run_id": "panel_vbench_shard1_r001",
+      "status": "failed",
+      "allocated_gpu_hours": 0.00024064483082232376,
+      "reason": "Old worker upstream had pruned tracked unused model directories; rerun on clean pinned snapshot, no score formula changes."
+    },
+    {
+      "run_id": "panel_quality_shard1_r001",
+      "status": "completed",
+      "allocated_gpu_hours": 0.023341841254150494,
+      "reason": "Old worker upstream had pruned tracked unused model directories; rerun on clean pinned snapshot, no score formula changes."
+    }
+  ],
+  "max_new_gpu_hours": 12,
+  "panel_manifest_sha256": "6760385f1b8b867038b2afdd414a2f6c39c40234b25821148784ac15ce55e4fd",
+  "effective_controls_sha256": "097fd1741512d5ba004caa5fa2fbb15a9a58dbfee95ed3874b809f6b311a267b",
+  "cohorts": {
+    "main_same_input": 96,
+    "archival_other_specification": 24
+  },
+  "limitations": [
+    "96 same-specification videos and24 archival videos are stratified, never pooled for causal claims.",
+    "Cur16 author-style zero for all-missing video is separate from strict ArcFace8 missing-score protocol.",
+    "Frame-averaged GME is order-insensitive; local Story substitute and ViCLIP require control-based interpretation.",
+    "High consistency or smoothness can reward static video; RAFT degree is not action correctness.",
+    "No Gemini API access/external video upload; local captioner is not official or original StoryScore.",
+    "No human scores manufactured, no official ranking score or gap-to-champion derived.",
+    "The evaluation-first gate precedes stronger baselines and method optimization; incomplete task semantics remain a blocker."
+  ],
+  "execution": {
+    "generation_model_runs_started": 0,
+    "training_runs_started": 0,
+    "panel_videos": 120,
+    "raw_score_dimensions": 11,
+    "coverage_columns": 3,
+    "independent_recalculation": "All126groupcells matched exact math.fsum aggregates; source/score/media hashes independently checked by primary audit.",
+    "source_stage_code_commit": "3eea1cb",
+    "cpu_tests": 525,
+    "clean_cpu_tests": 187,
+    "clean_skipped": 37,
+    "original_hard_cap_gpu_hours": 51.5,
+    "new_hard_cap_gpu_hours": 12
+  },
+  "all_jobs": [
+    {
+      "run_id": "controls_cur_shard0_r001",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 900,
+      "max_gpu_hours": 0.25,
+      "manifest_sha256": "04f3c1e7ece70ef06730718aa56b27e9d9d0494065d58345df1d5008ceb0c173",
+      "backend_elapsed_seconds": 23.799714444670826,
+      "allocated_gpu_hours": 0.006611031790186341,
+      "executed_evaluator_sha256": null
+    },
+    {
+      "run_id": "controls_gme_shard0_r001",
+      "status": "failed",
+      "gpus": 1,
+      "timeout_s": 900,
+      "max_gpu_hours": 0.25,
+      "manifest_sha256": "097fd1741512d5ba004caa5fa2fbb15a9a58dbfee95ed3874b809f6b311a267b",
+      "backend_elapsed_seconds": 32.15852295514196,
+      "allocated_gpu_hours": 0.00893292304309499,
+      "executed_evaluator_sha256": null
+    },
+    {
+      "run_id": "controls_gme_shard0_r002",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 900,
+      "max_gpu_hours": 0.25,
+      "manifest_sha256": "097fd1741512d5ba004caa5fa2fbb15a9a58dbfee95ed3874b809f6b311a267b",
+      "backend_elapsed_seconds": 96.64607837889344,
+      "allocated_gpu_hours": 0.026846132883025953,
+      "executed_evaluator_sha256": null
+    },
+    {
+      "run_id": "controls_quality_shard0_r001",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 900,
+      "max_gpu_hours": 0.25,
+      "manifest_sha256": "097fd1741512d5ba004caa5fa2fbb15a9a58dbfee95ed3874b809f6b311a267b",
+      "backend_elapsed_seconds": 25.84952981211245,
+      "allocated_gpu_hours": 0.007180424947809014,
+      "executed_evaluator_sha256": null
+    },
+    {
+      "run_id": "controls_story_shard0_r001",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 900,
+      "max_gpu_hours": 0.25,
+      "manifest_sha256": "097fd1741512d5ba004caa5fa2fbb15a9a58dbfee95ed3874b809f6b311a267b",
+      "backend_elapsed_seconds": 77.66856319271028,
+      "allocated_gpu_hours": 0.021574600886863967,
+      "executed_evaluator_sha256": null
+    },
+    {
+      "run_id": "controls_vbench_shard0_r001",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 900,
+      "max_gpu_hours": 0.25,
+      "manifest_sha256": "097fd1741512d5ba004caa5fa2fbb15a9a58dbfee95ed3874b809f6b311a267b",
+      "backend_elapsed_seconds": 98.9060502150096,
+      "allocated_gpu_hours": 0.027473902837502666,
+      "executed_evaluator_sha256": null
+    },
+    {
+      "run_id": "panel_cur_shard0_r001",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 1440,
+      "max_gpu_hours": 0.4,
+      "manifest_sha256": "1f16e7b423a57e81c117993057884695789385b0c81609514a6909d2b6e2810b",
+      "backend_elapsed_seconds": 107.36124674417078,
+      "allocated_gpu_hours": 0.02982256854004744,
+      "executed_evaluator_sha256": "d7797e622ab7c7d16a21c3baf9e9c3abbd7c213397e05c4626523ea68604dd55"
+    },
+    {
+      "run_id": "panel_cur_shard1_r001",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 1440,
+      "max_gpu_hours": 0.4,
+      "manifest_sha256": "aa8b2604c8ca6f2c13e2bc23a8c4dcff6d7a742103c3f4cc558c2a87255d8619",
+      "backend_elapsed_seconds": 104.99827485717833,
+      "allocated_gpu_hours": 0.029166187460327314,
+      "executed_evaluator_sha256": "d7797e622ab7c7d16a21c3baf9e9c3abbd7c213397e05c4626523ea68604dd55"
+    },
+    {
+      "run_id": "panel_gme_shard0_r001",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 1440,
+      "max_gpu_hours": 0.4,
+      "manifest_sha256": "1f16e7b423a57e81c117993057884695789385b0c81609514a6909d2b6e2810b",
+      "backend_elapsed_seconds": 277.0979540250264,
+      "allocated_gpu_hours": 0.07697165389584067,
+      "executed_evaluator_sha256": "b2b26b493f0ff2b25ae07cfd3d9685050484984b71e78143d947e022e18eab39"
+    },
+    {
+      "run_id": "panel_gme_shard1_r001",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 1440,
+      "max_gpu_hours": 0.4,
+      "manifest_sha256": "aa8b2604c8ca6f2c13e2bc23a8c4dcff6d7a742103c3f4cc558c2a87255d8619",
+      "backend_elapsed_seconds": 271.1643316471018,
+      "allocated_gpu_hours": 0.07532342545752828,
+      "executed_evaluator_sha256": "b2b26b493f0ff2b25ae07cfd3d9685050484984b71e78143d947e022e18eab39"
+    },
+    {
+      "run_id": "panel_quality_shard0_r001",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 1440,
+      "max_gpu_hours": 0.4,
+      "manifest_sha256": "1f16e7b423a57e81c117993057884695789385b0c81609514a6909d2b6e2810b",
+      "backend_elapsed_seconds": 83.92909395275638,
+      "allocated_gpu_hours": 0.023313637209098993,
+      "executed_evaluator_sha256": "7bca0a739aca56fbfb53cc6bbcd3032c7b886d81103618e2a725a46361d47070"
+    },
+    {
+      "run_id": "panel_quality_shard1_r001",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 1440,
+      "max_gpu_hours": 0.4,
+      "manifest_sha256": "aa8b2604c8ca6f2c13e2bc23a8c4dcff6d7a742103c3f4cc558c2a87255d8619",
+      "backend_elapsed_seconds": 84.03062851494178,
+      "allocated_gpu_hours": 0.023341841254150494,
+      "executed_evaluator_sha256": "7bca0a739aca56fbfb53cc6bbcd3032c7b886d81103618e2a725a46361d47070"
+    },
+    {
+      "run_id": "panel_quality_shard1_r002",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 1440,
+      "max_gpu_hours": 0.4,
+      "manifest_sha256": "aa8b2604c8ca6f2c13e2bc23a8c4dcff6d7a742103c3f4cc558c2a87255d8619",
+      "backend_elapsed_seconds": 83.42275094566867,
+      "allocated_gpu_hours": 0.02317298637379685,
+      "executed_evaluator_sha256": "afd1736f70d1638f837a1bf3bff31b37b530ffd91c9ebd188eb897f87728f44e"
+    },
+    {
+      "run_id": "panel_story_shard0_r001",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 1440,
+      "max_gpu_hours": 0.4,
+      "manifest_sha256": "1f16e7b423a57e81c117993057884695789385b0c81609514a6909d2b6e2810b",
+      "backend_elapsed_seconds": 259.9034774308093,
+      "allocated_gpu_hours": 0.07219541039744702,
+      "executed_evaluator_sha256": "dabdef8a3652f579105a89c2c526f1ea5ccd30ab817ffb41cbeab637246212dd"
+    },
+    {
+      "run_id": "panel_story_shard1_r001",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 1440,
+      "max_gpu_hours": 0.4,
+      "manifest_sha256": "aa8b2604c8ca6f2c13e2bc23a8c4dcff6d7a742103c3f4cc558c2a87255d8619",
+      "backend_elapsed_seconds": 237.62183559825644,
+      "allocated_gpu_hours": 0.06600606544396012,
+      "executed_evaluator_sha256": "dabdef8a3652f579105a89c2c526f1ea5ccd30ab817ffb41cbeab637246212dd"
+    },
+    {
+      "run_id": "panel_vbench_shard0_r001",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 1440,
+      "max_gpu_hours": 0.4,
+      "manifest_sha256": "1f16e7b423a57e81c117993057884695789385b0c81609514a6909d2b6e2810b",
+      "backend_elapsed_seconds": 219.8671899731271,
+      "allocated_gpu_hours": 0.06107421943697975,
+      "executed_evaluator_sha256": "a722fea85751e6c32be689487951e4dabb3e0abf3a0b4f9cce830faac013535e"
+    },
+    {
+      "run_id": "panel_vbench_shard1_r001",
+      "status": "failed",
+      "gpus": 1,
+      "timeout_s": 1440,
+      "max_gpu_hours": 0.4,
+      "manifest_sha256": "aa8b2604c8ca6f2c13e2bc23a8c4dcff6d7a742103c3f4cc558c2a87255d8619",
+      "backend_elapsed_seconds": 0.8663213909603655,
+      "allocated_gpu_hours": 0.00024064483082232376,
+      "executed_evaluator_sha256": "a722fea85751e6c32be689487951e4dabb3e0abf3a0b4f9cce830faac013535e"
+    },
+    {
+      "run_id": "panel_vbench_shard1_r002",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 1440,
+      "max_gpu_hours": 0.4,
+      "manifest_sha256": "aa8b2604c8ca6f2c13e2bc23a8c4dcff6d7a742103c3f4cc558c2a87255d8619",
+      "backend_elapsed_seconds": 186.95327174616978,
+      "allocated_gpu_hours": 0.051931464373936045,
+      "executed_evaluator_sha256": "a722fea85751e6c32be689487951e4dabb3e0abf3a0b4f9cce830faac013535e"
+    },
+    {
+      "run_id": "source_cur-calibration_shard0_r001",
+      "status": "completed",
+      "gpus": 1,
+      "timeout_s": 1800,
+      "max_gpu_hours": 0.5,
+      "manifest_sha256": "cd93f95ec9272b8ee46c805f15251b6d87188a8831f3ca395778d4946edde25c",
+      "backend_elapsed_seconds": 129.04633350716904,
+      "allocated_gpu_hours": 0.0358462037519914,
+      "executed_evaluator_sha256": null
+    }
+  ],
+  "blind_review": {
+    "comparisons": 80,
+    "prepared_local": true,
+    "human_completed": false,
+    "generated_scores": false,
+    "method_names_hidden_in_media": true,
+    "notice": "Local neutral-name media and method key stay private. Requires independent humans; not the official organizer human protocol."
+  }
+}

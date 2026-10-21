@@ -67,7 +67,9 @@ alpha1/.5/.25五run（两pilot+三16视频arm）50新视频、原AMT/MUSIQ共评
 
 按用户纠正，顺序调整为先补评测→同集强基线→方法优化。固定评分GME7B/Cur单权重/KaLM0.5B已获得并SHA验证，独立env部署；新增GME原协议、ConsisID-style Cur/Arc16、本地caption+KaLMStoryproxy与原VBench扩展五维均完成真实控制。Cur64源校准AUC1/EER0、valFAR.008333/TPR1、阈值.20226049；GME首次懒加载CPU探测误拦失败，唯一修复r002完成。控制揭示GMEframe平均顺序盲、冻结可高分，本地Story和ViCLIP对动作顺序也不可靠，不能据其做自然动作晋级。原GeminiStory/人工/官方完整总分仍null，不能把local替代塞入作者组合分。
 
-现在仅重评120已有视频（96同规格六arm+24历史异规格单列），不新增模型生成/训练/结构。权重/协议/控制边界详见[评价协议](METRICS.md)、`resources/evaluation_panel.lock.json`；当前完整CPU回归523passed/7skipped，实际完整面板与独立审计随后报告。下一步强基线必须等冻结评价和动作判断边界核清，不再以1.3B局部改善认定接近头部。
+120/120已有视频共评已结束（96同规格六arm+24历史异规格单列），没有新增模型生成/训练/结构。Cur/Arc16支持身份增益，但GME baseline .554678→高LR .527720、结构 .531047，原RAFT明显运动比例baseline3/16→高LR/结构0/16；身份高分不证明动作或文本收益。13控制揭示GME顺序盲，本地Story/ViCLIP对冻结/倒序不可靠，`stable_task_action_evaluator_verified=false`。19评分GPU作业17完成2失败均已结束，GME懒导入/worker源目录裁剪问题修复且旧结果保留/排除计账，总.667025325GPUh≤12。完整525passed/7skip、干净187passed/37skip/烟测通过，独立数值复算一致。权重锁与完整脱敏结果见[评价协议](METRICS.md)、`resources/evaluation_panel.lock.json`/`evaluation_panel_result.json`。
+
+本地80对neutral-name盲评包已准备，但没有真实人工分数；官方GeminiStory/人工/总分仍缺，不能声称完整评测或与冠军分差。下一步先可靠动作/自然性人工审核，再验证强基线，最后方法优化；此门槛未解除前保持新模型/训练/结构暂停。
 
 ## 当前实验与限制
 

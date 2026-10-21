@@ -125,6 +125,16 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 将120已有视频同协议重评：96同480×352同16dev的六方法，24历史480平方三方法单列；不再生成新视频，不用holdout。新计算硬上限12GPUh/白名单下载36GB，原51.5硬上限不增加。`resources/evaluation_panel.lock.json`锁权重/代码/许可与源校准；GME README带`Built with GME`及使用outputs改善公开模型的命名要求，不能仅凭Apache YAML忽略。官方完整scorer、原GeminiStory与人工仍缺，合成总分保持null；全部自动实现通过也不能声称完整官方评测。
 
+### 完整已有视频共评结束与结论
+
+120/120现有视频在新11维自动面板完成（另3coverage列），每项输入/score/video/prompt/reference SHA核验，96同规格六组与24历史三组分层。主集Cur/Arc16各均值：baseline .263468/.239781，lr1 .436314/.422514，lr5 .681828/.671621，alpha.5 .416965/.396216，alpha.25 .286567/.271397，structure0 .677477/.664232；与旧strictArc8的数值不混。GME baseline .554678、lr1 .554295、lr5 .527720、structure0 .531047，揭示高身份训练并未同步改善文本内容匹配。原RAFT dynamic_degree视频比例baseline3/16、lr1 1/16、lr5/alpha.5/structure0均0/16、alpha.25 2/16；这只是明显运动阈值，真实说话源也可判0，不能叫动作完成率。
+
+原MUSIQ/.AMT、DINO主体、CLIP背景、LAION美学与ViCLIP原视频文本cos均另报；身份/成像较高不等于自然动作改善。localStory六组仅约.853–.864、控制中冻结和倒序可更高（motion-vs-freeze−.011056、order−.002358、ViCLIPorder−.007038，GMEorder差0），因此`stable_task_action_evaluator_verified=false`。这部分没有补齐为可靠任务动作评分，禁止以其自动晋级或声称接近top。
+
+19GPU评分作业17completed/2failed均结束，原GME32s失败与worker旧上游删减目录拒绝2s保留，旧workerquality已完成但从最终结果排除并在独立clean fd18源码r002重评；原权重/公式未变。总实际allocatedGPUh=.667025325≤12，含所有失败/排除成本，不按工具延迟通知计时，无新模型生成/训练。完整525passed/7skipped，干净187passed/37skipped、CPU烟测passed，独立CPU复算126groupcells完全一致。结果`resources/evaluation_panel_result.json`。
+
+`scripts/prepare_blind_review.py`已准备本地80对neutral-name比较，身份/动作完成/自然运动/伪影/偏好与置信度分列。所有人工值未填，媒体与method key只在本地，不进Git/外部API；需要实际独立人类审核，agent不能代称已完成人工评测。原GeminiStory/官方human/完整finalscore仍null。下一步先补动作判定与人工边界，再同一冻结panel验证强基线，然后才研究结构/损失；本轮完成的是可复现自动面板和缺陷诊断，不是完整官方评测。
+
 ## 人工抽样与同预算对照
 
 先固定按身份及源视频隔离的dev与holdout；holdout不参与agent逐轮选型。人工审核预先抽定的正常样本，再加入固定规则选择的高分、低分和失败样本；后者属于诊断集，应与随机样本结论分开。比较视频时隐藏模型名、随机左右顺序，分别记录身份、动作完成、时间对齐、可见伪影及整体偏好。
