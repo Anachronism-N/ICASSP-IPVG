@@ -71,6 +71,12 @@ alpha1/.5/.25五run（两pilot+三16视频arm）50新视频、原AMT/MUSIQ共评
 
 本地80对neutral-name盲评包已准备，但没有真实人工分数；官方GeminiStory/人工/总分仍缺，不能声称官方全套评测或与冠军分差。用户随后明确“选择一个可以横向对比的方案即可”，因此采用`ipvg_cross_model_comparison_v1`：Cur/Arc16、GME、AMT、MUSIQ五项核心逐维比较，coverage/RAFT/美学等辅助，localStory/ViCLIP仅diagnostic、不参与核心选型，无合成总分。已用CPU重新核120媒体、prompt/ref/actor、规格、评分权重/精度，96主集与24历史集独立配对差值；原评分数值未改变。`comparable_evaluation_ready=true`只表示允许同协议强基线benchmark，不表示动作自然性或官方评分通过。人工未评分不再成为所有基线自动比较的唯一阻塞；下一步同集强基线，然后才模型方法优化。未获批合成方向探针不执行。新版配对协议CPU实际运行与19项针对性测试通过；完整541passed/7skip、干净203passed/37skip/烟测通过。配对结果见`resources/cross_model_comparison_result.json`，五核心逐维与配对视频/actor分母均报告，没有新GPU评分。
 
+## 原生强身份基线共同对照冻结（2026-10-22）
+
+用户批准三个单例pilot通过后各16原输入完整对照：Stand-In+Wan2.1-T2V14B、AnyIDpreview5B、未训练VACE1.3B，49frame480×35216fps20steps/CFG5，同原prompt/ref/ID与seed42派生噪声种子。只比较现成原生系统，不训练或加结构；各自原生预处理、sampler/shift/negativeprompt和成本差异显式记录，同seed不是同噪声。先验40GB可运行/真实身份分支，再生成48新视频共评固定五core及aux；不依据单例或模型规模宣称质量优势，未完成不写成功。
+
+Stand-In代码e351224、T2V14B权重a064a6c7仅六分片/adapterc6e90176单checkpoint/BiSeNet官方53MB，新增必要下载≤60GB；复用已核T5/VAE/tokenizer与同SHA检测器，原生crop1.5/whitepad512/BiSeNet保留，只改检测CPUORT和离线权重注入，未运行FaceSwap。新增生成预留4.833GPUh、评测2、唯一工程修复.5≤8GPUh，原51.5cap不增；失败/未启动保持真实状态。官方403/人工仍单列待外部完成，不阻塞固定自动benchmark。
+
 ## 当前实验与限制
 
 唯一H1对照是参考人脸bbox扩边.3的正方形裁剪，原参考仍作身份评价anchor。模型、prompt、sample_id/seed、采样步和候选数固定，不训练新LoRA。实验预注册及聚合结果见 [CREMA-D H1](EXPERIMENT_CREMA_D_H1.md)。crop64/64条完整解码；63样本/32演员共同帧配对，原基线身份均值0.143337、crop0.349797，配对提升+0.205661，演员bootstrap95%区间[0.168833,0.245416]。身份P10提升+0.192157、coverage+0.007813、灰度运动proxy比1.029227、静态比例无变化。新生成耗费0.602265GPU小时，所有任务正常退出。只在该单种子说话头部dev上支持H1，不是完整动作/人工/holdout/SOTA结论。
