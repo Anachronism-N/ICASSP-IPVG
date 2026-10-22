@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "task": "inference",
+  "purpose": "development",
+  "split": "dev",
+  "runs_dir": "runs",
+  "backend": {
+    "kind": "command",
+    "command": [
+      "{python}",
+      "scripts/adapters/standin.py",
+      "--request",
+      "{request}"
+    ]
+  },
+  "model_revisions": {
+    "WeChatCV/Stand-In:code": "e351224366be169076e94af1454115d91d458313",
+    "Wan-AI/Wan2.1-T2V-14B": "a064a6c71f5be440641209c07bf2a5ce7a2ff5e4",
+    "BowenXue/Stand-In": "c6e9017606276ee1a01c63fdb8f90da789678647"
+  },
+  "parameters": {
+    "upstream_dir": "upstream/Stand-In",
+    "base_dir": "models/wan21_t2v14b",
+    "standin_dir": "models/standin",
+    "parser_path": "models/preprocessing/parsing_bisenet.pth",
+    "detector_path": "models/identity/det_10g.onnx",
+    "model_lock": "resources/standin.lock.json",
+    "width": 480,
+    "height": 352,
+    "num_frames": 49,
+    "fps": 16,
+    "num_inference_steps": 20,
+    "cfg_scale": 5,
+    "seed": 42
+  },
+  "run_id": "native_standin_main_20261022_r001",
+  "manifest": "data/dense_train/eval16_original.jsonl",
+  "hypothesis": "Compare unmodified native identity-preserving systems on same16originaldevinputs, frozen5coremetrics; no training or architecture change.",
+  "resources": {
+    "gpus": 1,
+    "timeout_s": 7200,
+    "max_gpu_hours": 2.0
+  }
+}

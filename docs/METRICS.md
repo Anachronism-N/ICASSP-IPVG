@@ -143,6 +143,12 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 `scripts/evaluation_panel_report.py`已在120旧媒体与已完成评分上重新执行纯CPUhash/解码/配对检查，原评分与原GPU成本不变、没有新模型输出或新GPU实验。19项定向测试、完整541passed/7skip、干净203passed/37skip和CPU烟测通过；独立从原评分JSON重算45个group×核心指标配对差，全部一致。`resources/cross_model_comparison_result.json`记录协议和实际配对结果，`comparable_evaluation_ready=true`表示本地自动比较可开始，不是官方全套、自然动作验证或SOTA。下一阶段独立验证Stand-In/Wan14B及已有AnyID5B等原生强基线，共同输入/输出规格/评价不变，原生采样器参数与实际预算差异显式记录；不假设同seed意味着不同模型使用相同噪声。
 
+## 原生强基线共同共评（2026-10-22）
+
+已用本协议对三原生系统51新生成中的48完整main输出共同评价，16同输入/8演员，49帧480×35216fps。Cur/Arc16默认完全无脸视频按作者约定0，所有缺失framecoverage另报：Stand-In4/16视频全missing，整组Cur/Arc均值.496866/.488481，条件12视频均值.662488/.651307与AnyID全16.662902/.651611接近，但分母不同，禁止凭条件均值说打平。AnyIDframecoverage98.8281%，VACE100%。最大脸作者式不是严格单脸跟踪，不能将此值混作旧Arc8；无一般动作/人工验证。
+
+核心GME/MUSIQ分别VACE.554678/.731272、AnyID.442795/.697678、Stand-In.500700/.689096，展示身份与文本/质量可用性取舍，未选最终base或构建合成总分。三方法原生noise/shift/negative/参考预处理不同、同seed不等噪声，仅完整系统同输入benchmark。`scripts/analyze_native_baselines.py`复核每个generation/input/output/scorerhash、原IPtensor/条件call、五核心配对分母、scorer原精度与权重一致、51媒体解码及总预算；结果见[完整原生报告](EXPERIMENT_TWO_TRACKS.md)和`resources/native_baselines_result.json`，未改变已有评分协议。
+
 ## 人工抽样与同预算对照
 
 先固定按身份及源视频隔离的dev与holdout；holdout不参与agent逐轮选型。人工审核预先抽定的正常样本，再加入固定规则选择的高分、低分和失败样本；后者属于诊断集，应与随机样本结论分开。比较视频时隐藏模型名、随机左右顺序，分别记录身份、动作完成、时间对齐、可见伪影及整体偏好。

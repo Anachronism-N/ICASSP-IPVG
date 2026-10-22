@@ -11,7 +11,7 @@ ICASSP 2027 身份保持视频生成比赛工程。优先完成 Track 1 的可�
 | 阶段目标、算力安排、验收门槛 | [项目方案](docs/PROJECT_PLAN.md) |
 | 方法假设、同预算实验、论文路线 | [研究与消融](docs/RESEARCH_PLAN.md) |
 | MM2026头部方案、身份基线与ITA视频模型迁移 | [相关工作与迁移方案](docs/RELATED_WORK_AND_TRANSFER.md) |
-| AnyID5B身份对照、视频时间窗探针、成本及真实负结果 | [双赛道实验报告](docs/EXPERIMENT_TWO_TRACKS.md) |
+| 原生Stand-In14B/AnyID5B/VACE1.3B共同对照、覆盖与取舍；时间窗探针 | [双赛道与原生基线报告](docs/EXPERIMENT_TWO_TRACKS.md) |
 | AnyID原生GPU文本编码吞吐优化及覆盖率复验 | [T5设备实验](docs/EXPERIMENT_ANYID_T5.md) |
 | AnyID参考上下文的多身份/双种子质量对照 | [上下文质量实验](docs/EXPERIMENT_ANYID_CONTEXT.md) |
 | 原生同图双尺度参考及口部局部动态控制 | [双尺度效果实验](docs/EXPERIMENT_ANYID_MULTISCALE.md) |

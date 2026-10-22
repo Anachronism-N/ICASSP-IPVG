@@ -81,3 +81,47 @@ AnyID运行总1.214463GPU小时，上限4，未使用GPU修复槽；单条生成
 - 已读取新增远端 `wm-teacher-experiments-20261018` 分支的聚合分析与完整性报告：它是另一条Wan5B Teacher研究线，108例GT参考诊断、66组三视图物理诊断和3913条媒体完整性检查，不是当前IPVG身份或动作分数。其文件明确说明单种子、相关样本和多重比较局限，不代表Teacher最终验收；本轮未合并该分支或用其结论证明IPVG收益。
 
 公共聚合结果见 `resources/two_track_results.json`；原始人脸媒体、逐演员评分、临时凭据和内部路径不上传。两个赛道所有已启动作业已结束，无遗留GPU任务。
+
+## 2026-10-22：原生强身份基线同规格对照完成
+
+### 冻结方案与输入
+
+先定版横向可比评测（08f4e1e/CI39641297184）后再验证基线。本轮采用未训练VACE1.3B、AnyIDpreview/Wan2.2-TI2V5B、Stand-In/Wan2.1-T2V14B三个现成原生系统，不新增训练、结构或超参搜索。固定CREMA-D辅助域16dev输入/8演员×2原prompt，train身份/source隔离、holdout未用；参考源独立于目标，身份评测始终原anchor。统一480×352、49帧、16fps、20steps、CFG5、每输入1候选；实际seed=(42+原sample_id哈希前8位)%2^31。不同原生sampler/shift/negativeprompt/参考预处理是完整系统差异，不声称只换参数规模、相同随机噪声或完全同预算算法。
+
+每模型1单例pilot1800s/.5GPUh，各通过后每模型完整16新视频（重新生成pilot输入，不拼接历史输出），Stand-In7200s/2GPUh、AnyID/VACE2400s/.667各；共51新视频，方法比较仅48条完整main。core五指标Cur/Arc16、GME7B、AMT平滑、MUSIQ成像，辅助RAFT动态、DINO主体、CLIP背景、LAION美学/ViCLIP内容诊断。两节点各24视频，四类评分job各900s/.25GPUh，总8评分job。生成预留4.833GPUh+评价2+唯一工程修复.5≤8硬上限，历史51.5不增；未用修复槽，全部14作业正常结束。
+
+### 固定模型/预处理与真实接线
+
+Stand-In代码e351224366be169076e94af1454115d91d458313；WanT2V14B原六FP32分片a064a6c71f5be440641209c07bf2a5ce7a2ff5e4，不下载VACE14B控制模块。Stand-In原checkpointc6e9017606276ee1a01c63fdb8f90da789678647，SHA52f47630b4fefbdac841d3fd1ce146cca2a6a94ec0a6ab9407d16f2f635177e9；官方facexlibBiSeNet53,289,463B，下载一次后计算SHA468e13ca13a9b43cc0881a9f99083a430e9c0a38abd935431d1c28ee94b26567，不冒称作者发布摘要。新增权重57,836,726,941B≤60GB，复用同SHA原T5/VAE/umt5tokenizer，不重复下载完整antelope身份/属性包。
+
+保留原生最大脸bbox、1.5裁剪、白底pad512、BiSeNet去背景，以同SHA原SCRFD检测器CPUORT4线程替代仅预处理所需FaceAnalysis检测部分；设备差异记录，不改预处理几何、不执行FaceSwap、不发送外部API。独立torch2.7.1/transformers4.46.2/facexlib0.3/ORT1.23.2环境，不动其他环境；A100不能用本机HopperFA3，导入时只隔离该可选模块，走原FA2fallback，原上游文件不改。
+
+`scripts/adapters/standin.py` CPU weights_only实际核240完整IP q/k/v down/up tensor键/形状/有限值，原native set_stand_in后逐tensor精确匹配，非只看fileexists。每视频原生40CFG去噪call，仅首次有[1,16,1,64,64]IP latent、首次q_lora[1,1024,5120]；缓存按native重置，16例均核验。原nativeVRAMmanagement实际通过单A10040GB，main峰值allocated31.612GB/reserved39.345GB；后者接近40GB，不给更高分辨率/帧数显存保证。AnyID原单reference前缀inner_t=[1,13]/native_frame_num53/40call，输出49帧；VACE40条件forward。三模型生成源码commitdd60c820d7c8d5f76cec6d4527092b5397194687，sourceSHAe03405eeea8d54c5dad5e14f29feb43dc13d4cecdd63ec8087385a7fd169fcab。
+
+### 五核心与覆盖率结果
+
+| 指标 | VACE1.3B | AnyID5B | Stand-In14B |
+|---|---:|---:|---:|
+| Cur身份作者式全16视频均值 | .263468 | .662902 | .496866 |
+| Arc身份作者式全16视频均值 | .239781 | .651611 | .488481 |
+| 身份可评分帧coverage | 100% | 98.8281% | 75% |
+| 有至少1可评分脸视频 | 16/16 | 16/16 | 12/16 |
+| GME帧文本匹配 | .554678 | .442795 | .500700 |
+| AMT运动平滑 | .992506 | .990752 | .995131 |
+| MUSIQ成像质量 | .731272 | .697678 | .689096 |
+| RAFT达到明显运动阈值的视频 | 3/16 | 2/16 | 4/16 |
+| LAION美学 | .500643 | .522495 | .520139 |
+
+Cur/Arc采用已固定largestface/pad/16frames作者式协议：单帧missing不补0、完全无有效脸视频才按作者规则0。因此Stand-In4/16全missing令视频均值显著受损；条件在12可评分视频上的Cur/Arc约.662488/.651307，与AnyID全16的.662902/.651611接近，**但这是不同分母，不能删4失败案例说打平或胜出**。本轮未有人工作为脸消失/检测误差真值，不将75%coverage损失简单归因纯检测器或生成方法，应独立诊断。旧strict8frame值不替换或混用。
+
+相对VACE，同16输入等视频/等演员配对AnyID Cur+.399434/Arc+.411830，但GME−.111883、MUSIQ−.033594；Stand-In Cur+.233399/Arc+.248699，GME−.053978、MUSIQ−.042176。AMT接近高分天花板、RAFT对真实说话头部细微运动也可0，动态比例不是动作完成率/自然性或时间顺序验证。所有方法13列数值/coverage完整可读不代表身份帧全部有效，覆盖率必须和均值一起看。
+
+### 结论、资源与复现
+
+保留`report_native_system_tradeoffs_no_automatic_winner`：实际强基线已部署并比较，但不存在五核心+覆盖率均占优的统一胜者，更大14B不必然胜5B/1.3B。AnyID是身份诊断候选；Stand-In提供现成独立身份IP分支对照，但4全missing和高reserved显存未解决；VACE继续作文本/成像工程控制，不将其未训练人脸低分或高GME解释为广域最佳。不直接采用本轮任一模型作为最终base，不立即进行新的微调或结构搜索。
+
+下一步应先对Stand-In零脸案例核清主体可见性和检测可用性，并在更广独立动作/场景/姿态输入上检验本轮取舍，再决定强基线；本轮小集单seed不宣称已近Top/SOTA。若做生成参数或模型修改，另冻结单因素对照，不在当前结果后调指标/删案例。官方视频403/人工未完成仍如实单列，不阻塞自动比较也不伪结案。
+
+six生成controllerGPUh=.805647627，八评分完整wall=.187078033，总.992725660≤8；其中Stand-In16main实际1725.743秒/.479373GPUh，工具晚发4小时通知不是backend耗时，不计为4小时训练或占卡。main每条生成中位VACE22.911秒、AnyID21.239秒、Stand-In100.885秒，模型/预处理/加载/评分分开记录，速度不是质量。所有生成/评分作业已正常结束，两节点无遗留GPU任务。
+
+完整与缺失分母由`scripts/analyze_native_baselines.py`复核：同input/ref/prompt/seed、规格/51video解码/hash、模型IP接线、score/manifest/protocol/weights/precision、预算与16配对视频/8actor，独立CPU复算三组×13维均值和五核心差值一致。17项基线针对性测试、完整558passed/7skip、干净220passed/37skip/烟测passed。`resources/native_baselines_result.json`为脱敏聚合，`resources/standin.lock.json`锁模型/源码与预处理权重；六份`configs/experiments/native_{vace,anyid,standin}_{pilot,main}.json`需要实际本地权重/授权manifest再运行，模板SHA不冒充原执行SHA。媒体、逐身份清单/embedding/checkpoint/私有环境路径与凭据不入Git。

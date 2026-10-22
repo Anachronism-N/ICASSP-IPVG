@@ -71,11 +71,15 @@ alpha1/.5/.25五run（两pilot+三16视频arm）50新视频、原AMT/MUSIQ共评
 
 本地80对neutral-name盲评包已准备，但没有真实人工分数；官方GeminiStory/人工/总分仍缺，不能声称官方全套评测或与冠军分差。用户随后明确“选择一个可以横向对比的方案即可”，因此采用`ipvg_cross_model_comparison_v1`：Cur/Arc16、GME、AMT、MUSIQ五项核心逐维比较，coverage/RAFT/美学等辅助，localStory/ViCLIP仅diagnostic、不参与核心选型，无合成总分。已用CPU重新核120媒体、prompt/ref/actor、规格、评分权重/精度，96主集与24历史集独立配对差值；原评分数值未改变。`comparable_evaluation_ready=true`只表示允许同协议强基线benchmark，不表示动作自然性或官方评分通过。人工未评分不再成为所有基线自动比较的唯一阻塞；下一步同集强基线，然后才模型方法优化。未获批合成方向探针不执行。新版配对协议CPU实际运行与19项针对性测试通过；完整541passed/7skip、干净203passed/37skip/烟测通过。配对结果见`resources/cross_model_comparison_result.json`，五核心逐维与配对视频/actor分母均报告，没有新GPU评分。
 
-## 原生强身份基线共同对照冻结（2026-10-22）
+## 原生强身份基线共同对照完成（2026-10-22）
 
 用户批准三个单例pilot通过后各16原输入完整对照：Stand-In+Wan2.1-T2V14B、AnyIDpreview5B、未训练VACE1.3B，49frame480×35216fps20steps/CFG5，同原prompt/ref/ID与seed42派生噪声种子。只比较现成原生系统，不训练或加结构；各自原生预处理、sampler/shift/negativeprompt和成本差异显式记录，同seed不是同噪声。先验40GB可运行/真实身份分支，再生成48新视频共评固定五core及aux；不依据单例或模型规模宣称质量优势，未完成不写成功。
 
-Stand-In代码e351224、T2V14B权重a064a6c7仅六分片/adapterc6e90176单checkpoint/BiSeNet官方53MB，新增必要下载≤60GB；复用已核T5/VAE/tokenizer与同SHA检测器，原生crop1.5/whitepad512/BiSeNet保留，只改检测CPUORT和离线权重注入，未运行FaceSwap。新增生成预留4.833GPUh、评测2、唯一工程修复.5≤8GPUh，原51.5cap不增；失败/未启动保持真实状态。官方403/人工仍单列待外部完成，不阻塞固定自动benchmark。
+Stand-In代码e351224、T2V14B权重a064a6c7六分片/adapterc6e90176单checkpoint/BiSeNet官方53MB，新增57.837GB≤60；复用已核T5/VAE/tokenizer与同SHA检测器，原生crop1.5/whitepad512/BiSeNet保留，只改检测CPUORT和离线权重注入，未运行FaceSwap。三pilot+三个16video mains共51新视频均正常结束，48共同main原五core/aux共评完成。Stand-In实际240IPtensor精确回载、IP1024token及40CFGcall参与，单40GB卡main峰值allocated31.612GB/reserved39.345GB通过，不保证更大规格。
+
+同16输入Cur/Arc16均值：VACE.263468/.239781、AnyID.662902/.651611、Stand-In.496866/.488481；身份帧coverage分别100%/98.8281%/75%，Stand-In4/16视频全无有效脸，条件12视频身份均值只作诊断不能删失败刷分。GME分别.554678/.442795/.500700，MUSIQ.731272/.697678/.689096；高身份专用基线在本域仍有内容/成像/coverage取舍，不宣布统一胜者或最终base。six生成controller.805647627GPUh+八评分wall.187078033，总.992725660≤8，无失败/重试或遗留任务。完整558CPUtests/干净220+37skip/烟测通过，独立复算三组13维与五核心配对差一致。完整方案、资源/原生negative/shift差异、真实正负结论见[原生基线报告](EXPERIMENT_TWO_TRACKS.md)末节、`resources/native_baselines_result.json`与`standin.lock.json`。
+
+下一步在更广独立动作/场景输入核验这些取舍，并检查Stand-In零脸案例；不是立刻给小域最高身份模型加训练。官方403/真实人工未完成单列，不阻塞固定自动benchmark，也不被作业全部结束伪造为已解决。
 
 ## 当前实验与限制
 

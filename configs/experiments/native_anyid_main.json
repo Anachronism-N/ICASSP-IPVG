@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "run_id": "native_anyid_main_20261022_r001",
+  "task": "inference",
+  "purpose": "development",
+  "hypothesis": "Compare unmodified native identity-preserving systems on same16originaldevinputs, frozen5coremetrics; no training or architecture change.",
+  "manifest": "data/dense_train/eval16_original.jsonl",
+  "split": "dev",
+  "runs_dir": "runs",
+  "backend": {
+    "kind": "command",
+    "command": [
+      "{python}",
+      "scripts/adapters/anyid.py",
+      "--request",
+      "{request}"
+    ]
+  },
+  "resources": {
+    "gpus": 1,
+    "timeout_s": 2400,
+    "max_gpu_hours": 0.6666666666666666
+  },
+  "model_revisions": {
+    "JoHnneyWang/AnyID:code": "6c714f71af6e08d2af29aecd74a3a9fd9e8f94a3",
+    "JonneyWang/AnyID:LoRA": "d516b069c7ba6cfd487cfa432a4d44509b020fa2",
+    "Wan-AI/Wan2.2-TI2V-5B": "921dbaf3f1674a56f47e83fb80a34bac8a8f203e"
+  },
+  "parameters": {
+    "upstream_dir": "upstream/AnyID",
+    "base_dir": "models/wan22_ti2v5b",
+    "merged_dit": "models/anyid_merged",
+    "width": 480,
+    "height": 352,
+    "num_frames": 49,
+    "fps": 16,
+    "num_inference_steps": 20,
+    "cfg_scale": 5,
+    "seed": 42,
+    "sample_shift": 3.0,
+    "t5_cpu": false
+  },
+  "dataset_revision": "1658cd342dff90010aa843eaeebd53610a08b1dc"
+}

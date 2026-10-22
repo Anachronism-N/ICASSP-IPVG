@@ -1,0 +1,755 @@
+{
+  "status": "completed_native_baseline_comparison",
+  "decision": "report_native_system_tradeoffs_no_automatic_winner",
+  "comparison": {
+    "protocol": {
+      "version": "ipvg_cross_model_comparison_v1",
+      "core_metrics": [
+        "cur_score",
+        "arc_score",
+        "gme_aesr",
+        "motion_smoothness",
+        "imaging_quality"
+      ],
+      "auxiliary_metrics": [
+        "face_detection_coverage",
+        "cur_scoring_coverage",
+        "arc_scoring_coverage",
+        "dynamic_degree",
+        "aesthetic_quality",
+        "subject_consistency",
+        "background_consistency"
+      ],
+      "diagnostic_only": [
+        "local_story_similarity",
+        "overall_consistency"
+      ],
+      "paired_inputs": "Same base_sample_id, original prompt/reference/actor, decoded output dimensions/frames/fps/duration within cohort",
+      "aggregation": "Video-equal means plus paired deltas; paired actor-equal delta and explicit missing denominators",
+      "combined_score": null,
+      "official_final_score": null,
+      "action_naturalness_verified": false,
+      "readiness": "Audited comparable automatic metrics permit baseline benchmarking, not official ranking or natural-action claims"
+    },
+    "scorer_signatures_sha256": "8b3783a400b521adf63f270c7ca381c0c7c87be2024670eb9cc489a08d1d8056",
+    "comparable_evaluation_ready": true,
+    "comparisons": {
+      "main_same_input": {
+        "baseline_group": "baseline",
+        "groups": {
+          "baseline": {
+            "input_videos": 16,
+            "core_metrics": {
+              "cur_score": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.2634677691530669,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.2634677691530669,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": 0.0,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": 0.0
+              },
+              "arc_score": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.23978126300789881,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.23978126300789881,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": 0.0,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": 0.0
+              },
+              "gme_aesr": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.5546776298433542,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.5546776298433542,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": 0.0,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": 0.0
+              },
+              "motion_smoothness": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.9925058091188127,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.9925058091188127,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": 0.0,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": 0.0
+              },
+              "imaging_quality": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.731272310675407,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.731272310675407,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": 0.0,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": 0.0
+              }
+            }
+          },
+          "anyid": {
+            "input_videos": 16,
+            "core_metrics": {
+              "cur_score": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.2634677691530669,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.6629020793300767,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": 0.39943431017700975,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": 0.39943431017700975
+              },
+              "arc_score": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.23978126300789881,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.6516108720142466,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": 0.4118296090063478,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": 0.4118296090063478
+              },
+              "gme_aesr": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.5546776298433542,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.4427949544042349,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": -0.11188267543911934,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": -0.11188267543911934
+              },
+              "motion_smoothness": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.9925058091188127,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.9907518806339152,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": -0.0017539284848975129,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": -0.0017539284848975129
+              },
+              "imaging_quality": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.731272310675407,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.6976782466927354,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": -0.033594063982671625,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": -0.033594063982671625
+              }
+            }
+          },
+          "standin": {
+            "input_videos": 16,
+            "core_metrics": {
+              "cur_score": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.2634677691530669,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.4968663052422926,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": 0.23339853608922567,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": 0.23339853608922567
+              },
+              "arc_score": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.23978126300789881,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.4884805914480239,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": 0.2486993284401251,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": 0.2486993284401251
+              },
+              "gme_aesr": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.5546776298433542,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.5006998628377914,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": -0.05397776700556278,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": -0.05397776700556278
+              },
+              "motion_smoothness": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.9925058091188127,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.9951310747408147,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": 0.002625265622002021,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": 0.002625265622002021
+              },
+              "imaging_quality": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.731272310675407,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.6890958476066589,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": -0.04217646306874801,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": -0.04217646306874801
+              }
+            }
+          }
+        },
+        "cross_cohort_comparison_permitted": false
+      }
+    },
+    "official_evaluation_complete": false,
+    "action_naturalness_verified": false,
+    "automatic_winner_selected": null
+  },
+  "groups": {
+    "baseline": {
+      "videos": 16,
+      "scores": {
+        "aesthetic_quality": {
+          "count": 16,
+          "mean": 0.5006428025662899,
+          "coverage": 1.0
+        },
+        "arc_score": {
+          "count": 16,
+          "mean": 0.23978126300789881,
+          "coverage": 1.0
+        },
+        "arc_scoring_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "background_consistency": {
+          "count": 16,
+          "mean": 0.9654175440470377,
+          "coverage": 1.0
+        },
+        "cur_score": {
+          "count": 16,
+          "mean": 0.2634677691530669,
+          "coverage": 1.0
+        },
+        "cur_scoring_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "dynamic_degree": {
+          "count": 16,
+          "mean": 0.1875,
+          "coverage": 1.0
+        },
+        "face_detection_coverage": {
+          "count": 16,
+          "mean": 1.0,
+          "coverage": 1.0
+        },
+        "gme_aesr": {
+          "count": 16,
+          "mean": 0.5546776298433542,
+          "coverage": 1.0
+        },
+        "imaging_quality": {
+          "count": 16,
+          "mean": 0.731272310675407,
+          "coverage": 1.0
+        },
+        "motion_smoothness": {
+          "count": 16,
+          "mean": 0.9925058091188127,
+          "coverage": 1.0
+        },
+        "overall_consistency": {
+          "count": 16,
+          "mean": 0.18188809230923653,
+          "coverage": 1.0
+        },
+        "subject_consistency": {
+          "count": 16,
+          "mean": 0.9875506905761237,
+          "coverage": 1.0
+        }
+      }
+    },
+    "anyid": {
+      "videos": 16,
+      "scores": {
+        "aesthetic_quality": {
+          "count": 16,
+          "mean": 0.5224952511489391,
+          "coverage": 1.0
+        },
+        "arc_score": {
+          "count": 16,
+          "mean": 0.6516108720142466,
+          "coverage": 1.0
+        },
+        "arc_scoring_coverage": {
+          "count": 16,
+          "mean": 0.98828125,
+          "coverage": 1.0
+        },
+        "background_consistency": {
+          "count": 16,
+          "mean": 0.9570802052815756,
+          "coverage": 1.0
+        },
+        "cur_score": {
+          "count": 16,
+          "mean": 0.6629020793300767,
+          "coverage": 1.0
+        },
+        "cur_scoring_coverage": {
+          "count": 16,
+          "mean": 0.98828125,
+          "coverage": 1.0
+        },
+        "dynamic_degree": {
+          "count": 16,
+          "mean": 0.125,
+          "coverage": 1.0
+        },
+        "face_detection_coverage": {
+          "count": 16,
+          "mean": 0.98828125,
+          "coverage": 1.0
+        },
+        "gme_aesr": {
+          "count": 16,
+          "mean": 0.4427949544042349,
+          "coverage": 1.0
+        },
+        "imaging_quality": {
+          "count": 16,
+          "mean": 0.6976782466927354,
+          "coverage": 1.0
+        },
+        "motion_smoothness": {
+          "count": 16,
+          "mean": 0.9907518806339152,
+          "coverage": 1.0
+        },
+        "overall_consistency": {
+          "count": 16,
+          "mean": 0.138347580563277,
+          "coverage": 1.0
+        },
+        "subject_consistency": {
+          "count": 16,
+          "mean": 0.943178360738481,
+          "coverage": 1.0
+        }
+      }
+    },
+    "standin": {
+      "videos": 16,
+      "scores": {
+        "aesthetic_quality": {
+          "count": 16,
+          "mean": 0.5201388783752918,
+          "coverage": 1.0
+        },
+        "arc_score": {
+          "count": 16,
+          "mean": 0.4884805914480239,
+          "coverage": 1.0
+        },
+        "arc_scoring_coverage": {
+          "count": 16,
+          "mean": 0.75,
+          "coverage": 1.0
+        },
+        "background_consistency": {
+          "count": 16,
+          "mean": 0.9789889653523763,
+          "coverage": 1.0
+        },
+        "cur_score": {
+          "count": 16,
+          "mean": 0.4968663052422926,
+          "coverage": 1.0
+        },
+        "cur_scoring_coverage": {
+          "count": 16,
+          "mean": 0.75,
+          "coverage": 1.0
+        },
+        "dynamic_degree": {
+          "count": 16,
+          "mean": 0.25,
+          "coverage": 1.0
+        },
+        "face_detection_coverage": {
+          "count": 16,
+          "mean": 0.75,
+          "coverage": 1.0
+        },
+        "gme_aesr": {
+          "count": 16,
+          "mean": 0.5006998628377914,
+          "coverage": 1.0
+        },
+        "imaging_quality": {
+          "count": 16,
+          "mean": 0.6890958476066589,
+          "coverage": 1.0
+        },
+        "motion_smoothness": {
+          "count": 16,
+          "mean": 0.9951310747408147,
+          "coverage": 1.0
+        },
+        "overall_consistency": {
+          "count": 16,
+          "mean": 0.14934967923909426,
+          "coverage": 1.0
+        },
+        "subject_consistency": {
+          "count": 16,
+          "mean": 0.9865463494012753,
+          "coverage": 1.0
+        }
+      }
+    }
+  },
+  "identity_coverage_diagnostics": {
+    "anyid": {
+      "videos": 16,
+      "detected_identity_videos": 16,
+      "all_missing_identity_videos": 0,
+      "mean_face_frame_coverage": 0.98828125,
+      "valid_video_cur_mean_diagnostic_only": 0.6629020793300767,
+      "valid_video_arc_mean_diagnostic_only": 0.6516108720142466,
+      "notice": "Conditional means have method-specific denominators; never use them alone to select a winner."
+    },
+    "baseline": {
+      "videos": 16,
+      "detected_identity_videos": 16,
+      "all_missing_identity_videos": 0,
+      "mean_face_frame_coverage": 1.0,
+      "valid_video_cur_mean_diagnostic_only": 0.2634677691530669,
+      "valid_video_arc_mean_diagnostic_only": 0.23978126300789881,
+      "notice": "Conditional means have method-specific denominators; never use them alone to select a winner."
+    },
+    "standin": {
+      "videos": 16,
+      "detected_identity_videos": 12,
+      "all_missing_identity_videos": 4,
+      "mean_face_frame_coverage": 0.75,
+      "valid_video_cur_mean_diagnostic_only": 0.6624884069897234,
+      "valid_video_arc_mean_diagnostic_only": 0.6513074552640319,
+      "notice": "Conditional means have method-specific denominators; never use them alone to select a winner."
+    }
+  },
+  "generation_runs": [
+    {
+      "run_id": "native_vace_pilot_20261022_r001",
+      "arm": "vace",
+      "phase": "pilot",
+      "status": "completed",
+      "code_commit": "dd60c820d7c8d5f76cec6d4527092b5397194687",
+      "source_sha256": "e03405eeea8d54c5dad5e14f29feb43dc13d4cecdd63ec8087385a7fd169fcab",
+      "manifest_sha256": "609dbb696b47f5e8d3b2749f92ae36095d34e9668ddef58a3f378e78c0a64dcc",
+      "gpu_hours": 0.01335699954807448,
+      "backend_elapsed_seconds": 48.085198373068124,
+      "generation_median_seconds": 23.812904998194426,
+      "peak_allocated_vram_gb": 17.063067136,
+      "peak_reserved_vram_gb": 20.742930432
+    },
+    {
+      "run_id": "native_vace_main_20261022_r001",
+      "arm": "vace",
+      "phase": "main",
+      "status": "completed",
+      "code_commit": "dd60c820d7c8d5f76cec6d4527092b5397194687",
+      "source_sha256": "e03405eeea8d54c5dad5e14f29feb43dc13d4cecdd63ec8087385a7fd169fcab",
+      "manifest_sha256": "9642d924ba84549930c26e3bc852eb39b7832e345e15810aeae58b523520cf7c",
+      "gpu_hours": 0.11065178215943484,
+      "backend_elapsed_seconds": 398.3464157739654,
+      "generation_median_seconds": 22.91056933021173,
+      "peak_allocated_vram_gb": 17.063338496,
+      "peak_reserved_vram_gb": 20.742930432
+    },
+    {
+      "run_id": "native_anyid_pilot_20261022_r001",
+      "arm": "anyid",
+      "phase": "pilot",
+      "status": "completed",
+      "code_commit": "dd60c820d7c8d5f76cec6d4527092b5397194687",
+      "source_sha256": "e03405eeea8d54c5dad5e14f29feb43dc13d4cecdd63ec8087385a7fd169fcab",
+      "manifest_sha256": "609dbb696b47f5e8d3b2749f92ae36095d34e9668ddef58a3f378e78c0a64dcc",
+      "gpu_hours": 0.027722544336381057,
+      "backend_elapsed_seconds": 99.80115961097181,
+      "generation_median_seconds": 26.818882782012224,
+      "peak_allocated_vram_gb": 14.462017024,
+      "peak_reserved_vram_gb": 17.796431872
+    },
+    {
+      "run_id": "native_anyid_main_20261022_r001",
+      "arm": "anyid",
+      "phase": "main",
+      "status": "completed",
+      "code_commit": "dd60c820d7c8d5f76cec6d4527092b5397194687",
+      "source_sha256": "e03405eeea8d54c5dad5e14f29feb43dc13d4cecdd63ec8087385a7fd169fcab",
+      "manifest_sha256": "9642d924ba84549930c26e3bc852eb39b7832e345e15810aeae58b523520cf7c",
+      "gpu_hours": 0.12392959428576028,
+      "backend_elapsed_seconds": 446.146539428737,
+      "generation_median_seconds": 21.23869379516691,
+      "peak_allocated_vram_gb": 14.563204608,
+      "peak_reserved_vram_gb": 17.796431872
+    },
+    {
+      "run_id": "native_standin_pilot_20261022_r001",
+      "arm": "standin",
+      "phase": "pilot",
+      "status": "completed",
+      "code_commit": "dd60c820d7c8d5f76cec6d4527092b5397194687",
+      "source_sha256": "e03405eeea8d54c5dad5e14f29feb43dc13d4cecdd63ec8087385a7fd169fcab",
+      "manifest_sha256": "609dbb696b47f5e8d3b2749f92ae36095d34e9668ddef58a3f378e78c0a64dcc",
+      "gpu_hours": 0.05061351384812345,
+      "backend_elapsed_seconds": 182.20864985324442,
+      "generation_median_seconds": 101.79914424195886,
+      "peak_allocated_vram_gb": 31.604810752,
+      "peak_reserved_vram_gb": 39.344668672
+    },
+    {
+      "run_id": "native_standin_main_20261022_r001",
+      "arm": "standin",
+      "phase": "main",
+      "status": "completed",
+      "code_commit": "dd60c820d7c8d5f76cec6d4527092b5397194687",
+      "source_sha256": "e03405eeea8d54c5dad5e14f29feb43dc13d4cecdd63ec8087385a7fd169fcab",
+      "manifest_sha256": "9642d924ba84549930c26e3bc852eb39b7832e345e15810aeae58b523520cf7c",
+      "gpu_hours": 0.47937319296088793,
+      "backend_elapsed_seconds": 1725.7434946591966,
+      "generation_median_seconds": 100.88494895189069,
+      "peak_allocated_vram_gb": 31.611749376,
+      "peak_reserved_vram_gb": 39.344668672
+    }
+  ],
+  "scoring_runs": [
+    {
+      "run_id": "cur_shard0_r001",
+      "status": "completed",
+      "gpu_hours": 0.013216888764485096,
+      "score_sha256": "ff9d200b1b535ae79039ff984f088d6b7604e6c6ddf61a8895c59cb2e19142ac",
+      "evaluator_sha256": "d7797e622ab7c7d16a21c3baf9e9c3abbd7c213397e05c4626523ea68604dd55"
+    },
+    {
+      "run_id": "cur_shard1_r001",
+      "status": "completed",
+      "gpu_hours": 0.012687743273563683,
+      "score_sha256": "dd237b842fda8879cb56ea9fdea3c84b6e858b2d3af7f5a5988bf277912fe79a",
+      "evaluator_sha256": "d7797e622ab7c7d16a21c3baf9e9c3abbd7c213397e05c4626523ea68604dd55"
+    },
+    {
+      "run_id": "gme_shard0_r001",
+      "status": "completed",
+      "gpu_hours": 0.03833576127201215,
+      "score_sha256": "d6c78ff7d58d1a45473cf07759842c184250760dd5e5017485ebdb56f103cb0d",
+      "evaluator_sha256": "b2b26b493f0ff2b25ae07cfd3d9685050484984b71e78143d947e022e18eab39"
+    },
+    {
+      "run_id": "gme_shard1_r001",
+      "status": "completed",
+      "gpu_hours": 0.03767863811200692,
+      "score_sha256": "ae6c3d9fbdb9317ee3085acc5db4f2a2c99cd783e531b1a26719cffa9a461e49",
+      "evaluator_sha256": "b2b26b493f0ff2b25ae07cfd3d9685050484984b71e78143d947e022e18eab39"
+    },
+    {
+      "run_id": "quality_shard0_r001",
+      "status": "completed",
+      "gpu_hours": 0.010003809673815138,
+      "score_sha256": "10dd8578528fe11c0c8b1e2addc056dda4edb865063c67fa9a1200bce9b34a28",
+      "evaluator_sha256": "afd1736f70d1638f837a1bf3bff31b37b530ffd91c9ebd188eb897f87728f44e"
+    },
+    {
+      "run_id": "quality_shard1_r001",
+      "status": "completed",
+      "gpu_hours": 0.010281312072442638,
+      "score_sha256": "be3b5feb4ec1c80317ae28913a38d37fe1ccf41828d4a01ac00346b50317fbc6",
+      "evaluator_sha256": "afd1736f70d1638f837a1bf3bff31b37b530ffd91c9ebd188eb897f87728f44e"
+    },
+    {
+      "run_id": "extended_shard0_r001",
+      "status": "completed",
+      "gpu_hours": 0.04051755293906253,
+      "score_sha256": "7391607e334e10a7653f91df53a7be184f7cad4452812a808d4d20a34ad1b651",
+      "evaluator_sha256": "a722fea85751e6c32be689487951e4dabb3e0abf3a0b4f9cce830faac013535e"
+    },
+    {
+      "run_id": "extended_shard1_r001",
+      "status": "completed",
+      "gpu_hours": 0.024356327079521078,
+      "score_sha256": "e707a5841b53bacbc0d984f315e0b9677d8e4fd898faca812c523ae7af08af96",
+      "evaluator_sha256": "a722fea85751e6c32be689487951e4dabb3e0abf3a0b4f9cce830faac013535e"
+    }
+  ],
+  "actual_new_gpu_hours": 0.9927256603255712,
+  "new_hard_cap_gpu_hours": 8,
+  "original_overall_hard_cap_gpu_hours": 51.5,
+  "new_generated_videos": 51,
+  "main_comparison_videos": 48,
+  "training_performed": false,
+  "new_architecture_changes": false,
+  "official_final_score": null,
+  "action_naturalness_verified": false,
+  "retry_count": 0,
+  "native_system_settings": {
+    "vace": {
+      "num_inference_steps": 20,
+      "cfg_scale": 5,
+      "sample_shift": null,
+      "negative_prompt": null,
+      "t5_cpu": null
+    },
+    "anyid": {
+      "num_inference_steps": 20,
+      "cfg_scale": 5,
+      "sample_shift": 3.0,
+      "negative_prompt": null,
+      "t5_cpu": false
+    },
+    "standin": {
+      "num_inference_steps": 20,
+      "cfg_scale": 5,
+      "sample_shift": null,
+      "negative_prompt": "色调艳丽，过曝，静态，细节模糊不清，字幕，风格，作品，画作，画面，静止，整体发灰，最差质量，低质量，JPEG压缩残留，丑陋的，残缺的，多余的手指，画得不好的手部，画得不好的脸部，畸形的，毁容的，形态畸形的肢体，手指融合，静止不动的画面，杂乱的背景，三条腿，背景人很多，倒着走",
+      "t5_cpu": null
+    }
+  },
+  "limitations": [
+    "Same original prompt/reference/seed/output specification and frozen scores; native preprocess/sampler/shift/negative prompts differ.",
+    "Different model architectures do not share identical noise from a numeric seed; not a single-factor weight ablation.",
+    "Small talking-head development cohort, eightactors/one seed; no broad action or SOTA claim.",
+    "Cur/Arc largest-face policy can differ from strictsingle-face protocol; retain detection and score coverage.",
+    "No combined metric, automatic champion or exact official score; human/natural-action validation remains missing."
+  ],
+  "verification": {
+    "independent_group_mean_recalculation": "matched all3groups x13metrics, paired core deltas and allocated GPUhours",
+    "media_decode_and_hash": "primary audit verified all51output files",
+    "generation_source_sha256": "e03405eeea8d54c5dad5e14f29feb43dc13d4cecdd63ec8087385a7fd169fcab",
+    "no_failure_or_retry": true,
+    "official_or_sota_claim": false
+  },
+  "resource_download": {
+    "total_new_bytes": 57836726941,
+    "cap_bytes": 60000000000,
+    "parsing_model_sha256": "468e13ca13a9b43cc0881a9f99083a430e9c0a38abd935431d1c28ee94b26567"
+  }
+}

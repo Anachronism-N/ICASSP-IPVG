@@ -14,4 +14,6 @@
 
 `real_vace_training_result.json`记录2026-10-20两节点真实dense-caption LoRA训练及同规格48dev输出聚合结果，包含checkpoint/source/split哈希、成本、身份收益与运动取舍，不含真实媒体、逐条caption或内部节点。复现设置见八份`configs/experiments/real_vace_*.json`及`docs/EXPERIMENT_DUALNODE_TRAINING.md`。
 
+`standin.lock.json`固定原生Stand-In/T2V14B六分片、IP分支checkpoint、复用T5/VAE/tokenizer、同SHA检测器与官方BiSeNet预处理来源；`native_baselines_result.json`记录2026-10-22三原生模型共同16输入/48新主输出及3pilot的完整核心/辅助对照、脸部缺失与实际成本，不预设参数更多就效果更好。复现设置为六份`configs/experiments/native_{vace,anyid,standin}_{pilot,main}.json`，具体方案/结果见`docs/EXPERIMENT_TWO_TRACKS.md`末节。
+
 VACE/Wan/DiffSynth的许可不覆盖数据访问协议或额外人脸权重。AnyID、Hunyuan等候选另有不同限制，见证据文件和对应上游许可。原创工程未替用户选择开源许可证。
