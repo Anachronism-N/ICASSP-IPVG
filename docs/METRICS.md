@@ -149,6 +149,14 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 核心GME/MUSIQ分别VACE.554678/.731272、AnyID.442795/.697678、Stand-In.500700/.689096，展示身份与文本/质量可用性取舍，未选最终base或构建合成总分。三方法原生noise/shift/negative/参考预处理不同、同seed不等噪声，仅完整系统同输入benchmark。`scripts/analyze_native_baselines.py`复核每个generation/input/output/scorerhash、原IPtensor/条件call、五核心配对分母、scorer原精度与权重一致、51媒体解码及总预算；结果见[完整原生报告](EXPERIMENT_TWO_TRACKS.md)和`resources/native_baselines_result.json`，未改变已有评分协议。
 
+## 全帧双尺度检测诊断（2026-10-23，旧身份分数不变）
+
+`scripts/face_visibility_diagnostic.py`在旧48主输出各49帧及8去重原参考上执行同SHA det_10g/.5阈值、CPUORT4/1线程、320/640双尺度；只有无脸才按原协议灰128边25%pad重试。全2352帧逐帧顺序解码并检查EOF，输入/媒体/模型pre/post SHA通过，5218/9440次检测、359.339/1785秒（外层1800秒）、0GPUh，原运行完整结束无重试。脱敏证据见`resources/face_visibility_diagnostic_result.json`；逐帧框/媒体/参考和逐身份行不公开。
+
+每模型每尺度分母784实际帧、256原floor16采样帧。VACE检出784/784，AnyID775/784，两尺度最终相同（640的92帧需pad恢复，不能只看直接检出）；Stand-In320为588/784、192/256，4条全missing；640为592/784、193/256，3条全missing。没有320原16全missing却在320全49恢复的样本；640仅恢复原4条中的1条共4帧，不支持采样遗漏是主要原因。Stand-In两尺度98/784帧为多脸，最大脸得分不等于目标身份分配正确。双尺度无检出只说明当前检测器没找到，不是人工证明无人脸。此附加尺度不计算恢复后的Cur/Arc，也不修改已冻结主协议或旧分数。
+
+新独立动作构图cohort排除旧8演员与train/holdout，额外8dev演员、四固定模板各4输入，以原五core+aux另做48主视频共评；不与旧cohort配对混池、不用GME/RAFT推定动作完成率。完整评分与分层coverage未完成前仅报告执行状态，不选统一winner。
+
 ## 人工抽样与同预算对照
 
 先固定按身份及源视频隔离的dev与holdout；holdout不参与agent逐轮选型。人工审核预先抽定的正常样本，再加入固定规则选择的高分、低分和失败样本；后者属于诊断集，应与随机样本结论分开。比较视频时隐藏模型名、随机左右顺序，分别记录身份、动作完成、时间对齐、可见伪影及整体偏好。

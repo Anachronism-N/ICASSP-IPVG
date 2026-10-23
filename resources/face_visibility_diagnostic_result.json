@@ -1,0 +1,89 @@
+{
+  "status": "complete",
+  "diagnostic_only": true,
+  "existing_scores_modified": false,
+  "official_score": null,
+  "code_commit": "e11be0e",
+  "protocol": {
+    "version": "face_visibility_diagnostic_cpu_v1",
+    "scales": [320, 640],
+    "det_threshold": 0.5,
+    "frames_per_video": 49,
+    "video_width": 480,
+    "video_height": 352,
+    "fps": 16,
+    "sampled_frames": "16 floor-linspace indices over frames 0 through 48",
+    "padding_retry": "Only after zero detections; 25% per-edge gray 128 padding",
+    "bbox_policy": "Largest area, native last-detection tie; not identity assignment",
+    "provider": "CPUExecutionProvider",
+    "ort_intra_op_threads": 4,
+    "ort_inter_op_threads": 1
+  },
+  "model_sha256": "5838f7fe053675b1c7a08b633df49e7af5495cee0493c7dcf6697200b85b5b91",
+  "manifest_sha256": "672eff153ebc52df25496ac7c4b0ff354cd62911a88d3d97b9ff8e92169af2b8",
+  "hash_verification": {"pre": true, "post": true},
+  "resources": {
+    "wall_seconds": 359.33934973506257,
+    "timeout_s": 1785.0,
+    "controller_timeout_s": 1800,
+    "detect_calls": 5218,
+    "max_detect_calls": 9440,
+    "reference_direct_calls": 16,
+    "video_direct_calls": 4704,
+    "video_padding_calls_320": 205,
+    "video_padding_calls_640": 293,
+    "decode_calls": 2400,
+    "decoded_frames": 2352,
+    "gpus": 0,
+    "gpu_hours": 0,
+    "retries": 0
+  },
+  "completed_videos": 48,
+  "completed_unique_references": 8,
+  "groups": {
+    "baseline": {
+      "videos": 16,
+      "320": {"frames": 784, "detected_frames": 784, "sampled_detected_frames": 256, "all_missing_videos": 0, "sampled_all_missing_videos": 0, "sampled_missing_but_full_recovered_videos": 0, "single_face_frames": 784, "multi_face_frames": 0, "padding_attempted_frames": 0, "padding_recovered_frames": 0},
+      "640": {"frames": 784, "detected_frames": 784, "sampled_detected_frames": 256, "all_missing_videos": 0, "sampled_all_missing_videos": 0, "sampled_missing_but_full_recovered_videos": 0, "single_face_frames": 784, "multi_face_frames": 0, "padding_attempted_frames": 0, "padding_recovered_frames": 0},
+      "scale_320_all_missing_to_640_recovered_videos": 0,
+      "scale_320_missing_to_640_recovered_frames": 0
+    },
+    "anyid": {
+      "videos": 16,
+      "320": {"frames": 784, "detected_frames": 775, "sampled_detected_frames": 253, "all_missing_videos": 0, "sampled_all_missing_videos": 0, "sampled_missing_but_full_recovered_videos": 0, "single_face_frames": 775, "multi_face_frames": 0, "padding_attempted_frames": 9, "padding_recovered_frames": 0},
+      "640": {"frames": 784, "detected_frames": 775, "sampled_detected_frames": 253, "all_missing_videos": 0, "sampled_all_missing_videos": 0, "sampled_missing_but_full_recovered_videos": 0, "single_face_frames": 775, "multi_face_frames": 0, "padding_attempted_frames": 101, "padding_recovered_frames": 92},
+      "scale_320_all_missing_to_640_recovered_videos": 0,
+      "scale_320_missing_to_640_recovered_frames": 0
+    },
+    "standin": {
+      "videos": 16,
+      "320": {"frames": 784, "detected_frames": 588, "sampled_detected_frames": 192, "all_missing_videos": 4, "sampled_all_missing_videos": 4, "sampled_missing_but_full_recovered_videos": 0, "single_face_frames": 490, "multi_face_frames": 98, "padding_attempted_frames": 196, "padding_recovered_frames": 0},
+      "640": {"frames": 784, "detected_frames": 592, "sampled_detected_frames": 193, "all_missing_videos": 3, "sampled_all_missing_videos": 3, "sampled_missing_but_full_recovered_videos": 0, "single_face_frames": 494, "multi_face_frames": 98, "padding_attempted_frames": 192, "padding_recovered_frames": 0},
+      "scale_320_all_missing_to_640_recovered_videos": 1,
+      "scale_320_missing_to_640_recovered_frames": 4
+    }
+  },
+  "references": {
+    "320": {"unique_references": 8, "single_face_references": 8, "no_face_references": 0, "multi_face_references": 0},
+    "640": {"unique_references": 8, "single_face_references": 8, "no_face_references": 0, "multi_face_references": 0}
+  },
+  "independent_audit": {
+    "method": "Recompute directly from local frame/reference records without importing the diagnostic aggregation functions",
+    "record_checks": 50166,
+    "record_mismatches": 0,
+    "public_mapped_fields_checked": 110,
+    "public_mapped_field_mismatches": 0,
+    "private_token_leaks": 0,
+    "source_of_controller_fields": "Managed launch command and completion event; not fields of the diagnostic report",
+    "media_bytes_independently_rehashed": false,
+    "historical_runtime_independently_remeasured": false,
+    "visual_ground_truth_checked": false
+  },
+  "limitations": [
+    "Detection is not identity matching or human face-visibility ground truth.",
+    "The additional scale is diagnostic only; no recovered identity scores or modifications to the original 320-scale scores.",
+    "Multi-face frames require separate target-identity validation; largest-face scoring alone does not establish assignment.",
+    "A running incomplete snapshot was not a failed run; the original bounded execution completed without retries.",
+    "No media, per-video identifiers, reference paths, per-frame rows or bounding boxes are published."
+  ]
+}
