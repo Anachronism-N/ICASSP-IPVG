@@ -18,4 +18,6 @@
 
 `face_visibility_diagnostic_result.json`记录2026-10-23旧48主输出的全49帧/320与640双尺度CPU检测聚合与成本；不含逐视频标识、框、媒体路径或原参考。检测敏感性不是身份/人工可见性评分，旧Cur/Arc分数不变；`action_baselines_result.json`记录额外8dev演员/四固定动作模板各4输入的三原生系统48main+3pilot及八共同评分完整结果；含分动作coverage/完全missing、核心配对差、原生条件证据和实际.955013104GPUh预算，不含媒体或逐身份行。复现冻结入口`scripts/prepare_native_action_benchmark.py`，原生配置复用六份native模板，具体方案与真实正负结论见`docs/EXPERIMENT_TWO_TRACKS.md`末节，未宣布统一winner或动作真值。
 
+Stand-In分区注意力结构预注册复用上述模型锁，不增加权重下载。两份`configs/experiments/standin_partition_{native,candidate}_main.json`是便携设置模板，不含获准manifest/媒体，也不冒称实际执行配置SHA；真实运行前需要本地冻结输入、四pilot验收与完整控制复现。方案与门槛见`docs/EXPERIMENT_TWO_TRACKS.md`末节，尚无结构实测成功结论。
+
 VACE/Wan/DiffSynth的许可不覆盖数据访问协议或额外人脸权重。AnyID、Hunyuan等候选另有不同限制，见证据文件和对应上游许可。原创工程未替用户选择开源许可证。

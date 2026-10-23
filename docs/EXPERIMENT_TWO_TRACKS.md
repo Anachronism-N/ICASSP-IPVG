@@ -169,3 +169,23 @@ AnyID半身举手Cur=.791215、GME=.310956；全身坐下四条身份全missing�
 仍保留`report_native_system_tradeoffs_no_automatic_winner`。AnyID不能凭旧头部域身份最高晋级为广动作base；Stand-In是覆盖/成像方向的独立诊断候选，但高平滑/主体一致性可能伴随少运动，不能推断行走/坐下完成。VACE未训练身份与全身成像不足，继续作为工程控制，而非最终竞争base。GME顺序盲、RAFT非动作完成率，自动协议仍允许比较，不能声称自然动作已验证或官方SOTA。
 
 `scripts/prepare_native_action_benchmark.py`固定cohort，可用已有六份native配置作为原生设置模板；新生成前冻结manifest与config SHA。评分完成后仅在`scripts/analyze_native_baselines.py`补分动作完全missing/条件均值，记录`analysis_script_sha256`，与实际生成sourceSHA分开；旧评分/输出/预算不改。完整原始记录仅本地，公开`resources/action_baselines_result.json`包含全组/四动作逐维、缺失分母、五核心等视频与等actor配对差、实际六生成/八评分hash和成本，未附媒体或逐身份信息。原八评分独立CPU重算736项全组/分动作均值、coverage/完全missing、条件均值、核心配对等视频/actor差及总预算，0 mismatch；历史原生基线重新CPU审计均值/配对差/预算完全不变。614passed/7skip、CPU烟测passed。后续应优先针对明确的全身构图/身份/运动取舍设计一个有限单因素方法，而不是继续裁剪/融合强度搜索或直接堆小域训练；官方403/真实人工仍为外部缺项，不伪造为已完成。
+
+## 下一轮预注册：Stand-In固定等权分区注意力（2026-10-23）
+
+### 唯一结构因素与假设
+
+原生SelfAttention对video Q和拼接video/IP KV使用联合softmax。逐query/head原读出等于`Zv/(Zv+Zi)*Av + Zi/(Zv+Zi)*Ai`，其中Zv/Zi为两分区注意力指数和。候选改为`0.5*(Av+Ai)`，即分别softmax后的固定等权平均；既不训练LoRA、不搜条件缩放，也不改变视频查询、IP1024token/240tensors、RoPE、文本cross-attention、IPselfread、KVcache与正负CFG身份共享。平均避免简单相加，但不保证范数或运动保持；替换训练期门控分布可能有负效果。待证伪的是分区竞争是否造成内容/身份取舍，不是声称已证明IP阻碍动作。
+
+主仓库适配器仅封装40block的AttentionModule读出。native直接原forward，不多执行attention；partition仅video查询读jointKV时两次原attention kernel，IPselfread与无IP路径不变。单视频native1600主读kernel+40首次IPkernel，candidate3200+40；调用数不等于FLOPs严格翻倍，真实时间/峰值另测。不修改上游文件或kernel选择；旧运行FA2原路复用。
+
+### 固定输入、控制等价与有限预算
+
+使用上一轮同16开发输入（8演员/四模板各4），按sampleID哈希预先各取一portrait和fullbody_sit为两个singlepilot，禁止按分选择prompt/人。每arm两个pilot各900秒/.25GPUh；native须历史同输入输出SHA精确复现，candidate仅验结构确实参与/有限输出/媒体及单40GB峰值，通过后两arm各16全新main（7200秒/2GPUh各），不拼pilot输出。native16全部精确复现旧同种子对照，否则不以容差替代、不扩候选。固定49帧480×35216fps20steps/CFG5、原参考、negative/shift/模型与评测anchor。
+
+32main core5+aux沿用原scorer公式/权重/precision；two shards每片16、四类各900秒/.25GPUh共八job。预留四pilot1+两main4+评价2+一次明确工程修复.5=7.5≤新增8硬上限，历史总体51.5不增加。每个job实际GPU数×backend墙钟计账，失败/排除计入；科学失败不改权重/更多seed，工程修复必须新runID且至多一次。主单40GB依序生成以避免双加载新资源变量，worker与launcher并行共评；闲置健康卡holder保持，真实作业前让出对应卡，结束恢复，不用故障worker7。
+
+### 预注册判据与完成条件
+
+候选相对本轮native需GME至少+.02、Cur/Arc各不降超.02、facecoverage不降且完全missing≤2/16、MUSIQ不降超.02。原16完整分母与各动作4分母全部保留，条件均值不能单独选优。AMT/RAFT/一致性仅诊断，不据其称自然动作完成。达标仅下一轮验证候选、不是统一winner或SOTA；未达标公开负结果且有限结案。
+
+CPU tiny/fake模型验证native逐位等价、两softmax解析读出、IPselfread/cache/negative不变、40closure独立、异常恢复与计数。GPU验原240tensors/40CFGcall/1024tokens/seed/source/config/input/output/hash、控制SHA与候选真实接线。版本化冻结/共评/审计入口复用现有四scorer与配对/coverage helpers，分析源与生成源分别记录。所有启动job跟进结束、独立CPU复算与完整回归烟测、脱敏结果/中文正负结论正常push并验远端CI；原媒体/参考/逐身份/attention maps/权重不公开。此节为预注册，尚无本轮真实结果。

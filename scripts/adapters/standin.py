@@ -13,6 +13,10 @@ REVISION='e351224366be169076e94af1454115d91d458313'
 CHECKPOINT='Stand-In_wan2.1_T2V_14B.ckpt'
 CHECKPOINT_SHA='52f47630b4fefbdac841d3fd1ce146cca2a6a94ec0a6ab9407d16f2f635177e9'
 NEGATIVE='色调艳丽，过曝，静态，细节模糊不清，字幕，风格，作品，画作，画面，静止，整体发灰，最差质量，低质量，JPEG压缩残留，丑陋的，残缺的，多余的手指，画得不好的手部，画得不好的脸部，畸形的，毁容的，形态畸形的肢体，手指融合，静止不动的画面，杂乱的背景，三条腿，背景人很多，倒着走'
+ATTENTION_MECHANISMS={
+    'native':'original joint video/IP softmax; original IP self-read',
+    'partition_balanced':'0.5*(original video-only softmax + original IP-only softmax) for joint video reads; original IP self-read',
+}
 
 
 def validate_request(request):
@@ -25,6 +29,9 @@ def validate_request(request):
         raise ValueError('One original Track1 reference only; no target/control video')
     seed=p.get('seed',42)
     if isinstance(seed,bool) or not isinstance(seed,int) or not 0<=seed<2**31:raise ValueError('Invalid seed')
+    if p.get('attention_mode','native') not in ATTENTION_MECHANISMS:raise ValueError('Invalid attention_mode')
+    if 'expected_attention_backend' in p and p['expected_attention_backend'] not in ('FA2','SDPA'):
+        raise ValueError('Invalid expected_attention_backend')
 
 
 def validate_state(state, torch):
@@ -49,6 +56,78 @@ def verify_lock(root, base, weights, parser, detector, lock):
     if sha256_file(parser)!=lock['parser_sha256'] or sha256_file(detector)!=lock['detector_sha256']:
         raise ValueError('Preprocessor hash mismatch')
     if sha256_file(weights/CHECKPOINT)!=CHECKPOINT_SHA:raise ValueError('Stand-In checkpoint differs')
+
+
+def validate_attention_backend(module, expected=None):
+    backend=('FA3' if module.FLASH_ATTN_3_AVAILABLE else 'FA2' if module.FLASH_ATTN_2_AVAILABLE
+             else 'SAGE' if module.SAGE_ATTN_AVAILABLE else 'SDPA')
+    if expected is not None and backend!=expected:raise ValueError('Unexpected Stand-In attention backend: '+backend)
+    return backend
+
+
+@contextmanager
+def attention_partitioning(blocks, attention_mode='native'):
+    if attention_mode not in ATTENTION_MECHANISMS:raise ValueError('Invalid attention_mode')
+    if len(blocks)!=40:raise ValueError('Require exactly40 Stand-In blocks')
+    names=('joint_video_reads','ip_self_reads','plain_reads','kernel_calls','partition_reads')
+    stats={'mode':attention_mode,'block_count':40,
+           'blocks':[dict(block_index=i,**{name:0 for name in names}) for i in range(40)]}
+    previous=[]
+
+    def wrap(owner, original, counts):
+        def forward(q,k,v):
+            cond_size=owner.cond_size
+            if cond_size is None:
+                counts['plain_reads']+=1;counts['kernel_calls']+=1
+                return original(q,k,v)
+            shapes=q.shape,k.shape,v.shape
+            if (cond_size!=1024 or any(len(shape)!=3 for shape in shapes)
+                    or any(shape[0]!=shapes[0][0] or shape[2]!=shapes[0][2] for shape in shapes[1:])
+                    or k.device!=q.device or v.device!=q.device or k.dtype!=q.dtype or v.dtype!=q.dtype
+                    or k.shape[1]!=v.shape[1]):
+                raise ValueError('Invalid conditioned Stand-In attention shape/device/dtype')
+            main=q.shape[1]
+            if main==1024 and k.shape[1]==1024:
+                counts['ip_self_reads']+=1
+            elif main>0 and k.shape[1]==main+1024:
+                counts['joint_video_reads']+=1
+                if attention_mode=='partition_balanced':
+                    counts['kernel_calls']+=1;counts['partition_reads']+=1
+                    video=original(q,k[:,:main],v[:,:main])
+                    counts['kernel_calls']+=1
+                    ip=original(q,k[:,main:],v[:,main:])
+                    return 0.5*(video+ip)
+            else:
+                raise ValueError('Unexpected conditioned Stand-In attention read')
+            counts['kernel_calls']+=1
+            return original(q,k,v)
+        return forward
+
+    try:
+        for block,counts in zip(blocks,stats['blocks']):
+            owner=block.self_attn;attn=owner.attn
+            had_forward='forward' in vars(attn)
+            old_forward=vars(attn).get('forward')
+            original=attn.forward
+            previous.append((attn,had_forward,old_forward))
+            attn.forward=wrap(owner,original,counts)
+        yield stats
+    finally:
+        for attn,had_forward,old_forward in reversed(previous):
+            if had_forward:attn.forward=old_forward
+            else:delattr(attn,'forward')
+        stats.update({name:sum(block[name] for block in stats['blocks']) for name in names})
+
+
+def validate_attention_stats(stats, attention_mode):
+    expected={'joint_video_reads':40,'ip_self_reads':1,'plain_reads':0,
+              'kernel_calls':81 if attention_mode=='partition_balanced' else 41,
+              'partition_reads':40 if attention_mode=='partition_balanced' else 0}
+    if (stats['mode']!=attention_mode or stats['block_count']!=40 or len(stats['blocks'])!=40
+            or any(block['block_index']!=i or any(block[name]!=value for name,value in expected.items()) for i,block in enumerate(stats['blocks']))):
+        raise RuntimeError('Stand-In attention structure evidence failed')
+    if any(stats[name]!=40*value for name,value in expected.items()):
+        raise RuntimeError('Stand-In attention totals evidence failed')
 
 
 @contextmanager
@@ -83,6 +162,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--request',required=True);a=p.parse_args()
     request=load_json(a.request);validate_request(request)
     params=request['parameters'];root=request['repo_root']
+    attention_mode=params.get('attention_mode','native')
     upstream=resolve_path(params['upstream_dir'],root)
     revision=subprocess.check_output(['git','-C',str(upstream),'rev-parse','HEAD'],text=True).strip()
     if revision!=REVISION:raise ValueError('Stand-In native code revision differs')
@@ -108,6 +188,7 @@ def main():
     finally:
         if saved is None:sys.modules.pop('flash_attn_interface',None)
         else:sys.modules['flash_attn_interface']=saved
+    backend=validate_attention_backend(wan_video_dit,params.get('expected_attention_backend'))
     sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
     from mm2026_quality_eval import offline_only
     torch.cuda.reset_peak_memory_stats();started=time.monotonic()
@@ -128,7 +209,8 @@ def main():
         del state
     report={'backend':'Stand-In native Wan2.1-T2V14B','code_revision':revision,'model_lock_sha256':sha256_file(resolve_path(params['model_lock'],root)),
             'standin_checkpoint_sha256':CHECKPOINT_SHA,'matched_ip_tensors':matched,'native_vram_management':True,
-            'attention_backend':'FA2' if wan_video_dit.FLASH_ATTN_2_AVAILABLE else 'SDPA',
+            'attention_backend':backend,
+            'attention_mode':attention_mode,'mechanism':ATTENTION_MECHANISMS[attention_mode],
             'preprocessor':'native1.5bbox/whitepad512/BiSeNet; identicalSCRFD detector-only CPUORT4threads',
             'loading_seconds':time.monotonic()-started,'samples':[]}
     path=Path(request['run_dir'])/'backend_metrics.json';write_json(path,report)
@@ -139,33 +221,45 @@ def main():
         return original(**kw)
     pipe.model_fn=observe_fn
     handle=pipe.dit.blocks[0].self_attn.q_loras.register_forward_pre_hook(lambda m,args:q_calls.append(list(args[0].shape)))
-    for row in request['samples']:
-        ref=Path(row['reference_images'][0]);before=sha256_file(ref)
-        with offline_only():
-            with Image.open(ref) as image:ip=face_processor.process(image.convert('RGB'))
-        if ip.size!=(512,512):raise ValueError('Nativereferenceprocessingnot512square')
-        seed=(params.get('seed',42)+int(hashlib.sha256(row['sample_id'].encode()).hexdigest()[:8],16))%2**31
-        calls.clear();q_calls.clear();torch.cuda.reset_peak_memory_stats();torch.cuda.synchronize();start=time.monotonic()
-        with offline_only():
-            frames=pipe(prompt=row['prompt'],negative_prompt=params.get('negative_prompt',NEGATIVE),ip_image=ip,
-                        seed=seed,rand_device='cpu',width=480,height=352,num_frames=49,num_inference_steps=20,
-                        cfg_scale=5,tiled=True)
-        torch.cuda.synchronize();seconds=time.monotonic()-start
-        if len(frames)!=49 or any(np.asarray(f).shape!=(352,480,3) for f in frames):raise ValueError('Wrong outputframes/dimensions')
-        if (len(calls)!=40 or sum(c['ip_latent_shape'] is not None for c in calls)!=1
-                or not q_calls or q_calls[0]!=[1,1024,5120]):
-            raise RuntimeError('NativeIPconditionalbranch/CFGstep evidence failed')
-        if sha256_file(ref)!=before:raise ValueError('Originalreferencechanged')
-        from data.video import save_video
-        output=Path(request['output_dir'])/(row['sample_id']+'.mp4')
-        save_video(frames,str(output),fps=16,quality=5)
-        report['samples'].append({'sample_id':row['sample_id'],'seed':seed,'generated_frames':49,
-          'reference_original_sha256':before,'reference_pixels_sha256':hashlib.sha256(ip.tobytes()).hexdigest(),
-          'native_denoiser_calls':len(calls),'ip_latent_calls':[c for c in calls if c['ip_latent_shape'] is not None],
-          'ip_q_lora_calls':q_calls,'generation_seconds':seconds,
-          'peak_allocated_vram_gb':torch.cuda.max_memory_allocated()/1e9,'peak_reserved_vram_gb':torch.cuda.max_memory_reserved()/1e9})
-        write_json(path,report)
-    handle.remove();pipe.model_fn=original
+    try:
+        for row in request['samples']:
+            ref=Path(row['reference_images'][0]);before=sha256_file(ref)
+            with offline_only():
+                with Image.open(ref) as image:ip=face_processor.process(image.convert('RGB'))
+            if ip.size!=(512,512):raise ValueError('Nativereferenceprocessingnot512square')
+            seed=(params.get('seed',42)+int(hashlib.sha256(row['sample_id'].encode()).hexdigest()[:8],16))%2**31
+            sample={'sample_id':row['sample_id'],'seed':seed,'reference_original_sha256':before,
+                    'reference_pixels_sha256':hashlib.sha256(ip.tobytes()).hexdigest()}
+            report['samples'].append(sample)
+            calls.clear();q_calls.clear();torch.cuda.reset_peak_memory_stats();torch.cuda.synchronize();start=time.monotonic()
+            stats=None
+            try:
+                with attention_partitioning(pipe.dit.blocks,attention_mode) as stats:
+                    with offline_only():
+                        frames=pipe(prompt=row['prompt'],negative_prompt=params.get('negative_prompt',NEGATIVE),ip_image=ip,
+                                    seed=seed,rand_device='cpu',width=480,height=352,num_frames=49,num_inference_steps=20,
+                                    cfg_scale=5,tiled=True)
+                torch.cuda.synchronize();seconds=time.monotonic()-start
+            finally:
+                sample.update(native_denoiser_calls=len(calls),
+                              ip_latent_calls=[c for c in calls if c['ip_latent_shape'] is not None],
+                              ip_q_lora_calls=list(q_calls),attention_structure=stats)
+                write_json(path,report)
+            validate_attention_stats(stats,attention_mode)
+            if len(frames)!=49 or any(np.asarray(f).shape!=(352,480,3) for f in frames):raise ValueError('Wrong outputframes/dimensions')
+            if (len(calls)!=40 or sum(c['ip_latent_shape'] is not None for c in calls)!=1
+                    or not q_calls or q_calls[0]!=[1,1024,5120]):
+                raise RuntimeError('NativeIPconditionalbranch/CFGstep evidence failed')
+            if sha256_file(ref)!=before:raise ValueError('Originalreferencechanged')
+            from data.video import save_video
+            output=Path(request['output_dir'])/(row['sample_id']+'.mp4')
+            save_video(frames,str(output),fps=16,quality=5)
+            sample.update(generated_frames=49,generation_seconds=seconds,
+                          peak_allocated_vram_gb=torch.cuda.max_memory_allocated()/1e9,
+                          peak_reserved_vram_gb=torch.cuda.max_memory_reserved()/1e9)
+            write_json(path,report)
+    finally:
+        handle.remove();pipe.model_fn=original
 
 
 if __name__=='__main__':main()

@@ -157,6 +157,12 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 新独立动作构图cohort排除旧8演员与train/holdout，额外8dev演员、四固定模板各4输入，以原五core+aux另做48主视频共评；不与旧cohort配对混池、不用GME/RAFT推定动作完成率。本轮现已完成51新生成中的48main八job共评，原权重/公式/精度不变：全16Cur均值VACE.076055、AnyID.471180、Stand-In.427261，facecoverage45.7031%/60.5469%/75.3906%，全missing5/6/2；GME.548098/.321755/.445105、MUSIQ.530477/.657986/.669959。四动作各4输入另报缺失与条件均值，AnyID全身坐下4/4missing，不能删失败刷身份分。六生成+八评分实际.955013104GPUh≤7，0失败/重试。`resources/action_baselines_result.json`保留全group/动作与core配对等视频/actor差，分析源码SHA与生成源码分列。仍不选统一winner，不将GME/RAFT当动作完成或高平滑当自然性。
 
+## 分区注意力结构对照评价预注册（2026-10-23）
+
+下一轮在固定Stand-In原生系统上仅将video/IP联合softmax替换为分别softmax的等权平均，不改五core或aux评分器。两arm各16同一动作构图输入、四动作各4，两个node各16视频的四类scorer共八job。原生控制需16历史同输入媒体SHA精确一致，先验pilot不能按分选样；native与partition的原模型/参考/种子/预处理/49f480×35216fps20stepsCFG5相同，attention kernel调用成本不同必须另报。
+
+开发候选门槛预先固定：GME至少+.02，Cur/Arc各下降不超过.02，facecoverage不降且全missing≤2/16，MUSIQ下降不超过.02。评分weight/protocol/实际precision/manifest与输入/输出SHA跨arm和node一致，否则拒绝配对；每视频/每演员core差与各动作全部缺失/条件均值分母分别报告。不得用有效脸子集补偿missing，AMT/RAFT/一致性不构成动作完成或自然性真值。预算生成5+评分2+唯一工程修复.5≤新增8GPUh；达标最多成为下一轮验证候选，未过门槛公开负结果，不追加搜索或宣称SOTA。
+
 ## 人工抽样与同预算对照
 
 先固定按身份及源视频隔离的dev与holdout；holdout不参与agent逐轮选型。人工审核预先抽定的正常样本，再加入固定规则选择的高分、低分和失败样本；后者属于诊断集，应与随机样本结论分开。比较视频时隐藏模型名、随机左右顺序，分别记录身份、动作完成、时间对齐、可见伪影及整体偏好。

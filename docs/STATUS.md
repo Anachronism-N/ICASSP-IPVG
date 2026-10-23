@@ -101,6 +101,14 @@ CPU双尺度诊断完整处理48/48旧主视频、2352个实际帧和8去重参�
 
 分动作全部缺失/条件均值在评分结束后仅补分析脚本，原生成executioncommit仍e11be0e/sourceSHA不变，分析SHA另记。新增四视频全缺失/部分有效/全有效测试后完整CPU回归614passed/7skip、CPU烟测passed。从原八评分独立CPU复算736项group/动作均值、coverage/完全missing、条件均值、五core等视频/actor差和总预算0 mismatch；历史基线重新CPU审计原分数/配对差/预算完全不变。完整三组/四动作逐维及配对差/成本见`resources/action_baselines_result.json`和[实验报告](EXPERIMENT_TWO_TRACKS.md)末节；GME顺序盲、RAFT非动作完成率、没有真实人工/官方分数，结论保持开发系统取舍、不宣布最终base或SOTA。
 
+## Stand-In分区注意力结构实验预注册（2026-10-23，尚未实测）
+
+已完成评测和强基线后，仅改变独立身份IP与视频KV的注意力归一化：原生video query对video+IP联合softmax，候选分别对两分区softmax后固定等权平均，保持IP240tensor、1024token、KVcache、正负CFG共享、文本cross-attention、原预处理/权重/seed/20steps和输出规格。不是LoRA缩放、裁剪或旧VACE时间均值路由。统一softmax的竞争可能影响时空内容是待证伪假设；训练分布偏移/输出范数变化可能令候选变差，不能提前宣布优化。
+
+复用同一已冻结8额外dev演员/16输入/四模板，不新增人或调prompt。原生控制与partition各两个单样本pilot（portrait、fullbody_sit按预定哈希选择），每pilot900秒/.25GPUh；控制须历史同输入媒体SHA精确一致、候选先验接线/有限变化/媒体/显存。通过后两arm各16完整新main，每main7200秒/2GPUh，不拼pilot或旧输出；native全部16须历史SHA一致，否则有限结案。32main原core5+aux两node各16、八评分job各900秒/.25GPUh；预留5生成+2评分+唯一工程修复.5=7.5≤新8硬上限，原51.5不增。主节点单40GB依序生成，其他健康闲卡继续占卡，评分两节点并行；用卡先暂停holder、结束恢复，worker故障7排除。
+
+先验开发门槛：GME≥native+.02，Cur/Arc分别≥native−.02，facecoverage不降且全missing≤2/16，MUSIQ≥native−.02；各动作4视频缺失分母与条件均值单列，不删失败。AMT/RAFT/一致性只作诊断，不能证明完成动作/自然性。达标也仅进入下一轮验证，不宣称SOTA；未过门槛保留负结果，不追加强度或seed搜索。实现的统一结构证据契约为每视频1600次joint读、40次IPselfread、native1640/partition3240次kernel；partition_reads记录被分区的joint次数1600而非kernel次数。36项适配器定向CPU测试通过，完整671passed/7skip、干净279passed/42skip与两环境烟测passed。代码commit后冻结source/config/manifest再启动，当前尚无本轮GPU结果。
+
 ## 当前实验与限制
 
 唯一H1对照是参考人脸bbox扩边.3的正方形裁剪，原参考仍作身份评价anchor。模型、prompt、sample_id/seed、采样步和候选数固定，不训练新LoRA。实验预注册及聚合结果见 [CREMA-D H1](EXPERIMENT_CREMA_D_H1.md)。crop64/64条完整解码；63样本/32演员共同帧配对，原基线身份均值0.143337、crop0.349797，配对提升+0.205661，演员bootstrap95%区间[0.168833,0.245416]。身份P10提升+0.192157、coverage+0.007813、灰度运动proxy比1.029227、静态比例无变化。新生成耗费0.602265GPU小时，所有任务正常退出。只在该单种子说话头部dev上支持H1，不是完整动作/人工/holdout/SOTA结论。
