@@ -1,5 +1,4 @@
 import copy
-import importlib.util
 from pathlib import Path
 import sys
 from types import SimpleNamespace
@@ -223,19 +222,29 @@ def test_score_failure_always_accounts_real_time(campaign, monkeypatch, bad):
 
 
 @pytest.mark.parametrize('metric', benchmark.METRICS)
-def test_original_driver_argv_and_worker_vbench(metric, campaign, monkeypatch):
+def test_original_driver_argv_and_worker_vbench(metric, campaign):
     c = campaign
-    spec = importlib.util.spec_from_file_location('original_driver', '/dockerdata/ipvg/logs/native_baselines_eval_20261022.py')
-    driver = importlib.util.module_from_spec(spec); spec.loader.exec_module(driver)
-    driver.WORK = c.work; driver.REPO = c.repo; driver.EVAL = c.eval
-    write_json(c.work / 'quality_shard0.json', {'samples': []})
-    captured = []
-    def original_run(command, **kwargs):
-        captured.append(command)
-        write_json(Path(command[command.index('--output') + 1]), {'records': [{}] * 24})
-    monkeypatch.setattr(driver, 'run_process', original_run)
-    driver.run(metric, 0, 'worker')
-    assert captured == [benchmark.scorer_argv(metric, 0, 'worker', c.work, c.repo, c.eval)]
+    common = ['--manifest', str(c.work / 'quality_shard0.json'), '--output',
+              str(c.work / 'evaluation' / f'{metric}_shard0_r001' / 'scores.json')]
+    python = str(c.eval / 'venv/bin/python')
+    vbench_python = '/dockerdata/venv_vbench/bin/python'
+    cache = '/dockerdata/vbench_cache'
+    expected = {
+        'gme': [python, str(c.repo / 'scripts/gme_text_eval.py'), *common,
+                '--model', str(c.eval / 'gme'), '--model-lock', str(c.eval / 'gme.lock.json')],
+        'cur': [python, str(c.repo / 'scripts/curricularface_eval.py'), *common,
+                '--upstream', str(c.eval / 'ConsisID_source'),
+                '--weights', str(c.eval / 'cur/face_encoder/glint360k_curricular_face_r101_backbone.bin'),
+                '--face-model-dir', '/dockerdata/ipvg/models/identity', '--model-lock', str(c.eval / 'cur.lock.json')],
+        'quality': [vbench_python, str(c.repo / 'scripts/mm2026_quality_eval.py'), *common,
+                    '--vbench', str(c.eval / 'VBench_clean'), '--cache', cache,
+                    '--amt', cache + '/amt_model/amt-s.pth',
+                    '--musiq', cache + '/pyiqa_model/musiq_spaq_ckpt-358bb6af.pth'],
+        'extended': [vbench_python, str(c.repo / 'scripts/vbench_extended_eval.py'), *common,
+                     '--vbench', str(c.eval / 'VBench_clean'), '--cache', cache,
+                     '--model-lock', str(c.eval / 'vbench.lock.json')],
+    }
+    assert benchmark.scorer_argv(metric, 0, 'worker', c.work, c.repo, c.eval) == expected[metric]
     assert '--dtype' not in benchmark.scorer_argv(metric, 0, 'launcher', c.work, c.repo, c.eval)
     cmd = benchmark.scorer_argv(metric, 0, 'worker', c.work, c.repo, c.eval)
     assert cmd[cmd.index('--manifest') + 1] == str(c.work / 'quality_shard0.json')
