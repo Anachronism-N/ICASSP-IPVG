@@ -125,3 +125,47 @@ Cur/Arc采用已固定largestface/pad/16frames作者式协议：单帧missing不
 six生成controllerGPUh=.805647627，八评分完整wall=.187078033，总.992725660≤8；其中Stand-In16main实际1725.743秒/.479373GPUh，工具晚发4小时通知不是backend耗时，不计为4小时训练或占卡。main每条生成中位VACE22.911秒、AnyID21.239秒、Stand-In100.885秒，模型/预处理/加载/评分分开记录，速度不是质量。所有生成/评分作业已正常结束，两节点无遗留GPU任务。
 
 完整与缺失分母由`scripts/analyze_native_baselines.py`复核：同input/ref/prompt/seed、规格/51video解码/hash、模型IP接线、score/manifest/protocol/weights/precision、预算与16配对视频/8actor，独立CPU复算三组×13维均值和五核心差值一致。17项基线针对性测试、完整558passed/7skip、干净220passed/37skip/烟测passed。`resources/native_baselines_result.json`为脱敏聚合，`resources/standin.lock.json`锁模型/源码与预处理权重；六份`configs/experiments/native_{vace,anyid,standin}_{pilot,main}.json`需要实际本地权重/授权manifest再运行，模板SHA不冒充原执行SHA。媒体、逐身份清单/embedding/checkpoint/私有环境路径与凭据不入Git。
+
+## 2026-10-23：独立动作构图共同对照完成
+
+### 预注册与执行
+
+旧零脸全帧诊断已完整结束，见`resources/face_visibility_diagnostic_result.json`及[评价协议](METRICS.md)。320尺度原4条Stand-In全missing未因49全帧采样恢复；640仅1条恢复4帧，另外3条仍全missing。诊断不更新旧身份分数，不把检出/未检出当作人工可见性真值。
+
+新cohort从原32dev演员排除旧8演员与所有train/holdout，用固定盐`native-action-v1`SHA排序取额外8演员，每人2输入，四固定模板各4：portrait转头后返回、halfbody抬右手后放下、fullbody横向行走、fullbody坐到椅子。仅使用原独立来源reference，移除继承targetvideo/media字段；不消费holdout或动作目标视频，不按生成结果挑人/改prompt。参考来自说话头部域，本轮是开发集prompt-framing泛化探查，不是官方动作GT。与旧说话头部cohort单列，不计算跨cohort配对因果delta。
+
+模型/预处理/negative/shift与上一轮原生系统完全保持，统一480×352、49帧16fps20steps/CFG5，每input1候选，seed42+sampleIDhash派生。三新contentpilot各600秒通过原生条件/媒体/hash后，三个main各16重新生成（不拼pilot输出），共51新视频。生成executioncommit为`e11be0e`、sourceSHA`b3e5b245ec85433066a56a629fb928ea0acc72543a16237b0820490c74ff340a`；Stand-In240IPtensor/1024token/40call、AnyID单reference/inner_t[1,13]/native53frame/40call、VACE40条件forward全部通过。
+
+48main同五core+aux，两个node各24视频、各四独立900秒评分job，权重/采样/精度与冻结协议一致。六生成及八评分均completed，0失败/重试，实际generation.778234419+score.176778686=.955013104GPUh≤7；原51.5GPUh硬上限不增加。CPU检测.0GPUh单列；占卡程序的利用率与时间不是本轮生成质量或GPUh结果，实验卡启动前暂停占卡，结束后恢复，故障workerGPU7继续排除。
+
+### 全16输入结果（完全missing视频的作者式0保留）
+
+| 指标 | VACE1.3B | AnyID5B | Stand-In14B |
+|---|---:|---:|---:|
+| Cur16 | .076055 | .471180 | .427261 |
+| Arc16 | .076323 | .471088 | .416936 |
+| 身份可评分帧coverage | 45.7031% | 60.5469% | 75.3906% |
+| 完全无可评分脸视频 | 5/16 | 6/16 | 2/16 |
+| GME帧文本匹配 | .548098 | .321755 | .445105 |
+| AMT平滑 | .995012 | .989838 | .996092 |
+| MUSIQ成像 | .530477 | .657986 | .669959 |
+| RAFT明显运动阈值视频 | 4/16 | 2/16 | 1/16 |
+
+不同可评分视频分母的条件Cur均值为VACE11条.110625、AnyID10条.753888、Stand-In14条.488298，只作诊断，不能用条件均值删除失败或选winner。作者式视频均值coverage=100%不等于身份帧都有效。
+
+### 四动作分层（每格4视频，facecoverage / 全missing数）
+
+| 模板 | VACE | AnyID | Stand-In |
+|---|---:|---:|---:|
+| portrait_turn | 100% / 0 | 92.1875% / 0 | 100% / 0 |
+| halfbody_raise_hand | 76.5625% / 0 | 100% / 0 | 53.125% / 0 |
+| fullbody_walk | 1.5625% / 3 | 50% / 2 | 75% / 1 |
+| fullbody_sit | 4.6875% / 2 | 0% / 4 | 73.4375% / 1 |
+
+AnyID半身举手Cur=.791215、GME=.310956；全身坐下四条身份全missing且GME=.342632，不能把该失败移出平均。Stand-Inportrait Cur=.705480、GME=.457156；全身坐下Cur=.143314，虽facecoverage较高且MUSIQ=.674634，RAFT阈值视频0/4。VACE全身行走MUSIQ=.285815、facecoverage1.5625%，高GME/平滑不意味着合格动作或身份。每动作只有4演员输入，不能据分层点估计保证普遍泛化。
+
+### 结论、审计与复现
+
+仍保留`report_native_system_tradeoffs_no_automatic_winner`。AnyID不能凭旧头部域身份最高晋级为广动作base；Stand-In是覆盖/成像方向的独立诊断候选，但高平滑/主体一致性可能伴随少运动，不能推断行走/坐下完成。VACE未训练身份与全身成像不足，继续作为工程控制，而非最终竞争base。GME顺序盲、RAFT非动作完成率，自动协议仍允许比较，不能声称自然动作已验证或官方SOTA。
+
+`scripts/prepare_native_action_benchmark.py`固定cohort，可用已有六份native配置作为原生设置模板；新生成前冻结manifest与config SHA。评分完成后仅在`scripts/analyze_native_baselines.py`补分动作完全missing/条件均值，记录`analysis_script_sha256`，与实际生成sourceSHA分开；旧评分/输出/预算不改。完整原始记录仅本地，公开`resources/action_baselines_result.json`包含全组/四动作逐维、缺失分母、五核心等视频与等actor配对差、实际六生成/八评分hash和成本，未附媒体或逐身份信息。后续应优先针对明确的全身构图/身份/运动取舍设计一个有限单因素方法，而不是继续裁剪/融合强度搜索或直接堆小域训练；官方403/真实人工仍为外部缺项，不伪造为已完成。

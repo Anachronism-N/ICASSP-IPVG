@@ -93,6 +93,14 @@ CPU双尺度诊断完整处理48/48旧主视频、2352个实际帧和8去重参�
 
 新动作构图三pilot均通过49帧媒体、原生条件分支、配置/源码/输入/输出哈希验收，实际合计0.093374GPUh。正式三模型各16输入已启动；48主输出五core+aux评分和分动作分析尚未完成，不提前报告结果或选winner。完整CPU回归611passed/7skip、CPU烟测passed；独立CPU从逐帧记录复算50,166项检查0 mismatch，公开聚合映射/隐私扫描0差异或泄露。诊断完整JSON及新日志权限收紧至600，逐视频/逐帧/框与原参考不公开。此审计验证记录一致性，不代替视觉真值；1785秒为协作式检查，1800秒为外层进程组终止限额，不能宣称硬实时。
 
+### 独立动作构图对照完成（2026-10-23）
+
+三个main各16新视频及八共同评分job全部completed，3pilot+48main共51新输出，0失败/重试；generation.778234419+score.176778686=.955013104GPUh≤新增7硬上限。相同原reference/prompt/seed/规格、原生条件分支、输入/output/hash及评分权重/精度均验收，未训练/改生成结构。两节点真实实验卡结束后恢复占卡，worker故障GPU7不使用；占卡利用率不当作实验效果或混入controller预算。
+
+全16输入Cur/Arc：VACE.076055/.076323、AnyID.471180/.471088、Stand-In.427261/.416936；facecoverage45.7031%/60.5469%/75.3906%，全missing5/6/2条。GME.548098/.321755/.445105，MUSIQ.530477/.657986/.669959；没有统一winner。AnyID全身坐下4/4视频全missing、全身行走2/4全missing；Stand-In两全身模板各1/4missing，coverage75%/73.4375%，但RAFT明显运动全身两组均0/4，不能将高coverage/平滑说成完成动作。portrait/halfbody/fullbody取舍显著，旧头部域最高身份不足以晋级广动作base。
+
+分动作全部缺失/条件均值在评分结束后仅补分析脚本，原生成executioncommit仍e11be0e/sourceSHA不变，分析SHA另记。新增四视频全缺失/部分有效/全有效测试后完整CPU回归614passed/7skip、CPU烟测passed。完整三组/四动作逐维及配对差/成本见`resources/action_baselines_result.json`和[实验报告](EXPERIMENT_TWO_TRACKS.md)末节；GME顺序盲、RAFT非动作完成率、没有真实人工/官方分数，结论保持开发系统取舍、不宣布最终base或SOTA。
+
 ## 当前实验与限制
 
 唯一H1对照是参考人脸bbox扩边.3的正方形裁剪，原参考仍作身份评价anchor。模型、prompt、sample_id/seed、采样步和候选数固定，不训练新LoRA。实验预注册及聚合结果见 [CREMA-D H1](EXPERIMENT_CREMA_D_H1.md)。crop64/64条完整解码；63样本/32演员共同帧配对，原基线身份均值0.143337、crop0.349797，配对提升+0.205661，演员bootstrap95%区间[0.168833,0.245416]。身份P10提升+0.192157、coverage+0.007813、灰度运动proxy比1.029227、静态比例无变化。新生成耗费0.602265GPU小时，所有任务正常退出。只在该单种子说话头部dev上支持H1，不是完整动作/人工/holdout/SOTA结论。

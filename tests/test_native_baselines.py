@@ -27,6 +27,20 @@ def test_missing_faces_separate_from_author_zero_mean(monkeypatch):
     assert 'method-specific denominators' in result['notice']
 
 
+@pytest.mark.parametrize('valid_videos',[0,2,4])
+def test_four_video_action_coverage_keeps_all_missing(valid_videos,monkeypatch):
+    monkeypatch.syspath_prepend(str(SCRIPTS))
+    rows=[identity_record(.7,16) for _ in range(valid_videos)]+[identity_record(0.,0) for _ in range(4-valid_videos)]
+    result=module.identity_coverage_summary(rows)['standin']
+    assert result['videos']==4
+    assert result['detected_identity_videos']==valid_videos
+    assert result['all_missing_identity_videos']==4-valid_videos
+    assert result['mean_face_frame_coverage']==valid_videos/4
+    expected=.7 if valid_videos else None
+    assert result['valid_video_cur_mean_diagnostic_only']==expected
+    assert result['valid_video_arc_mean_diagnostic_only']==expected
+
+
 @pytest.mark.parametrize('error',['coverage','count','mean','nonfinite'])
 def test_identity_coverage_or_mean_drift_rejected(error,monkeypatch):
     monkeypatch.syspath_prepend(str(SCRIPTS))

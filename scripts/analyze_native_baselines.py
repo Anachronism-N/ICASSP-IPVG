@@ -159,6 +159,8 @@ def main():
                 subset=[scores[sid] for sid,r in ids.items() if r['group']==group and action_categories[r['base_sample_id']]==action]
                 if len(subset)!=4:raise ValueError('Each action category must have four inputs per model')
                 stratified[action][group]={'videos':len(subset),'scores':{k:dict(finite_values([r.get(k) for r in subset]),coverage=sum(r.get(k)is not None for r in subset)/len(subset)) for k in sorted({k for r in subset for k in r})}}
+                identity_subset=[r for r in identity_records if r['group']==group and action_categories[ids[r['sample_id']]['base_sample_id']]==action]
+                stratified[action][group]['identity_coverage_diagnostics']=identity_coverage_summary(identity_subset)[group]
     groups={}
     for group in ('baseline','anyid','standin'):
         subset=[scores[sid] for sid,r in ids.items() if r['group']==group]
@@ -167,7 +169,7 @@ def main():
     output={'status':'completed_native_baseline_comparison','decision':'report_native_system_tradeoffs_no_automatic_winner',
        'comparison':comparison,'groups':groups,'action_stratified_groups':stratified,'cohort':ledger.get('cohort','original_talking_head_development'),
        'identity_coverage_diagnostics':identity_coverage_summary(identity_records),
-       'generation_runs':generation,'scoring_runs':scoring,
+       'generation_runs':generation,'scoring_runs':scoring,'analysis_script_sha256':sha256_file(Path(__file__)),
        'actual_new_gpu_hours':hours,'new_hard_cap_gpu_hours':ledger['new_hard_cap_gpu_hours'],'original_overall_hard_cap_gpu_hours':ledger['original_overall_cap_gpu_hours'],
        'new_generated_videos':sum(e['count'] for e in ledger['runs']),'main_comparison_videos':len(panel),'training_performed':False,'new_architecture_changes':False,
        'official_final_score':None,'action_naturalness_verified':False,'retry_count':0,

@@ -155,7 +155,7 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 每模型每尺度分母784实际帧、256原floor16采样帧。VACE检出784/784，AnyID775/784，两尺度最终相同（640的92帧需pad恢复，不能只看直接检出）；Stand-In320为588/784、192/256，4条全missing；640为592/784、193/256，3条全missing。没有320原16全missing却在320全49恢复的样本；640仅恢复原4条中的1条共4帧，不支持采样遗漏是主要原因。Stand-In两尺度98/784帧为多脸，最大脸得分不等于目标身份分配正确。双尺度无检出只说明当前检测器没找到，不是人工证明无人脸。此附加尺度不计算恢复后的Cur/Arc，也不修改已冻结主协议或旧分数。
 
-新独立动作构图cohort排除旧8演员与train/holdout，额外8dev演员、四固定模板各4输入，以原五core+aux另做48主视频共评；不与旧cohort配对混池、不用GME/RAFT推定动作完成率。完整评分与分层coverage未完成前仅报告执行状态，不选统一winner。
+新独立动作构图cohort排除旧8演员与train/holdout，额外8dev演员、四固定模板各4输入，以原五core+aux另做48主视频共评；不与旧cohort配对混池、不用GME/RAFT推定动作完成率。本轮现已完成51新生成中的48main八job共评，原权重/公式/精度不变：全16Cur均值VACE.076055、AnyID.471180、Stand-In.427261，facecoverage45.7031%/60.5469%/75.3906%，全missing5/6/2；GME.548098/.321755/.445105、MUSIQ.530477/.657986/.669959。四动作各4输入另报缺失与条件均值，AnyID全身坐下4/4missing，不能删失败刷身份分。六生成+八评分实际.955013104GPUh≤7，0失败/重试。`resources/action_baselines_result.json`保留全group/动作与core配对等视频/actor差，分析源码SHA与生成源码分列。仍不选统一winner，不将GME/RAFT当动作完成或高平滑当自然性。
 
 ## 人工抽样与同预算对照
 
