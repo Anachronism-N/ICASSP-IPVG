@@ -101,13 +101,29 @@ CPU双尺度诊断完整处理48/48旧主视频、2352个实际帧和8去重参�
 
 分动作全部缺失/条件均值在评分结束后仅补分析脚本，原生成executioncommit仍e11be0e/sourceSHA不变，分析SHA另记。新增四视频全缺失/部分有效/全有效测试后完整CPU回归614passed/7skip、CPU烟测passed。从原八评分独立CPU复算736项group/动作均值、coverage/完全missing、条件均值、五core等视频/actor差和总预算0 mismatch；历史基线重新CPU审计原分数/配对差/预算完全不变。完整三组/四动作逐维及配对差/成本见`resources/action_baselines_result.json`和[实验报告](EXPERIMENT_TWO_TRACKS.md)末节；GME顺序盲、RAFT非动作完成率、没有真实人工/官方分数，结论保持开发系统取舍、不宣布最终base或SOTA。
 
-## Stand-In分区注意力结构实验预注册（2026-10-23，尚未实测）
+## Stand-In分区注意力结构实验（2026-10-23，预注册与阶段记录）
 
 已完成评测和强基线后，仅改变独立身份IP与视频KV的注意力归一化：原生video query对video+IP联合softmax，候选分别对两分区softmax后固定等权平均，保持IP240tensor、1024token、KVcache、正负CFG共享、文本cross-attention、原预处理/权重/seed/20steps和输出规格。不是LoRA缩放、裁剪或旧VACE时间均值路由。统一softmax的竞争可能影响时空内容是待证伪假设；训练分布偏移/输出范数变化可能令候选变差，不能提前宣布优化。
 
 复用同一已冻结8额外dev演员/16输入/四模板，不新增人或调prompt。原生控制与partition各两个单样本pilot（portrait、fullbody_sit按预定哈希选择），每pilot900秒/.25GPUh；控制须历史同输入媒体SHA精确一致、候选先验接线/有限变化/媒体/显存。通过后两arm各16完整新main，每main7200秒/2GPUh，不拼pilot或旧输出；native全部16须历史SHA一致，否则有限结案。32main原core5+aux两node各16、八评分job各900秒/.25GPUh；预留5生成+2评分+唯一工程修复.5=7.5≤新8硬上限，原51.5不增。主节点单40GB依序生成，其他健康闲卡继续占卡，评分两节点并行；用卡先暂停holder、结束恢复，worker故障7排除。
 
-先验开发门槛：GME≥native+.02，Cur/Arc分别≥native−.02，facecoverage不降且全missing≤2/16，MUSIQ≥native−.02；各动作4视频缺失分母与条件均值单列，不删失败。AMT/RAFT/一致性只作诊断，不能证明完成动作/自然性。达标也仅进入下一轮验证，不宣称SOTA；未过门槛保留负结果，不追加强度或seed搜索。实现的统一结构证据契约为每视频1600次joint读、40次IPselfread、native1640/partition3240次kernel；partition_reads记录被分区的joint次数1600而非kernel次数。36项适配器定向CPU测试通过，完整671passed/7skip、干净279passed/42skip与两环境烟测passed。代码commit后冻结source/config/manifest再启动，当前尚无本轮GPU结果。
+先验开发门槛：GME≥native+.02，Cur/Arc分别≥native−.02，facecoverage不降且全missing≤2/16，MUSIQ≥native−.02；各动作4视频缺失分母与条件均值单列，不删失败。AMT/RAFT/一致性只作诊断，不能证明完成动作/自然性。达标也仅进入下一轮验证，不宣称SOTA；未过门槛保留负结果，不追加强度或seed搜索。实现的统一结构证据契约为每视频1600次joint读、40次IPselfread、native1640/partition3240次kernel；partition_reads记录被分区的joint次数1600而非kernel次数。36项适配器定向CPU测试通过，完整671passed/7skip、干净279passed/42skip与两环境烟测passed。代码commit后冻结source/config/manifest再启动；以上为生成前预注册记录，当时尚无本轮GPU结果。
+
+### 分区结构pilot已验收，正式对照运行中（2026-10-23）
+
+四单例pilot均completed，原生portrait/fullbody同输入媒体SHA精确复现历史；candidate输出确实变化，40block各40joint+1IPselfread，native1640/candidate3240kernel、candidate1600分区joint读证据通过。实际四pilot.192459212GPUh，single40GB峰值reserved原生39.345GB/candidate37.419GB；只是此规格接线/媒体/显存验收，不证明质量提高。两arm各16main正在主单卡依序执行，未拼pilot；源码生成冻结e35e6c0，测试修复不改src/scripts指纹。
+
+首次freeze后发现编排源文件最后审计校验改动，preflight在GPU启动前拒绝旧指纹，保留未启动的准备目录；重新commit/freshwork目录冻结，没有GPU失败或重新生成。首两远端CI因测试引用本机ignored日志路径失败，已改为可移植完整argv契约测试，没有放松scorer协议或跳过检查。最终新增审计漂移测试后完整683passed/7skip、干净291passed/42skip；测试可移植性修复提交136efa2已推送，CI39947564485两Python版本成功。评分/最终质量结果尚未产生，不能提前宣称晋级。
+
+### 分区注意力结构实验完整结束（2026-10-23，不晋级）
+
+四pilot及两16main共36新输出、32main原core5+aux八评分job全部completed，0GPU失败/重试；原生16/16输出SHA精确复现上一轮同输入Stand-In，原IP240tensor/1024token/40CFGcall、原参考像素/seed/FA2、40block缓存与kernel计数核验。candidate每视频1600次分区joint读、3240kernel（原生1640）真实执行，功能接线验收不等于效果优化。
+
+候选发生严重质量退化：Cur/Arc从.427261/.416936降为0/0，facecoverage75.3906%→0%，全missing2/16→16/16；GME.445105→.409861，MUSIQ.669959→.241604，RAFT明显运动1/16→0/16。四动作各4视频均无可评分脸，条件身份均值为null而不是删行；不是人工证明画面无人脸。全部八项预注册检查失败，结论`not_promoted`，不追加比例/seed搜索或将科学负结果改成工程成功。
+
+实际六生成1.082196291GPUh+八评分.139000479=1.221196770GPUh≤8，原51.5硬帽不增。主卡main峰值allocated原生31.611GB/candidate31.612GB、reserved39.345/38.680GB，中位采样92.284/94.386秒；计账使用实际backend而非工具通知延迟。四pilot的原生执行commit为e35e6c0，main为136efa2（其差异仅CI测试可移植性修复），均锁同sourceSHA`a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b`。独立从八rawscores复算491项分组/动作均值、缺失/条件分母、等视频/actor配对与总预算0 mismatch，136私密token扫描0泄露。完整683passed/7skip、干净291passed/42skip与烟测passed。公共结果`resources/standin_partition_result.json`，详细负结果见[实验报告](EXPERIMENT_TWO_TRACKS.md)末节；原评分/holdout未改，15健康卡占卡恢复。原生媒体全部逐字节一致，身份及12/13评分均值精确复现；AMT新评分均值相对历史有−1.81e−10差异，原历史值不覆盖。
+
+此结果只否定当前权重下无训练固定等权替换的收益，不否定所有身份/时空分离结构；训练分布偏移是待进一步证实的解释，不将本次结果说成已找到因果机制。下一步如继续研究，应另立有限、原生等价可验收的可训练路由或更可靠动作验证，不复用当前失败候选称晋级。
 
 ## 当前实验与限制
 

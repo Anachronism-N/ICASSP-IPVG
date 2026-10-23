@@ -1,0 +1,1281 @@
+{
+  "status": "completed_partition_benchmark",
+  "decision": "not_promoted",
+  "gates": {
+    "thresholds": {
+      "gme_aesr_min_delta": 0.02,
+      "cur_score_min_delta": -0.02,
+      "arc_score_min_delta": -0.02,
+      "imaging_quality_min_delta": -0.02,
+      "identity_coverage_must_not_decrease": true,
+      "max_missing_identity_videos": 2
+    },
+    "checks": {
+      "gme_aesr": false,
+      "cur_score": false,
+      "arc_score": false,
+      "imaging_quality": false,
+      "missing_identity": false,
+      "face_frame_coverage": false,
+      "cur_scoring_coverage": false,
+      "arc_scoring_coverage": false
+    },
+    "passed": false,
+    "decision": "not_promoted",
+    "automatic_winner_selected": null
+  },
+  "comparison": {
+    "protocol": {
+      "version": "ipvg_cross_model_comparison_v1",
+      "core_metrics": [
+        "cur_score",
+        "arc_score",
+        "gme_aesr",
+        "motion_smoothness",
+        "imaging_quality"
+      ],
+      "auxiliary_metrics": [
+        "face_detection_coverage",
+        "cur_scoring_coverage",
+        "arc_scoring_coverage",
+        "dynamic_degree",
+        "aesthetic_quality",
+        "subject_consistency",
+        "background_consistency"
+      ],
+      "diagnostic_only": [
+        "local_story_similarity",
+        "overall_consistency"
+      ],
+      "paired_inputs": "Same base_sample_id, original prompt/reference/actor, decoded output dimensions/frames/fps/duration within cohort",
+      "aggregation": "Video-equal means plus paired deltas; paired actor-equal delta and explicit missing denominators",
+      "combined_score": null,
+      "official_final_score": null,
+      "action_naturalness_verified": false,
+      "readiness": "Audited comparable automatic metrics permit baseline benchmarking, not official ranking or natural-action claims"
+    },
+    "scorer_signatures_sha256": "8b3783a400b521adf63f270c7ca381c0c7c87be2024670eb9cc489a08d1d8056",
+    "comparable_evaluation_ready": true,
+    "comparisons": {
+      "main_same_input": {
+        "baseline_group": "baseline",
+        "groups": {
+          "baseline": {
+            "input_videos": 16,
+            "core_metrics": {
+              "cur_score": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.42726054929521384,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.42726054929521384,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": 0.0,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": 0.0
+              },
+              "arc_score": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.41693630592163766,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.41693630592163766,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": 0.0,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": 0.0
+              },
+              "gme_aesr": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.4451053775846958,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.4451053775846958,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": 0.0,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": 0.0
+              },
+              "motion_smoothness": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.9960915037837526,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.9960915037837526,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": 0.0,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": 0.0
+              },
+              "imaging_quality": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.6699594193088765,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.6699594193088765,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": 0.0,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": 0.0
+              }
+            }
+          },
+          "partition": {
+            "input_videos": 16,
+            "core_metrics": {
+              "cur_score": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.42726054929521384,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.0,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": -0.42726054929521384,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": -0.42726054929521384
+              },
+              "arc_score": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.41693630592163766,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.0,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": -0.41693630592163766,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": -0.41693630592163766
+              },
+              "gme_aesr": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.4451053775846958,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.4098608158528805,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": -0.03524456173181534,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": -0.03524456173181534
+              },
+              "motion_smoothness": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.9960915037837526,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.9942013366461477,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": -0.00189016713760487,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": -0.00189016713760487
+              },
+              "imaging_quality": {
+                "baseline": {
+                  "count": 16,
+                  "mean": 0.6699594193088765,
+                  "coverage": 1.0
+                },
+                "candidate": {
+                  "count": 16,
+                  "mean": 0.2416042044333049,
+                  "coverage": 1.0
+                },
+                "paired_videos": 16,
+                "unpaired_videos": 0,
+                "paired_video_mean_delta": -0.42835521487557154,
+                "paired_actors": 8,
+                "paired_actor_mean_delta": -0.4283552148755716
+              }
+            }
+          }
+        },
+        "cross_cohort_comparison_permitted": false
+      }
+    },
+    "official_evaluation_complete": false,
+    "action_naturalness_verified": false,
+    "automatic_winner_selected": null
+  },
+  "groups": {
+    "baseline": {
+      "videos": 16,
+      "scores": {
+        "aesthetic_quality": {
+          "count": 16,
+          "mean": 0.5321506131440401,
+          "coverage": 1.0
+        },
+        "arc_score": {
+          "count": 16,
+          "mean": 0.41693630592163766,
+          "coverage": 1.0
+        },
+        "arc_scoring_coverage": {
+          "count": 16,
+          "mean": 0.75390625,
+          "coverage": 1.0
+        },
+        "background_consistency": {
+          "count": 16,
+          "mean": 0.9719355901082356,
+          "coverage": 1.0
+        },
+        "cur_score": {
+          "count": 16,
+          "mean": 0.42726054929521384,
+          "coverage": 1.0
+        },
+        "cur_scoring_coverage": {
+          "count": 16,
+          "mean": 0.75390625,
+          "coverage": 1.0
+        },
+        "dynamic_degree": {
+          "count": 16,
+          "mean": 0.0625,
+          "coverage": 1.0
+        },
+        "face_detection_coverage": {
+          "count": 16,
+          "mean": 0.75390625,
+          "coverage": 1.0
+        },
+        "gme_aesr": {
+          "count": 16,
+          "mean": 0.4451053775846958,
+          "coverage": 1.0
+        },
+        "imaging_quality": {
+          "count": 16,
+          "mean": 0.6699594193088765,
+          "coverage": 1.0
+        },
+        "motion_smoothness": {
+          "count": 16,
+          "mean": 0.9960915037837526,
+          "coverage": 1.0
+        },
+        "overall_consistency": {
+          "count": 16,
+          "mean": 0.10742576024495065,
+          "coverage": 1.0
+        },
+        "subject_consistency": {
+          "count": 16,
+          "mean": 0.972709657100495,
+          "coverage": 1.0
+        }
+      },
+      "identity_coverage_diagnostics": {
+        "videos": 16,
+        "detected_identity_videos": 14,
+        "all_missing_identity_videos": 2,
+        "mean_face_frame_coverage": 0.75390625,
+        "valid_video_cur_mean_diagnostic_only": 0.48829777062310153,
+        "valid_video_arc_mean_diagnostic_only": 0.4764986353390145,
+        "notice": "Conditional means have method-specific denominators; never use them alone to select a winner."
+      }
+    },
+    "partition": {
+      "videos": 16,
+      "scores": {
+        "aesthetic_quality": {
+          "count": 16,
+          "mean": 0.23361705616116524,
+          "coverage": 1.0
+        },
+        "arc_score": {
+          "count": 16,
+          "mean": 0.0,
+          "coverage": 1.0
+        },
+        "arc_scoring_coverage": {
+          "count": 16,
+          "mean": 0.0,
+          "coverage": 1.0
+        },
+        "background_consistency": {
+          "count": 16,
+          "mean": 0.9634100596110026,
+          "coverage": 1.0
+        },
+        "cur_score": {
+          "count": 16,
+          "mean": 0.0,
+          "coverage": 1.0
+        },
+        "cur_scoring_coverage": {
+          "count": 16,
+          "mean": 0.0,
+          "coverage": 1.0
+        },
+        "dynamic_degree": {
+          "count": 16,
+          "mean": 0.0,
+          "coverage": 1.0
+        },
+        "face_detection_coverage": {
+          "count": 16,
+          "mean": 0.0,
+          "coverage": 1.0
+        },
+        "gme_aesr": {
+          "count": 16,
+          "mean": 0.4098608158528805,
+          "coverage": 1.0
+        },
+        "imaging_quality": {
+          "count": 16,
+          "mean": 0.2416042044333049,
+          "coverage": 1.0
+        },
+        "motion_smoothness": {
+          "count": 16,
+          "mean": 0.9942013366461477,
+          "coverage": 1.0
+        },
+        "overall_consistency": {
+          "count": 16,
+          "mean": 0.1195823922753334,
+          "coverage": 1.0
+        },
+        "subject_consistency": {
+          "count": 16,
+          "mean": 0.8997239719998712,
+          "coverage": 1.0
+        }
+      },
+      "identity_coverage_diagnostics": {
+        "videos": 16,
+        "detected_identity_videos": 0,
+        "all_missing_identity_videos": 16,
+        "mean_face_frame_coverage": 0.0,
+        "valid_video_cur_mean_diagnostic_only": null,
+        "valid_video_arc_mean_diagnostic_only": null,
+        "notice": "Conditional means have method-specific denominators; never use them alone to select a winner."
+      }
+    }
+  },
+  "action_stratified_groups": {
+    "portrait_turn": {
+      "baseline": {
+        "videos": 4,
+        "scores": {
+          "aesthetic_quality": {
+            "count": 4,
+            "mean": 0.5565968975424767,
+            "coverage": 1.0
+          },
+          "arc_score": {
+            "count": 4,
+            "mean": 0.6823415858671069,
+            "coverage": 1.0
+          },
+          "arc_scoring_coverage": {
+            "count": 4,
+            "mean": 1.0,
+            "coverage": 1.0
+          },
+          "background_consistency": {
+            "count": 4,
+            "mean": 0.9779624938964844,
+            "coverage": 1.0
+          },
+          "cur_score": {
+            "count": 4,
+            "mean": 0.7054803716018796,
+            "coverage": 1.0
+          },
+          "cur_scoring_coverage": {
+            "count": 4,
+            "mean": 1.0,
+            "coverage": 1.0
+          },
+          "dynamic_degree": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "face_detection_coverage": {
+            "count": 4,
+            "mean": 1.0,
+            "coverage": 1.0
+          },
+          "gme_aesr": {
+            "count": 4,
+            "mean": 0.4571562558412552,
+            "coverage": 1.0
+          },
+          "imaging_quality": {
+            "count": 4,
+            "mean": 0.7186531129175303,
+            "coverage": 1.0
+          },
+          "motion_smoothness": {
+            "count": 4,
+            "mean": 0.9953905363505356,
+            "coverage": 1.0
+          },
+          "overall_consistency": {
+            "count": 4,
+            "mean": 0.13963470607995987,
+            "coverage": 1.0
+          },
+          "subject_consistency": {
+            "count": 4,
+            "mean": 0.9849252528510988,
+            "coverage": 1.0
+          }
+        },
+        "identity_coverage_diagnostics": {
+          "videos": 4,
+          "detected_identity_videos": 4,
+          "all_missing_identity_videos": 0,
+          "mean_face_frame_coverage": 1.0,
+          "valid_video_cur_mean_diagnostic_only": 0.7054803716018796,
+          "valid_video_arc_mean_diagnostic_only": 0.6823415858671069,
+          "notice": "Conditional means have method-specific denominators; never use them alone to select a winner."
+        }
+      },
+      "partition": {
+        "videos": 4,
+        "scores": {
+          "aesthetic_quality": {
+            "count": 4,
+            "mean": 0.23364396393299103,
+            "coverage": 1.0
+          },
+          "arc_score": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "arc_scoring_coverage": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "background_consistency": {
+            "count": 4,
+            "mean": 0.961992899576823,
+            "coverage": 1.0
+          },
+          "cur_score": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "cur_scoring_coverage": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "dynamic_degree": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "face_detection_coverage": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "gme_aesr": {
+            "count": 4,
+            "mean": 0.4305628389120102,
+            "coverage": 1.0
+          },
+          "imaging_quality": {
+            "count": 4,
+            "mean": 0.21543386250126118,
+            "coverage": 1.0
+          },
+          "motion_smoothness": {
+            "count": 4,
+            "mean": 0.9939568685218195,
+            "coverage": 1.0
+          },
+          "overall_consistency": {
+            "count": 4,
+            "mean": 0.12477022409439087,
+            "coverage": 1.0
+          },
+          "subject_consistency": {
+            "count": 4,
+            "mean": 0.8992362292483449,
+            "coverage": 1.0
+          }
+        },
+        "identity_coverage_diagnostics": {
+          "videos": 4,
+          "detected_identity_videos": 0,
+          "all_missing_identity_videos": 4,
+          "mean_face_frame_coverage": 0.0,
+          "valid_video_cur_mean_diagnostic_only": null,
+          "valid_video_arc_mean_diagnostic_only": null,
+          "notice": "Conditional means have method-specific denominators; never use them alone to select a winner."
+        }
+      }
+    },
+    "halfbody_raise_hand": {
+      "baseline": {
+        "videos": 4,
+        "scores": {
+          "aesthetic_quality": {
+            "count": 4,
+            "mean": 0.44503653049468994,
+            "coverage": 1.0
+          },
+          "arc_score": {
+            "count": 4,
+            "mean": 0.40419988265740825,
+            "coverage": 1.0
+          },
+          "arc_scoring_coverage": {
+            "count": 4,
+            "mean": 0.53125,
+            "coverage": 1.0
+          },
+          "background_consistency": {
+            "count": 4,
+            "mean": 0.9533360799153645,
+            "coverage": 1.0
+          },
+          "cur_score": {
+            "count": 4,
+            "mean": 0.427033896769651,
+            "coverage": 1.0
+          },
+          "cur_scoring_coverage": {
+            "count": 4,
+            "mean": 0.53125,
+            "coverage": 1.0
+          },
+          "dynamic_degree": {
+            "count": 4,
+            "mean": 0.25,
+            "coverage": 1.0
+          },
+          "face_detection_coverage": {
+            "count": 4,
+            "mean": 0.53125,
+            "coverage": 1.0
+          },
+          "gme_aesr": {
+            "count": 4,
+            "mean": 0.3995041698217392,
+            "coverage": 1.0
+          },
+          "imaging_quality": {
+            "count": 4,
+            "mean": 0.6155911517629817,
+            "coverage": 1.0
+          },
+          "motion_smoothness": {
+            "count": 4,
+            "mean": 0.9957666743356512,
+            "coverage": 1.0
+          },
+          "overall_consistency": {
+            "count": 4,
+            "mean": 0.05495857261121273,
+            "coverage": 1.0
+          },
+          "subject_consistency": {
+            "count": 4,
+            "mean": 0.9245972362502167,
+            "coverage": 1.0
+          }
+        },
+        "identity_coverage_diagnostics": {
+          "videos": 4,
+          "detected_identity_videos": 4,
+          "all_missing_identity_videos": 0,
+          "mean_face_frame_coverage": 0.53125,
+          "valid_video_cur_mean_diagnostic_only": 0.427033896769651,
+          "valid_video_arc_mean_diagnostic_only": 0.40419988265740825,
+          "notice": "Conditional means have method-specific denominators; never use them alone to select a winner."
+        }
+      },
+      "partition": {
+        "videos": 4,
+        "scores": {
+          "aesthetic_quality": {
+            "count": 4,
+            "mean": 0.23817477747797966,
+            "coverage": 1.0
+          },
+          "arc_score": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "arc_scoring_coverage": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "background_consistency": {
+            "count": 4,
+            "mean": 0.9638239542643229,
+            "coverage": 1.0
+          },
+          "cur_score": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "cur_scoring_coverage": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "dynamic_degree": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "face_detection_coverage": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "gme_aesr": {
+            "count": 4,
+            "mean": 0.38591841608285904,
+            "coverage": 1.0
+          },
+          "imaging_quality": {
+            "count": 4,
+            "mean": 0.2720619997199701,
+            "coverage": 1.0
+          },
+          "motion_smoothness": {
+            "count": 4,
+            "mean": 0.9942110728757911,
+            "coverage": 1.0
+          },
+          "overall_consistency": {
+            "count": 4,
+            "mean": 0.10438819788396358,
+            "coverage": 1.0
+          },
+          "subject_consistency": {
+            "count": 4,
+            "mean": 0.8951760044631858,
+            "coverage": 1.0
+          }
+        },
+        "identity_coverage_diagnostics": {
+          "videos": 4,
+          "detected_identity_videos": 0,
+          "all_missing_identity_videos": 4,
+          "mean_face_frame_coverage": 0.0,
+          "valid_video_cur_mean_diagnostic_only": null,
+          "valid_video_arc_mean_diagnostic_only": null,
+          "notice": "Conditional means have method-specific denominators; never use them alone to select a winner."
+        }
+      }
+    },
+    "fullbody_walk": {
+      "baseline": {
+        "videos": 4,
+        "scores": {
+          "aesthetic_quality": {
+            "count": 4,
+            "mean": 0.5333620309829712,
+            "coverage": 1.0
+          },
+          "arc_score": {
+            "count": 4,
+            "mean": 0.4454694443847984,
+            "coverage": 1.0
+          },
+          "arc_scoring_coverage": {
+            "count": 4,
+            "mean": 0.75,
+            "coverage": 1.0
+          },
+          "background_consistency": {
+            "count": 4,
+            "mean": 0.9784431457519531,
+            "coverage": 1.0
+          },
+          "cur_score": {
+            "count": 4,
+            "mean": 0.43321369192563,
+            "coverage": 1.0
+          },
+          "cur_scoring_coverage": {
+            "count": 4,
+            "mean": 0.75,
+            "coverage": 1.0
+          },
+          "dynamic_degree": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "face_detection_coverage": {
+            "count": 4,
+            "mean": 0.75,
+            "coverage": 1.0
+          },
+          "gme_aesr": {
+            "count": 4,
+            "mean": 0.42874372005462646,
+            "coverage": 1.0
+          },
+          "imaging_quality": {
+            "count": 4,
+            "mean": 0.6709589413234165,
+            "coverage": 1.0
+          },
+          "motion_smoothness": {
+            "count": 4,
+            "mean": 0.9963223952627531,
+            "coverage": 1.0
+          },
+          "overall_consistency": {
+            "count": 4,
+            "mean": 0.0804675417020917,
+            "coverage": 1.0
+          },
+          "subject_consistency": {
+            "count": 4,
+            "mean": 0.9897982506081462,
+            "coverage": 1.0
+          }
+        },
+        "identity_coverage_diagnostics": {
+          "videos": 4,
+          "detected_identity_videos": 3,
+          "all_missing_identity_videos": 1,
+          "mean_face_frame_coverage": 0.75,
+          "valid_video_cur_mean_diagnostic_only": 0.5776182559008399,
+          "valid_video_arc_mean_diagnostic_only": 0.5939592591797312,
+          "notice": "Conditional means have method-specific denominators; never use them alone to select a winner."
+        }
+      },
+      "partition": {
+        "videos": 4,
+        "scores": {
+          "aesthetic_quality": {
+            "count": 4,
+            "mean": 0.22935301437973976,
+            "coverage": 1.0
+          },
+          "arc_score": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "arc_scoring_coverage": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "background_consistency": {
+            "count": 4,
+            "mean": 0.9627494812011719,
+            "coverage": 1.0
+          },
+          "cur_score": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "cur_scoring_coverage": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "dynamic_degree": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "face_detection_coverage": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "gme_aesr": {
+            "count": 4,
+            "mean": 0.42023442685604095,
+            "coverage": 1.0
+          },
+          "imaging_quality": {
+            "count": 4,
+            "mean": 0.2335527296455539,
+            "coverage": 1.0
+          },
+          "motion_smoothness": {
+            "count": 4,
+            "mean": 0.9943220703866431,
+            "coverage": 1.0
+          },
+          "overall_consistency": {
+            "count": 4,
+            "mean": 0.13316896930336952,
+            "coverage": 1.0
+          },
+          "subject_consistency": {
+            "count": 4,
+            "mean": 0.8991590249352157,
+            "coverage": 1.0
+          }
+        },
+        "identity_coverage_diagnostics": {
+          "videos": 4,
+          "detected_identity_videos": 0,
+          "all_missing_identity_videos": 4,
+          "mean_face_frame_coverage": 0.0,
+          "valid_video_cur_mean_diagnostic_only": null,
+          "valid_video_arc_mean_diagnostic_only": null,
+          "notice": "Conditional means have method-specific denominators; never use them alone to select a winner."
+        }
+      }
+    },
+    "fullbody_sit": {
+      "baseline": {
+        "videos": 4,
+        "scores": {
+          "aesthetic_quality": {
+            "count": 4,
+            "mean": 0.5936069935560226,
+            "coverage": 1.0
+          },
+          "arc_score": {
+            "count": 4,
+            "mean": 0.13573431077723702,
+            "coverage": 1.0
+          },
+          "arc_scoring_coverage": {
+            "count": 4,
+            "mean": 0.734375,
+            "coverage": 1.0
+          },
+          "background_consistency": {
+            "count": 4,
+            "mean": 0.9780006408691406,
+            "coverage": 1.0
+          },
+          "cur_score": {
+            "count": 4,
+            "mean": 0.14331423688369493,
+            "coverage": 1.0
+          },
+          "cur_scoring_coverage": {
+            "count": 4,
+            "mean": 0.734375,
+            "coverage": 1.0
+          },
+          "dynamic_degree": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "face_detection_coverage": {
+            "count": 4,
+            "mean": 0.734375,
+            "coverage": 1.0
+          },
+          "gme_aesr": {
+            "count": 4,
+            "mean": 0.4950173646211624,
+            "coverage": 1.0
+          },
+          "imaging_quality": {
+            "count": 4,
+            "mean": 0.6746344712315773,
+            "coverage": 1.0
+          },
+          "motion_smoothness": {
+            "count": 4,
+            "mean": 0.9968864091860703,
+            "coverage": 1.0
+          },
+          "overall_consistency": {
+            "count": 4,
+            "mean": 0.15464222058653831,
+            "coverage": 1.0
+          },
+          "subject_consistency": {
+            "count": 4,
+            "mean": 0.9915178886925181,
+            "coverage": 1.0
+          }
+        },
+        "identity_coverage_diagnostics": {
+          "videos": 4,
+          "detected_identity_videos": 3,
+          "all_missing_identity_videos": 1,
+          "mean_face_frame_coverage": 0.734375,
+          "valid_video_cur_mean_diagnostic_only": 0.1910856491782599,
+          "valid_video_arc_mean_diagnostic_only": 0.18097908103631602,
+          "notice": "Conditional means have method-specific denominators; never use them alone to select a winner."
+        }
+      },
+      "partition": {
+        "videos": 4,
+        "scores": {
+          "aesthetic_quality": {
+            "count": 4,
+            "mean": 0.2332964688539505,
+            "coverage": 1.0
+          },
+          "arc_score": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "arc_scoring_coverage": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "background_consistency": {
+            "count": 4,
+            "mean": 0.9650739034016927,
+            "coverage": 1.0
+          },
+          "cur_score": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "cur_scoring_coverage": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "dynamic_degree": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "face_detection_coverage": {
+            "count": 4,
+            "mean": 0.0,
+            "coverage": 1.0
+          },
+          "gme_aesr": {
+            "count": 4,
+            "mean": 0.4027275815606117,
+            "coverage": 1.0
+          },
+          "imaging_quality": {
+            "count": 4,
+            "mean": 0.24536822586643453,
+            "coverage": 1.0
+          },
+          "motion_smoothness": {
+            "count": 4,
+            "mean": 0.9943153348003368,
+            "coverage": 1.0
+          },
+          "overall_consistency": {
+            "count": 4,
+            "mean": 0.11600217781960964,
+            "coverage": 1.0
+          },
+          "subject_consistency": {
+            "count": 4,
+            "mean": 0.9053246293527384,
+            "coverage": 1.0
+          }
+        },
+        "identity_coverage_diagnostics": {
+          "videos": 4,
+          "detected_identity_videos": 0,
+          "all_missing_identity_videos": 4,
+          "mean_face_frame_coverage": 0.0,
+          "valid_video_cur_mean_diagnostic_only": null,
+          "valid_video_arc_mean_diagnostic_only": null,
+          "notice": "Conditional means have method-specific denominators; never use them alone to select a winner."
+        }
+      }
+    }
+  },
+  "identity_coverage_diagnostics": {
+    "baseline": {
+      "videos": 16,
+      "detected_identity_videos": 14,
+      "all_missing_identity_videos": 2,
+      "mean_face_frame_coverage": 0.75390625,
+      "valid_video_cur_mean_diagnostic_only": 0.48829777062310153,
+      "valid_video_arc_mean_diagnostic_only": 0.4764986353390145,
+      "notice": "Conditional means have method-specific denominators; never use them alone to select a winner."
+    },
+    "partition": {
+      "videos": 16,
+      "detected_identity_videos": 0,
+      "all_missing_identity_videos": 16,
+      "mean_face_frame_coverage": 0.0,
+      "valid_video_cur_mean_diagnostic_only": null,
+      "valid_video_arc_mean_diagnostic_only": null,
+      "notice": "Conditional means have method-specific denominators; never use them alone to select a winner."
+    }
+  },
+  "generation_runs": [
+    {
+      "run_id": "standin_partition_native_pilot_portrait_20261023_r001",
+      "condition": "native",
+      "phase": "pilot_portrait",
+      "status": "completed",
+      "code_commit": "e35e6c0d67674f86441e4812d39faaf0733cc4fa",
+      "source_sha256": "a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b",
+      "config_sha256": "d81442495585e68391dc558c83c72fe1ab48d608275b1029589dba5b34bea4a0",
+      "manifest_sha256": "f37e0fecdca1500c27e9ffe5a1144bc5319a025614035e7131dfdded2f484d42",
+      "gpu_hours": 0.048404519010024766,
+      "model_revisions": {
+        "WeChatCV/Stand-In:code": "e351224366be169076e94af1454115d91d458313",
+        "Wan-AI/Wan2.1-T2V-14B": "a064a6c71f5be440641209c07bf2a5ce7a2ff5e4",
+        "BowenXue/Stand-In": "c6e9017606276ee1a01c63fdb8f90da789678647"
+      },
+      "model_lock_sha256": "3f1f634bae34837c3871fe3d485140c2c8906f0da92179328115071fb0b3f4a0"
+    },
+    {
+      "run_id": "standin_partition_partition_pilot_portrait_20261023_r001",
+      "condition": "partition",
+      "phase": "pilot_portrait",
+      "status": "completed",
+      "code_commit": "e35e6c0d67674f86441e4812d39faaf0733cc4fa",
+      "source_sha256": "a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b",
+      "config_sha256": "e517f591735572718a439f4834584e1fcece51b986b65b6d354d09833da01b97",
+      "manifest_sha256": "f37e0fecdca1500c27e9ffe5a1144bc5319a025614035e7131dfdded2f484d42",
+      "gpu_hours": 0.04798545554086255,
+      "model_revisions": {
+        "WeChatCV/Stand-In:code": "e351224366be169076e94af1454115d91d458313",
+        "Wan-AI/Wan2.1-T2V-14B": "a064a6c71f5be440641209c07bf2a5ce7a2ff5e4",
+        "BowenXue/Stand-In": "c6e9017606276ee1a01c63fdb8f90da789678647"
+      },
+      "model_lock_sha256": "3f1f634bae34837c3871fe3d485140c2c8906f0da92179328115071fb0b3f4a0"
+    },
+    {
+      "run_id": "standin_partition_native_pilot_fullbody_20261023_r001",
+      "condition": "native",
+      "phase": "pilot_fullbody",
+      "status": "completed",
+      "code_commit": "e35e6c0d67674f86441e4812d39faaf0733cc4fa",
+      "source_sha256": "a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b",
+      "config_sha256": "c4c361f3bba56ecff64e69e5dd5362bc63f67260c6c141eaa6303bdab9dcc11c",
+      "manifest_sha256": "cff5d31288c1eddc22a7ae2da763e66404e56267a76c801e4dca2cdefca44517",
+      "gpu_hours": 0.04833220504806377,
+      "model_revisions": {
+        "WeChatCV/Stand-In:code": "e351224366be169076e94af1454115d91d458313",
+        "Wan-AI/Wan2.1-T2V-14B": "a064a6c71f5be440641209c07bf2a5ce7a2ff5e4",
+        "BowenXue/Stand-In": "c6e9017606276ee1a01c63fdb8f90da789678647"
+      },
+      "model_lock_sha256": "3f1f634bae34837c3871fe3d485140c2c8906f0da92179328115071fb0b3f4a0"
+    },
+    {
+      "run_id": "standin_partition_partition_pilot_fullbody_20261023_r001",
+      "condition": "partition",
+      "phase": "pilot_fullbody",
+      "status": "completed",
+      "code_commit": "e35e6c0d67674f86441e4812d39faaf0733cc4fa",
+      "source_sha256": "a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b",
+      "config_sha256": "23bf8bd0ed7355f28b81fc554854e7edc02fd2a860f5257a2217bd4bd2f43f54",
+      "manifest_sha256": "cff5d31288c1eddc22a7ae2da763e66404e56267a76c801e4dca2cdefca44517",
+      "gpu_hours": 0.04773703225461456,
+      "model_revisions": {
+        "WeChatCV/Stand-In:code": "e351224366be169076e94af1454115d91d458313",
+        "Wan-AI/Wan2.1-T2V-14B": "a064a6c71f5be440641209c07bf2a5ce7a2ff5e4",
+        "BowenXue/Stand-In": "c6e9017606276ee1a01c63fdb8f90da789678647"
+      },
+      "model_lock_sha256": "3f1f634bae34837c3871fe3d485140c2c8906f0da92179328115071fb0b3f4a0"
+    },
+    {
+      "run_id": "standin_partition_native_main_20261023_r001",
+      "condition": "native",
+      "phase": "main",
+      "status": "completed",
+      "code_commit": "136efa2ebc85874a59ca54961ad54ee47775c22b",
+      "source_sha256": "a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b",
+      "config_sha256": "ad0596b3760e1bbd43a49c1d27d13ada0310a4e7c1f6502c38f6838f23e600be",
+      "manifest_sha256": "146a769beb10e330aa062784a761be7e12fd3a63b775b89221ede2f489245d39",
+      "gpu_hours": 0.438929491639784,
+      "model_revisions": {
+        "WeChatCV/Stand-In:code": "e351224366be169076e94af1454115d91d458313",
+        "Wan-AI/Wan2.1-T2V-14B": "a064a6c71f5be440641209c07bf2a5ce7a2ff5e4",
+        "BowenXue/Stand-In": "c6e9017606276ee1a01c63fdb8f90da789678647"
+      },
+      "model_lock_sha256": "3f1f634bae34837c3871fe3d485140c2c8906f0da92179328115071fb0b3f4a0"
+    },
+    {
+      "run_id": "standin_partition_partition_main_20261023_r001",
+      "condition": "partition",
+      "phase": "main",
+      "status": "completed",
+      "code_commit": "136efa2ebc85874a59ca54961ad54ee47775c22b",
+      "source_sha256": "a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b",
+      "config_sha256": "227e8be536136f1dc5747334217a263bc5b81ec9e27cbc026b3d414471e410fd",
+      "manifest_sha256": "146a769beb10e330aa062784a761be7e12fd3a63b775b89221ede2f489245d39",
+      "gpu_hours": 0.45080758784871755,
+      "model_revisions": {
+        "WeChatCV/Stand-In:code": "e351224366be169076e94af1454115d91d458313",
+        "Wan-AI/Wan2.1-T2V-14B": "a064a6c71f5be440641209c07bf2a5ce7a2ff5e4",
+        "BowenXue/Stand-In": "c6e9017606276ee1a01c63fdb8f90da789678647"
+      },
+      "model_lock_sha256": "3f1f634bae34837c3871fe3d485140c2c8906f0da92179328115071fb0b3f4a0"
+    }
+  ],
+  "scoring_runs": [
+    {
+      "run_id": "cur_shard0_r001",
+      "status": "completed",
+      "manifest_sha256": "42cd061ea3d5d59b8f9742fbe055f71cfc7e62ccad8f3ec7269a6bb4474db742",
+      "score_sha256": "927cb7192aca3ed59de8bf34bd1da2e69f15258c0bd49b020bf9dea52d2b6d7b",
+      "evaluator_sha256": "d7797e622ab7c7d16a21c3baf9e9c3abbd7c213397e05c4626523ea68604dd55",
+      "controller_sha256": "9a456b425f88edf0aea90b987ed2fb7f49f48275298b961b381cc1d4ae47d04b",
+      "source_sha256": "a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b",
+      "allocated_gpu_hours": 0.007750535068076311
+    },
+    {
+      "run_id": "cur_shard1_r001",
+      "status": "completed",
+      "manifest_sha256": "2f8b946fb6ed0ed32e4a96134e36bfa4736ed3a20f9fdb0fed78ad35b9a2d575",
+      "score_sha256": "0fc5f6942b4a7bb0e8fa1f43276f71cdb4889dec7951e7ac5a97a115d52df521",
+      "evaluator_sha256": "d7797e622ab7c7d16a21c3baf9e9c3abbd7c213397e05c4626523ea68604dd55",
+      "controller_sha256": "9a456b425f88edf0aea90b987ed2fb7f49f48275298b961b381cc1d4ae47d04b",
+      "source_sha256": "a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b",
+      "allocated_gpu_hours": 0.007736905937264156
+    },
+    {
+      "run_id": "gme_shard0_r001",
+      "status": "completed",
+      "manifest_sha256": "42cd061ea3d5d59b8f9742fbe055f71cfc7e62ccad8f3ec7269a6bb4474db742",
+      "score_sha256": "873ffa4cb758a8db71cef3b7c7ac35fa7398c0b4a0d47e934c82cb3c0f64db33",
+      "evaluator_sha256": "b2b26b493f0ff2b25ae07cfd3d9685050484984b71e78143d947e022e18eab39",
+      "controller_sha256": "9a456b425f88edf0aea90b987ed2fb7f49f48275298b961b381cc1d4ae47d04b",
+      "source_sha256": "a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b",
+      "allocated_gpu_hours": 0.02988106184677842
+    },
+    {
+      "run_id": "gme_shard1_r001",
+      "status": "completed",
+      "manifest_sha256": "2f8b946fb6ed0ed32e4a96134e36bfa4736ed3a20f9fdb0fed78ad35b9a2d575",
+      "score_sha256": "a113a682b8c4162693c71f78a0ac9ef9de341915ae68c9a1f2f6bd6fce1c1c17",
+      "evaluator_sha256": "b2b26b493f0ff2b25ae07cfd3d9685050484984b71e78143d947e022e18eab39",
+      "controller_sha256": "9a456b425f88edf0aea90b987ed2fb7f49f48275298b961b381cc1d4ae47d04b",
+      "source_sha256": "a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b",
+      "allocated_gpu_hours": 0.0286950911493558
+    },
+    {
+      "run_id": "quality_shard0_r001",
+      "status": "completed",
+      "manifest_sha256": "42cd061ea3d5d59b8f9742fbe055f71cfc7e62ccad8f3ec7269a6bb4474db742",
+      "score_sha256": "b23340b765358251bd774c42ec39230a74b128cc34dd6361835ae03c0d5b4a87",
+      "evaluator_sha256": "afd1736f70d1638f837a1bf3bff31b37b530ffd91c9ebd188eb897f87728f44e",
+      "controller_sha256": "9a456b425f88edf0aea90b987ed2fb7f49f48275298b961b381cc1d4ae47d04b",
+      "source_sha256": "a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b",
+      "allocated_gpu_hours": 0.007182008479075092
+    },
+    {
+      "run_id": "quality_shard1_r001",
+      "status": "completed",
+      "manifest_sha256": "2f8b946fb6ed0ed32e4a96134e36bfa4736ed3a20f9fdb0fed78ad35b9a2d575",
+      "score_sha256": "0249f1fcd36ff6fd40a958b1b3a10170f6a82ce69a9226141ea1f190ddab0768",
+      "evaluator_sha256": "afd1736f70d1638f837a1bf3bff31b37b530ffd91c9ebd188eb897f87728f44e",
+      "controller_sha256": "9a456b425f88edf0aea90b987ed2fb7f49f48275298b961b381cc1d4ae47d04b",
+      "source_sha256": "a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b",
+      "allocated_gpu_hours": 0.007207914066966623
+    },
+    {
+      "run_id": "extended_shard0_r001",
+      "status": "completed",
+      "manifest_sha256": "42cd061ea3d5d59b8f9742fbe055f71cfc7e62ccad8f3ec7269a6bb4474db742",
+      "score_sha256": "30b65d0eeaa16b2d964fd8084dfd9537fbf73d7275c68f10c0ed3b5302b2486e",
+      "evaluator_sha256": "a722fea85751e6c32be689487951e4dabb3e0abf3a0b4f9cce830faac013535e",
+      "controller_sha256": "9a456b425f88edf0aea90b987ed2fb7f49f48275298b961b381cc1d4ae47d04b",
+      "source_sha256": "a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b",
+      "allocated_gpu_hours": 0.032769101086952204
+    },
+    {
+      "run_id": "extended_shard1_r001",
+      "status": "completed",
+      "manifest_sha256": "2f8b946fb6ed0ed32e4a96134e36bfa4736ed3a20f9fdb0fed78ad35b9a2d575",
+      "score_sha256": "2b4d007982df8c91749bc464573c0ae80dff2f61a46699357d5d36d7efe39a80",
+      "evaluator_sha256": "a722fea85751e6c32be689487951e4dabb3e0abf3a0b4f9cce830faac013535e",
+      "controller_sha256": "9a456b425f88edf0aea90b987ed2fb7f49f48275298b961b381cc1d4ae47d04b",
+      "source_sha256": "a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b",
+      "allocated_gpu_hours": 0.01777786118056004
+    }
+  ],
+  "analysis_script_sha256": "9a456b425f88edf0aea90b987ed2fb7f49f48275298b961b381cc1d4ae47d04b",
+  "ledger_sha256": "7313e648eb1886187907f854220e576f6af05fa7093206504b4e47f092387d48",
+  "actual_new_gpu_hours": 1.2211967701570954,
+  "new_hard_cap_gpu_hours": 8,
+  "original_overall_cap_gpu_hours": 51.5,
+  "prior_gpu_hours_upper": 5.31,
+  "generation_reserved_gpu_hours": 5,
+  "evaluation_reserved_gpu_hours": 2,
+  "single_engineering_repair_allowance_gpu_hours": 0.5,
+  "main_comparison_videos": 32,
+  "new_generated_videos": 36,
+  "retry_count": 0,
+  "training_performed": false,
+  "combined_score": null,
+  "official_final_score": null,
+  "action_naturalness_verified": false,
+  "automatic_winner_selected": null,
+  "limitations": [
+    "Same eight development actors/four reference-only action prompts/one seed; no action ground truth.",
+    "Passing frozen gates permits further verification, not promotion or an automatic winner.",
+    "Identity all-missing author-style zeros retained with explicit coverage/missing denominators."
+  ]
+}

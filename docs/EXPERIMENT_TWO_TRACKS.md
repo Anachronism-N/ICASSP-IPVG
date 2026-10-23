@@ -188,4 +188,39 @@ AnyID半身举手Cur=.791215、GME=.310956；全身坐下四条身份全missing�
 
 候选相对本轮native需GME至少+.02、Cur/Arc各不降超.02、facecoverage不降且完全missing≤2/16、MUSIQ不降超.02。原16完整分母与各动作4分母全部保留，条件均值不能单独选优。AMT/RAFT/一致性仅诊断，不据其称自然动作完成。达标仅下一轮验证候选、不是统一winner或SOTA；未达标公开负结果且有限结案。
 
-CPU tiny/fake模型验证native逐位等价、两softmax解析读出、IPselfread/cache/negative不变、40closure独立、异常恢复与计数。GPU验原240tensors/40CFGcall/1024tokens/seed/source/config/input/output/hash、控制SHA与候选真实接线。版本化冻结/共评/审计入口复用现有四scorer与配对/coverage helpers，分析源与生成源分别记录。所有启动job跟进结束、独立CPU复算与完整回归烟测、脱敏结果/中文正负结论正常push并验远端CI；原媒体/参考/逐身份/attention maps/权重不公开。此节为预注册，尚无本轮真实结果。
+CPU tiny/fake模型验证native逐位等价、两softmax解析读出、IPselfread/cache/negative不变、40closure独立、异常恢复与计数。GPU验原240tensors/40CFGcall/1024tokens/seed/source/config/input/output/hash、控制SHA与候选真实接线。版本化冻结/共评/审计入口复用现有四scorer与配对/coverage helpers，分析源与生成源分别记录。所有启动job跟进结束、独立CPU复算与完整回归烟测、脱敏结果/中文正负结论正常push并验远端CI；原媒体/参考/逐身份/attention maps/权重不公开。以上为生成前冻结的预注册，实际结果如下。
+
+### 全部实测结束：固定等权分区不晋级
+
+四单例pilot、两arm各16完整main共36新视频及八共同评分job全部完成，所有媒体满足49帧480×35216fps。native16/16编码视频SHA精确复现历史同输入，候选输出确有变化；两arm相同参考像素/seed/240IPtensor/1024token/40CFGcall与FA2。candidate每视频1600joint读变为3200主kernel，首次IP仍40kernel；原生1640/candidate3240总kernel证据通过。没有训练、更多候选、删样或GPU重试。
+
+| 指标（各16视频完整分母） | 原生joint softmax | 固定等权partition |
+|---|---:|---:|
+| Cur16作者式 | .427261 | 0 |
+| Arc16作者式 | .416936 | 0 |
+| 身份检测/评分帧coverage | 75.3906% | 0% |
+| 完全无可评分脸视频 | 2/16 | 16/16 |
+| GME帧文本匹配 | .445105 | .409861 |
+| AMT平滑 | .996092 | .994201 |
+| MUSIQ成像 | .669959 | .241604 |
+| RAFT明显运动阈值视频 | 1/16 | 0/16 |
+| LAION美学 | .532151 | .233617 |
+
+原生输出媒体16/16逐字节一致，身份与12/13指标均值精确复现；AMT重新评分均值由旧.9960915039650811变为.9960915037837526（−1.81e−10），如实保留新计算值而不覆盖旧分数，不宣称所有评分逐位一致。
+
+等视频/等actor配对GME−.035244、Cur−.427261、Arc−.416936、MUSIQ−.428355；全16视频与8actor均参与，作者式完全missing视频0保留。所有八项预注册检查均false，不晋级`not_promoted`。候选四动作每类4/4全missing，条件Cur/Arc均值null；native对应portrait/halfbody/walk/sit全missing分别0/0/1/1。分层结果不支持把任何高分子集救回整体；未有人工作为可见性/自然性真值，不能从检测缺失说画面一定没有人物。
+
+| 模板（候选各4视频） | GME | MUSIQ | 全missing |
+|---|---:|---:|---:|
+| portrait_turn | .430563 | .215434 | 4/4 |
+| halfbody_raise_hand | .385918 | .272062 | 4/4 |
+| fullbody_walk | .420234 | .233553 | 4/4 |
+| fullbody_sit | .402728 | .245368 | 4/4 |
+
+GME仍在.39–.43、ViCLIP overall .107426→.119582，而身份/成像失效；这进一步说明内容相似诊断不能独立判动作或综合质量。平滑/一致性高值不构成自然动作验证，RAFT0不能证明画面绝对静止。此次固定等权平均改变原联合softmax逐query/head的数据依赖门控，结果与预期收益相反；训练分布偏移可能解释退化，但没有测量原native分区质量或训练对照，不能称已证明唯一原因。否定的仅是这项零训练固定均分替换，不外推所有可训练分区/身份路径均无效。
+
+实际generation1.082196291+score.139000479=1.221196770GPUh≤8；其中四pilot.192459212，native16main.438929492/candidate16main.450807588。主单40GBmain中位采样92.284/94.386秒、peakallocated31.611/31.612GB、peakreserved39.345/38.680GB，未OOM；效率不是质量晋级证据。两main实际executioncommit136efa2、四pilot e35e6c0，仅测试可移植性提交使HEAD变化，src/scripts指纹相同`a01f5117cbb9604b58aba4190c4ced4f18ed1b5db788ff8b82911621b6ec017b`。
+
+初次prepare后发生最后审计源码校验编辑，preflight在GPU启动前拒绝旧指纹，保留未启动准备目录并新fresh目录重新冻结；没有GPU失败或重复生成。首两CI因测试导入仅本机存在的ignored日志路径失败，改为四scorer完整argv契约断言，不跳过检查、不改变实际scorer；136efa2/CI39947564485两Python版本成功。完整683passed/7skip、干净291passed/42skip与烟测passed。
+
+从八rawscores独立CPU重算491项全组/分动作均值、count/coverage、全missing/条件均值、五core等视频/actor差和总预算，0 mismatch；136个私密ID/path/mediahash token扫描0泄露。`resources/standin_partition_result.json`保留全部13列、分动作缺失、六生成/八评分source/hash与真实成本，旧基线/评价权重/holdout不变。所有真实任务已结束，15健康GPU恢复占卡，故障worker7排除。科学负结果有限结案，不在当前权重上追加强度/seed搜索；继续研究需新预注册，而不是把功能通过当效果成功。

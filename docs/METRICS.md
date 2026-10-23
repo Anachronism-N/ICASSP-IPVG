@@ -163,6 +163,10 @@ ipvg evaluate data/dev.jsonl runs/baseline/videos --proxy-scores runs/baseline/p
 
 开发候选门槛预先固定：GME至少+.02，Cur/Arc各下降不超过.02，facecoverage不降且全missing≤2/16，MUSIQ下降不超过.02。评分weight/protocol/实际precision/manifest与输入/输出SHA跨arm和node一致，否则拒绝配对；每视频/每演员core差与各动作全部缺失/条件均值分母分别报告。不得用有效脸子集补偿missing，AMT/RAFT/一致性不构成动作完成或自然性真值。预算生成5+评分2+唯一工程修复.5≤新增8GPUh；达标最多成为下一轮验证候选，未过门槛公开负结果，不追加搜索或宣称SOTA。
 
+### 分区结构共评完成与负结果
+
+36新生成中的32main已在八原scorer job完整共评，原生16输出SHA精确复现历史；协议/权重/精度/原参考/seed与输入SHA均固定。候选Cur/Arc0、facecoverage0、全missing16/16（四动作各4/4），GME.409861/MUSIQ.241604；原生.427261/.416936、75.3906%、2/16、GME.445105/MUSIQ.669959。所有八个开发门槛均失败，完整视频分母不删，条件身份均值null。原生成/评分budget1.221196770GPUh≤8，0GPU失败/重试。结果`resources/standin_partition_result.json`，独立CPU491项复算无差异；高GME或ViCLIP不能挽救明显身份/成像退化，更不能叫动作完成。保留科学负结果`not_promoted`，未改变旧分数或宣称官方质量。
+
 ## 人工抽样与同预算对照
 
 先固定按身份及源视频隔离的dev与holdout；holdout不参与agent逐轮选型。人工审核预先抽定的正常样本，再加入固定规则选择的高分、低分和失败样本；后者属于诊断集，应与随机样本结论分开。比较视频时隐藏模型名、随机左右顺序，分别记录身份、动作完成、时间对齐、可见伪影及整体偏好。
