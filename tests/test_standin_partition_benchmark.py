@@ -242,6 +242,50 @@ def test_original_driver_argv_and_worker_vbench(metric, campaign, monkeypatch):
     if metric in ('quality', 'extended'): assert cmd[cmd.index('--vbench') + 1] == str(c.eval / 'VBench_clean')
 
 
+@pytest.mark.parametrize('drift', ['score_hash', 'shard_hash', 'cohort', 'reference', 'prompt', 'movie', 'coverage', 'author_zero', 'weights', 'controller', 'source'])
+def test_audit_rejects_frozen_scoring_and_identity_drift(campaign, monkeypatch, drift):
+    c = campaign; benchmark.freeze(c.work, c.runs, c.repo, c.eval); mock_scores(c, monkeypatch)
+    score_path = c.work / 'evaluation/cur_shard0_r001/scores.json'
+    report = load_json(score_path); row = report['records'][0]
+    if drift == 'shard_hash':
+        path = c.work / 'quality_shard0.json'; changed = load_json(path); changed['samples'].pop(); write_json(path, changed)
+    elif drift == 'cohort':
+        path = c.work / 'quality_frozen.json'; changed = load_json(path); changed['samples'][0]['group'] = 'wrong'; write_json(path, changed)
+    elif drift in ('controller', 'source'):
+        path = score_path.parent / 'result.json'; changed = load_json(path)
+        changed['controller_sha256' if drift == 'controller' else 'source_sha256'] = 'drift' if drift == 'controller' else ''
+        write_json(path, changed)
+    else:
+        if drift == 'reference': row['reference_sha256'] = 'changed'
+        if drift == 'prompt':
+            score_path = c.work / 'evaluation/gme_shard0_r001/scores.json'; report = load_json(score_path)
+            report['records'][0]['prompt_sha256'] = 'changed'
+        if drift == 'movie': row['video_sha256'] = 'changed'
+        if drift == 'coverage': row['cur_scoring_coverage'] = .5
+        if drift == 'author_zero':
+            row.update(cur_frame_cosines=[None] * 16, arc_frame_cosines=[None] * 16,
+                       cur_scoring_coverage=0, arc_scoring_coverage=0, cur_score=42, arc_score=42)
+        if drift == 'weights': report['model_source']['files']['weight'] = 'different'
+        if drift == 'score_hash': row['cur_score'] += .1
+        write_json(score_path, report)
+        if drift != 'score_hash':
+            path = score_path.parent / 'result.json'; changed = load_json(path)
+            changed['score_sha256'] = sha256_file(score_path); write_json(path, changed)
+    with pytest.raises(ValueError): benchmark.audit(c.work, c.runs, c.repo, c.work / 'rejected.json')
+    assert not (c.work / 'rejected.json').exists()
+
+
+def test_audit_failed_generation_and_hard_budget_accounted(campaign):
+    c = campaign
+    entry = c.ledger['runs'][0]; path = c.runs / entry['run_id'] / 'result.json'
+    result = load_json(path); result.update(status='failed', backend_elapsed_seconds=9 * 3600, estimated_backend_gpu_hours=9)
+    write_json(path, result)
+    report = benchmark.audit(c.work, c.runs, c.repo, c.work / 'failed.json')
+    assert report['status'] == 'failed_partition_benchmark' and report['actual_new_gpu_hours'] >= 9
+    assert 'hard_budget_exceeded' in report['failure_codes']
+    assert 'generation_failed_or_over_budget' in report['failure_codes']
+
+
 def test_verify_one_pilot_does_not_require_other_new_runs(campaign, monkeypatch):
     c = campaign
     entry = c.ledger['runs'][0]

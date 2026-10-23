@@ -400,7 +400,12 @@ def audit(work_dir, runs_dir, repo_root, output):
                     raise ValueError('Scoring original prompt changed')
                 for value in values.values():
                     finite_values([value])
+                if metric != 'cur' and any(value is None for value in values.values()):
+                    raise ValueError('Non-identity automatic metrics must be fully observed')
                 if metric == 'cur':
+                    for name in ('cur', 'arc'):
+                        if not any(v is not None for v in row[name + '_frame_cosines']) and row[name + '_score'] != 0:
+                            raise ValueError('Original author all-missing identity video must retain zero')
                     identities.append(row)
                 scores[sid].update(values); seen.add(sid)
             scoring.append({k: result[k] for k in ('run_id', 'status', 'manifest_sha256', 'score_sha256',
