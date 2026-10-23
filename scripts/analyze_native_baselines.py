@@ -137,32 +137,44 @@ def main():
     from adapters.standin import NEGATIVE
     if configs['standin']['parameters'].get('negative_prompt') is None:
         configs['standin']['parameters']['negative_prompt']=NEGATIVE
-    main_rows=read_manifest(args.runs_dir/'native_vace_main_20261022_r001/manifest.jsonl')
+    main_entries={e['arm']:e for e in ledger['runs'] if e['phase']=='main'}
+    main_rows=read_manifest(args.runs_dir/main_entries['vace']['run_id']/'manifest.jsonl')
     for row in main_rows:
         sid=row['sample_id']
         expected_seed=(42+int(hashlib.sha256(sid.encode()).hexdigest()[:8],16))%2**31
         if {profiles[a][sid]['seed'] for a in profiles}!={expected_seed}:raise ValueError('Original per-sample seeds differ')
         for arm in ('vace','anyid','standin'):
-            folder=args.runs_dir/f'native_{arm}_main_20261022_r001'
+            folder=args.runs_dir/main_entries[arm]['run_id']
             original=next(r for r in read_manifest(folder/'manifest.jsonl') if r['sample_id']==sid)
             if original['prompt']!=row['prompt'] or original['reference_images']!=row['reference_images'] or original['identity_id']!=row['identity_id']:
                 raise ValueError('Original generation prompt/reference/actor differs')
     if hours>ledger['new_hard_cap_gpu_hours']:raise ValueError('Native baseline hard budget exceeded')
+    action_categories={r['sample_id']:r.get('action_category') for r in main_rows}
+    stratified={}
+    if any(action_categories.values()):
+        for action in sorted(set(action_categories.values())):
+            if action is None:raise ValueError('Action category missing from new cohort')
+            stratified[action]={}
+            for group in ('baseline','anyid','standin'):
+                subset=[scores[sid] for sid,r in ids.items() if r['group']==group and action_categories[r['base_sample_id']]==action]
+                if len(subset)!=4:raise ValueError('Each action category must have four inputs per model')
+                stratified[action][group]={'videos':len(subset),'scores':{k:dict(finite_values([r.get(k) for r in subset]),coverage=sum(r.get(k)is not None for r in subset)/len(subset)) for k in sorted({k for r in subset for k in r})}}
     groups={}
     for group in ('baseline','anyid','standin'):
         subset=[scores[sid] for sid,r in ids.items() if r['group']==group]
         metrics=sorted({k for r in subset for k in r})
         groups[group]={'videos':len(subset),'scores':{k:dict(finite_values([r.get(k) for r in subset]),coverage=sum(r.get(k)is not None for r in subset)/len(subset)) for k in metrics}}
     output={'status':'completed_native_baseline_comparison','decision':'report_native_system_tradeoffs_no_automatic_winner',
-       'comparison':comparison,'groups':groups,'identity_coverage_diagnostics':identity_coverage_summary(identity_records),
+       'comparison':comparison,'groups':groups,'action_stratified_groups':stratified,'cohort':ledger.get('cohort','original_talking_head_development'),
+       'identity_coverage_diagnostics':identity_coverage_summary(identity_records),
        'generation_runs':generation,'scoring_runs':scoring,
-       'actual_new_gpu_hours':hours,'new_hard_cap_gpu_hours':8,'original_overall_hard_cap_gpu_hours':51.5,
-       'new_generated_videos':51,'main_comparison_videos':48,'training_performed':False,'new_architecture_changes':False,
+       'actual_new_gpu_hours':hours,'new_hard_cap_gpu_hours':ledger['new_hard_cap_gpu_hours'],'original_overall_hard_cap_gpu_hours':ledger['original_overall_cap_gpu_hours'],
+       'new_generated_videos':sum(e['count'] for e in ledger['runs']),'main_comparison_videos':len(panel),'training_performed':False,'new_architecture_changes':False,
        'official_final_score':None,'action_naturalness_verified':False,'retry_count':0,
        'native_system_settings':{a:{k:c['parameters'].get(k) for k in ('num_inference_steps','cfg_scale','sample_shift','negative_prompt','t5_cpu')} for a,c in configs.items()},
        'limitations':['Same original prompt/reference/seed/output specification and frozen scores; native preprocess/sampler/shift/negative prompts differ.',
           'Different model architectures do not share identical noise from a numeric seed; not a single-factor weight ablation.',
-          'Small talking-head development cohort, eightactors/one seed; no broad action or SOTA claim.',
+          'Small eight-actor development cohort/one seed with talking-head-source references; no broad action or SOTA claim.',
           'Cur/Arc largest-face policy can differ from strictsingle-face protocol; retain detection and score coverage.',
           'No combined metric, automatic champion or exact official score; human/natural-action validation remains missing.']}
     write_json(args.output,output);print('Native baseline audit complete,51videos core5+aux;GPUh',hours)
