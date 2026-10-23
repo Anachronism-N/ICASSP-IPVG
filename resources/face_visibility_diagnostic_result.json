@@ -3,7 +3,8 @@
   "diagnostic_only": true,
   "existing_scores_modified": false,
   "official_score": null,
-  "code_commit": "e11be0e",
+  "archived_code_commit": "e11be0e",
+  "provenance_notice": "Diagnostic launch preceded this archival commit; launch-time HEAD was not recorded in the diagnostic JSON. This field identifies the archived implementation, not the launch-time HEAD.",
   "protocol": {
     "version": "face_visibility_diagnostic_cpu_v1",
     "scales": [320, 640],
