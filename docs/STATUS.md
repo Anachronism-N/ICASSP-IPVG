@@ -99,7 +99,7 @@ CPU双尺度诊断完整处理48/48旧主视频、2352个实际帧和8去重参�
 
 全16输入Cur/Arc：VACE.076055/.076323、AnyID.471180/.471088、Stand-In.427261/.416936；facecoverage45.7031%/60.5469%/75.3906%，全missing5/6/2条。GME.548098/.321755/.445105，MUSIQ.530477/.657986/.669959；没有统一winner。AnyID全身坐下4/4视频全missing、全身行走2/4全missing；Stand-In两全身模板各1/4missing，coverage75%/73.4375%，但RAFT明显运动全身两组均0/4，不能将高coverage/平滑说成完成动作。portrait/halfbody/fullbody取舍显著，旧头部域最高身份不足以晋级广动作base。
 
-分动作全部缺失/条件均值在评分结束后仅补分析脚本，原生成executioncommit仍e11be0e/sourceSHA不变，分析SHA另记。新增四视频全缺失/部分有效/全有效测试后完整CPU回归614passed/7skip、CPU烟测passed。完整三组/四动作逐维及配对差/成本见`resources/action_baselines_result.json`和[实验报告](EXPERIMENT_TWO_TRACKS.md)末节；GME顺序盲、RAFT非动作完成率、没有真实人工/官方分数，结论保持开发系统取舍、不宣布最终base或SOTA。
+分动作全部缺失/条件均值在评分结束后仅补分析脚本，原生成executioncommit仍e11be0e/sourceSHA不变，分析SHA另记。新增四视频全缺失/部分有效/全有效测试后完整CPU回归614passed/7skip、CPU烟测passed。从原八评分独立CPU复算736项group/动作均值、coverage/完全missing、条件均值、五core等视频/actor差和总预算0 mismatch；历史基线重新CPU审计原分数/配对差/预算完全不变。完整三组/四动作逐维及配对差/成本见`resources/action_baselines_result.json`和[实验报告](EXPERIMENT_TWO_TRACKS.md)末节；GME顺序盲、RAFT非动作完成率、没有真实人工/官方分数，结论保持开发系统取舍、不宣布最终base或SOTA。
 
 ## 当前实验与限制
 
