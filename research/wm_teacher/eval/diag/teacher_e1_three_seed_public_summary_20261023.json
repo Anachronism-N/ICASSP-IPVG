@@ -1,0 +1,82 @@
+{
+ "protocol": "E1 s12_c5 vs s5_c5 across 3 generation seeds (dev set 94)",
+ "seeds": {
+  "seed0_s5_c5": {
+   "i2v_subject": 0.9770529229400006,
+   "i2v_background": 0.9820429852715832,
+   "subject_consistency": 0.9279885954150917,
+   "background_consistency": 0.9478848071808511,
+   "motion_smoothness": 0.9896258254809215,
+   "aesthetic_quality": 0.48424174018362737,
+   "imaging_quality": 0.6686046799209806,
+   "dynamic_degree": 0.574468085106383,
+   "dreamsim": 0.15912578302495023,
+   "motion_ratio": 0.8176038544107919
+  },
+  "seed0_s12_c5": {
+   "i2v_subject": 0.9785897665312315,
+   "i2v_background": 0.9816170694203453,
+   "subject_consistency": 0.9248337063158975,
+   "background_consistency": 0.945540191433954,
+   "motion_smoothness": 0.9907040157720237,
+   "aesthetic_quality": 0.4865355846729684,
+   "imaging_quality": 0.6634821166626615,
+   "dynamic_degree": 0.5957446808510638,
+   "dreamsim": 0.16373466013382512,
+   "motion_ratio": 0.7857002188403183
+  },
+  "seed1_s5_c5": {
+   "i2v_subject": 0.9813237919626717,
+   "i2v_background": 0.9837497167796531,
+   "subject_consistency": 0.9367556980480802,
+   "background_consistency": 0.949988095980164,
+   "motion_smoothness": 0.9919231018909263,
+   "aesthetic_quality": 0.4850939030342914,
+   "imaging_quality": 0.6628863277388348,
+   "dynamic_degree": 0.5425531914893617,
+   "dreamsim": 0.15102381528692044,
+   "motion_ratio": 0.798522814034946
+  },
+  "seed1_s12_c5": {
+   "i2v_subject": 0.9829243266154477,
+   "i2v_background": 0.9858740233725055,
+   "subject_consistency": 0.9382262669701843,
+   "background_consistency": 0.9526778633712877,
+   "motion_smoothness": 0.9925198378769233,
+   "aesthetic_quality": 0.48150071152981294,
+   "imaging_quality": 0.6659802214097783,
+   "dynamic_degree": 0.5212765957446809,
+   "dreamsim": 0.15348417919578283,
+   "motion_ratio": 0.8001034261660791
+  },
+  "seed2_s5_c5": {
+   "i2v_subject": 0.9822402220441305,
+   "i2v_background": 0.9851534028430569,
+   "subject_consistency": 0.9315674926880879,
+   "background_consistency": 0.9487216056661404,
+   "motion_smoothness": 0.9916525518245248,
+   "aesthetic_quality": 0.4825649578520592,
+   "imaging_quality": 0.6688401484753558,
+   "dynamic_degree": 0.574468085106383,
+   "dreamsim": 0.16023789953889578,
+   "motion_ratio": 0.7854551882475284
+  },
+  "seed2_s12_c5": {
+   "i2v_subject": 0.9826855385921738,
+   "i2v_background": 0.9855084108973436,
+   "subject_consistency": 0.9284255872526807,
+   "background_consistency": 0.9471782819599125,
+   "motion_smoothness": 0.9918379265707288,
+   "aesthetic_quality": 0.483278400403388,
+   "imaging_quality": 0.6682304367483322,
+   "dynamic_degree": 0.5851063829787234,
+   "dreamsim": 0.16732274075137807,
+   "motion_ratio": 0.7945855934430036
+  }
+ },
+ "conclusion": "The E1 selection of s12_c5 was within generation-seed noise: dynamic delta per seed +2.13/-2.13/+1.06pp (mean +0.36pp, std 3.29pp). Consistent with E2 full-benchmark non-transfer. Inference sampling parameters offer no real gain for the dynamic gap.",
+ "caveats": [
+  "94-case dev set, 3 seeds",
+  "consistent with E2 frozen single run on 355 public prompts"
+ ]
+}
