@@ -7,6 +7,13 @@ from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 
+# Public snapshot guard: these tests need private helpers (prepare_e1_devset) not in the snapshot.
+_HAS_PRIVATE_DEPS = (SCRIPTS / "prepare_e1_devset.py").is_file() and (SCRIPTS / "score_e3_motion.py").is_file()
+
+import unittest as _u
+if not _HAS_PRIVATE_DEPS:
+    raise _u.SkipTest('e3_data tests require private helpers (prepare_e1_devset/score_e3_motion) absent from the public snapshot')
+
 
 def _load(name):
     spec = importlib.util.spec_from_file_location(name, SCRIPTS / f"{name}.py")

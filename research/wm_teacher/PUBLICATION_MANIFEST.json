@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "549878ed9d7e2936310264b3f0a94cd6841c6374243e6c475b2b2458552cc55d",
-      "snapshot_sha256": "549878ed9d7e2936310264b3f0a94cd6841c6374243e6c475b2b2458552cc55d"
+      "source_sha256": "a609da0c893b460a20238ed928185957189d73ea7f0eb64907f5149c3d08166e",
+      "snapshot_sha256": "a609da0c893b460a20238ed928185957189d73ea7f0eb64907f5149c3d08166e"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -689,8 +689,8 @@
     },
     {
       "path": "tests/test_e3_train.py",
-      "source_sha256": "135e5dec9226684032e09e288b4a52441fb3a29d426ed1a9f9ef28d342b50379",
-      "snapshot_sha256": "135e5dec9226684032e09e288b4a52441fb3a29d426ed1a9f9ef28d342b50379"
+      "source_sha256": "d456cd0648cd2c225d44ccba33fcc9e8b0534be937540cbd4ff8d099b4a98332",
+      "snapshot_sha256": "d456cd0648cd2c225d44ccba33fcc9e8b0534be937540cbd4ff8d099b4a98332"
     },
     {
       "path": "tests/test_recaption_e3.py",
@@ -699,8 +699,13 @@
     },
     {
       "path": "tests/test_e3_data.py",
-      "source_sha256": "8093560bfe930e70ae511bb61a6d94416bd9da3c22e8b1d7ee9e32b33c8535a2",
-      "snapshot_sha256": "8093560bfe930e70ae511bb61a6d94416bd9da3c22e8b1d7ee9e32b33c8535a2"
+      "source_sha256": "c932a882101ae59e8566c0b98e96c99d1d3c399deb6ba59952d248e0171a72d8",
+      "snapshot_sha256": "c932a882101ae59e8566c0b98e96c99d1d3c399deb6ba59952d248e0171a72d8"
+    },
+    {
+      "path": "docs/47_节点idea全景与SOTA距离.md",
+      "source_sha256": "8f911a5ed523e039725531ab02ac6b3a504f4dd2b906247fc211dd521e7a61f7",
+      "snapshot_sha256": "8f911a5ed523e039725531ab02ac6b3a504f4dd2b906247fc211dd521e7a61f7"
     }
   ],
   "experiment_progress": {
@@ -831,5 +836,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "E1 three-seed variance analysis (s12_c5 selection was seed noise) + E3 trainer/recaption/pool code with DDP device fix"
+  "latest_increment_scope": "Node idea panorama, SOTA gap summary, AR-training precondition; E3 test public-snapshot guards"
 }

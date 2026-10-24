@@ -15,6 +15,10 @@ os.environ['CUDA_VISIBLE_DEVICES'] = ''
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / 'scripts'
 FRAMEWORK = ROOT / 'DiffSynth-Studio'
+# Public snapshot guard: the trainer imports private helpers (run_teacher_training_smoke /
+# run_teacher_mechanism_probe) that are not part of the public snapshot.
+if not (SCRIPTS / 'cache_e3_inputs.py').is_file() or not (SCRIPTS / 'merge_e3_lora.py').is_file():
+    raise unittest.SkipTest('e3_train tests require cache/merge helpers absent from the public snapshot')
 sys.path.insert(0, str(SCRIPTS))
 import train_e3_lora as tr  # noqa: E402
 import cache_e3_inputs as ce  # noqa: E402
