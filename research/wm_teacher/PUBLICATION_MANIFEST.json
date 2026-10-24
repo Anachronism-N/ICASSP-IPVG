@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "a609da0c893b460a20238ed928185957189d73ea7f0eb64907f5149c3d08166e",
-      "snapshot_sha256": "a609da0c893b460a20238ed928185957189d73ea7f0eb64907f5149c3d08166e"
+      "source_sha256": "47397a740837919b95f295b122cf79eb9e0d8c2768530ea6a57bbfe18e06373e",
+      "snapshot_sha256": "47397a740837919b95f295b122cf79eb9e0d8c2768530ea6a57bbfe18e06373e"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -706,6 +706,11 @@
       "path": "docs/47_节点idea全景与SOTA距离.md",
       "source_sha256": "8f911a5ed523e039725531ab02ac6b3a504f4dd2b906247fc211dd521e7a61f7",
       "snapshot_sha256": "8f911a5ed523e039725531ab02ac6b3a504f4dd2b906247fc211dd521e7a61f7"
+    },
+    {
+      "path": "docs/48_背景实验全景与阶段总结.md",
+      "source_sha256": "8df83b4fc88b74698d76dc94812b2d89ba62ba2090676564631028331f939ca7",
+      "snapshot_sha256": "8df83b4fc88b74698d76dc94812b2d89ba62ba2090676564631028331f939ca7"
     }
   ],
   "experiment_progress": {
@@ -836,5 +841,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "Node idea panorama, SOTA gap summary, AR-training precondition; E3 test public-snapshot guards"
+  "latest_increment_scope": "Full background/experiment panorama/stage summary (docs/48)"
 }

@@ -40,6 +40,7 @@ FILES = [
     "eval/diag/teacher_e1_three_seed_public_summary_20261023.json",
     "docs/46_E2完整基准结论.md",
     "docs/47_节点idea全景与SOTA距离.md",
+    "docs/48_背景实验全景与阶段总结.md",
     "eval/e2_s12c5_20261021/plan.json",
     "training_metadata/teacher_namespace_candidates_20261020_v1/eligibility_summary.json",
     "eval/diag/namespace_inventory_public_summary_20261020.json",
