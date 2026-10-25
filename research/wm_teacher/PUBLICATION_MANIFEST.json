@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "6e562307ee2e7f438233e647b801611a16e4a18568fd78d1a7c2bc76fb46e2dc",
-      "snapshot_sha256": "6e562307ee2e7f438233e647b801611a16e4a18568fd78d1a7c2bc76fb46e2dc"
+      "source_sha256": "a031be4c486d7990fe1b149e5f5f6c76ad06f9fe2c1bae82340e925c81f81fc3",
+      "snapshot_sha256": "a031be4c486d7990fe1b149e5f5f6c76ad06f9fe2c1bae82340e925c81f81fc3"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -796,6 +796,46 @@
       "path": "eval/diag/teacher_e3_subset_preregistered_public_20261025.json",
       "source_sha256": "0316dc0ffb1e8ddab2e3dbd6554f49b3123927b2d8dedbe84f29e9eba8843703",
       "snapshot_sha256": "0316dc0ffb1e8ddab2e3dbd6554f49b3123927b2d8dedbe84f29e9eba8843703"
+    },
+    {
+      "path": "scripts/run_e3_subset_recovery.py",
+      "source_sha256": "4f17e00917e990b8341cc1d6907bc60453bd850acf51e481bd0ed7a9878ce5ac",
+      "snapshot_sha256": "4f17e00917e990b8341cc1d6907bc60453bd850acf51e481bd0ed7a9878ce5ac"
+    },
+    {
+      "path": "tests/test_e3_subset_recovery.py",
+      "source_sha256": "cdb83c4447744fbe3380b1c48d36a2f08b228853ee351e1d62392a56c7d6093c",
+      "snapshot_sha256": "cdb83c4447744fbe3380b1c48d36a2f08b228853ee351e1d62392a56c7d6093c"
+    },
+    {
+      "path": "scripts/teacher_alg.py",
+      "source_sha256": "3f040f65e8ede76c998472581b9be1d0ad2bff486b4cac77f2d1385fa368761e",
+      "snapshot_sha256": "3f040f65e8ede76c998472581b9be1d0ad2bff486b4cac77f2d1385fa368761e"
+    },
+    {
+      "path": "tests/test_teacher_alg.py",
+      "source_sha256": "1e6a220b3d75dddafe9e57b889e305fe9be66b163829b6323200d79d83eeef8d",
+      "snapshot_sha256": "1e6a220b3d75dddafe9e57b889e305fe9be66b163829b6323200d79d83eeef8d"
+    },
+    {
+      "path": "docs/51_免训练Teacher多维策略有限实验预注册.md",
+      "source_sha256": "1f6a01889060bab1859f3dffcb955c17598f2425699697e271c63c4049e4b604",
+      "snapshot_sha256": "1f6a01889060bab1859f3dffcb955c17598f2425699697e271c63c4049e4b604"
+    },
+    {
+      "path": "docs/52_四基准SOTA逐维对照与协议核验.md",
+      "source_sha256": "58a7c8580a3331312fbd47c45c81475a27221d3e76a2ceb656e2e9a6afd285b7",
+      "snapshot_sha256": "58a7c8580a3331312fbd47c45c81475a27221d3e76a2ceb656e2e9a6afd285b7"
+    },
+    {
+      "path": "eval/diag/teacher_sota_protocol_public_20261025.json",
+      "source_sha256": "d12c9bd67ec48eb1a32410f31f5c678707bf201fb566e14bc69e55ef21157bed",
+      "snapshot_sha256": "d12c9bd67ec48eb1a32410f31f5c678707bf201fb566e14bc69e55ef21157bed"
+    },
+    {
+      "path": "DiffSynth-Studio/diffsynth/diffusion/base_pipeline.py",
+      "source_sha256": "60958bdbfd5dba507da4352ef65592ddc7082758942aba5efc1a3ef309b941f6",
+      "snapshot_sha256": "60958bdbfd5dba507da4352ef65592ddc7082758942aba5efc1a3ef309b941f6"
     }
   ],
   "experiment_progress": {
@@ -926,5 +966,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "C fixed stratified subset preparation, supervision and original scorers; no GPU/quality claim"
+  "latest_increment_scope": "Finite recovery, ALG isolated CPU mechanism and four-benchmark SOTA protocol reference; no quality claim"
 }

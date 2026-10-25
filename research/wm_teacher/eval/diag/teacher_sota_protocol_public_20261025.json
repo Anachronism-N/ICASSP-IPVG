@@ -1,0 +1,128 @@
+{
+  "access_date": "2026-10-25",
+  "source": "https://vchitect-vbench-leaderboard.hf.space/config",
+  "dataframe_component": 69,
+  "model_count": 36,
+  "kind": "Published leaderboard reference, not paired same-protocol experiment",
+  "local_version": "Wan2.2-TI2V-5B base raw s5c5 seed0",
+  "dimensions": [
+    {
+      "dim": "i2v_subject",
+      "local_pct": 97.82692885418552,
+      "published_max_pct": 99.38,
+      "model": "LTX-2-I2V (w/o prompt optimized)",
+      "published_descriptive_delta_pp": -1.5530711458144708,
+      "matched_sota_gap": null,
+      "status": "published_table_value_only"
+    },
+    {
+      "dim": "i2v_background",
+      "local_pct": 99.09327113696739,
+      "published_max_pct": 99.64,
+      "model": "ToMoviee-2.0",
+      "published_descriptive_delta_pp": -0.5467288630326124,
+      "matched_sota_gap": null,
+      "status": "published_table_value_only"
+    },
+    {
+      "dim": "subject_consistency",
+      "local_pct": 95.44887364015418,
+      "published_max_pct": 98.9,
+      "model": "Animate-Anything",
+      "published_descriptive_delta_pp": -3.45112635984583,
+      "matched_sota_gap": null,
+      "status": "published_table_value_only"
+    },
+    {
+      "dim": "background_consistency",
+      "local_pct": 97.54072743453747,
+      "published_max_pct": 98.79,
+      "model": "VideoCrafter-I2V",
+      "published_descriptive_delta_pp": -1.2492725654625332,
+      "matched_sota_gap": null,
+      "status": "published_table_value_only"
+    },
+    {
+      "dim": "motion_smoothness",
+      "local_pct": 98.70531319019015,
+      "published_max_pct": 99.61,
+      "model": "STIV Apple",
+      "published_descriptive_delta_pp": -0.9046868098098457,
+      "matched_sota_gap": null,
+      "status": "published_table_value_only"
+    },
+    {
+      "dim": "dynamic_degree",
+      "local_pct": 56.09756097560976,
+      "published_max_pct": 83.01,
+      "model": "DynamiCrafter-CIL-512",
+      "published_descriptive_delta_pp": -26.912439024390245,
+      "matched_sota_gap": null,
+      "status": "published_table_value_only"
+    },
+    {
+      "dim": "aesthetic_quality",
+      "local_pct": 61.9714569961521,
+      "published_max_pct": 70.21,
+      "model": "CogVideoX1.5-5B-I2V",
+      "published_descriptive_delta_pp": -8.238543003847894,
+      "matched_sota_gap": null,
+      "status": "needs_source_validation_suspected_column_shift"
+    },
+    {
+      "dim": "imaging_quality",
+      "local_pct": 71.06062536762475,
+      "published_max_pct": 97.07,
+      "model": "CogVideoX1.5-5B-I2V",
+      "published_descriptive_delta_pp": -26.00937463237524,
+      "matched_sota_gap": null,
+      "status": "needs_source_validation_suspected_column_shift"
+    }
+  ],
+  "excluded_suspect_row_maxima": {
+    "aesthetic_quality": {
+      "model": "Animate-Anything",
+      "published_pct": 67.12,
+      "descriptive_delta_pp": -5.148543003847905
+    },
+    "imaging_quality": {
+      "model": "Pi",
+      "published_pct": 72.86,
+      "descriptive_delta_pp": -1.7993746323752475
+    }
+  },
+  "total_star": {
+    "local": 89.86007506693805,
+    "DreamX_recomputed_8dims": 90.78772167521008,
+    "published_original_total": 90.49,
+    "delta_pp": -0.9276466082720276,
+    "camera_not_evaluated": true
+  },
+  "protocol_caveat": "Local core355 one seed; official core355 five videos each. Resolution, frames, seed counts and model version differ. No strict SOTA or paired significance claim.",
+  "other_benchmarks": {
+    "wm108": {
+      "external_sota": null,
+      "gap": null,
+      "reason": "project-specific domainset"
+    },
+    "physics_iq": {
+      "local_original_pct": 30.13037868892134,
+      "published_original_i2v_no_bon": 43.8,
+      "published_original_i2v_bon": 48.9,
+      "published_verified_i2v_bon": 55.1,
+      "matched_gap": null,
+      "reason": "Original/Verified and BoN, context, checkpoint, run protocols differ",
+      "source": "https://physics-iq.github.io/"
+    },
+    "worldmodelbench": {
+      "local_judge_base": 8.297142857142857,
+      "local_judge_s12": 8.397142857142857,
+      "published_kling_judge": 9.1,
+      "published_kling_human": 8.82,
+      "matched_gap": null,
+      "reason": "historical mixed T2V/I2V row; exact checkpoint and generation protocol undisclosed",
+      "source": "https://worldmodelbench-team.github.io/"
+    }
+  },
+  "sota_verified": false
+}
