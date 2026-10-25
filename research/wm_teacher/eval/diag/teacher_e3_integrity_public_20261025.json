@@ -1,0 +1,30 @@
+{
+  "protocol": "Independent E3 seed0 and E1 seed3 integrity audit",
+  "counts": {
+    "e3": 282,
+    "seed3": 188,
+    "base_reused": 94
+  },
+  "full_decode_passed": 564,
+  "frames": 121,
+  "width": 1280,
+  "height": 704,
+  "fps": 24,
+  "stage_sha256_matched": 564,
+  "stage_missing": 0,
+  "stage_mismatched": 0,
+  "e3_score_groups": 24,
+  "seed3_score_groups": 16,
+  "cases_per_group": 94,
+  "finite_exact_coverage": true,
+  "gt_dataset_duration_verified": true,
+  "summary_independent_formula_and_paired_bootstrap_verified": true,
+  "bootstrap_B": 2000,
+  "bootstrap_seed": 20261021,
+  "selected": "armC_fixed_anchor",
+  "quality_promoted": false,
+  "sota_proven": false,
+  "old_duplicate_gpu_hours_reported": 2.131666666666667,
+  "billing_exact_complete_verified": false,
+  "billing_caveat": "Old duplicate duration supported by managed task exit records; inherited process end times bounded by observed snapshots. Reservations separate."
+}

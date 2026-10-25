@@ -35,7 +35,8 @@ ROOT = "/srv/wm_teacher"
 E1 = f"{ROOT}/eval/e1_devset_20261021"
 VBREPO = "/dockerdata/wm_eval/VBench"
 WORK_BASE = "/dockerdata/wm_eval/work"
-CONFIGS = [config_name(s, c) for s in SHIFTS for c in CFGS]
+CONFIGS = [config_name(s, c) for s in SHIFTS for c in CFGS] + ["z0_s5_c5", "z2_s5_c5"]  # E1b CFG-Zero* variants
+E3_ARMS = ["armA_orig", "armB_fixed", "armC_fixed_anchor"]  # E3 three-arm dev-set eval (same scorer, root eval/e3_devset_eval_20261024)
 DEFAULT_CONFIG = config_name(*DEFAULT)
 GT_KEYS = ("dreamsim", "dreamsim_last", "motion_ratio")
 # Preregistered rule (docs/43 section 3). Deltas are config minus default on dev-set means; 1pp = 0.01.
@@ -211,6 +212,9 @@ def guard_checks(s, d, rule=RULE):
 
 
 def parse_config(name):
+    """Grid configs are s<shift>_c<cfg>; E1b CFG-Zero* variants report their base grid point."""
+    if name.startswith("z"):
+        return parse_config(name.split("_", 1)[1])
     s, c = name[1:].split("_c")
     return int(s), int(c)
 
@@ -291,7 +295,7 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     for name in ("vbench", "gtref"):
         p = sub.add_parser(name)
-        p.add_argument("configs", nargs="+", choices=CONFIGS)
+        p.add_argument("configs", nargs="+", choices=CONFIGS + E3_ARMS)
         p.add_argument("--root", default=E1, help="dev-set dir with cases.jsonl and videos/<config>/ (smoke only)")
     p = sub.add_parser("summarize")
     p.add_argument("--partial", action="store_true", help="report complete configs only; no selection")

@@ -9,7 +9,7 @@
     {
       "path": "PROGRESS.md",
       "source_sha256": "f1d611eb111f3b91d2d8956a60c747006f03f051f3044426ac881ea4155ce8ee",
-      "snapshot_sha256": "a778b2e8672f598739ed1dc94fc67c36231de1e78260f424ab2e58ae916fcbc1"
+      "snapshot_sha256": "4df51b11aa344ca2a616ec351478fff1fe3ad265560972bafecc2f8b8da78861"
     },
     {
       "path": "docs/README.md",
@@ -48,8 +48,8 @@
     },
     {
       "path": "docs/31_服务器迁移与CodingAgent交接.md",
-      "source_sha256": "ea0ff700e95875e0088e6afac225ce2b9ec5c43d9357d391e2df9213bb2ad222",
-      "snapshot_sha256": "223df7e1fffefdfc0d8a452102dae04ea47d4c40f18bf047f21d3b8c6d4ecbc6"
+      "source_sha256": "6157d98f66878705917f2ee4a15c7ef5c5069bc5428a08c65372cd6d0eaa5da1",
+      "snapshot_sha256": "8707102dcff2fea0e5a0f359b2ed35b6416f0bfbe7c552c7de2ec01df7ecfa77"
     },
     {
       "path": "patches/diffsynth_studio_fb337fb.patch",
@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "47397a740837919b95f295b122cf79eb9e0d8c2768530ea6a57bbfe18e06373e",
-      "snapshot_sha256": "47397a740837919b95f295b122cf79eb9e0d8c2768530ea6a57bbfe18e06373e"
+      "source_sha256": "8c69642a7f0c0d9953cd179a86e808c12565ec0ef38a7345cec0927de70183e7",
+      "snapshot_sha256": "8c69642a7f0c0d9953cd179a86e808c12565ec0ef38a7345cec0927de70183e7"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -624,8 +624,8 @@
     },
     {
       "path": "scripts/score_e1.py",
-      "source_sha256": "52d7f1398aedb9fae4016659d0bb0b32a772c1b7e3f5c570dbb2330e4eb4c650",
-      "snapshot_sha256": "8c2da0406f44c9ccd113ef42b0cd4668d394fee552ca0df0651e366b3f448308"
+      "source_sha256": "1fc1e0bf77f798d66c792f3c2d134077c86fb8b0bd6f8b80a0f1104dd86f2c31",
+      "snapshot_sha256": "d2f7df2074779f8b8d91d935996fd99529c6942519efab2bea59cde9d5db6722"
     },
     {
       "path": "tests/test_e1_devset.py",
@@ -639,8 +639,8 @@
     },
     {
       "path": "tests/test_e1_score.py",
-      "source_sha256": "2d0d805e33255f3208c08681f08b5b04e99bb6300018f13aeb575d088ecdce6a",
-      "snapshot_sha256": "2d0d805e33255f3208c08681f08b5b04e99bb6300018f13aeb575d088ecdce6a"
+      "source_sha256": "55d10b2650e3e5e466632cb1232a56b92443c7a78fb594b951296f2e17d49c85",
+      "snapshot_sha256": "55d10b2650e3e5e466632cb1232a56b92443c7a78fb594b951296f2e17d49c85"
     },
     {
       "path": "eval/diag/teacher_e1_devset_public_summary_20261021.json",
@@ -704,13 +704,58 @@
     },
     {
       "path": "docs/47_节点idea全景与SOTA距离.md",
-      "source_sha256": "8f911a5ed523e039725531ab02ac6b3a504f4dd2b906247fc211dd521e7a61f7",
-      "snapshot_sha256": "8f911a5ed523e039725531ab02ac6b3a504f4dd2b906247fc211dd521e7a61f7"
+      "source_sha256": "4a7276d1d5781ee7e346a0046bd30fc24ec3fd1755eed030718e1c02c9c160c2",
+      "snapshot_sha256": "4a7276d1d5781ee7e346a0046bd30fc24ec3fd1755eed030718e1c02c9c160c2"
     },
     {
       "path": "docs/48_背景实验全景与阶段总结.md",
-      "source_sha256": "8df83b4fc88b74698d76dc94812b2d89ba62ba2090676564631028331f939ca7",
-      "snapshot_sha256": "8df83b4fc88b74698d76dc94812b2d89ba62ba2090676564631028331f939ca7"
+      "source_sha256": "3e9442de2cf929ac7ce7f8b7a2ec675db91c52254f64e7e0d093e468089bb61a",
+      "snapshot_sha256": "3e9442de2cf929ac7ce7f8b7a2ec675db91c52254f64e7e0d093e468089bb61a"
+    },
+    {
+      "path": "docs/49_E3三臂开发集结论与完整基准验收.md",
+      "source_sha256": "cc2ce9eff22479e12d1b9b18f5854b5bc9fd5c72618ca81dafd62fbb6234ae07",
+      "snapshot_sha256": "cc2ce9eff22479e12d1b9b18f5854b5bc9fd5c72618ca81dafd62fbb6234ae07"
+    },
+    {
+      "path": "docs/50_C臂276条分层子集诊断预注册.md",
+      "source_sha256": "fc33bb707d2051e871e42c3538d62ca8199c63ccb588a828946a6a347dd97014",
+      "snapshot_sha256": "fc33bb707d2051e871e42c3538d62ca8199c63ccb588a828946a6a347dd97014"
+    },
+    {
+      "path": "eval/diag/teacher_e3_devset_public_summary_20261025.json",
+      "source_sha256": "e4aca435c94f864a969b243cff641dae09ae5b1fd30f2a6f09c7ba7144383714",
+      "snapshot_sha256": "e4aca435c94f864a969b243cff641dae09ae5b1fd30f2a6f09c7ba7144383714"
+    },
+    {
+      "path": "eval/diag/teacher_e3_integrity_public_20261025.json",
+      "source_sha256": "b7d4bcd5a13d90bb4c47d49116bf7125855f27708fbbe240923f99911671bd29",
+      "snapshot_sha256": "b7d4bcd5a13d90bb4c47d49116bf7125855f27708fbbe240923f99911671bd29"
+    },
+    {
+      "path": "eval/diag/teacher_e1_four_seed_public_summary_20261025.json",
+      "source_sha256": "04889d3f3af783f0948766eff73c57de1334eb98312695bc8b675f7a7f9de908",
+      "snapshot_sha256": "04889d3f3af783f0948766eff73c57de1334eb98312695bc8b675f7a7f9de908"
+    },
+    {
+      "path": "scripts/summarize_e3.py",
+      "source_sha256": "b8e5eceb4927d61291718bdb8b157f6af7e7556b67e227396e422f932ab76714",
+      "snapshot_sha256": "b8e5eceb4927d61291718bdb8b157f6af7e7556b67e227396e422f932ab76714"
+    },
+    {
+      "path": "scripts/summarize_e1_seeds.py",
+      "source_sha256": "39773dfc88cfbb810c2aca01b0b30e67a0b5dde630ac4ecbe88b4bbd5743fe98",
+      "snapshot_sha256": "39773dfc88cfbb810c2aca01b0b30e67a0b5dde630ac4ecbe88b4bbd5743fe98"
+    },
+    {
+      "path": "tests/test_summarize_e3.py",
+      "source_sha256": "ae88cfcd92945a98127592c8cda9f36d7e00f69f69c2544fa6ef59cbd14d0187",
+      "snapshot_sha256": "ae88cfcd92945a98127592c8cda9f36d7e00f69f69c2544fa6ef59cbd14d0187"
+    },
+    {
+      "path": "tests/test_e1_seeds.py",
+      "source_sha256": "1bd700d6e9da7b8e939efca598c7a59f124bb0a885d63ee5637cad3e9a5817d4",
+      "snapshot_sha256": "1bd700d6e9da7b8e939efca598c7a59f124bb0a885d63ee5637cad3e9a5817d4"
     }
   ],
   "experiment_progress": {
@@ -841,5 +886,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "Full background/experiment panorama/stage summary (docs/48)"
+  "latest_increment_scope": "E3 three-arm seed0 integrity/results, E1 four-seed results, frozen C 276 subset preregistration (docs/47-50), updated docs/31 handoff and historical PROGRESS backup-path redaction; subset implementation excluded"
 }

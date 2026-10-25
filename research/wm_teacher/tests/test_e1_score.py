@@ -26,7 +26,9 @@ class SelectionRuleTests(unittest.TestCase):
         self.assertEqual(sc.RULE, {"motion_smoothness_min_delta": -0.003, "subject_consistency_min_delta": -0.010,
                                    "dreamsim_max_delta": 0.005, "motion_ratio_max_delta": 0.05})
         self.assertEqual(sc.DEFAULT_CONFIG, "s5_c5")
-        self.assertEqual(len(sc.CONFIGS), 12)
+        self.assertEqual(sc.CONFIGS[:12], [f"s{s}_c{c}" for s in (3, 5, 8, 12) for c in (4, 5, 6)])  # E1 grid
+        self.assertEqual(sc.CONFIGS[12:], ["z0_s5_c5", "z2_s5_c5"])  # E1 grid selection is unchanged
+        self.assertEqual(sc.E3_ARMS, ["armA_orig", "armB_fixed", "armC_fixed_anchor"])
 
     def test_exact_boundaries_pass(self):
         s = {"s5_c5": cfg(), "s8_c5": cfg(total=0.81, motion_smoothness=0.977, subject_consistency=0.930,

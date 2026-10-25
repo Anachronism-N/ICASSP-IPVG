@@ -17,7 +17,7 @@
 
 > 以下记录当时的导出边界；新机之后已恢复所需生成/评分资产，当前状态见上文。
 
-- 用户要求旧机资产私下导出到仓库外共享目录：`/srv/research/wm_migration_private_20261018`，根目录700、文件600，不公开上传。
+- 用户要求旧机资产私下导出到仓库外共享目录：`PRIVATE_MIGRATION_BACKUP`，根目录700、文件600，不公开上传。
 - 现有会话BatchMode SSH仍可访问旧worker，无需保存或重新获取密码；新服务器密码认证失败不影响本次旧会话导出。
 - **2026-10-18 12:15:23 CST完整私有备份验证通过**：worker6份约94.36GB、launcher9份约169.12GB，加VBench外链真实权重约0.72GB，总16归档264,197,908,480字节。全归档SHA256、15个源目录对比及额外目标对比PASS；207外链均覆盖，pip/conda导出成功，无partial，700/600权限核验通过。
 - 完成证据`manifests/backup_complete.json`及`manifests/final_verification.log`；恢复说明`RESTORE_PRIVATE.md`。新Agent从共享盘恢复即可，不再需要密码登录旧机下载本次列出的资产。回收旧机前仍要确认新机可访问共享备份和项目ROOT、没有其他任务/资产依赖；本次未关机或实际解包，插值实验仍暂停未完成。

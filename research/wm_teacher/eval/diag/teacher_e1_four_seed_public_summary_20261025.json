@@ -1,0 +1,775 @@
+{
+  "protocol": "E1 fixed s12_c5 vs s5_c5 replication on four seeds; docs/43 section 3 guards",
+  "complete": true,
+  "n_groups": 8,
+  "n_cases_per_group": 94,
+  "n_seeds": 4,
+  "configs": [
+    "s5_c5",
+    "s12_c5"
+  ],
+  "baseline": "s5_c5",
+  "candidate": "s12_c5",
+  "delta_definition": "s12_c5 minus s5_c5, paired within each seed on the same cases",
+  "metric_units": {
+    "i2v_subject": "fraction, not percentage points",
+    "i2v_background": "fraction, not percentage points",
+    "subject_consistency": "fraction, not percentage points",
+    "background_consistency": "fraction, not percentage points",
+    "motion_smoothness": "fraction, not percentage points",
+    "dynamic_degree": "fraction, not percentage points",
+    "aesthetic_quality": "fraction, not percentage points",
+    "imaging_quality": "fraction, not percentage points",
+    "dreamsim": "native GT-reference units",
+    "dreamsim_last": "native GT-reference units",
+    "motion_ratio": "native GT-reference units",
+    "total": "fraction, not percentage points"
+  },
+  "guard_rule": {
+    "motion_smoothness_min_delta": -0.003,
+    "subject_consistency_min_delta": -0.01,
+    "dreamsim_max_delta": 0.005,
+    "motion_ratio_max_delta": 0.05
+  },
+  "seeds": {
+    "seed0": {
+      "means": {
+        "s5_c5": {
+          "i2v_subject": 0.9770529229400006,
+          "i2v_background": 0.9820429852715832,
+          "subject_consistency": 0.9279885954150917,
+          "background_consistency": 0.9478848071808511,
+          "motion_smoothness": 0.9896258254809215,
+          "dynamic_degree": 0.574468085106383,
+          "aesthetic_quality": 0.48424174018362737,
+          "imaging_quality": 0.6686046799209806,
+          "dreamsim": 0.15912578302495023,
+          "dreamsim_last": 0.187312587778619,
+          "motion_ratio": 0.8176038544107919,
+          "total": 0.8743071656260979,
+          "i2v": 0.9744040338806879,
+          "quality": 0.774210297371508,
+          "n": 94
+        },
+        "s12_c5": {
+          "i2v_subject": 0.9785897665312315,
+          "i2v_background": 0.9816170694203453,
+          "subject_consistency": 0.9248337063158975,
+          "background_consistency": 0.945540191433954,
+          "motion_smoothness": 0.9907040157720237,
+          "dynamic_degree": 0.5957446808510638,
+          "aesthetic_quality": 0.4865355846729684,
+          "imaging_quality": 0.6634821166626615,
+          "dreamsim": 0.16373466013382512,
+          "dreamsim_last": 0.18990346599132457,
+          "motion_ratio": 0.7857002188403183,
+          "total": 0.8750346562049147,
+          "i2v": 0.9750156704785357,
+          "quality": 0.7750536419312938,
+          "n": 94
+        }
+      },
+      "paired_delta": {
+        "i2v_subject": {
+          "mean": 0.0015368435912309784,
+          "ci95": [
+            -0.0011822997857915585,
+            0.004327733015760459
+          ],
+          "better_cases": 51,
+          "n": 94
+        },
+        "i2v_background": {
+          "mean": -0.00042591585123792777,
+          "ci95": [
+            -0.002701859085800795,
+            0.001758070267895432
+          ],
+          "better_cases": 46,
+          "n": 94
+        },
+        "subject_consistency": {
+          "mean": -0.003154889099194227,
+          "ci95": [
+            -0.005466986921160154,
+            -0.000823420281555003
+          ],
+          "better_cases": 31,
+          "n": 94
+        },
+        "background_consistency": {
+          "mean": -0.002344615746897159,
+          "ci95": [
+            -0.004883007293051862,
+            1.3462364250890225e-05
+          ],
+          "better_cases": 37,
+          "n": 94
+        },
+        "motion_smoothness": {
+          "mean": 0.0010781902911021497,
+          "ci95": [
+            -5.349694960999151e-05,
+            0.0024794258768432538
+          ],
+          "better_cases": 45,
+          "n": 94
+        },
+        "dynamic_degree": {
+          "mean": 0.02127659574468085,
+          "ci95": [
+            -0.031914893617021274,
+            0.07446808510638298
+          ],
+          "better_cases": 4,
+          "n": 94
+        },
+        "aesthetic_quality": {
+          "mean": 0.0022938444893410865,
+          "ci95": [
+            -0.0017228468935540382,
+            0.006297309030877783
+          ],
+          "better_cases": 55,
+          "n": 94
+        },
+        "imaging_quality": {
+          "mean": -0.005122563258319152,
+          "ci95": [
+            -0.009743818373971057,
+            -0.0006423681331934316
+          ],
+          "better_cases": 41,
+          "n": 94
+        },
+        "dreamsim": {
+          "mean": 0.004608877108874898,
+          "ci95": [
+            0.0018455465951709889,
+            0.007526429356835416
+          ],
+          "better_cases": 29,
+          "n": 94
+        },
+        "dreamsim_last": {
+          "mean": 0.0025908782127055715,
+          "ci95": [
+            -0.003929430499989936,
+            0.0092259074779267
+          ],
+          "better_cases": 43,
+          "n": 94
+        },
+        "motion_ratio": {
+          "mean": -0.03190363557047355,
+          "ci95": [
+            -0.07337048088230586,
+            0.012134084447477683
+          ],
+          "better_cases": 56,
+          "n": 94
+        },
+        "total": {
+          "mean": 0.0007274905788168027,
+          "ci95": [
+            -0.002008697748395346,
+            0.0036347956655812573
+          ],
+          "better_cases": 48,
+          "n": 94
+        }
+      },
+      "guard_checks": {
+        "motion_smoothness": true,
+        "subject_consistency": true,
+        "dreamsim": true,
+        "motion_ratio": true
+      },
+      "all_guards_pass": true
+    },
+    "seed1": {
+      "means": {
+        "s5_c5": {
+          "i2v_subject": 0.9813237919626717,
+          "i2v_background": 0.9837497167796531,
+          "subject_consistency": 0.9367556980480802,
+          "background_consistency": 0.949988095980164,
+          "motion_smoothness": 0.9919231018909263,
+          "dynamic_degree": 0.5425531914893617,
+          "aesthetic_quality": 0.4850939030342914,
+          "imaging_quality": 0.6628863277388349,
+          "dreamsim": 0.15102381528692044,
+          "dreamsim_last": 0.18508020106782305,
+          "motion_ratio": 0.798522814034946,
+          "total": 0.8761512672230221,
+          "i2v": 0.9780606676868389,
+          "quality": 0.7742418667592051,
+          "n": 94
+        },
+        "s12_c5": {
+          "i2v_subject": 0.9829243266154477,
+          "i2v_background": 0.9858740233725055,
+          "subject_consistency": 0.9382262669701843,
+          "background_consistency": 0.9526778633712877,
+          "motion_smoothness": 0.9925198378769233,
+          "dynamic_degree": 0.5212765957446809,
+          "aesthetic_quality": 0.48150071152981294,
+          "imaging_quality": 0.6659802214097784,
+          "dreamsim": 0.15348417919578283,
+          "dreamsim_last": 0.18519131236887992,
+          "motion_ratio": 0.8001034261660791,
+          "total": 0.8770003291973827,
+          "i2v": 0.9804362260532931,
+          "quality": 0.7735644323414724,
+          "n": 94
+        }
+      },
+      "paired_delta": {
+        "i2v_subject": {
+          "mean": 0.0016005346527759123,
+          "ci95": [
+            -0.0005797656530395401,
+            0.00405839433219839
+          ],
+          "better_cases": 48,
+          "n": 94
+        },
+        "i2v_background": {
+          "mean": 0.002124306592852505,
+          "ci95": [
+            0.00031980376769887877,
+            0.004397412286476887
+          ],
+          "better_cases": 50,
+          "n": 94
+        },
+        "subject_consistency": {
+          "mean": 0.0014705689221039282,
+          "ci95": [
+            -0.0008650699022708333,
+            0.004410286516558823
+          ],
+          "better_cases": 34,
+          "n": 94
+        },
+        "background_consistency": {
+          "mean": 0.002689767391123663,
+          "ci95": [
+            0.0007894529518506115,
+            0.004480802928302292
+          ],
+          "better_cases": 62,
+          "n": 94
+        },
+        "motion_smoothness": {
+          "mean": 0.0005967359859970554,
+          "ci95": [
+            -8.220311336204607e-05,
+            0.001560688976319137
+          ],
+          "better_cases": 55,
+          "n": 94
+        },
+        "dynamic_degree": {
+          "mean": -0.02127659574468085,
+          "ci95": [
+            -0.06382978723404255,
+            0.02127659574468085
+          ],
+          "better_cases": 1,
+          "n": 94
+        },
+        "aesthetic_quality": {
+          "mean": -0.0035931915044784546,
+          "ci95": [
+            -0.007977383884977787,
+            0.0004627917041169836
+          ],
+          "better_cases": 44,
+          "n": 94
+        },
+        "imaging_quality": {
+          "mean": 0.0030938936709435367,
+          "ci95": [
+            -1.8799323827700665e-05,
+            0.006604560770216239
+          ],
+          "better_cases": 53,
+          "n": 94
+        },
+        "dreamsim": {
+          "mean": 0.0024603639088623926,
+          "ci95": [
+            -1.747874503439905e-05,
+            0.004849260791819146
+          ],
+          "better_cases": 37,
+          "n": 94
+        },
+        "dreamsim_last": {
+          "mean": 0.00011111130105688217,
+          "ci95": [
+            -0.004868620887715766,
+            0.005202552105518098
+          ],
+          "better_cases": 47,
+          "n": 94
+        },
+        "motion_ratio": {
+          "mean": 0.0015806121311331275,
+          "ci95": [
+            -0.0314875864177295,
+            0.03843711525206715
+          ],
+          "better_cases": 50,
+          "n": 94
+        },
+        "total": {
+          "mean": 0.0008490619743606863,
+          "ci95": [
+            -0.0017004883085675227,
+            0.0035319118346814446
+          ],
+          "better_cases": 44,
+          "n": 94
+        }
+      },
+      "guard_checks": {
+        "motion_smoothness": true,
+        "subject_consistency": true,
+        "dreamsim": true,
+        "motion_ratio": true
+      },
+      "all_guards_pass": true
+    },
+    "seed2": {
+      "means": {
+        "s5_c5": {
+          "i2v_subject": 0.9822402220441305,
+          "i2v_background": 0.9851534028430569,
+          "subject_consistency": 0.9315674926880879,
+          "background_consistency": 0.9487216056661404,
+          "motion_smoothness": 0.9916525518245248,
+          "dynamic_degree": 0.574468085106383,
+          "aesthetic_quality": 0.4825649578520592,
+          "imaging_quality": 0.6688401484753559,
+          "dreamsim": 0.16023789953889578,
+          "dreamsim_last": 0.19737040869733122,
+          "motion_ratio": 0.7854551882475284,
+          "total": 0.8778641179679556,
+          "i2v": 0.9795477078830126,
+          "quality": 0.7761805280528986,
+          "n": 94
+        },
+        "s12_c5": {
+          "i2v_subject": 0.9826855385921738,
+          "i2v_background": 0.9855084108973436,
+          "subject_consistency": 0.9284255872526807,
+          "background_consistency": 0.9471782819599125,
+          "motion_smoothness": 0.9918379265707288,
+          "dynamic_degree": 0.5851063829787234,
+          "aesthetic_quality": 0.483278400403388,
+          "imaging_quality": 0.6682304367483323,
+          "dreamsim": 0.16732274075137807,
+          "dreamsim_last": 0.201496995509939,
+          "motion_ratio": 0.7945855934430036,
+          "total": 0.8781409708012855,
+          "i2v": 0.9800488504491945,
+          "quality": 0.7762330911533766,
+          "n": 94
+        }
+      },
+      "paired_delta": {
+        "i2v_subject": {
+          "mean": 0.0004453165480430949,
+          "ci95": [
+            -0.0010657296393145905,
+            0.0016878663621684219
+          ],
+          "better_cases": 55,
+          "n": 94
+        },
+        "i2v_background": {
+          "mean": 0.00035500805428687824,
+          "ci95": [
+            -0.0006043114957023212,
+            0.0013878774817319577
+          ],
+          "better_cases": 47,
+          "n": 94
+        },
+        "subject_consistency": {
+          "mean": -0.0031419054354072024,
+          "ci95": [
+            -0.005465415412731841,
+            -0.0008908584086448983
+          ],
+          "better_cases": 32,
+          "n": 94
+        },
+        "background_consistency": {
+          "mean": -0.0015433237062278345,
+          "ci95": [
+            -0.0036121341353612586,
+            0.00031649542193040964
+          ],
+          "better_cases": 45,
+          "n": 94
+        },
+        "motion_smoothness": {
+          "mean": 0.00018537474620395616,
+          "ci95": [
+            -0.0002457609744854465,
+            0.0006797443604866415
+          ],
+          "better_cases": 48,
+          "n": 94
+        },
+        "dynamic_degree": {
+          "mean": 0.010638297872340425,
+          "ci95": [
+            -0.05319148936170213,
+            0.07446808510638298
+          ],
+          "better_cases": 5,
+          "n": 94
+        },
+        "aesthetic_quality": {
+          "mean": 0.0007134425513287808,
+          "ci95": [
+            -0.0030004632599810338,
+            0.004547875295294092
+          ],
+          "better_cases": 45,
+          "n": 94
+        },
+        "imaging_quality": {
+          "mean": -0.0006097117270235995,
+          "ci95": [
+            -0.004362883156121921,
+            0.0031582443739715236
+          ],
+          "better_cases": 49,
+          "n": 94
+        },
+        "dreamsim": {
+          "mean": 0.007084841212482315,
+          "ci95": [
+            0.0035422109860054974,
+            0.011662151955120952
+          ],
+          "better_cases": 33,
+          "n": 94
+        },
+        "dreamsim_last": {
+          "mean": 0.0041265868126077855,
+          "ci95": [
+            -0.0022447033131376224,
+            0.010962093764163077
+          ],
+          "better_cases": 45,
+          "n": 94
+        },
+        "motion_ratio": {
+          "mean": 0.009130405195475224,
+          "ci95": [
+            -0.022269594009848046,
+            0.039854518457680316
+          ],
+          "better_cases": 48,
+          "n": 94
+        },
+        "total": {
+          "mean": 0.00027685283332992043,
+          "ci95": [
+            -0.0024958931018069504,
+            0.0031766628523185424
+          ],
+          "better_cases": 44,
+          "n": 94
+        }
+      },
+      "guard_checks": {
+        "motion_smoothness": true,
+        "subject_consistency": true,
+        "dreamsim": false,
+        "motion_ratio": true
+      },
+      "all_guards_pass": false
+    },
+    "seed3": {
+      "means": {
+        "s5_c5": {
+          "i2v_subject": 0.9826968025083238,
+          "i2v_background": 0.9857954876774804,
+          "subject_consistency": 0.9375574682462723,
+          "background_consistency": 0.9485645050698138,
+          "motion_smoothness": 0.9917337805271512,
+          "dynamic_degree": 0.5638297872340425,
+          "aesthetic_quality": 0.48236666905119063,
+          "imaging_quality": 0.6664943640920049,
+          "dreamsim": 0.1525935932254115,
+          "dreamsim_last": 0.18899793700968964,
+          "motion_ratio": 0.7879672295160397,
+          "total": 0.878144112733301,
+          "i2v": 0.9802498115727403,
+          "quality": 0.7760384138938615,
+          "n": 94
+        },
+        "s12_c5": {
+          "i2v_subject": 0.9846382803374781,
+          "i2v_background": 0.9865695261971114,
+          "subject_consistency": 0.9358659852520688,
+          "background_consistency": 0.9501834950548538,
+          "motion_smoothness": 0.9929512580808599,
+          "dynamic_degree": 0.5425531914893617,
+          "aesthetic_quality": 0.48300838850914163,
+          "imaging_quality": 0.6640810218091293,
+          "dreamsim": 0.15573333415156562,
+          "dreamsim_last": 0.18729202671253936,
+          "motion_ratio": 0.780247884775871,
+          "total": 0.8782453356906545,
+          "i2v": 0.981910835747822,
+          "quality": 0.774579835633487,
+          "n": 94
+        }
+      },
+      "paired_delta": {
+        "i2v_subject": {
+          "mean": 0.0019414778291544992,
+          "ci95": [
+            -6.544589045199432e-05,
+            0.005012213842982949
+          ],
+          "better_cases": 54,
+          "n": 94
+        },
+        "i2v_background": {
+          "mean": 0.0007740385196310303,
+          "ci95": [
+            -0.0008750832714933053,
+            0.0032073820350651916
+          ],
+          "better_cases": 50,
+          "n": 94
+        },
+        "subject_consistency": {
+          "mean": -0.0016914829942034472,
+          "ci95": [
+            -0.0037647575047527614,
+            0.00079361048018467
+          ],
+          "better_cases": 29,
+          "n": 94
+        },
+        "background_consistency": {
+          "mean": 0.001618989985039891,
+          "ci95": [
+            -0.00015232816655585602,
+            0.0035408831657247324
+          ],
+          "better_cases": 56,
+          "n": 94
+        },
+        "motion_smoothness": {
+          "mean": 0.00121747755370869,
+          "ci95": [
+            -8.483228483616097e-05,
+            0.003302572209237761
+          ],
+          "better_cases": 44,
+          "n": 94
+        },
+        "dynamic_degree": {
+          "mean": -0.02127659574468085,
+          "ci95": [
+            -0.05319148936170213,
+            0.0
+          ],
+          "better_cases": 0,
+          "n": 94
+        },
+        "aesthetic_quality": {
+          "mean": 0.0006417194579509979,
+          "ci95": [
+            -0.0027156605365428518,
+            0.0038933807865102242
+          ],
+          "better_cases": 52,
+          "n": 94
+        },
+        "imaging_quality": {
+          "mean": -0.002413342282875623,
+          "ci95": [
+            -0.006311717793877356,
+            0.0013357923268559068
+          ],
+          "better_cases": 45,
+          "n": 94
+        },
+        "dreamsim": {
+          "mean": 0.0031397409261541163,
+          "ci95": [
+            0.000693015754222872,
+            0.00584190048224537
+          ],
+          "better_cases": 35,
+          "n": 94
+        },
+        "dreamsim_last": {
+          "mean": -0.0017059102971503076,
+          "ci95": [
+            -0.007291186997231016,
+            0.003552781140550654
+          ],
+          "better_cases": 46,
+          "n": 94
+        },
+        "motion_ratio": {
+          "mean": -0.007719344740168691,
+          "ci95": [
+            -0.039553495936031635,
+            0.026923474249244038
+          ],
+          "better_cases": 51,
+          "n": 94
+        },
+        "total": {
+          "mean": 0.00010122295735365745,
+          "ci95": [
+            -0.0020057695184162155,
+            0.0029731536454667123
+          ],
+          "better_cases": 47,
+          "n": 94
+        }
+      },
+      "guard_checks": {
+        "motion_smoothness": true,
+        "subject_consistency": true,
+        "dreamsim": true,
+        "motion_ratio": true
+      },
+      "all_guards_pass": true
+    }
+  },
+  "cross_seed_delta": {
+    "i2v_subject": {
+      "mean": 0.0013810431553011211,
+      "sample_std": 0.0006486194571260354,
+      "range": [
+        0.0004453165480430949,
+        0.0019414778291544992
+      ],
+      "n_seeds": 4
+    },
+    "i2v_background": {
+      "mean": 0.0007068593288831214,
+      "sample_std": 0.001067809083737524,
+      "range": [
+        -0.00042591585123792777,
+        0.002124306592852505
+      ],
+      "n_seeds": 4
+    },
+    "subject_consistency": {
+      "mean": -0.0016294271516752372,
+      "sample_std": 0.002177800977831181,
+      "range": [
+        -0.003154889099194227,
+        0.0014705689221039282
+      ],
+      "n_seeds": 4
+    },
+    "background_consistency": {
+      "mean": 0.00010520448075964007,
+      "sample_std": 0.0024283585897835725,
+      "range": [
+        -0.002344615746897159,
+        0.002689767391123663
+      ],
+      "n_seeds": 4
+    },
+    "motion_smoothness": {
+      "mean": 0.0007694446442529628,
+      "sample_std": 0.00047153058891487255,
+      "range": [
+        0.00018537474620395616,
+        0.00121747755370869
+      ],
+      "n_seeds": 4
+    },
+    "dynamic_degree": {
+      "mean": -0.0026595744680851063,
+      "sample_std": 0.021931412902221597,
+      "range": [
+        -0.02127659574468085,
+        0.02127659574468085
+      ],
+      "n_seeds": 4
+    },
+    "aesthetic_quality": {
+      "mean": 1.3953748535602649e-05,
+      "sample_std": 0.002522748041158244,
+      "range": [
+        -0.0035931915044784546,
+        0.0022938444893410865
+      ],
+      "n_seeds": 4
+    },
+    "imaging_quality": {
+      "mean": -0.0012629308993187093,
+      "sample_std": 0.003446197127325296,
+      "range": [
+        -0.005122563258319152,
+        0.0030938936709435367
+      ],
+      "n_seeds": 4
+    },
+    "dreamsim": {
+      "mean": 0.004323455789093431,
+      "sample_std": 0.00204768218702811,
+      "range": [
+        0.0024603639088623926,
+        0.007084841212482315
+      ],
+      "n_seeds": 4
+    },
+    "dreamsim_last": {
+      "mean": 0.001280666507304983,
+      "sample_std": 0.002588655860124834,
+      "range": [
+        -0.0017059102971503076,
+        0.0041265868126077855
+      ],
+      "n_seeds": 4
+    },
+    "motion_ratio": {
+      "mean": -0.007227990746008472,
+      "sample_std": 0.017835521473324564,
+      "range": [
+        -0.03190363557047355,
+        0.009130405195475224
+      ],
+      "n_seeds": 4
+    },
+    "total": {
+      "mean": 0.0004886570859652667,
+      "sample_std": 0.00035679095949609586,
+      "range": [
+        0.00010122295735365745,
+        0.0008490619743606863
+      ],
+      "n_seeds": 4
+    }
+  },
+  "methodology": {
+    "paired_ci": "95% case-bootstrap interval within each seed; descriptive only",
+    "bootstrap_samples": 2000,
+    "bootstrap_seed": 20261021,
+    "sample_std": "standard deviation of seed-level paired means, denominator n_seeds - 1",
+    "inference": "Four seeds are not a strict population-significance claim; shared cases are not independent seed-case samples.",
+    "interpretation": "A gain on one seed does not establish a stable gain across seeds.",
+    "scope": "Fixed two-config replication only; no new selection, tuning or full-benchmark result."
+  }
+}

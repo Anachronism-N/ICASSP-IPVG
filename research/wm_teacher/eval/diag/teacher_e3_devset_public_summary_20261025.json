@@ -1,0 +1,1613 @@
+{
+ "protocol": "E3 three-arm dev-set eval vs base s5_c5 seed0 (docs/43 s3 rule / docs/47 s4 guards)",
+ "n_cases": 94,
+ "arms": [
+  "armA_orig",
+  "armB_fixed",
+  "armC_fixed_anchor"
+ ],
+ "base": "s5_c5",
+ "means": {
+  "armA_orig": {
+   "i2v_subject": 0.9733026708963702,
+   "i2v_background": 0.9796938808167234,
+   "subject_consistency": 0.9213069264644902,
+   "background_consistency": 0.9438832059819647,
+   "motion_smoothness": 0.9887407610019445,
+   "dynamic_degree": 0.5957446808510638,
+   "aesthetic_quality": 0.48565445459903556,
+   "imaging_quality": 0.6678681784848326,
+   "dreamsim": 0.16507723573463182,
+   "dreamsim_last": 0.19232894258296235,
+   "motion_ratio": 0.745126503699836,
+   "total": 0.8719623689315861,
+   "i2v": 0.9706173649890877,
+   "quality": 0.7733073728740844,
+   "n": 94
+  },
+  "armB_fixed": {
+   "i2v_subject": 0.9758583442533904,
+   "i2v_background": 0.9805957436672551,
+   "subject_consistency": 0.9227033363754287,
+   "background_consistency": 0.9442355649691102,
+   "motion_smoothness": 0.9890860873575471,
+   "dynamic_degree": 0.5851063829787234,
+   "aesthetic_quality": 0.48516908097774425,
+   "imaging_quality": 0.6680768015348201,
+   "dreamsim": 0.163628710235687,
+   "dreamsim_last": 0.1913502133907156,
+   "motion_ratio": 0.7534516935986953,
+   "total": 0.8728070311812156,
+   "i2v": 0.9727246158709577,
+   "quality": 0.7728894464914735,
+   "n": 94
+  },
+  "armC_fixed_anchor": {
+   "i2v_subject": 0.9765290708491142,
+   "i2v_background": 0.9804281919227635,
+   "subject_consistency": 0.924943794368218,
+   "background_consistency": 0.9449555850198083,
+   "motion_smoothness": 0.9892440688392529,
+   "dynamic_degree": 0.574468085106383,
+   "aesthetic_quality": 0.48483015311525224,
+   "imaging_quality": 0.6696377958059939,
+   "dreamsim": 0.16277219434367848,
+   "dreamsim_last": 0.18905371744581995,
+   "motion_ratio": 0.7686999486091558,
+   "total": 0.872950701416312,
+   "i2v": 0.9730039643438211,
+   "quality": 0.7728974384888031,
+   "n": 94
+  },
+  "s5_c5": {
+   "i2v_subject": 0.9770529229400006,
+   "i2v_background": 0.9820429852715832,
+   "subject_consistency": 0.9279885954150917,
+   "background_consistency": 0.9478848071808511,
+   "motion_smoothness": 0.9896258254809215,
+   "dynamic_degree": 0.574468085106383,
+   "aesthetic_quality": 0.48424174018362737,
+   "imaging_quality": 0.6686046799209806,
+   "dreamsim": 0.15912578302495023,
+   "dreamsim_last": 0.187312587778619,
+   "motion_ratio": 0.8176038544107919,
+   "total": 0.8743071656260979,
+   "i2v": 0.9744040338806879,
+   "quality": 0.774210297371508,
+   "n": 94
+  }
+ },
+ "paired_vs_base": {
+  "armA_orig": {
+   "i2v_subject": {
+    "mean": -0.0037502520436302213,
+    "ci95": [
+     -0.006819401294627083,
+     -0.0013500981793758728
+    ],
+    "better_cases": 30,
+    "n": 94
+   },
+   "i2v_background": {
+    "mean": -0.002349104454859784,
+    "ci95": [
+     -0.004104701256815446,
+     -0.000575750330661209
+    ],
+    "better_cases": 34,
+    "n": 94
+   },
+   "subject_consistency": {
+    "mean": -0.006681668950601464,
+    "ci95": [
+     -0.00930800076164569,
+     -0.004379172379428413
+    ],
+    "better_cases": 30,
+    "n": 94
+   },
+   "background_consistency": {
+    "mean": -0.0040016011988863,
+    "ci95": [
+     -0.006111134197695029,
+     -0.0018818632085272524
+    ],
+    "better_cases": 27,
+    "n": 94
+   },
+   "motion_smoothness": {
+    "mean": -0.0008850644789770251,
+    "ci95": [
+     -0.0013880009617928408,
+     -0.0003952918197088986
+    ],
+    "better_cases": 23,
+    "n": 94
+   },
+   "dynamic_degree": {
+    "mean": 0.02127659574468085,
+    "ci95": [
+     -0.02127659574468085,
+     0.07446808510638298
+    ],
+    "better_cases": 4,
+    "n": 94
+   },
+   "aesthetic_quality": {
+    "mean": 0.0014127144154081953,
+    "ci95": [
+     -0.001541254051188205,
+     0.004449882405869504
+    ],
+    "better_cases": 47,
+    "n": 94
+   },
+   "imaging_quality": {
+    "mean": -0.0007365014361480042,
+    "ci95": [
+     -0.005320526875656402,
+     0.004050565668960977
+    ],
+    "better_cases": 40,
+    "n": 94
+   },
+   "dreamsim": {
+    "mean": 0.005951452709681599,
+    "ci95": [
+     0.003004975035680946,
+     0.00918054184380998
+    ],
+    "better_cases": 29,
+    "n": 94
+   },
+   "dreamsim_last": {
+    "mean": 0.005016354804343366,
+    "ci95": [
+     -0.00004613336096418665,
+     0.010307262552545425
+    ],
+    "better_cases": 42,
+    "n": 94
+   },
+   "motion_ratio": {
+    "mean": -0.07247735071095585,
+    "ci95": [
+     -0.13278583553923964,
+     -0.018036511894475214
+    ],
+    "better_cases": 54,
+    "n": 94
+   },
+   "total": {
+    "mean": -0.002344796694511894,
+    "ci95": [
+     -0.00504655809642648,
+     0.00022080419141656108
+    ],
+    "better_cases": 36,
+    "n": 94
+   }
+  },
+  "armB_fixed": {
+   "i2v_subject": {
+    "mean": -0.0011945786866101806,
+    "ci95": [
+     -0.003831729949154754,
+     0.0010883410005493605
+    ],
+    "better_cases": 36,
+    "n": 94
+   },
+   "i2v_background": {
+    "mean": -0.001447241604328176,
+    "ci95": [
+     -0.0029727012648227604,
+     0.0005213071770490296
+    ],
+    "better_cases": 33,
+    "n": 94
+   },
+   "subject_consistency": {
+    "mean": -0.005285259039663044,
+    "ci95": [
+     -0.007700089845436471,
+     -0.003169712657439156
+    ],
+    "better_cases": 27,
+    "n": 94
+   },
+   "background_consistency": {
+    "mean": -0.003649242211740908,
+    "ci95": [
+     -0.005531137885776811,
+     -0.001802117097462322
+    ],
+    "better_cases": 31,
+    "n": 94
+   },
+   "motion_smoothness": {
+    "mean": -0.0005397381233744005,
+    "ci95": [
+     -0.0009890971969031147,
+     -0.00007782956425715371
+    ],
+    "better_cases": 24,
+    "n": 94
+   },
+   "dynamic_degree": {
+    "mean": 0.010638297872340425,
+    "ci95": [
+     -0.031914893617021274,
+     0.06382978723404255
+    ],
+    "better_cases": 3,
+    "n": 94
+   },
+   "aesthetic_quality": {
+    "mean": 0.0009273407941168927,
+    "ci95": [
+     -0.0026174837604482125,
+     0.004352267118210488
+    ],
+    "better_cases": 50,
+    "n": 94
+   },
+   "imaging_quality": {
+    "mean": -0.0005278783861606064,
+    "ci95": [
+     -0.004254080916784223,
+     0.003560809057794796
+    ],
+    "better_cases": 48,
+    "n": 94
+   },
+   "dreamsim": {
+    "mean": 0.004502927210736783,
+    "ci95": [
+     0.0020146034393750192,
+     0.007282577930612768
+    ],
+    "better_cases": 35,
+    "n": 94
+   },
+   "dreamsim_last": {
+    "mean": 0.004037625612096584,
+    "ci95": [
+     -0.0002425668087411434,
+     0.008727277212954581
+    ],
+    "better_cases": 40,
+    "n": 94
+   },
+   "motion_ratio": {
+    "mean": -0.06415216081209647,
+    "ci95": [
+     -0.11890041511801788,
+     -0.017234386952110794
+    ],
+    "better_cases": 51,
+    "n": 94
+   },
+   "total": {
+    "mean": -0.0015001344448822805,
+    "ci95": [
+     -0.003959107188577334,
+     0.000970394123734325
+    ],
+    "better_cases": 41,
+    "n": 94
+   }
+  },
+  "armC_fixed_anchor": {
+   "i2v_subject": {
+    "mean": -0.000523852090886285,
+    "ci95": [
+     -0.0018130760164336945,
+     0.0009566752676000263
+    ],
+    "better_cases": 38,
+    "n": 94
+   },
+   "i2v_background": {
+    "mean": -0.0016147933488196596,
+    "ci95": [
+     -0.0028683792514369896,
+     -0.0004247202470581637
+    ],
+    "better_cases": 40,
+    "n": 94
+   },
+   "subject_consistency": {
+    "mean": -0.003044801046873667,
+    "ci95": [
+     -0.004735586350347773,
+     -0.0014865739165362813
+    ],
+    "better_cases": 32,
+    "n": 94
+   },
+   "background_consistency": {
+    "mean": -0.0029292221610427768,
+    "ci95": [
+     -0.004762376284768398,
+     -0.0012060070714206633
+    ],
+    "better_cases": 35,
+    "n": 94
+   },
+   "motion_smoothness": {
+    "mean": -0.0003817566416686251,
+    "ci95": [
+     -0.0007120715584759296,
+     -0.00004901708184779558
+    ],
+    "better_cases": 30,
+    "n": 94
+   },
+   "dynamic_degree": {
+    "mean": 0,
+    "ci95": [
+     -0.031914893617021274,
+     0.031914893617021274
+    ],
+    "better_cases": 1,
+    "n": 94
+   },
+   "aesthetic_quality": {
+    "mean": 0.0005884129316248792,
+    "ci95": [
+     -0.00207072876869364,
+     0.003161658949040352
+    ],
+    "better_cases": 49,
+    "n": 94
+   },
+   "imaging_quality": {
+    "mean": 0.0010331158850133007,
+    "ci95": [
+     -0.002629759208125147,
+     0.004697118529079448
+    ],
+    "better_cases": 47,
+    "n": 94
+   },
+   "dreamsim": {
+    "mean": 0.003646411318728266,
+    "ci95": [
+     0.001734232331844087,
+     0.005988851136772347
+    ],
+    "better_cases": 30,
+    "n": 94
+   },
+   "dreamsim_last": {
+    "mean": 0.0017411296672009407,
+    "ci95": [
+     -0.0028992789856930995,
+     0.006561688920284839
+    ],
+    "better_cases": 51,
+    "n": 94
+   },
+   "motion_ratio": {
+    "mean": -0.04890390580163609,
+    "ci95": [
+     -0.08703026133757284,
+     -0.012843135787877496
+    ],
+    "better_cases": 51,
+    "n": 94
+   },
+   "total": {
+    "mean": -0.0013564642097857107,
+    "ci95": [
+     -0.0029457627985374816,
+     0.00020116699489493325
+    ],
+    "better_cases": 38,
+    "n": 94
+   }
+  }
+ },
+ "judgment": {
+  "rule": {
+   "motion_smoothness_min_delta": -0.003,
+   "subject_consistency_min_delta": -0.01,
+   "dreamsim_max_delta": 0.005,
+   "motion_ratio_max_delta": 0.05
+  },
+  "checks": {
+   "armA_orig": {
+    "motion_smoothness": true,
+    "subject_consistency": true,
+    "dreamsim": false,
+    "motion_ratio": true
+   },
+   "armB_fixed": {
+    "motion_smoothness": true,
+    "subject_consistency": true,
+    "dreamsim": true,
+    "motion_ratio": true
+   },
+   "armC_fixed_anchor": {
+    "motion_smoothness": true,
+    "subject_consistency": true,
+    "dreamsim": true,
+    "motion_ratio": true
+   }
+  },
+  "passing_arms": [
+   "armB_fixed",
+   "armC_fixed_anchor"
+  ],
+  "selected": "armC_fixed_anchor",
+  "negative_result": false,
+  "next_step": "selected arm -> full benchmark acceptance run"
+ },
+ "per_dataset": {
+  "armA_orig": {
+   "celebvhq": {
+    "i2v_subject": 0.9807359548161427,
+    "i2v_background": 0.9885136558363835,
+    "subject_consistency": 0.934287817734811,
+    "background_consistency": 0.945344712999132,
+    "motion_smoothness": 0.9951022761926609,
+    "dynamic_degree": 0.6666666666666666,
+    "aesthetic_quality": 0.5068279902140299,
+    "imaging_quality": 0.6447213175277079,
+    "dreamsim": 0.15920637216832903,
+    "dreamsim_last": 0.18460808197657266,
+    "motion_ratio": 1.0888251371583466,
+    "total": 0.8837149439838861,
+    "i2v": 0.9809418358651075,
+    "quality": 0.7864880521026646,
+    "n": 6
+   },
+   "charades": {
+    "i2v_subject": 0.9914123953382173,
+    "i2v_background": 0.9912190550565719,
+    "subject_consistency": 0.9570568337208695,
+    "background_consistency": 0.945745849609375,
+    "motion_smoothness": 0.9962445405428816,
+    "dynamic_degree": 0.3333333333333333,
+    "aesthetic_quality": 0.43442079424858093,
+    "imaging_quality": 0.6372212665862617,
+    "dreamsim": 0.1395649512608846,
+    "dreamsim_last": 0.1637623111406962,
+    "motion_ratio": 0.9001364456647245,
+    "total": 0.8681710945260466,
+    "i2v": 0.9890258288244966,
+    "quality": 0.7473163602275964,
+    "n": 6
+   },
+   "direct": {
+    "i2v_subject": 0.9821537412206331,
+    "i2v_background": 0.9839893881479899,
+    "subject_consistency": 0.8991823856615357,
+    "background_consistency": 0.9374647352430556,
+    "motion_smoothness": 0.9965335334329044,
+    "dynamic_degree": 0.5,
+    "aesthetic_quality": 0.4223621686299642,
+    "imaging_quality": 0.49454414485899867,
+    "dreamsim": 0.2248085505432553,
+    "dreamsim_last": 0.2565312286218007,
+    "motion_ratio": 0.9904389036379274,
+    "total": 0.8494300294201477,
+    "i2v": 0.9787089693185662,
+    "quality": 0.7201510895217291,
+    "n": 6
+   },
+   "easycom": {
+    "i2v_subject": 0.9896375146806241,
+    "i2v_background": 0.9928456286489963,
+    "subject_consistency": 0.9466475353141626,
+    "background_consistency": 0.952703857421875,
+    "motion_smoothness": 0.9963595499263468,
+    "dynamic_degree": 0.2,
+    "aesthetic_quality": 0.5084774792194366,
+    "imaging_quality": 0.604183698291621,
+    "dreamsim": 0.13368815084298452,
+    "dreamsim_last": 0.1609644651412964,
+    "motion_ratio": 1.392190678042288,
+    "total": 0.8656544898489882,
+    "i2v": 0.9890876966235888,
+    "quality": 0.7422212830743877,
+    "n": 5
+   },
+   "egodex": {
+    "i2v_subject": 0.976620500460267,
+    "i2v_background": 0.9807847854246696,
+    "subject_consistency": 0.9425328853643603,
+    "background_consistency": 0.9558258056640625,
+    "motion_smoothness": 0.9955086231389093,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.4207349220911662,
+    "imaging_quality": 0.7134959174647476,
+    "dreamsim": 0.15680575205220118,
+    "dreamsim_last": 0.1698799729347229,
+    "motion_ratio": 0.39531065413350364,
+    "total": 0.8957654495464247,
+    "i2v": 0.9732989380427983,
+    "quality": 0.8182319610500511,
+    "n": 6
+   },
+   "egoexo4d": {
+    "i2v_subject": 0.9817066505551338,
+    "i2v_background": 0.9778218858192363,
+    "subject_consistency": 0.9338086062007481,
+    "background_consistency": 0.9494459364149305,
+    "motion_smoothness": 0.9939815531505439,
+    "dynamic_degree": 0.5,
+    "aesthetic_quality": 0.4096176475286484,
+    "imaging_quality": 0.6220131613991478,
+    "dreamsim": 0.15192170606719121,
+    "dreamsim_last": 0.16140140096346536,
+    "motion_ratio": 0.2770864141495713,
+    "total": 0.8620066303543266,
+    "i2v": 0.9742714497658009,
+    "quality": 0.7497418109428522,
+    "n": 6
+   },
+   "h2o": {
+    "i2v_subject": 0.9800479393601418,
+    "i2v_background": 0.9850327072143555,
+    "subject_consistency": 0.9310082413752874,
+    "background_consistency": 0.9331351725260417,
+    "motion_smoothness": 0.9943274508208232,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.42481024861335753,
+    "imaging_quality": 0.6539389773282138,
+    "dreamsim": 0.16693270007769265,
+    "dreamsim_last": 0.2210867166519165,
+    "motion_ratio": 0.4722144741705967,
+    "total": 0.8887746002890257,
+    "i2v": 0.9781821526045429,
+    "quality": 0.7993670479735084,
+    "n": 5
+   },
+   "hoigen1m": {
+    "i2v_subject": 0.9757113138089576,
+    "i2v_background": 0.9778088698039452,
+    "subject_consistency": 0.9145717916803228,
+    "background_consistency": 0.9350694444444444,
+    "motion_smoothness": 0.9921327735909441,
+    "dynamic_degree": 0.5,
+    "aesthetic_quality": 0.5081379413604736,
+    "imaging_quality": 0.6942096214189345,
+    "dreamsim": 0.16600391931003994,
+    "dreamsim_last": 0.19194131096204123,
+    "motion_ratio": 0.6803068989105167,
+    "total": 0.8713718727610233,
+    "i2v": 0.9707516647361707,
+    "quality": 0.7719920807858759,
+    "n": 6
+   },
+   "matrix": {
+    "i2v_subject": 0.9453487149129312,
+    "i2v_background": 0.9643521543095509,
+    "subject_consistency": 0.8865558279057343,
+    "background_consistency": 0.9243967692057291,
+    "motion_smoothness": 0.9661728842338572,
+    "dynamic_degree": 0.8333333333333334,
+    "aesthetic_quality": 0.529865230123202,
+    "imaging_quality": 0.7024496030676136,
+    "dreamsim": 0.251059668759505,
+    "dreamsim_last": 0.3045336902141571,
+    "motion_ratio": 0.5426265774585008,
+    "total": 0.8634089860511285,
+    "i2v": 0.9438599600945221,
+    "quality": 0.782958012007735,
+    "n": 6
+   },
+   "mira": {
+    "i2v_subject": 0.9081516357014577,
+    "i2v_background": 0.9426210970183213,
+    "subject_consistency": 0.7779042075698573,
+    "background_consistency": 0.9247063530815972,
+    "motion_smoothness": 0.9458549061160265,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.44341157376766205,
+    "imaging_quality": 0.6503121517906504,
+    "dreamsim": 0.3210692662331793,
+    "dreamsim_last": 0.41083260377248126,
+    "motion_ratio": 0.5769187092619597,
+    "total": 0.8222702789678573,
+    "i2v": 0.9073637388023158,
+    "quality": 0.7371768191333988,
+    "n": 6
+   },
+   "noxi": {
+    "i2v_subject": 0.9846206334978342,
+    "i2v_background": 0.9888974316914876,
+    "subject_consistency": 0.962218889180157,
+    "background_consistency": 0.9627966986762152,
+    "motion_smoothness": 0.9965397671584745,
+    "dynamic_degree": 0,
+    "aesthetic_quality": 0.5115718940893809,
+    "imaging_quality": 0.7471667214595911,
+    "dreamsim": 0.061788751019371875,
+    "dreamsim_last": 0.06623642643292744,
+    "motion_ratio": 1.2024843951673074,
+    "total": 0.869994404492223,
+    "i2v": 0.983476605377356,
+    "quality": 0.7565122036070899,
+    "n": 6
+   },
+   "openvidgen": {
+    "i2v_subject": 0.9673450545221568,
+    "i2v_background": 0.9813326219220956,
+    "subject_consistency": 0.9566456586536435,
+    "background_consistency": 0.9579718695746529,
+    "motion_smoothness": 0.9855104682969206,
+    "dynamic_degree": 0.3333333333333333,
+    "aesthetic_quality": 0.5675840725501379,
+    "imaging_quality": 0.6968295067400971,
+    "dreamsim": 0.08927497350507313,
+    "dreamsim_last": 0.14050926764806113,
+    "motion_ratio": 1.354679043051374,
+    "total": 0.8734154987050544,
+    "i2v": 0.9682379886309356,
+    "quality": 0.7785930087791734,
+    "n": 6
+   },
+   "openvidhd": {
+    "i2v_subject": 0.9771389276534319,
+    "i2v_background": 0.9777814738949141,
+    "subject_consistency": 0.9194495844654739,
+    "background_consistency": 0.9213380601671006,
+    "motion_smoothness": 0.99023203170453,
+    "dynamic_degree": 0.8333333333333334,
+    "aesthetic_quality": 0.5860224465529124,
+    "imaging_quality": 0.7315060885090473,
+    "dreamsim": 0.13603581156995562,
+    "dreamsim_last": 0.13062220811843872,
+    "motion_ratio": 0.5061678861292003,
+    "total": 0.8956393897034902,
+    "i2v": 0.9715691516690268,
+    "quality": 0.8197096277379536,
+    "n": 6
+   },
+   "robomind": {
+    "i2v_subject": 0.9667636168499788,
+    "i2v_background": 0.972018958205978,
+    "subject_consistency": 0.9006157768683302,
+    "background_consistency": 0.9380527072482638,
+    "motion_smoothness": 0.9934587802636377,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.4924876441558202,
+    "imaging_quality": 0.7140425447196015,
+    "dreamsim": 0.2529076412320137,
+    "dreamsim_last": 0.2589696447054545,
+    "motion_ratio": 0.4927761764492639,
+    "total": 0.8891941941717928,
+    "i2v": 0.9615916906583173,
+    "quality": 0.8167966976852683,
+    "n": 6
+   },
+   "seamless": {
+    "i2v_subject": 0.9878051886955896,
+    "i2v_background": 0.9904577651619911,
+    "subject_consistency": 0.9452326296932169,
+    "background_consistency": 0.9598687065972222,
+    "motion_smoothness": 0.9970690468999508,
+    "dynamic_degree": 0,
+    "aesthetic_quality": 0.5349251826604208,
+    "imaging_quality": 0.6746129891892109,
+    "dreamsim": 0.11339102851019965,
+    "dreamsim_last": 0.11757622162501018,
+    "motion_ratio": 0.17613793380662401,
+    "total": 0.8649783156938624,
+    "i2v": 0.9863979565701188,
+    "quality": 0.743558674817606,
+    "n": 3
+   },
+   "ukdash": {
+    "i2v_subject": 0.9683242528140544,
+    "i2v_background": 0.9715819869438808,
+    "subject_consistency": 0.881849341839552,
+    "background_consistency": 0.9309814453124999,
+    "motion_smoothness": 0.9774196343122554,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.45979442199071247,
+    "imaging_quality": 0.7368978784104024,
+    "dreamsim": 0.21273252533541787,
+    "dreamsim_last": 0.2680654128392537,
+    "motion_ratio": 1.342928108164891,
+    "total": 0.8807381682045388,
+    "i2v": 0.9622097754353072,
+    "quality": 0.7992665609737702,
+    "n": 3
+   },
+   "vfhq": {
+    "i2v_subject": 0.9912301055838664,
+    "i2v_background": 0.992144266391794,
+    "subject_consistency": 0.9707241165969106,
+    "background_consistency": 0.9723870171440971,
+    "motion_smoothness": 0.9968496099794283,
+    "dynamic_degree": 0.3333333333333333,
+    "aesthetic_quality": 0.5004425545533498,
+    "imaging_quality": 0.6605650872369772,
+    "dreamsim": 0.062183510098192424,
+    "dreamsim_last": 0.06212848424911499,
+    "motion_ratio": 0.35268733562873966,
+    "total": 0.8814785235139007,
+    "i2v": 0.9895454893508056,
+    "quality": 0.7734115576769959,
+    "n": 6
+   }
+  },
+  "armB_fixed": {
+   "celebvhq": {
+    "i2v_subject": 0.9817871548732122,
+    "i2v_background": 0.9860602865119774,
+    "subject_consistency": 0.9320488875524865,
+    "background_consistency": 0.9458224826388889,
+    "motion_smoothness": 0.995140865236019,
+    "dynamic_degree": 0.6666666666666666,
+    "aesthetic_quality": 0.507815808057785,
+    "imaging_quality": 0.6488300626928156,
+    "dreamsim": 0.1601323766840829,
+    "dreamsim_last": 0.1785627007484436,
+    "motion_ratio": 1.0961498531879554,
+    "total": 0.8834879997333833,
+    "i2v": 0.9798963877747175,
+    "quality": 0.7870796116920491,
+    "n": 6
+   },
+   "charades": {
+    "i2v_subject": 0.9921984621385733,
+    "i2v_background": 0.9912796362489461,
+    "subject_consistency": 0.9594962703271044,
+    "background_consistency": 0.9411170111762153,
+    "motion_smoothness": 0.9963394911145191,
+    "dynamic_degree": 0.3333333333333333,
+    "aesthetic_quality": 0.4321860571702321,
+    "imaging_quality": 0.632157687930693,
+    "dreamsim": 0.1368023157119751,
+    "dreamsim_last": 0.1620574096838633,
+    "motion_ratio": 0.8605931135706973,
+    "total": 0.8674778312350143,
+    "i2v": 0.9895271794744263,
+    "quality": 0.7454284829956024,
+    "n": 6
+   },
+   "direct": {
+    "i2v_subject": 0.9831511838237444,
+    "i2v_background": 0.9841899083554745,
+    "subject_consistency": 0.9033311951491568,
+    "background_consistency": 0.9430240207248265,
+    "motion_smoothness": 0.9966594706431012,
+    "dynamic_degree": 0.16666666666666666,
+    "aesthetic_quality": 0.42121495803197223,
+    "imaging_quality": 0.46844678261391715,
+    "dreamsim": 0.2189322436849276,
+    "dreamsim_last": 0.24373007814089456,
+    "motion_ratio": 1.1180185177187139,
+    "total": 0.8333270453796611,
+    "i2v": 0.9794288507229851,
+    "quality": 0.6872252400363371,
+    "n": 6
+   },
+   "easycom": {
+    "i2v_subject": 0.9897368104159832,
+    "i2v_background": 0.9922249377071857,
+    "subject_consistency": 0.944851340552171,
+    "background_consistency": 0.9512984212239584,
+    "motion_smoothness": 0.9964025732876405,
+    "dynamic_degree": 0.2,
+    "aesthetic_quality": 0.49625648856163024,
+    "imaging_quality": 0.6058493878703473,
+    "dreamsim": 0.13171046276887258,
+    "dreamsim_last": 0.1699931025505066,
+    "motion_ratio": 1.4594375028973032,
+    "total": 0.8641630303263124,
+    "i2v": 0.9887256083136544,
+    "quality": 0.7396004523389702,
+    "n": 5
+   },
+   "egodex": {
+    "i2v_subject": 0.977219390074412,
+    "i2v_background": 0.9766954427212476,
+    "subject_consistency": 0.9435907984359396,
+    "background_consistency": 0.9558895534939236,
+    "motion_smoothness": 0.995527364667244,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.42250413199265796,
+    "imaging_quality": 0.7131952551639441,
+    "dreamsim": 0.15973440557718277,
+    "dreamsim_last": 0.1707561214764913,
+    "motion_ratio": 0.3871726358609182,
+    "total": 0.8948163075189451,
+    "i2v": 0.9708809765394316,
+    "quality": 0.8187516384984587,
+    "n": 6
+   },
+   "egoexo4d": {
+    "i2v_subject": 0.9827528394510349,
+    "i2v_background": 0.9797436646620432,
+    "subject_consistency": 0.9345018997788429,
+    "background_consistency": 0.9454610188802084,
+    "motion_smoothness": 0.9942345977881927,
+    "dynamic_degree": 0.6666666666666666,
+    "aesthetic_quality": 0.4091491947571437,
+    "imaging_quality": 0.6232032211555922,
+    "dreamsim": 0.15088064057959452,
+    "dreamsim_last": 0.16782766580581665,
+    "motion_ratio": 0.25801630166409506,
+    "total": 0.8702670832525341,
+    "i2v": 0.9761852526774181,
+    "quality": 0.76434891382765,
+    "n": 6
+   },
+   "h2o": {
+    "i2v_subject": 0.9806531282067299,
+    "i2v_background": 0.9841778586506843,
+    "subject_consistency": 0.934836764683326,
+    "background_consistency": 0.9309505208333333,
+    "motion_smoothness": 0.9941839058815406,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.4133230984210968,
+    "imaging_quality": 0.6641127581635782,
+    "dreamsim": 0.15903622011343638,
+    "dreamsim_last": 0.20683043003082274,
+    "motion_ratio": 0.46252645394064257,
+    "total": 0.88863696940203,
+    "i2v": 0.9779577880563775,
+    "quality": 0.7993161507476824,
+    "n": 5
+   },
+   "hoigen1m": {
+    "i2v_subject": 0.9760048452516398,
+    "i2v_background": 0.9772895902146895,
+    "subject_consistency": 0.9170797009434964,
+    "background_consistency": 0.9311442057291667,
+    "motion_smoothness": 0.992236701895319,
+    "dynamic_degree": 0.5,
+    "aesthetic_quality": 0.5186916490395864,
+    "imaging_quality": 0.6985695255689385,
+    "dreamsim": 0.1642506139145957,
+    "dreamsim_last": 0.1815955936908722,
+    "motion_ratio": 0.6917096804773757,
+    "total": 0.872454063619774,
+    "i2v": 0.9705719845657448,
+    "quality": 0.7743361426738032,
+    "n": 6
+   },
+   "matrix": {
+    "i2v_subject": 0.953502031614383,
+    "i2v_background": 0.9686472621063391,
+    "subject_consistency": 0.8854518559450905,
+    "background_consistency": 0.9224114312065973,
+    "motion_smoothness": 0.9668902457052074,
+    "dynamic_degree": 0.8333333333333334,
+    "aesthetic_quality": 0.5299578607082367,
+    "imaging_quality": 0.7050388536374431,
+    "dreamsim": 0.2523772261208958,
+    "dreamsim_last": 0.3045748968919118,
+    "motion_ratio": 0.572053966264509,
+    "total": 0.8673559323152098,
+    "i2v": 0.9515426773687636,
+    "quality": 0.7831691872616559,
+    "n": 6
+   },
+   "mira": {
+    "i2v_subject": 0.9245710526655118,
+    "i2v_background": 0.9493415633092325,
+    "subject_consistency": 0.7813083876959152,
+    "background_consistency": 0.9279793633355035,
+    "motion_smoothness": 0.9475849221614183,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.44466058413187665,
+    "imaging_quality": 0.6655949819580583,
+    "dreamsim": 0.3168560448620054,
+    "dreamsim_last": 0.4183214604854584,
+    "motion_ratio": 0.5695277361051309,
+    "total": 0.8321608632686577,
+    "i2v": 0.9215293111911361,
+    "quality": 0.7427924153461791,
+    "n": 6
+   },
+   "noxi": {
+    "i2v_subject": 0.9855530284593503,
+    "i2v_background": 0.9894002250830333,
+    "subject_consistency": 0.9621308577557405,
+    "background_consistency": 0.963609144422743,
+    "motion_smoothness": 0.9965524746965416,
+    "dynamic_degree": 0,
+    "aesthetic_quality": 0.5094773968060812,
+    "imaging_quality": 0.7470680051861387,
+    "dreamsim": 0.060621439582771726,
+    "dreamsim_last": 0.06458688775698344,
+    "motion_ratio": 1.1885856190998818,
+    "total": 0.8703328439918956,
+    "i2v": 0.9843630472374045,
+    "quality": 0.7563026407463865,
+    "n": 6
+   },
+   "openvidgen": {
+    "i2v_subject": 0.9703300901750723,
+    "i2v_background": 0.983075241073966,
+    "subject_consistency": 0.9574784538812108,
+    "background_consistency": 0.9566158718532987,
+    "motion_smoothness": 0.9861498753056633,
+    "dynamic_degree": 0.3333333333333333,
+    "aesthetic_quality": 0.5670396139224371,
+    "imaging_quality": 0.693419055098016,
+    "dreamsim": 0.08777735630671184,
+    "dreamsim_last": 0.13568589091300964,
+    "motion_ratio": 1.3329285816966463,
+    "total": 0.8746410834312482,
+    "i2v": 0.9711659139072423,
+    "quality": 0.7781162529552542,
+    "n": 6
+   },
+   "openvidhd": {
+    "i2v_subject": 0.9770271332313617,
+    "i2v_background": 0.9795118486632903,
+    "subject_consistency": 0.9193157906851007,
+    "background_consistency": 0.9215145534939236,
+    "motion_smoothness": 0.9907479807787652,
+    "dynamic_degree": 0.8333333333333334,
+    "aesthetic_quality": 0.5822412768999735,
+    "imaging_quality": 0.7314557751742276,
+    "dreamsim": 0.13834472994009653,
+    "dreamsim_last": 0.1309404174486796,
+    "motion_ratio": 0.4911872391065852,
+    "total": 0.896012499848156,
+    "i2v": 0.972675229826083,
+    "quality": 0.8193497698702289,
+    "n": 6
+   },
+   "robomind": {
+    "i2v_subject": 0.9685565531005462,
+    "i2v_background": 0.9731743240356444,
+    "subject_consistency": 0.9049595848346751,
+    "background_consistency": 0.9466603597005209,
+    "motion_smoothness": 0.9935517661495791,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.4944503903388977,
+    "imaging_quality": 0.716134942425184,
+    "dreamsim": 0.24881947702831694,
+    "dreamsim_last": 0.261668066183726,
+    "motion_ratio": 0.5629467111303569,
+    "total": 0.8920300587878229,
+    "i2v": 0.9634239032434921,
+    "quality": 0.8206362143321538,
+    "n": 6
+   },
+   "seamless": {
+    "i2v_subject": 0.9890132717291514,
+    "i2v_background": 0.9912014163533845,
+    "subject_consistency": 0.9494262596799268,
+    "background_consistency": 0.9653774685329862,
+    "motion_smoothness": 0.997189568981791,
+    "dynamic_degree": 0,
+    "aesthetic_quality": 0.5412804087003072,
+    "imaging_quality": 0.6749790705531097,
+    "dreamsim": 0.11182115475336711,
+    "dreamsim_last": 0.12920107444127402,
+    "motion_ratio": 0.12668679797544605,
+    "total": 0.8673570583994372,
+    "i2v": 0.9876089184268078,
+    "quality": 0.7471051983720666,
+    "n": 3
+   },
+   "ukdash": {
+    "i2v_subject": 0.9767965035140515,
+    "i2v_background": 0.9791225480039915,
+    "subject_consistency": 0.8866064065446456,
+    "background_consistency": 0.9323106553819445,
+    "motion_smoothness": 0.9795209016820704,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.46371447046597797,
+    "imaging_quality": 0.7296991635157056,
+    "dreamsim": 0.2163480652703179,
+    "dreamsim_last": 0.2784416874249776,
+    "motion_ratio": 1.3172938627602702,
+    "total": 0.8867989696194216,
+    "i2v": 0.9722765938272493,
+    "quality": 0.801321345411594,
+    "n": 3
+   },
+   "vfhq": {
+    "i2v_subject": 0.9908971253037452,
+    "i2v_background": 0.9920933453241984,
+    "subject_consistency": 0.9705688327550889,
+    "background_consistency": 0.9743899875217014,
+    "motion_smoothness": 0.9968889778204199,
+    "dynamic_degree": 0.3333333333333333,
+    "aesthetic_quality": 0.5011129180590311,
+    "imaging_quality": 0.6627815033778671,
+    "dreamsim": 0.06161407795217302,
+    "dreamsim_last": 0.05967182914415995,
+    "motion_ratio": 0.35155961609721625,
+    "total": 0.8818685290070281,
+    "i2v": 0.9893160143474372,
+    "quality": 0.7744210436666189,
+    "n": 6
+   }
+  },
+  "armC_fixed_anchor": {
+   "celebvhq": {
+    "i2v_subject": 0.984734109789133,
+    "i2v_background": 0.9889672087629635,
+    "subject_consistency": 0.9417870520303646,
+    "background_consistency": 0.9454881456163194,
+    "motion_smoothness": 0.9953506890730929,
+    "dynamic_degree": 0.6666666666666666,
+    "aesthetic_quality": 0.5045206695795059,
+    "imaging_quality": 0.6462634699009667,
+    "dreamsim": 0.15489349597030216,
+    "dreamsim_last": 0.17514915267626444,
+    "motion_ratio": 1.1353595055269317,
+    "total": 0.8858632316421311,
+    "i2v": 0.9835903014815386,
+    "quality": 0.7881361618027235,
+    "n": 6
+   },
+   "charades": {
+    "i2v_subject": 0.9932004282126824,
+    "i2v_background": 0.9918467593938113,
+    "subject_consistency": 0.9597658777402507,
+    "background_consistency": 0.9465938991970487,
+    "motion_smoothness": 0.996396865265483,
+    "dynamic_degree": 0.3333333333333333,
+    "aesthetic_quality": 0.43316255509853363,
+    "imaging_quality": 0.6313143544157674,
+    "dreamsim": 0.135960819820563,
+    "dreamsim_last": 0.15785729885101318,
+    "motion_ratio": 0.8648546927210948,
+    "total": 0.8686961089624129,
+    "i2v": 0.9904979177128099,
+    "quality": 0.7468943002120159,
+    "n": 6
+   },
+   "direct": {
+    "i2v_subject": 0.9835619635631642,
+    "i2v_background": 0.9853519877294699,
+    "subject_consistency": 0.9117277442167202,
+    "background_consistency": 0.9441199408637152,
+    "motion_smoothness": 0.9967198461183914,
+    "dynamic_degree": 0.16666666666666666,
+    "aesthetic_quality": 0.4211067159970601,
+    "imaging_quality": 0.4792831613997783,
+    "dreamsim": 0.21511061489582062,
+    "dreamsim_last": 0.23480361700057983,
+    "motion_ratio": 1.2072414913847977,
+    "total": 0.8358637684596857,
+    "i2v": 0.980456194018297,
+    "quality": 0.6912713429010743,
+    "n": 6
+   },
+   "easycom": {
+    "i2v_subject": 0.989489337593317,
+    "i2v_background": 0.9924801575243473,
+    "subject_consistency": 0.9463304585218429,
+    "background_consistency": 0.9501493326822917,
+    "motion_smoothness": 0.9963547225181502,
+    "dynamic_degree": 0.2,
+    "aesthetic_quality": 0.5023732364177704,
+    "imaging_quality": 0.6057086345578029,
+    "dreamsim": 0.1359030524889628,
+    "dreamsim_last": 0.17537107467651367,
+    "motion_ratio": 1.464212998204936,
+    "total": 0.8647213533355066,
+    "i2v": 0.9887534800468687,
+    "quality": 0.7406892266241445,
+    "n": 5
+   },
+   "egodex": {
+    "i2v_subject": 0.9747426790744066,
+    "i2v_background": 0.9756256647159657,
+    "subject_consistency": 0.9436193326281176,
+    "background_consistency": 0.9565219455295139,
+    "motion_smoothness": 0.9955353876371906,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.42175822456677753,
+    "imaging_quality": 0.7185561065043299,
+    "dreamsim": 0.16105451186498007,
+    "dreamsim_last": 0.17141594489415488,
+    "motion_ratio": 0.388859739560893,
+    "total": 0.8942318875130771,
+    "i2v": 0.9687062807436688,
+    "quality": 0.8197574942824855,
+    "n": 6
+   },
+   "egoexo4d": {
+    "i2v_subject": 0.98095794642965,
+    "i2v_background": 0.9772903210173051,
+    "subject_consistency": 0.9356602594256401,
+    "background_consistency": 0.9482140435112848,
+    "motion_smoothness": 0.99412514842741,
+    "dynamic_degree": 0.5,
+    "aesthetic_quality": 0.4040749619404475,
+    "imaging_quality": 0.6275360479959115,
+    "dreamsim": 0.15347831116782293,
+    "dreamsim_last": 0.17052440841992697,
+    "motion_ratio": 0.270426597770763,
+    "total": 0.8616959493106046,
+    "i2v": 0.9734731007983836,
+    "quality": 0.7499187978228256,
+    "n": 6
+   },
+   "h2o": {
+    "i2v_subject": 0.9849264833629132,
+    "i2v_background": 0.986859651952982,
+    "subject_consistency": 0.940072552661101,
+    "background_consistency": 0.9329443359375,
+    "motion_smoothness": 0.9950084652485718,
+    "dynamic_degree": 0.8,
+    "aesthetic_quality": 0.4176380217075348,
+    "imaging_quality": 0.6619108555060773,
+    "dreamsim": 0.15118559499581657,
+    "dreamsim_last": 0.2000491976737976,
+    "motion_ratio": 0.6642262899280036,
+    "total": 0.8829573552519864,
+    "i2v": 0.9822760414914908,
+    "quality": 0.7836386690124819,
+    "n": 5
+   },
+   "hoigen1m": {
+    "i2v_subject": 0.9799123388280471,
+    "i2v_background": 0.9810034362226725,
+    "subject_consistency": 0.9172268896260195,
+    "background_consistency": 0.9352108425564235,
+    "motion_smoothness": 0.9921232057670765,
+    "dynamic_degree": 0.5,
+    "aesthetic_quality": 0.5168028225501379,
+    "imaging_quality": 0.693514863584324,
+    "dreamsim": 0.16484686649507946,
+    "dreamsim_last": 0.1900811493396759,
+    "motion_ratio": 0.6988476486396151,
+    "total": 0.8747050893003815,
+    "i2v": 0.9753747324450274,
+    "quality": 0.7740354461557356,
+    "n": 6
+   },
+   "matrix": {
+    "i2v_subject": 0.9435122776031495,
+    "i2v_background": 0.9560911946495375,
+    "subject_consistency": 0.8906361014064815,
+    "background_consistency": 0.9232167561848957,
+    "motion_smoothness": 0.9684197383021068,
+    "dynamic_degree": 0.8333333333333334,
+    "aesthetic_quality": 0.5298376381397247,
+    "imaging_quality": 0.713669317734143,
+    "dreamsim": 0.2541158811913596,
+    "dreamsim_last": 0.2924938201904297,
+    "motion_ratio": 0.5919442270138726,
+    "total": 0.8620821036866271,
+    "i2v": 0.9371914439471134,
+    "quality": 0.7869727634261406,
+    "n": 6
+   },
+   "mira": {
+    "i2v_subject": 0.9318980069210131,
+    "i2v_background": 0.9484200135121742,
+    "subject_consistency": 0.783237394835386,
+    "background_consistency": 0.9247775607638888,
+    "motion_smoothness": 0.9474327611945254,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.44509460031986237,
+    "imaging_quality": 0.6598527915681361,
+    "dreamsim": 0.3168295481138759,
+    "dreamsim_last": 0.41560880343119305,
+    "motion_ratio": 0.5726113607000641,
+    "total": 0.833275528601247,
+    "i2v": 0.925196168412149,
+    "quality": 0.7413548887903448,
+    "n": 6
+   },
+   "noxi": {
+    "i2v_subject": 0.9874752546598514,
+    "i2v_background": 0.9894785454124212,
+    "subject_consistency": 0.9637058490266402,
+    "background_consistency": 0.9646538628472222,
+    "motion_smoothness": 0.9965852166589687,
+    "dynamic_degree": 0,
+    "aesthetic_quality": 0.5053568035364151,
+    "imaging_quality": 0.7434730828235301,
+    "dreamsim": 0.059766766097810536,
+    "dreamsim_last": 0.06301440795262654,
+    "motion_ratio": 1.0502259674751209,
+    "total": 0.8705273053419961,
+    "i2v": 0.9855417626685825,
+    "quality": 0.7555128480154096,
+    "n": 6
+   },
+   "openvidgen": {
+    "i2v_subject": 0.9844490163773298,
+    "i2v_background": 0.988481296201547,
+    "subject_consistency": 0.960841376086076,
+    "background_consistency": 0.9594607883029513,
+    "motion_smoothness": 0.9862422713583637,
+    "dynamic_degree": 0.5,
+    "aesthetic_quality": 0.565876786907514,
+    "imaging_quality": 0.6948475456763233,
+    "dreamsim": 0.0845851128300031,
+    "dreamsim_last": 0.13498390714327493,
+    "motion_ratio": 1.3543926144075282,
+    "total": 0.8889423086302985,
+    "i2v": 0.9830943597023168,
+    "quality": 0.7947902575582803,
+    "n": 6
+   },
+   "openvidhd": {
+    "i2v_subject": 0.9699380207558472,
+    "i2v_background": 0.9770319766551255,
+    "subject_consistency": 0.9178059770622187,
+    "background_consistency": 0.9215455796983507,
+    "motion_smoothness": 0.9908953916615539,
+    "dynamic_degree": 0.8333333333333334,
+    "aesthetic_quality": 0.5799747407436371,
+    "imaging_quality": 0.7342690086890187,
+    "dreamsim": 0.1391234795252482,
+    "dreamsim_last": 0.13440634806950888,
+    "motion_ratio": 0.512765544328552,
+    "total": 0.8930359832132435,
+    "i2v": 0.9668447307820718,
+    "quality": 0.8192272356444154,
+    "n": 6
+   },
+   "robomind": {
+    "i2v_subject": 0.9671603894978761,
+    "i2v_background": 0.9749332696447771,
+    "subject_consistency": 0.9026872200891375,
+    "background_consistency": 0.9458780924479168,
+    "motion_smoothness": 0.993619666896575,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.5003207872311274,
+    "imaging_quality": 0.721520073472961,
+    "dreamsim": 0.24911078231202233,
+    "dreamsim_last": 0.25047160188357037,
+    "motion_ratio": 0.5343794966072452,
+    "total": 0.8929228523781877,
+    "i2v": 0.9637971764977348,
+    "quality": 0.8220485282586406,
+    "n": 6
+   },
+   "seamless": {
+    "i2v_subject": 0.9893881409863631,
+    "i2v_background": 0.9919675920903682,
+    "subject_consistency": 0.9502522588604027,
+    "background_consistency": 0.9656914605034722,
+    "motion_smoothness": 0.9971955588085074,
+    "dynamic_degree": 0,
+    "aesthetic_quality": 0.5399236679077148,
+    "imaging_quality": 0.6774865606008481,
+    "dreamsim": 0.11207134359412724,
+    "dreamsim_last": 0.13735141356786093,
+    "motion_ratio": 0.14445429551606306,
+    "total": 0.8679592751227556,
+    "i2v": 0.9883471861311133,
+    "quality": 0.747571364114398,
+    "n": 3
+   },
+   "ukdash": {
+    "i2v_subject": 0.9770180269082388,
+    "i2v_background": 0.9771074223021664,
+    "subject_consistency": 0.8890883922576904,
+    "background_consistency": 0.9300211588541667,
+    "motion_smoothness": 0.9794602782300513,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.45822904507319134,
+    "imaging_quality": 0.7317677196786422,
+    "dreamsim": 0.20963494976361594,
+    "dreamsim_last": 0.2579363187154134,
+    "motion_ratio": 1.3127489070152856,
+    "total": 0.8858345695430221,
+    "i2v": 0.9710419847780151,
+    "quality": 0.8006271543080292,
+    "n": 3
+   },
+   "vfhq": {
+    "i2v_subject": 0.9888634101798136,
+    "i2v_background": 0.9915326511114836,
+    "subject_consistency": 0.9704122027175295,
+    "background_consistency": 0.9715216742621529,
+    "motion_smoothness": 0.9969136484626765,
+    "dynamic_degree": 0.3333333333333333,
+    "aesthetic_quality": 0.5020326872666677,
+    "imaging_quality": 0.6659155953357371,
+    "dreamsim": 0.06112783484988742,
+    "dreamsim_last": 0.06053702036539713,
+    "motion_ratio": 0.35875596736383836,
+    "total": 0.881089692326532,
+    "i2v": 0.9877454187736415,
+    "quality": 0.7744339658794225,
+    "n": 6
+   }
+  },
+  "s5_c5": {
+   "celebvhq": {
+    "i2v_subject": 0.9864367579917114,
+    "i2v_background": 0.9899669728179772,
+    "subject_consistency": 0.9446058576305707,
+    "background_consistency": 0.9466373019748264,
+    "motion_smoothness": 0.9955562709003201,
+    "dynamic_degree": 0.6666666666666666,
+    "aesthetic_quality": 0.5003222823143005,
+    "imaging_quality": 0.648801555712361,
+    "dreamsim": 0.15357625153329638,
+    "dreamsim_last": 0.16752086083094278,
+    "motion_ratio": 1.1425911834403424,
+    "total": 0.8870549989692232,
+    "i2v": 0.985264289947912,
+    "quality": 0.7888457079905344,
+    "n": 6
+   },
+   "charades": {
+    "i2v_subject": 0.992005997846524,
+    "i2v_background": 0.9918997066467999,
+    "subject_consistency": 0.9604323646260632,
+    "background_consistency": 0.9517164442274305,
+    "motion_smoothness": 0.9965561230370429,
+    "dynamic_degree": 0.5,
+    "aesthetic_quality": 0.4343940019607544,
+    "imaging_quality": 0.6158151898765039,
+    "dreamsim": 0.1349983008371459,
+    "dreamsim_last": 0.16256477435429892,
+    "motion_ratio": 0.8581278921579453,
+    "total": 0.8753942011338782,
+    "i2v": 0.9898342865331949,
+    "quality": 0.7609541157345615,
+    "n": 6
+   },
+   "direct": {
+    "i2v_subject": 0.9854332366337379,
+    "i2v_background": 0.9863411998748779,
+    "subject_consistency": 0.9162266086786985,
+    "background_consistency": 0.947760009765625,
+    "motion_smoothness": 0.9969207124388352,
+    "dynamic_degree": 0.16666666666666666,
+    "aesthetic_quality": 0.41921064754327136,
+    "imaging_quality": 0.4825498379163506,
+    "dreamsim": 0.20695045093695322,
+    "dreamsim_last": 0.24885844190915427,
+    "motion_ratio": 1.4613859095454143,
+    "total": 0.8378609213223712,
+    "i2v": 0.9822217879645199,
+    "quality": 0.6935000546802226,
+    "n": 6
+   },
+   "easycom": {
+    "i2v_subject": 0.9915115086138249,
+    "i2v_background": 0.993428110718727,
+    "subject_consistency": 0.9518525039156278,
+    "background_consistency": 0.9496818033854166,
+    "motion_smoothness": 0.9966584583580907,
+    "dynamic_degree": 0.2,
+    "aesthetic_quality": 0.5070368826389313,
+    "imaging_quality": 0.5998412855794607,
+    "dreamsim": 0.1295633057753245,
+    "dreamsim_last": 0.15580058097839355,
+    "motion_ratio": 1.639218907484268,
+    "total": 0.8661500767493722,
+    "i2v": 0.990579508140959,
+    "quality": 0.7417206453577854,
+    "n": 5
+   },
+   "egodex": {
+    "i2v_subject": 0.96990069364508,
+    "i2v_background": 0.9793748071044682,
+    "subject_consistency": 0.9432017244398594,
+    "background_consistency": 0.9564232720269098,
+    "motion_smoothness": 0.9954597264435486,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.4206574360529582,
+    "imaging_quality": 0.7204464562471248,
+    "dreamsim": 0.1590335236655341,
+    "dreamsim_last": 0.1656652788321177,
+    "motion_ratio": 0.3718788554361021,
+    "total": 0.8940748574849464,
+    "i2v": 0.968409080217498,
+    "quality": 0.8197406347523948,
+    "n": 6
+   },
+   "egoexo4d": {
+    "i2v_subject": 0.9784979294240475,
+    "i2v_background": 0.979569923033317,
+    "subject_consistency": 0.9366596491386493,
+    "background_consistency": 0.9456797281901043,
+    "motion_smoothness": 0.9942811416099117,
+    "dynamic_degree": 0.5,
+    "aesthetic_quality": 0.40416548152764636,
+    "imaging_quality": 0.6254396150131857,
+    "dreamsim": 0.14885150641202927,
+    "dreamsim_last": 0.16307623187700906,
+    "motion_ratio": 0.2855633997039047,
+    "total": 0.8614080660405321,
+    "i2v": 0.973575872574054,
+    "quality": 0.7492402595070101,
+    "n": 6
+   },
+   "h2o": {
+    "i2v_subject": 0.9826517952680588,
+    "i2v_background": 0.9857288246452809,
+    "subject_consistency": 0.9482056772212187,
+    "background_consistency": 0.9533207194010416,
+    "motion_smoothness": 0.9953469051295352,
+    "dynamic_degree": 0.8,
+    "aesthetic_quality": 0.409077912569046,
+    "imaging_quality": 0.659781227679292,
+    "dreamsim": 0.14618032177289325,
+    "dreamsim_last": 0.19213215112686158,
+    "motion_ratio": 0.9034487146383873,
+    "total": 0.8844165556480361,
+    "i2v": 0.980178320479572,
+    "quality": 0.7886547908165004,
+    "n": 5
+   },
+   "hoigen1m": {
+    "i2v_subject": 0.9811660862217346,
+    "i2v_background": 0.9829060652107001,
+    "subject_consistency": 0.921790846106079,
+    "background_consistency": 0.9361891004774305,
+    "motion_smoothness": 0.9928055380996702,
+    "dynamic_degree": 0.5,
+    "aesthetic_quality": 0.5103988448778788,
+    "imaging_quality": 0.6981758855919535,
+    "dreamsim": 0.15359857264492247,
+    "dreamsim_last": 0.1781973441441854,
+    "motion_ratio": 0.8501524184129133,
+    "total": 0.8763770034901547,
+    "i2v": 0.9773971198191485,
+    "quality": 0.7753568871611609,
+    "n": 6
+   },
+   "matrix": {
+    "i2v_subject": 0.9488771457225084,
+    "i2v_background": 0.9618622041245302,
+    "subject_consistency": 0.8966781910612353,
+    "background_consistency": 0.9283576117621527,
+    "motion_smoothness": 0.9707802518432963,
+    "dynamic_degree": 0.8333333333333334,
+    "aesthetic_quality": 0.5374318559964498,
+    "imaging_quality": 0.7134929825648789,
+    "dreamsim": 0.24732915146483314,
+    "dreamsim_last": 0.29493698477745056,
+    "motion_ratio": 0.6593616817912621,
+    "total": 0.868293301072891,
+    "i2v": 0.9442404540405815,
+    "quality": 0.7923461481052004,
+    "n": 6
+   },
+   "mira": {
+    "i2v_subject": 0.9277151854087909,
+    "i2v_background": 0.948411995669206,
+    "subject_consistency": 0.7884458482886355,
+    "background_consistency": 0.9284781561957466,
+    "motion_smoothness": 0.9473739124926953,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.452083761493365,
+    "imaging_quality": 0.66500937149216,
+    "dreamsim": 0.3131353076961305,
+    "dreamsim_last": 0.4035101532936096,
+    "motion_ratio": 0.6035777391517821,
+    "total": 0.8341439700845599,
+    "i2v": 0.9227412075552477,
+    "quality": 0.7455467326138719,
+    "n": 6
+   },
+   "noxi": {
+    "i2v_subject": 0.9876613909751177,
+    "i2v_background": 0.990203477119406,
+    "subject_consistency": 0.9650299401332935,
+    "background_consistency": 0.9683203803168402,
+    "motion_smoothness": 0.9966747172871872,
+    "dynamic_degree": 0,
+    "aesthetic_quality": 0.5099923511346182,
+    "imaging_quality": 0.7443299136411388,
+    "dreamsim": 0.059821567601627774,
+    "dreamsim_last": 0.06712442636489868,
+    "motion_ratio": 0.9478499779668644,
+    "total": 0.8719467646006387,
+    "i2v": 0.9861415809172942,
+    "quality": 0.7577519482839833,
+    "n": 6
+   },
+   "openvidgen": {
+    "i2v_subject": 0.9868292010575533,
+    "i2v_background": 0.9896206273138523,
+    "subject_consistency": 0.9608655262738467,
+    "background_consistency": 0.9629082573784723,
+    "motion_smoothness": 0.9874477474106619,
+    "dynamic_degree": 0.3333333333333333,
+    "aesthetic_quality": 0.5667752474546432,
+    "imaging_quality": 0.6838530513143408,
+    "dreamsim": 0.08558730367157195,
+    "dreamsim_last": 0.14254390199979147,
+    "motion_ratio": 1.3570538172711706,
+    "total": 0.882334260624961,
+    "i2v": 0.9852596188179479,
+    "quality": 0.7794089024319741,
+    "n": 6
+   },
+   "openvidhd": {
+    "i2v_subject": 0.9772716353585323,
+    "i2v_background": 0.9829244074225426,
+    "subject_consistency": 0.9207865540869534,
+    "background_consistency": 0.9204082912868924,
+    "motion_smoothness": 0.9917053348941441,
+    "dynamic_degree": 0.8333333333333334,
+    "aesthetic_quality": 0.5790445854266485,
+    "imaging_quality": 0.7378303487373121,
+    "dreamsim": 0.13918340040577784,
+    "dreamsim_last": 0.13982189695040384,
+    "motion_ratio": 0.4828546056760628,
+    "total": 0.8978472107208038,
+    "i2v": 0.9751288808102334,
+    "quality": 0.8205655406313742,
+    "n": 6
+   },
+   "robomind": {
+    "i2v_subject": 0.9675552613536517,
+    "i2v_background": 0.9756850288063288,
+    "subject_consistency": 0.9073142405185434,
+    "background_consistency": 0.9450686984592015,
+    "motion_smoothness": 0.993721585001813,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.49896223843097687,
+    "imaging_quality": 0.725041675725259,
+    "dreamsim": 0.251518189907074,
+    "dreamsim_last": 0.267200767993927,
+    "motion_ratio": 0.6062820825352543,
+    "total": 0.8939144187464863,
+    "i2v": 0.9645373973540372,
+    "quality": 0.8232914401389354,
+    "n": 6
+   },
+   "seamless": {
+    "i2v_subject": 0.9905161947011948,
+    "i2v_background": 0.9916603035231432,
+    "subject_consistency": 0.9514041509893204,
+    "background_consistency": 0.9668389214409722,
+    "motion_smoothness": 0.9972423750419716,
+    "dynamic_degree": 0,
+    "aesthetic_quality": 0.5290002822875977,
+    "imaging_quality": 0.6741295423061066,
+    "dreamsim": 0.1098895122607549,
+    "dreamsim_last": 0.12300898631413777,
+    "motion_ratio": 0.18288329380210236,
+    "total": 0.8671658370331081,
+    "i2v": 0.9887997447033099,
+    "quality": 0.7455319293629062,
+    "n": 3
+   },
+   "ukdash": {
+    "i2v_subject": 0.9787788014113903,
+    "i2v_background": 0.9810449262460074,
+    "subject_consistency": 0.8920939608580536,
+    "background_consistency": 0.9369493272569445,
+    "motion_smoothness": 0.9786292226238205,
+    "dynamic_degree": 1,
+    "aesthetic_quality": 0.4529709418614705,
+    "imaging_quality": 0.7327228324406733,
+    "dreamsim": 0.1894845830069648,
+    "dreamsim_last": 0.23809091250101724,
+    "motion_ratio": 1.2831399551852827,
+    "total": 0.8882055954559177,
+    "i2v": 0.9747390041312405,
+    "quality": 0.8016721867805949,
+    "n": 3
+   },
+   "vfhq": {
+    "i2v_subject": 0.988028353129824,
+    "i2v_background": 0.990923626422882,
+    "subject_consistency": 0.9713197703162829,
+    "background_consistency": 0.9745185004340278,
+    "motion_smoothness": 0.9969146026693934,
+    "dynamic_degree": 0.3333333333333333,
+    "aesthetic_quality": 0.4986005872488022,
+    "imaging_quality": 0.6609091531737777,
+    "dreamsim": 0.05991367002328237,
+    "dreamsim_last": 0.06304891904195149,
+    "motion_ratio": 0.3305461797508156,
+    "total": 0.8803377106084014,
+    "i2v": 0.9868440559780551,
+    "quality": 0.7738313652387475,
+    "n": 6
+   }
+  }
+ }
+}
