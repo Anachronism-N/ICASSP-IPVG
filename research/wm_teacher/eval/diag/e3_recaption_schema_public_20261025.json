@@ -1,0 +1,80 @@
+{
+  "audit_version": "e3-recaption-schema-public-v1",
+  "parser_prompt_version": "e3-grounded-recaption-v2",
+  "schema_audit_only": true,
+  "semantic_review_passed": false,
+  "preference_dataset_ready": false,
+  "legacy_records_modified": false,
+  "relabeling_performed": false,
+  "legacy_pool": {
+    "file_count": 7,
+    "per_file_record_counts": [
+      265,
+      265,
+      264,
+      265,
+      265,
+      265,
+      265
+    ],
+    "record_count": 1854,
+    "invalid_record_json_count": 0,
+    "record_error_field_count": 0,
+    "exact_six_root_field_count": 1283,
+    "entity_fragment_attrs_desc_count": 489,
+    "hands_fragment_held_object_visible_count": 82,
+    "missing_six_root_fields_count": 571,
+    "complete_root_hands_null_count": 36,
+    "strict_schema_pass_count": 1247,
+    "strict_schema_reject_count": 607,
+    "missing_six_root_fields_fraction": 0.307982740021575,
+    "strict_schema_reject_fraction": 0.32740021574973033,
+    "fact_root_type_counts": {
+      "object": 1854
+    },
+    "complete_root_entity_attrs_type_counts": {
+      "array": 2666
+    },
+    "complete_root_entity_attrs_item_type_counts": {
+      "string": 5619
+    },
+    "prompt_version_counts": {
+      "e3-grounded-recaption-v1": 1854
+    }
+  },
+  "fix2_separate": {
+    "file_count": 1,
+    "record_count": 2,
+    "invalid_record_json_count": 0,
+    "record_error_field_count": 0,
+    "exact_six_root_field_count": 2,
+    "entity_fragment_attrs_desc_count": 0,
+    "hands_fragment_held_object_visible_count": 0,
+    "missing_six_root_fields_count": 0,
+    "complete_root_hands_null_count": 0,
+    "strict_schema_pass_count": 2,
+    "strict_schema_reject_count": 0,
+    "missing_six_root_fields_fraction": 0,
+    "strict_schema_reject_fraction": 0,
+    "fact_root_type_counts": {
+      "object": 2
+    },
+    "complete_root_entity_attrs_type_counts": {
+      "array": 4
+    },
+    "complete_root_entity_attrs_item_type_counts": {
+      "string": 8
+    },
+    "prompt_version_counts": {
+      "e3-grounded-recaption-v1": 2
+    }
+  },
+  "required_fact_schema": {
+    "scene": "string",
+    "rendered_or_screen": "boolean",
+    "entities": "array of objects with desc:string and attrs:array of strings",
+    "hands": "object with visible:boolean and held_object:string|null",
+    "actions_by_time": "array of objects with frames:string and action:string",
+    "start_end_difference": "string"
+  }
+}

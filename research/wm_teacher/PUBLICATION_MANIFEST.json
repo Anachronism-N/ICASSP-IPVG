@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "5144d66f09df152ec374e95c9bcabafe6f8f42a80a4a80d7ba1dfbf32aa7ced0",
-      "snapshot_sha256": "5144d66f09df152ec374e95c9bcabafe6f8f42a80a4a80d7ba1dfbf32aa7ced0"
+      "source_sha256": "6933412740410018235d2d1f4d94a023e86401319c134d1db31aba36e9fcfd15",
+      "snapshot_sha256": "6933412740410018235d2d1f4d94a023e86401319c134d1db31aba36e9fcfd15"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -679,8 +679,8 @@
     },
     {
       "path": "scripts/recaption_e3.py",
-      "source_sha256": "8946207778c96890a44bc39b263b49ef850da6286ff8cf58e835d4d07349fac3",
-      "snapshot_sha256": "8946207778c96890a44bc39b263b49ef850da6286ff8cf58e835d4d07349fac3"
+      "source_sha256": "a48031997bea2b4bafc599f3782e801ee05708d2c2d517c2cbe15ceb09adf2f2",
+      "snapshot_sha256": "a48031997bea2b4bafc599f3782e801ee05708d2c2d517c2cbe15ceb09adf2f2"
     },
     {
       "path": "scripts/build_e3_pool.py",
@@ -694,8 +694,8 @@
     },
     {
       "path": "tests/test_recaption_e3.py",
-      "source_sha256": "a8352b0edf725067b99c4a9f6668640f46ba1486f6c6e1798a5729c3916e5c2a",
-      "snapshot_sha256": "a8352b0edf725067b99c4a9f6668640f46ba1486f6c6e1798a5729c3916e5c2a"
+      "source_sha256": "cec774d1d0fa1e70b7a23aede2072a9e20e32c090482471644dacd935c47b7c2",
+      "snapshot_sha256": "cec774d1d0fa1e70b7a23aede2072a9e20e32c090482471644dacd935c47b7c2"
     },
     {
       "path": "tests/test_e3_data.py",
@@ -719,8 +719,8 @@
     },
     {
       "path": "docs/50_C臂276条分层子集诊断预注册.md",
-      "source_sha256": "bbe12aa612e2a60169c3d35c7425b33d53c65e36bfd8427bad949c4b199ee261",
-      "snapshot_sha256": "bbe12aa612e2a60169c3d35c7425b33d53c65e36bfd8427bad949c4b199ee261"
+      "source_sha256": "00fe27dbe6680c6fe7822f74beda96a66982ac98cbc5d0d49ff9d03e0f963fa5",
+      "snapshot_sha256": "00fe27dbe6680c6fe7822f74beda96a66982ac98cbc5d0d49ff9d03e0f963fa5"
     },
     {
       "path": "eval/diag/teacher_e3_devset_public_summary_20261025.json",
@@ -876,6 +876,21 @@
       "path": "eval/diag/teacher_e3_seed1_integrity_public_20261025.json",
       "source_sha256": "7749d8bcba6de2a8bf4bfb8d24b90d988f35144ea7d24ec39d06fe861ff01a71",
       "snapshot_sha256": "7749d8bcba6de2a8bf4bfb8d24b90d988f35144ea7d24ec39d06fe861ff01a71"
+    },
+    {
+      "path": "eval/diag/e3_recaption_schema_public_20261025.json",
+      "source_sha256": "3d561b0400c82140d9bc783c7052630e384923a3a66374030ef68e69892c77d8",
+      "snapshot_sha256": "3d561b0400c82140d9bc783c7052630e384923a3a66374030ef68e69892c77d8"
+    },
+    {
+      "path": "docs/53_标签解析修复与偏好训练门禁.md",
+      "source_sha256": "d8408ac3a3de297a551d133fbcd82f9e7396536451d8991d90771ca977cecbb7",
+      "snapshot_sha256": "d8408ac3a3de297a551d133fbcd82f9e7396536451d8991d90771ca977cecbb7"
+    },
+    {
+      "path": "docs/54_C276预算修订与一次收尾授权.md",
+      "source_sha256": "62b6f2c7acff47507b407fd3c50e480434d71c7a67490c6984e8b47a67843aa7",
+      "snapshot_sha256": "62b6f2c7acff47507b407fd3c50e480434d71c7a67490c6984e8b47a67843aa7"
     }
   ],
   "experiment_progress": {
