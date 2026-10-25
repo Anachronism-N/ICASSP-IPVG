@@ -43,6 +43,7 @@ FILES = [
     "docs/48_背景实验全景与阶段总结.md",
     "docs/49_E3三臂开发集结论与完整基准验收.md",
     "docs/50_C臂276条分层子集诊断预注册.md",
+    "eval/diag/teacher_e3_subset_preregistered_public_20261025.json",
     "eval/diag/teacher_e3_devset_public_summary_20261025.json",
     "eval/diag/teacher_e3_integrity_public_20261025.json",
     "eval/diag/teacher_e1_four_seed_public_summary_20261025.json",
@@ -71,6 +72,7 @@ FILES = [
     "prepare_teacher_eligibility.py", "run_teacher_training_smoke.py", "serve_label_review.py",
     "train_e3_lora.py", "cache_e3_inputs.py", "recaption_e3.py", "build_e3_pool.py", "score_e3_motion.py",
     "merge_e3_lora.py", "prepare_e1_devset.py", "build_e1_jobs.py", "score_e1.py", "summarize_e3.py", "summarize_e1_seeds.py",
+    "prepare_e3_subset.py", "run_e3_subset_node.py", "score_e3_subset.py", "gpu_hold.py",
     "build_teacher_review.py", "build_demo.py", "serve_demo.py", "merge_ckpt.py",
     "build_round1_mixture.py", "build_round2_mixture.py", "build_round3_mixture.py",
     "build_round4_mixture.py", "build_round5_mixture.py", "build_ft2_mixture.py",
@@ -83,6 +85,7 @@ FILES = [
     "test_audit_teacher_labels.py", "test_teacher_mechanism_probe.py", "test_teacher_caption_probe.py",
     "test_reslice_namespace.py", "test_prepare_teacher_eligibility.py", "test_teacher_training_smoke.py", "test_serve_label_review.py",
     "test_e1_devset.py", "test_e1_jobs.py", "test_e1_score.py", "test_summarize_e3.py", "test_e1_seeds.py",
+    "test_e3_subset.py", "test_e3_subset_node.py", "test_e3_subset_score.py",
     "test_e3_train.py", "test_recaption_e3.py", "test_e3_data.py",
 )] + ["eval/diag/" + name for name in (
     "ft2_paired_bootstrap.json", "merge_integrity.json", "physiq_paired_bootstrap.json",

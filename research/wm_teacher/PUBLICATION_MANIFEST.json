@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "8c69642a7f0c0d9953cd179a86e808c12565ec0ef38a7345cec0927de70183e7",
-      "snapshot_sha256": "8c69642a7f0c0d9953cd179a86e808c12565ec0ef38a7345cec0927de70183e7"
+      "source_sha256": "6e562307ee2e7f438233e647b801611a16e4a18568fd78d1a7c2bc76fb46e2dc",
+      "snapshot_sha256": "6e562307ee2e7f438233e647b801611a16e4a18568fd78d1a7c2bc76fb46e2dc"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -756,6 +756,46 @@
       "path": "tests/test_e1_seeds.py",
       "source_sha256": "1bd700d6e9da7b8e939efca598c7a59f124bb0a885d63ee5637cad3e9a5817d4",
       "snapshot_sha256": "1bd700d6e9da7b8e939efca598c7a59f124bb0a885d63ee5637cad3e9a5817d4"
+    },
+    {
+      "path": "scripts/prepare_e3_subset.py",
+      "source_sha256": "1266067ba544db855e80466dec8cc372b2af9ecc67031da25947f41c40ac913e",
+      "snapshot_sha256": "1266067ba544db855e80466dec8cc372b2af9ecc67031da25947f41c40ac913e"
+    },
+    {
+      "path": "scripts/run_e3_subset_node.py",
+      "source_sha256": "2014a096fa127621163a4e7e097757d0f926401c126445aeade40770acb9c3e7",
+      "snapshot_sha256": "2014a096fa127621163a4e7e097757d0f926401c126445aeade40770acb9c3e7"
+    },
+    {
+      "path": "scripts/score_e3_subset.py",
+      "source_sha256": "b8940de1ad0a8f59749e5e0866f98902d0879b6cfc8b278f7a32fabcc6533eef",
+      "snapshot_sha256": "b8940de1ad0a8f59749e5e0866f98902d0879b6cfc8b278f7a32fabcc6533eef"
+    },
+    {
+      "path": "scripts/gpu_hold.py",
+      "source_sha256": "7933108b11d9114f4ae7c0994853d6e44f5b0e44b2c3cc7c0e11a70527f9a019",
+      "snapshot_sha256": "7933108b11d9114f4ae7c0994853d6e44f5b0e44b2c3cc7c0e11a70527f9a019"
+    },
+    {
+      "path": "tests/test_e3_subset.py",
+      "source_sha256": "47a3b03770720be4976b2593fe32ff2a6ff901b0a73f2c6631931a288e9b9371",
+      "snapshot_sha256": "47a3b03770720be4976b2593fe32ff2a6ff901b0a73f2c6631931a288e9b9371"
+    },
+    {
+      "path": "tests/test_e3_subset_node.py",
+      "source_sha256": "96048316b50d0e3d76eb00abf8a05dad8dbf2632216ccf244ac864838232d86d",
+      "snapshot_sha256": "96048316b50d0e3d76eb00abf8a05dad8dbf2632216ccf244ac864838232d86d"
+    },
+    {
+      "path": "tests/test_e3_subset_score.py",
+      "source_sha256": "f53ed7e692802961386c48383b09f9f28ed4a14197297a92536b1245c475e425",
+      "snapshot_sha256": "f53ed7e692802961386c48383b09f9f28ed4a14197297a92536b1245c475e425"
+    },
+    {
+      "path": "eval/diag/teacher_e3_subset_preregistered_public_20261025.json",
+      "source_sha256": "0316dc0ffb1e8ddab2e3dbd6554f49b3123927b2d8dedbe84f29e9eba8843703",
+      "snapshot_sha256": "0316dc0ffb1e8ddab2e3dbd6554f49b3123927b2d8dedbe84f29e9eba8843703"
     }
   ],
   "experiment_progress": {
@@ -886,5 +926,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "E3 three-arm seed0 integrity/results, E1 four-seed results, frozen C 276 subset preregistration (docs/47-50), updated docs/31 handoff and historical PROGRESS backup-path redaction; subset implementation excluded"
+  "latest_increment_scope": "C fixed stratified subset preparation, supervision and original scorers; no GPU/quality claim"
 }

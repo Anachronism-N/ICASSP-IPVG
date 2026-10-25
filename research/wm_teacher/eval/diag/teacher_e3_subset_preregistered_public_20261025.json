@@ -1,0 +1,236 @@
+{
+  "protocol": "C fixed safe stratified diagnostic subset; not full or SOTA acceptance",
+  "plan_sha256": "afd1cd967ae03088930a1637ea93f66053f2adcaeae3b213f38e1c7160e57254",
+  "case_manifest_sha256": "66c81d890adc0ec8a00059a6b6880498710fb780ab17e7e04f0caaf1fcc4726c",
+  "job_manifest_sha256": "152bece6a3e330936f1e04d815526af6535edef78adab256bba06267fc60b800",
+  "checkpoint_sha256": "b8fde3f5f989e461ad8eeef5a3fab9c2cec370e6a562e6ae613795c3c67bf6e2",
+  "selection": {
+    "counts": {
+      "physiq": 42,
+      "vbench": 71,
+      "vbench_po": 71,
+      "wm": 22,
+      "wmb": 70
+    },
+    "distribution_claim": "diagnostic safety-screened subset, NOT official complete benchmark distribution",
+    "exclusion_policy": "conservative exclusions before sampling: intimate whole word, romantic kiss/scene, erotic/sexualized expressions, nude/naked; apply union of VBench raw/po and exclude whole Physics scene if any view unsafe. May exclude non-sexual intimate close-ups or nude sculpture; ordinary non-sexual sculpture/art remains eligible. Diagnostic subset, not official distribution.",
+    "method": "proportional largest-remainder with >=1 per observed stratum; sorted pools then seeded shuffle",
+    "physics_unit": "scene, keep all three views; category strata",
+    "safety_exclusions": {
+      "physiq_scenes": {
+        "eligible_cases": 66,
+        "excluded_cases": 0,
+        "input_cases": 66,
+        "reason_counts": {}
+      },
+      "vbench_paired": {
+        "eligible_cases": 332,
+        "excluded_cases": 23,
+        "input_cases": 355,
+        "reason_counts": {
+          "sexualized_or_erotic": 23
+        }
+      },
+      "wm": {
+        "eligible_cases": 104,
+        "excluded_cases": 4,
+        "input_cases": 108,
+        "reason_counts": {
+          "sexualized_or_erotic": 4
+        }
+      },
+      "wmb": {
+        "eligible_cases": 350,
+        "excluded_cases": 0,
+        "input_cases": 350,
+        "reason_counts": {}
+      }
+    },
+    "score_blind": true,
+    "score_files_read": 0,
+    "seed": 20261025,
+    "strata": {
+      "physiq_scenes": {
+        "Fluid Dynamics": {
+          "eligible": 15,
+          "selected": 3
+        },
+        "Magnetism": {
+          "eligible": 2,
+          "selected": 1
+        },
+        "Optics": {
+          "eligible": 8,
+          "selected": 1
+        },
+        "Solid Mechanics": {
+          "eligible": 38,
+          "selected": 8
+        },
+        "Thermodynamics": {
+          "eligible": 3,
+          "selected": 1
+        }
+      },
+      "vbench": {
+        "(('aesthetic_quality', 'background_consistency', 'i2v_background', 'imaging_quality', 'temporal_flickering'), 'abstract')": {
+          "eligible": 8,
+          "selected": 2
+        },
+        "(('aesthetic_quality', 'background_consistency', 'i2v_background', 'imaging_quality', 'temporal_flickering'), 'architecture')": {
+          "eligible": 40,
+          "selected": 9
+        },
+        "(('aesthetic_quality', 'background_consistency', 'i2v_background', 'imaging_quality', 'temporal_flickering'), 'indoor')": {
+          "eligible": 13,
+          "selected": 3
+        },
+        "(('aesthetic_quality', 'background_consistency', 'i2v_background', 'imaging_quality', 'temporal_flickering'), 'scenery')": {
+          "eligible": 40,
+          "selected": 8
+        },
+        "(('aesthetic_quality', 'dynamic_degree', 'i2v_subject', 'imaging_quality', 'motion_smoothness', 'subject_consistency', 'temporal_flickering'), 'animal')": {
+          "eligible": 44,
+          "selected": 9
+        },
+        "(('aesthetic_quality', 'dynamic_degree', 'i2v_subject', 'imaging_quality', 'motion_smoothness', 'subject_consistency', 'temporal_flickering'), 'food')": {
+          "eligible": 35,
+          "selected": 7
+        },
+        "(('aesthetic_quality', 'dynamic_degree', 'i2v_subject', 'imaging_quality', 'motion_smoothness', 'subject_consistency', 'temporal_flickering'), 'multiple-human')": {
+          "eligible": 29,
+          "selected": 6
+        },
+        "(('aesthetic_quality', 'dynamic_degree', 'i2v_subject', 'imaging_quality', 'motion_smoothness', 'subject_consistency', 'temporal_flickering'), 'other')": {
+          "eligible": 9,
+          "selected": 2
+        },
+        "(('aesthetic_quality', 'dynamic_degree', 'i2v_subject', 'imaging_quality', 'motion_smoothness', 'subject_consistency', 'temporal_flickering'), 'plant')": {
+          "eligible": 23,
+          "selected": 5
+        },
+        "(('aesthetic_quality', 'dynamic_degree', 'i2v_subject', 'imaging_quality', 'motion_smoothness', 'subject_consistency', 'temporal_flickering'), 'single-human')": {
+          "eligible": 60,
+          "selected": 13
+        },
+        "(('aesthetic_quality', 'dynamic_degree', 'i2v_subject', 'imaging_quality', 'motion_smoothness', 'subject_consistency', 'temporal_flickering'), 'transportation')": {
+          "eligible": 31,
+          "selected": 7
+        }
+      },
+      "wm": {
+        "celebvhq": {
+          "eligible": 8,
+          "selected": 2
+        },
+        "charades": {
+          "eligible": 10,
+          "selected": 2
+        },
+        "direct": {
+          "eligible": 10,
+          "selected": 2
+        },
+        "easycom": {
+          "eligible": 10,
+          "selected": 2
+        },
+        "h2o": {
+          "eligible": 2,
+          "selected": 1
+        },
+        "hoigen1m": {
+          "eligible": 9,
+          "selected": 2
+        },
+        "matrix": {
+          "eligible": 10,
+          "selected": 2
+        },
+        "mira": {
+          "eligible": 10,
+          "selected": 2
+        },
+        "noxi": {
+          "eligible": 10,
+          "selected": 2
+        },
+        "openvidhd": {
+          "eligible": 6,
+          "selected": 1
+        },
+        "seamless": {
+          "eligible": 10,
+          "selected": 2
+        },
+        "vfhq": {
+          "eligible": 9,
+          "selected": 2
+        }
+      },
+      "wmb": {
+        "animation": {
+          "eligible": 50,
+          "selected": 10
+        },
+        "autonomous vehicle": {
+          "eligible": 50,
+          "selected": 10
+        },
+        "human": {
+          "eligible": 50,
+          "selected": 10
+        },
+        "industrial": {
+          "eligible": 50,
+          "selected": 10
+        },
+        "natural": {
+          "eligible": 50,
+          "selected": 10
+        },
+        "robotics": {
+          "eligible": 50,
+          "selected": 10
+        },
+        "video games": {
+          "eligible": 50,
+          "selected": 10
+        }
+      }
+    },
+    "vbench_dimension_counts": {
+      "aesthetic_quality": 71,
+      "background_consistency": 22,
+      "dynamic_degree": 49,
+      "i2v_background": 22,
+      "i2v_subject": 49,
+      "imaging_quality": 71,
+      "motion_smoothness": 49,
+      "subject_consistency": 49,
+      "temporal_flickering": 71
+    },
+    "vbench_stratum": "official non-camera dimension signature x image_type; raw/po common IDs",
+    "wm_stratum": "historical dataset",
+    "wmb_stratum": "domain, exactly 10 each"
+  },
+  "budget": {
+    "full_1366_authorized": false,
+    "generation_gpu_hours": 28,
+    "generation_nodes": 4,
+    "generation_reserve_gpu_hours": 1.3333333333333321,
+    "gpus_per_node": 8,
+    "per_node_wall_seconds": 3000,
+    "scheduled_generation_gpu_hours": 26.666666666666668,
+    "score_gpu_hours": 12,
+    "total_generation_gpus": 32,
+    "total_gpu_hours": 40,
+    "training_authorized": false
+  },
+  "generator_model": "e3C_subset_20261025",
+  "GPU_started": false,
+  "full_1366_authorized": false,
+  "AR_training_authorized": false,
+  "scorer_sha256": "b8940de1ad0a8f59749e5e0866f98902d0879b6cfc8b278f7a32fabcc6533eef",
+  "node_supervisor_sha256": "2014a096fa127621163a4e7e097757d0f926401c126445aeade40770acb9c3e7"
+}
