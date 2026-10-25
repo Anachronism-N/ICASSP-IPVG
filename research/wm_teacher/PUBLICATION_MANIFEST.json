@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "a031be4c486d7990fe1b149e5f5f6c76ad06f9fe2c1bae82340e925c81f81fc3",
-      "snapshot_sha256": "a031be4c486d7990fe1b149e5f5f6c76ad06f9fe2c1bae82340e925c81f81fc3"
+      "source_sha256": "5144d66f09df152ec374e95c9bcabafe6f8f42a80a4a80d7ba1dfbf32aa7ced0",
+      "snapshot_sha256": "5144d66f09df152ec374e95c9bcabafe6f8f42a80a4a80d7ba1dfbf32aa7ced0"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -714,13 +714,13 @@
     },
     {
       "path": "docs/49_E3三臂开发集结论与完整基准验收.md",
-      "source_sha256": "cc2ce9eff22479e12d1b9b18f5854b5bc9fd5c72618ca81dafd62fbb6234ae07",
-      "snapshot_sha256": "cc2ce9eff22479e12d1b9b18f5854b5bc9fd5c72618ca81dafd62fbb6234ae07"
+      "source_sha256": "055ea85ae5a7c5f1b5f3a560f932d74534f15a8a75689006aabedb9e6b1158b9",
+      "snapshot_sha256": "055ea85ae5a7c5f1b5f3a560f932d74534f15a8a75689006aabedb9e6b1158b9"
     },
     {
       "path": "docs/50_C臂276条分层子集诊断预注册.md",
-      "source_sha256": "fc33bb707d2051e871e42c3538d62ca8199c63ccb588a828946a6a347dd97014",
-      "snapshot_sha256": "fc33bb707d2051e871e42c3538d62ca8199c63ccb588a828946a6a347dd97014"
+      "source_sha256": "bbe12aa612e2a60169c3d35c7425b33d53c65e36bfd8427bad949c4b199ee261",
+      "snapshot_sha256": "bbe12aa612e2a60169c3d35c7425b33d53c65e36bfd8427bad949c4b199ee261"
     },
     {
       "path": "eval/diag/teacher_e3_devset_public_summary_20261025.json",
@@ -836,6 +836,46 @@
       "path": "DiffSynth-Studio/diffsynth/diffusion/base_pipeline.py",
       "source_sha256": "60958bdbfd5dba507da4352ef65592ddc7082758942aba5efc1a3ef309b941f6",
       "snapshot_sha256": "60958bdbfd5dba507da4352ef65592ddc7082758942aba5efc1a3ef309b941f6"
+    },
+    {
+      "path": "scripts/teacher_dymos.py",
+      "source_sha256": "cb5ad112672d775240037f24eef98557ea5ea15aab5d7b83e0c6b4f5fc9b49a6",
+      "snapshot_sha256": "cb5ad112672d775240037f24eef98557ea5ea15aab5d7b83e0c6b4f5fc9b49a6"
+    },
+    {
+      "path": "scripts/run_teacher_inference_smoke.py",
+      "source_sha256": "c334d87d96f43a9e6e3c0c9bce5e9ce5a60e97bd456bbbd977859c96e81e51e4",
+      "snapshot_sha256": "c334d87d96f43a9e6e3c0c9bce5e9ce5a60e97bd456bbbd977859c96e81e51e4"
+    },
+    {
+      "path": "tests/test_teacher_dymos.py",
+      "source_sha256": "4247eb65a28e176a67e29f1c875b008e8e8d898f04a956b71d00c51fe015d8da",
+      "snapshot_sha256": "4247eb65a28e176a67e29f1c875b008e8e8d898f04a956b71d00c51fe015d8da"
+    },
+    {
+      "path": "tests/test_teacher_inference_smoke.py",
+      "source_sha256": "99748e85cab3c1e4b957f78ce6c7151752b417830ec9661d4ce317f1880d1798",
+      "snapshot_sha256": "99748e85cab3c1e4b957f78ce6c7151752b417830ec9661d4ce317f1880d1798"
+    },
+    {
+      "path": "DiffSynth-Studio/diffsynth/models/wan_video_dit.py",
+      "source_sha256": "034f3133efff44b7a144f1e4824df92448e46196a011e88d60b9f989243143f4",
+      "snapshot_sha256": "034f3133efff44b7a144f1e4824df92448e46196a011e88d60b9f989243143f4"
+    },
+    {
+      "path": "DiffSynth-Studio/diffsynth/configs/model_configs.py",
+      "source_sha256": "76faf5bda287254a831ce31d3d794a4dd03273e4282b1f52937ecd0b3e9f9b8a",
+      "snapshot_sha256": "76faf5bda287254a831ce31d3d794a4dd03273e4282b1f52937ecd0b3e9f9b8a"
+    },
+    {
+      "path": "eval/diag/teacher_e3_seed1_public_summary_20261025.json",
+      "source_sha256": "7da2504e0d26db25e65fd18da417fa520c10e40708b6e207b6f3740b162c6a30",
+      "snapshot_sha256": "7da2504e0d26db25e65fd18da417fa520c10e40708b6e207b6f3740b162c6a30"
+    },
+    {
+      "path": "eval/diag/teacher_e3_seed1_integrity_public_20261025.json",
+      "source_sha256": "7749d8bcba6de2a8bf4bfb8d24b90d988f35144ea7d24ec39d06fe861ff01a71",
+      "snapshot_sha256": "7749d8bcba6de2a8bf4bfb8d24b90d988f35144ea7d24ec39d06fe861ff01a71"
     }
   ],
   "experiment_progress": {
@@ -966,5 +1006,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "Finite recovery, ALG isolated CPU mechanism and four-benchmark SOTA protocol reference; no quality claim"
+  "latest_increment_scope": "C fixed stratified subset preparation, supervision and original scorers; no GPU/quality claim"
 }
