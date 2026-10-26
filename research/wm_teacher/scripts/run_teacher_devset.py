@@ -59,7 +59,7 @@ def frozen_cases(root):
     for case in cases:
         name = case["id"]
         require(isinstance(name, str) and name not in (".", "..") and name
-                and all(c.isalnum() or c in "_-" for c in name), "Unsafe case id")
+                and all(c.isalnum() or c in "_.+-" for c in name), "Unsafe case id")
         require(isinstance(case["prompt"], str) and case["prompt"]
                 and sha(case["prompt"].encode()) == case["prompt_sha256"], "Raw prompt hash drift")
         require(case.get("n_frames") == 121 and case.get("width") == 1280

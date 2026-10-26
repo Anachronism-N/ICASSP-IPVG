@@ -1,0 +1,49 @@
+{
+  "protocol": "Actual once-load two-seed throughput measurement, no quality claim",
+  "results": {
+    "alg": {
+      "load_count": 1,
+      "load_seconds": 9.139028018340468,
+      "per_video_inference_save_seconds": [
+        389.4599884301424,
+        386.5074408920482
+      ],
+      "allocated_gpu_hours": 0.26162980009568854,
+      "prior_smoke_gpu_hours": 0.17174101285403595,
+      "cumulative_smoke_performance_gpu_hours": 0.43337081294972446,
+      "measured_two_videos": true,
+      "video_count": 2,
+      "frames": 121,
+      "width": 1280,
+      "height": 704,
+      "fps": 24,
+      "base_parameters_unchanged": true,
+      "estimated_16_shard_generation_gpu_hours": 21.07579873367316,
+      "estimate_not_guarantee": true,
+      "quality_pass": false,
+      "sota_proven": false
+    },
+    "dymos": {
+      "load_count": 1,
+      "load_seconds": 11.05993387941271,
+      "per_video_inference_save_seconds": [
+        368.05966061446816,
+        360.6184491245076
+      ],
+      "allocated_gpu_hours": 0.24913885465331584,
+      "prior_smoke_gpu_hours": 0.16473392798539457,
+      "cumulative_smoke_performance_gpu_hours": 0.4138727826387104,
+      "measured_two_videos": true,
+      "video_count": 2,
+      "frames": 121,
+      "width": 1280,
+      "height": 704,
+      "fps": 24,
+      "base_parameters_unchanged": true,
+      "estimated_16_shard_generation_gpu_hours": 19.96854568547983,
+      "estimate_not_guarantee": true,
+      "quality_pass": false,
+      "sota_proven": false
+    }
+  }
+}

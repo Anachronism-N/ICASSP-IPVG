@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "d90ec043c5f59716244c91b1cfcde15b2b7e06b45bce9ad28a6fab553b7495aa",
-      "snapshot_sha256": "d90ec043c5f59716244c91b1cfcde15b2b7e06b45bce9ad28a6fab553b7495aa"
+      "source_sha256": "fd40bb3786fadd36c7d1fb6f5e9411122057647d990ec9f7895387ddc817b0b2",
+      "snapshot_sha256": "fd40bb3786fadd36c7d1fb6f5e9411122057647d990ec9f7895387ddc817b0b2"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -934,8 +934,8 @@
     },
     {
       "path": "scripts/run_teacher_devset.py",
-      "source_sha256": "9d7dd7633060b44b5a18f5dcf003befde858641025c1063e8c7dab1d95847b75",
-      "snapshot_sha256": "9d7dd7633060b44b5a18f5dcf003befde858641025c1063e8c7dab1d95847b75"
+      "source_sha256": "591dfdaffa14c9af8be88a5289996d6925cf799f3d13de7830f92b669aa8cf67",
+      "snapshot_sha256": "591dfdaffa14c9af8be88a5289996d6925cf799f3d13de7830f92b669aa8cf67"
     },
     {
       "path": "tests/test_teacher_throughput.py",
@@ -944,13 +944,23 @@
     },
     {
       "path": "tests/test_teacher_devset.py",
-      "source_sha256": "79ccac2498b348cebab4e5be726644ea26befbb043b783ddc881550497157e7a",
-      "snapshot_sha256": "79ccac2498b348cebab4e5be726644ea26befbb043b783ddc881550497157e7a"
+      "source_sha256": "a986651b93ae307af03c52d4cbeda1bf50487d441ec129f1931be7080ed6562c",
+      "snapshot_sha256": "a986651b93ae307af03c52d4cbeda1bf50487d441ec129f1931be7080ed6562c"
     },
     {
       "path": "docs/56_双策略性能复验与双seed开发评测准入.md",
       "source_sha256": "eb8c7e1a94b113e8d93e4a1b41a7c6c24cd289787f787e429baec0762e6fb589",
       "snapshot_sha256": "eb8c7e1a94b113e8d93e4a1b41a7c6c24cd289787f787e429baec0762e6fb589"
+    },
+    {
+      "path": "docs/57_双策略实测吞吐与有限开发集调度.md",
+      "source_sha256": "f53df6128fbe69bb6cb76cafb9e5c2f8c0e22c740b5a1bc7fa3e25c8f70281ba",
+      "snapshot_sha256": "f53df6128fbe69bb6cb76cafb9e5c2f8c0e22c740b5a1bc7fa3e25c8f70281ba"
+    },
+    {
+      "path": "eval/diag/teacher_batch_throughput_public_20261026.json",
+      "source_sha256": "b3413db77836f8896d2356942adfbfef43529cfb3e06f422fd8fbea524ca2ae3",
+      "snapshot_sha256": "b3413db77836f8896d2356942adfbfef43529cfb3e06f422fd8fbea524ca2ae3"
     }
   ],
   "experiment_progress": {

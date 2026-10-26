@@ -49,6 +49,8 @@ FILES = [
     "docs/54_C276预算修订与一次收尾授权.md",
     "docs/55_ALG与DyMoS真实机制Smoke结论.md",
     "docs/56_双策略性能复验与双seed开发评测准入.md",
+    "docs/57_双策略实测吞吐与有限开发集调度.md",
+    "eval/diag/teacher_batch_throughput_public_20261026.json",
     "eval/diag/teacher_inference_smoke_public_results_20261026.json",
     "eval/diag/teacher_C276_generation_public_20261026.json",
     "eval/diag/e3_recaption_schema_public_20261025.json",

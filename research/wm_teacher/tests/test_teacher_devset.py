@@ -194,6 +194,20 @@ class Fixture(SmokeFixture):
 
 
 class PrepareTests(Fixture):
+    def test_frozen_basename_accepts_dots_plus_but_rejects_traversal(self):
+        def manifest_with(name):
+            cases = [dict(c) for c in self.cases]
+            cases[1]["id"] = name
+            raw = b"".join(smoke.encoded(c) for c in cases)
+            self.cases_path.write_bytes(raw)
+            return mock.patch.object(dev, "CASES_SHA256", smoke.sha(raw))
+        with manifest_with("vfhq__Clip+sample.v1_w000"):
+            self.assertEqual(len(dev.frozen_cases(self.root)[1]), 94)
+        for name in ("../escape", "a/b", "a\\b", ".", "..", "a" + chr(0)):
+            with manifest_with(name):
+                with self.assertRaisesRegex(ValueError, "Unsafe case id"):
+                    dev.frozen_cases(self.root)
+
     def test_default_prepare_no_torch_no_generator_no_metrics_import(self):
         original = builtins.__import__
         def guarded(name, *args, **kwargs):
