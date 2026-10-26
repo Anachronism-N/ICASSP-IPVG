@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "885a83b9b8b389a25a5184839b902d542a88d675490c83b6b13ec8b3b7981319",
-      "snapshot_sha256": "885a83b9b8b389a25a5184839b902d542a88d675490c83b6b13ec8b3b7981319"
+      "source_sha256": "8a6eb02eb94ebd862f1573dc0df7453bdf41c18e194fb8242df3226b0ef98b17",
+      "snapshot_sha256": "8a6eb02eb94ebd862f1573dc0df7453bdf41c18e194fb8242df3226b0ef98b17"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -904,13 +904,23 @@
     },
     {
       "path": "tests/test_e3_subset_completion.py",
-      "source_sha256": "417b54f9a7633ecf803d7cda01881d0c24d64cf3418ed8f8d226448687ab75e4",
-      "snapshot_sha256": "417b54f9a7633ecf803d7cda01881d0c24d64cf3418ed8f8d226448687ab75e4"
+      "source_sha256": "ee06bf68f5f521c7f66184efc3cb39517ad614ea3b7dcfb00b1bb1a2808b5b96",
+      "snapshot_sha256": "ee06bf68f5f521c7f66184efc3cb39517ad614ea3b7dcfb00b1bb1a2808b5b96"
     },
     {
       "path": "tests/test_e3_subset_scoring_driver.py",
       "source_sha256": "8ce672284e7c7edd78d67134a9aee95960baa77a8b90acdd22d3acbea4773876",
       "snapshot_sha256": "8ce672284e7c7edd78d67134a9aee95960baa77a8b90acdd22d3acbea4773876"
+    },
+    {
+      "path": "docs/55_ALG与DyMoS真实机制Smoke结论.md",
+      "source_sha256": "02eb983824a746966d5696ef72cc4c95256ea70b2a2d4bb8e1231a72e9bbd5ab",
+      "snapshot_sha256": "02eb983824a746966d5696ef72cc4c95256ea70b2a2d4bb8e1231a72e9bbd5ab"
+    },
+    {
+      "path": "eval/diag/teacher_inference_smoke_public_results_20261026.json",
+      "source_sha256": "235bcb96fe787e6212054413f1c616d1b45cf4ffbceb3d58076d9df342c00570",
+      "snapshot_sha256": "235bcb96fe787e6212054413f1c616d1b45cf4ffbceb3d58076d9df342c00570"
     }
   ],
   "experiment_progress": {

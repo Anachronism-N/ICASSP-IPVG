@@ -47,6 +47,8 @@ FILES = [
     "docs/52_四基准SOTA逐维对照与协议核验.md",
     "docs/53_标签解析修复与偏好训练门禁.md",
     "docs/54_C276预算修订与一次收尾授权.md",
+    "docs/55_ALG与DyMoS真实机制Smoke结论.md",
+    "eval/diag/teacher_inference_smoke_public_results_20261026.json",
     "eval/diag/e3_recaption_schema_public_20261025.json",
     "eval/diag/teacher_sota_protocol_public_20261025.json",
     "eval/diag/teacher_e3_subset_preregistered_public_20261025.json",

@@ -1,0 +1,89 @@
+{
+  "protocol": "Isolated ALG/DyMoS Wan2.2-TI2V-5B full-format one-video mechanism smoke",
+  "date": "2026-10-26",
+  "results": {
+    "alg": {
+      "successful_attempt": 2,
+      "first_attempt_gpu_hours": 0.026576835840630034,
+      "second_attempt_gpu_hours": 0.14516417701340592,
+      "cumulative_smoke_gpu_hours": 0.17174101285403595,
+      "elapsed_seconds": 522.5910372482613,
+      "peak_memory_GiB": 26.35053253173828,
+      "parameters_before_after_equal": true,
+      "mechanism_pass": true,
+      "complete_video": {
+        "frames": 121,
+        "width": 1280,
+        "height": 704,
+        "fps": 24,
+        "full_decode_xerror": true,
+        "sha256": "44720cfdcd3d95d454964a76e701fe738e3656abfd13712686466da01f6be265"
+      },
+      "stats": {
+        "method": {
+          "active_steps": 10,
+          "bypassed": false,
+          "completed_steps": 50,
+          "effective_first_frame_dtype": "torch.bfloat16",
+          "effective_first_frame_sha256": "28859d7673b6b834771c860433663ec75ce7db63cae3b40a4ee5338f11e71da4",
+          "first_frame_sha256": "28859d7673b6b834771c860433663ec75ce7db63cae3b40a4ee5338f11e71da4",
+          "model_forwards": 110,
+          "raw_first_frame_dtype": "torch.bfloat16",
+          "raw_first_frame_sha256": "28859d7673b6b834771c860433663ec75ce7db63cae3b40a4ee5338f11e71da4"
+        },
+        "observed": {
+          "finite_checks": 590,
+          "model_forwards": 110,
+          "progress_steps": 50,
+          "scheduler_steps": 50
+        }
+      },
+      "quality_pass": false,
+      "sota_proven": false
+    },
+    "dymos": {
+      "successful_attempt": 2,
+      "first_attempt_gpu_hours": 0.025954998457907802,
+      "second_attempt_gpu_hours": 0.13877892952748677,
+      "cumulative_smoke_gpu_hours": 0.16473392798539457,
+      "elapsed_seconds": 499.6041462989524,
+      "peak_memory_GiB": 26.350217819213867,
+      "parameters_before_after_equal": true,
+      "mechanism_pass": true,
+      "complete_video": {
+        "frames": 121,
+        "width": 1280,
+        "height": 704,
+        "fps": 24,
+        "full_decode_xerror": true,
+        "sha256": "7bf9322a32c38d018a5cf8e72d15fcb6e1e624a781fd140c3eb274aba6db4158"
+      },
+      "stats": {
+        "method": {
+          "active_steps": 10,
+          "biased_attention_calls": 300,
+          "bypassed": false,
+          "completed_steps": 50,
+          "effective_first_frame_dtype": "torch.bfloat16",
+          "effective_first_frame_sha256": "28859d7673b6b834771c860433663ec75ce7db63cae3b40a4ee5338f11e71da4",
+          "model_forwards": 100,
+          "original_attention_calls": 2700,
+          "raw_first_frame_dtype": "torch.bfloat16",
+          "raw_first_frame_sha256": "28859d7673b6b834771c860433663ec75ce7db63cae3b40a4ee5338f11e71da4",
+          "reference_tokens": 880,
+          "sequence_tokens": 27280
+        },
+        "observed": {
+          "finite_checks": 550,
+          "model_forwards": 100,
+          "progress_steps": 50,
+          "scheduler_steps": 50
+        }
+      },
+      "quality_pass": false,
+      "sota_proven": false
+    }
+  },
+  "quality_claim": false,
+  "benchmark_evaluation_pending": true
+}

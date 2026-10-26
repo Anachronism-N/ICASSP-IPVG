@@ -19,6 +19,9 @@ class CompletionTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
+        self.no_writers_patch = patch.object(c, "no_writers")
+        self.no_writers_patch.start()
+        self.addCleanup(self.no_writers_patch.stop)
         self.root = Path(self.temp.name) / "project"
         self.exp = self.root / "eval/e3_subset_20261025"
         self.exp.mkdir(parents=True)
@@ -96,6 +99,19 @@ class CompletionTests(unittest.TestCase):
     def verify(self):
         with patch.object(c, "PLAN_SHA", self.args.plan_sha256):
             return c.validate_global(self.exp, self.args.plan_sha256, getattr(self.args, "budget_amendment_sha256", None))
+
+    def test_real_no_writers_rejects_generation_process(self):
+        self.no_writers_patch.stop()
+        for executable in (b"gen_jobs.py", b"run_gen.sh"):
+            entry = Mock(name="process")
+            entry.name = "987654"
+            cmdline = Mock()
+            cmdline.read_bytes.return_value = b"python" + bytes([0]) + executable + bytes([0])
+            entry.__truediv__ = Mock(return_value=cmdline)
+            with patch.object(Path, "iterdir", return_value=iter([entry])):
+                with self.assertRaisesRegex(ValueError, "Active generation"):
+                    c.no_writers()
+        self.no_writers_patch.start()
 
     def test_all_276_already_valid_zero_gpu_preserves_original_failures(self):
         gpu = Mock(side_effect=AssertionError("GPU forbidden"))
