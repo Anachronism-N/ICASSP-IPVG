@@ -299,7 +299,10 @@ def verify_plan(path, approved_sha, node_preflight, approved_node_sha):
     require({r["path"] for r in plan["source_files"]} == {str(p) for p in sources(root)}, "Source set drift")
     for r in plan["source_files"]:
         check_record(r)
-    require(smoke.runtime_records() == plan["runtime"], "Runtime source/version hash drift")
+    runtime = smoke.runtime_records()
+    runtime_identity = lambda value: {**value, "files": [{k: v for k, v in row.items() if k != "mtime_ns"}
+                                                       for row in value["files"]]}
+    require(runtime_identity(runtime) == runtime_identity(plan["runtime"]), "Runtime source/version hash drift")
     raw, cases, inputs, manifest = frozen_cases(root)
     require(manifest == plan["cases_file"] and cases == plan["cases"] and inputs == plan["inputs"]
             and plan["jobs"] == jobs_for(cases, root, method), "Case/seed/input/job schema drift")
@@ -526,7 +529,7 @@ def _run(path, approved_sha, node_preflight, approved_node_sha, ledger_path, gpu
     require(ledger_path.is_file(), "Caller must preregister reserved allocation ledger")
     lock_path = ledger_path.with_suffix(ledger_path.suffix + ".lock")
     with lock_path.open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        fcntl.flock(lock, fcntl.LOCK_EX)
         ledger = json.loads(ledger_path.read_bytes())
         item, _ = validate_ledger(ledger, plan, approved_sha, shard, nshards, gpu_index, gen_cap_seconds)
         uuid, start = managed_scope(item, state_dir, gpu_index), item["allocation_start_monotonic"]
@@ -592,7 +595,7 @@ def _run(path, approved_sha, node_preflight, approved_node_sha, ledger_path, gpu
         receipt["failure"] = not receipt["success"]
         exclusive(folder / f"shard{shard}.finished.json", receipt)
         with lock_path.open("a") as lock:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.flock(lock, fcntl.LOCK_EX)
             ledger = json.loads(ledger_path.read_bytes())
             matching = [a for a in ledger["allocations"] if a["phase"] == "generation" and a["shard"] == shard]
             require(len(matching) == 1 and matching[0].get("worker_pid") == os.getpid()

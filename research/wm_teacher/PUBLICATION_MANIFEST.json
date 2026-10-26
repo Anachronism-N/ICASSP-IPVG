@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "fd40bb3786fadd36c7d1fb6f5e9411122057647d990ec9f7895387ddc817b0b2",
-      "snapshot_sha256": "fd40bb3786fadd36c7d1fb6f5e9411122057647d990ec9f7895387ddc817b0b2"
+      "source_sha256": "a29ed809a7ee2bb9a2a6c6156730705b0fb0949544cec30cc436318d5543adb3",
+      "snapshot_sha256": "a29ed809a7ee2bb9a2a6c6156730705b0fb0949544cec30cc436318d5543adb3"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -934,8 +934,8 @@
     },
     {
       "path": "scripts/run_teacher_devset.py",
-      "source_sha256": "591dfdaffa14c9af8be88a5289996d6925cf799f3d13de7830f92b669aa8cf67",
-      "snapshot_sha256": "591dfdaffa14c9af8be88a5289996d6925cf799f3d13de7830f92b669aa8cf67"
+      "source_sha256": "08f19f38976daafbdc222edbe6015f2056455f348769f595ee8e2cdfff5871a2",
+      "snapshot_sha256": "08f19f38976daafbdc222edbe6015f2056455f348769f595ee8e2cdfff5871a2"
     },
     {
       "path": "tests/test_teacher_throughput.py",
@@ -944,8 +944,8 @@
     },
     {
       "path": "tests/test_teacher_devset.py",
-      "source_sha256": "a986651b93ae307af03c52d4cbeda1bf50487d441ec129f1931be7080ed6562c",
-      "snapshot_sha256": "a986651b93ae307af03c52d4cbeda1bf50487d441ec129f1931be7080ed6562c"
+      "source_sha256": "99dc0beb6eb8b8849ef167164b2ba98a580270df93189d2958ab1c63f4f62d3b",
+      "snapshot_sha256": "99dc0beb6eb8b8849ef167164b2ba98a580270df93189d2958ab1c63f4f62d3b"
     },
     {
       "path": "docs/56_双策略性能复验与双seed开发评测准入.md",
@@ -961,6 +961,36 @@
       "path": "eval/diag/teacher_batch_throughput_public_20261026.json",
       "source_sha256": "b3413db77836f8896d2356942adfbfef43529cfb3e06f422fd8fbea524ca2ae3",
       "snapshot_sha256": "b3413db77836f8896d2356942adfbfef43529cfb3e06f422fd8fbea524ca2ae3"
+    },
+    {
+      "path": "scripts/run_teacher_devset_node.py",
+      "source_sha256": "679a2eec7caf9cf3e2300a86a8797c25f0f6de4e831445e1070fcd94c48eae1b",
+      "snapshot_sha256": "679a2eec7caf9cf3e2300a86a8797c25f0f6de4e831445e1070fcd94c48eae1b"
+    },
+    {
+      "path": "tests/test_teacher_devset_node.py",
+      "source_sha256": "9fe0a7437144cd048b619ced3cb419b634e02bc5e92803ba21ec49967d951dbd",
+      "snapshot_sha256": "9fe0a7437144cd048b619ced3cb419b634e02bc5e92803ba21ec49967d951dbd"
+    },
+    {
+      "path": "eval/diag/teacher_devset_generation_plan_public_20261026.json",
+      "source_sha256": "31f2946c8a92f60cc0d7f3fd3195202e8ec8973e3ba7d1eb612b526048803bbd",
+      "snapshot_sha256": "31f2946c8a92f60cc0d7f3fd3195202e8ec8973e3ba7d1eb612b526048803bbd"
+    },
+    {
+      "path": "eval/diag/teacher_C276_public_results_20261026.json",
+      "source_sha256": "6ce6993b8866fe7310378d29241637bd398a390a8d9c1b7a38f94ee4b41d3e58",
+      "snapshot_sha256": "6ce6993b8866fe7310378d29241637bd398a390a8d9c1b7a38f94ee4b41d3e58"
+    },
+    {
+      "path": "docs/58_C276四基准子集完整结论.md",
+      "source_sha256": "be454321ae07990baa94ea0d80a2076af97a437837d33e1061ba78a22e71c801",
+      "snapshot_sha256": "be454321ae07990baa94ea0d80a2076af97a437837d33e1061ba78a22e71c801"
+    },
+    {
+      "path": "eval/diag/teacher_C276_independent_audit_public_20261026.json",
+      "source_sha256": "71c7451be8816eef45a7d016afead86046e849b4fdadf3be8c92e4f91685cba4",
+      "snapshot_sha256": "71c7451be8816eef45a7d016afead86046e849b4fdadf3be8c92e4f91685cba4"
     }
   ],
   "experiment_progress": {

@@ -1,0 +1,30 @@
+{
+  "protocol": "Independent C276 final numerical and provenance audit",
+  "status": "PASS",
+  "check_count": 9884,
+  "failure_count": 0,
+  "bootstrap": 2000,
+  "seed": 20261025,
+  "driver_summary_called": false,
+  "gpu_actions_started": 0,
+  "media_redecoded": false,
+  "source_and_local_sha_verified": true,
+  "full_decode_evidence_frames": 33396,
+  "scope": {
+    "vbench_raw": 71,
+    "vbench_po": 71,
+    "WM": 22,
+    "physics_views": 42,
+    "physics_scenes": 14,
+    "WMB": 70
+  },
+  "generation_gpu_hours": 28.483680308025797,
+  "score_gpu_hours": 1.100151776883803,
+  "total_gpu_hours": 29.5838320849096,
+  "SOTA": false,
+  "comprehensive_improvement": false,
+  "model_promoted": false,
+  "subset_not_full": true,
+  "dependencies_current_audit_only": true,
+  "native_and_transitive_dependencies_not_exhaustively_frozen": true
+}

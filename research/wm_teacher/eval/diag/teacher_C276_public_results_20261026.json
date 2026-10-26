@@ -1,0 +1,938 @@
+{
+  "schema": "e3_subset_public_aggregates_v1",
+  "subset_counts": {
+    "vbench": 71,
+    "vbench_po": 71,
+    "wm": 22,
+    "physiq": 42,
+    "wmb": 70
+  },
+  "bootstrap": 2000,
+  "seed": 20261025,
+  "vbench": {
+    "vbench": {
+      "left": {
+        "i2v_subject": 0.9706274965952854,
+        "i2v_background": 0.9892586909302257,
+        "subject_consistency": 0.9527192653289863,
+        "background_consistency": 0.9759454900568182,
+        "motion_smoothness": 0.9865411519144235,
+        "dynamic_degree": 0.673469387755102,
+        "aesthetic_quality": 0.6180565130542701,
+        "imaging_quality": 0.716952321882118
+      },
+      "right": {
+        "i2v_subject": 0.9725427381762741,
+        "i2v_background": 0.9894114655865865,
+        "subject_consistency": 0.9556334090241719,
+        "background_consistency": 0.9751920757871686,
+        "motion_smoothness": 0.9871425854353736,
+        "dynamic_degree": 0.6122448979591837,
+        "aesthetic_quality": 0.6185278187335377,
+        "imaging_quality": 0.7171246443259924
+      },
+      "n_by_dim": {
+        "i2v_subject": 49,
+        "i2v_background": 22,
+        "subject_consistency": 49,
+        "background_consistency": 22,
+        "motion_smoothness": 49,
+        "dynamic_degree": 49,
+        "aesthetic_quality": 71,
+        "imaging_quality": 71
+      },
+      "aggregate_only_total": {
+        "left": 0.9010541871396278,
+        "right": 0.8993473924801265,
+        "delta": 0.0017067946595012984,
+        "ci95": [
+          -0.0021896998588637807,
+          0.006080912175717925
+        ]
+      },
+      "paired": {
+        "i2v_subject": {
+          "delta": -0.001915241580988769,
+          "ci95": [
+            -0.004716401557232788,
+            0.001061536989413364
+          ]
+        },
+        "i2v_background": {
+          "delta": -0.00015277465636087673,
+          "ci95": [
+            -0.000680281758344059,
+            0.0002861656223734047
+          ]
+        },
+        "subject_consistency": {
+          "delta": -0.0029141436951856114,
+          "ci95": [
+            -0.005829454430889008,
+            -0.0008186312530121282
+          ]
+        },
+        "background_consistency": {
+          "delta": 0.0007534142696495882,
+          "ci95": [
+            -0.001210396506569611,
+            0.0030261278382821264
+          ]
+        },
+        "motion_smoothness": {
+          "delta": -0.0006014335209501009,
+          "ci95": [
+            -0.0009734230649382503,
+            -0.0002703626713883134
+          ]
+        },
+        "dynamic_degree": {
+          "delta": 0.061224489795918324,
+          "ci95": [
+            -0.021739130434782594,
+            0.15555555555555556
+          ]
+        },
+        "aesthetic_quality": {
+          "delta": -0.00047130567926756406,
+          "ci95": [
+            -0.0032161756195653118,
+            0.002196338562898227
+          ]
+        },
+        "imaging_quality": {
+          "delta": -0.00017232244387443973,
+          "ci95": [
+            -0.0020297567777506575,
+            0.0017936957367306685
+          ]
+        }
+      }
+    },
+    "vbench_po": {
+      "left": {
+        "i2v_subject": 0.9831581616401672,
+        "i2v_background": 0.9900609096952461,
+        "subject_consistency": 0.9601650874149434,
+        "background_consistency": 0.9783975312204072,
+        "motion_smoothness": 0.9883561609584057,
+        "dynamic_degree": 0.4489795918367347,
+        "aesthetic_quality": 0.624423152124378,
+        "imaging_quality": 0.7143406017300359
+      },
+      "right": {
+        "i2v_subject": 0.9836591493566426,
+        "i2v_background": 0.9902080216461961,
+        "subject_consistency": 0.9601351242563149,
+        "background_consistency": 0.9748949455492424,
+        "motion_smoothness": 0.9885281007797493,
+        "dynamic_degree": 0.40816326530612246,
+        "aesthetic_quality": 0.624632479439319,
+        "imaging_quality": 0.7161038684278828
+      },
+      "n_by_dim": {
+        "i2v_subject": 49,
+        "i2v_background": 22,
+        "subject_consistency": 49,
+        "background_consistency": 22,
+        "motion_smoothness": 49,
+        "dynamic_degree": 49,
+        "aesthetic_quality": 71,
+        "imaging_quality": 71
+      },
+      "aggregate_only_total": {
+        "left": 0.8967928051364218,
+        "right": 0.8949326036020784,
+        "delta": 0.0018602015343434086,
+        "ci95": [
+          -0.0002481966408523134,
+          0.0048830223353758685
+        ]
+      },
+      "paired": {
+        "i2v_subject": {
+          "delta": -0.0005009877164753318,
+          "ci95": [
+            -0.0015741532980475897,
+            0.0005813203695614802
+          ]
+        },
+        "i2v_background": {
+          "delta": -0.000147111950950074,
+          "ci95": [
+            -0.00047869962346737405,
+            0.00009864869944583017
+          ]
+        },
+        "subject_consistency": {
+          "delta": 0.00002996315862857646,
+          "ci95": [
+            -0.00094747867506077,
+            0.001005126360790642
+          ]
+        },
+        "background_consistency": {
+          "delta": 0.003502585671164793,
+          "ci95": [
+            0.0006316021988565318,
+            0.007033067924735252
+          ]
+        },
+        "motion_smoothness": {
+          "delta": -0.00017193982134355856,
+          "ci95": [
+            -0.00037081230537413243,
+            0.00004043157665097583
+          ]
+        },
+        "dynamic_degree": {
+          "delta": 0.040816326530612235,
+          "ci95": [
+            0,
+            0.10638297872340424
+          ]
+        },
+        "aesthetic_quality": {
+          "delta": -0.0002093273149409436,
+          "ci95": [
+            -0.0023549797144574725,
+            0.0019901024623655552
+          ]
+        },
+        "imaging_quality": {
+          "delta": -0.001763266697846877,
+          "ci95": [
+            -0.004180540188520851,
+            0.0004188570713168272
+          ]
+        }
+      }
+    },
+    "wm": {
+      "left": {
+        "i2v_subject": 0.978203631307591,
+        "i2v_background": 0.9805884047462182,
+        "subject_consistency": 0.931827434095921,
+        "background_consistency": 0.9526012073863637,
+        "motion_smoothness": 0.9899392695909367,
+        "dynamic_degree": 0.5909090909090909,
+        "aesthetic_quality": 0.4777832749215039,
+        "imaging_quality": 0.6602663771072607
+      },
+      "right": {
+        "i2v_subject": 0.9753523610667749,
+        "i2v_background": 0.9799852423031222,
+        "subject_consistency": 0.9340346078021509,
+        "background_consistency": 0.9522137266216856,
+        "motion_smoothness": 0.9905741669779801,
+        "dynamic_degree": 0.5909090909090909,
+        "aesthetic_quality": 0.47494667226617987,
+        "imaging_quality": 0.6610943746172693
+      },
+      "n_by_dim": {
+        "i2v_subject": 22,
+        "i2v_background": 22,
+        "subject_consistency": 22,
+        "background_consistency": 22,
+        "motion_smoothness": 22,
+        "dynamic_degree": 22,
+        "aesthetic_quality": 22,
+        "imaging_quality": 22
+      },
+      "aggregate_only_total": {
+        "left": 0.8746409337900991,
+        "right": 0.8738045870489093,
+        "delta": 0.0008363467411898196,
+        "ci95": [
+          -0.0014714139249856124,
+          0.004147951237541583
+        ]
+      },
+      "paired": {
+        "i2v_subject": {
+          "delta": 0.002851270240816106,
+          "ci95": [
+            -0.0011202551375396803,
+            0.00860608248785135
+          ]
+        },
+        "i2v_background": {
+          "delta": 0.0006031624430959948,
+          "ci95": [
+            -0.0022052187479353947,
+            0.005012430556965079
+          ]
+        },
+        "subject_consistency": {
+          "delta": -0.0022071737062299146,
+          "ci95": [
+            -0.005343388062619606,
+            0.0006587745490568741
+          ]
+        },
+        "background_consistency": {
+          "delta": 0.0003874807646780942,
+          "ci95": [
+            -0.0025303719260475867,
+            0.0036219833836411085
+          ]
+        },
+        "motion_smoothness": {
+          "delta": -0.000634897387043365,
+          "ci95": [
+            -0.0015320005255426649,
+            0.000002302598497383385
+          ]
+        },
+        "dynamic_degree": {
+          "delta": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        "aesthetic_quality": {
+          "delta": 0.0028366026553240387,
+          "ci95": [
+            -0.002885665609077964,
+            0.008262224326079561
+          ]
+        },
+        "imaging_quality": {
+          "delta": -0.0008279975100086157,
+          "ci95": [
+            -0.006836071850571029,
+            0.004409864056656606
+          ]
+        }
+      }
+    }
+  },
+  "gtref": {
+    "n_cases": 22,
+    "K": 12,
+    "metrics": {
+      "dreamsim": {
+        "left": 0.15638279914855954,
+        "right": 0.15421404441197714,
+        "delta": 0.002168754736582439,
+        "ci95": [
+          -0.0008344188784108023,
+          0.005416023849763651
+        ]
+      },
+      "dreamsim_last": {
+        "left": 0.17832838676192544,
+        "right": 0.1759031821380962,
+        "delta": 0.0024252046238292346,
+        "ci95": [
+          -0.0036192321641878647,
+          0.008833281831307842
+        ]
+      },
+      "motion_ratio": {
+        "left": 1.161043364607208,
+        "right": 1.2296114367013788,
+        "delta": -0.06856807209417094,
+        "ci95": [
+          -0.14582858423677947,
+          -0.005724602635149474
+        ]
+      }
+    }
+  },
+  "physics": {
+    "left": 26.89279533833302,
+    "right": 26.111923247065665,
+    "delta": 0.780872091267355,
+    "ci95": [
+      -0.7672294686358179,
+      2.2400025537945725
+    ],
+    "n_scenes": 14,
+    "views_per_scene": 3,
+    "units": "percentage points"
+  },
+  "wmb": {
+    "n_cases": 70,
+    "questions_per_case": 8,
+    "aggregate": {
+      "left": 8.342857142857142,
+      "right": 8.5,
+      "delta": -0.1571428571428571,
+      "ci95": [
+        -0.5,
+        0.15714285714285714
+      ],
+      "n_cases": 70,
+      "eight_question_paired": [
+        {
+          "delta": 0.1,
+          "ci95": [
+            -0.07142857142857142,
+            0.2717857142857123
+          ]
+        },
+        {
+          "delta": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        {
+          "delta": -0.11428571428571428,
+          "ci95": [
+            -0.2,
+            -0.02857142857142857
+          ]
+        },
+        {
+          "delta": -0.014285714285714285,
+          "ci95": [
+            -0.04285714285714286,
+            0
+          ]
+        },
+        {
+          "delta": -0.07142857142857142,
+          "ci95": [
+            -0.15714285714285714,
+            0
+          ]
+        },
+        {
+          "delta": 0,
+          "ci95": [
+            0,
+            0
+          ]
+        },
+        {
+          "delta": 0.014285714285714285,
+          "ci95": [
+            -0.05714285714285714,
+            0.08571428571428572
+          ]
+        },
+        {
+          "delta": -0.07142857142857142,
+          "ci95": [
+            -0.17142857142857143,
+            0.02857142857142857
+          ]
+        }
+      ]
+    },
+    "domains": {
+      "animation": {
+        "left": 8.8,
+        "right": 8.8,
+        "delta": 0,
+        "ci95": [
+          -0.6,
+          0.6
+        ],
+        "n_cases": 10,
+        "eight_question_paired": [
+          {
+            "delta": 0.2,
+            "ci95": [
+              0,
+              0.6
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": -0.1,
+            "ci95": [
+              -0.3,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": -0.1,
+            "ci95": [
+              -0.3,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": 0.1,
+            "ci95": [
+              0,
+              0.3
+            ]
+          },
+          {
+            "delta": -0.1,
+            "ci95": [
+              -0.3,
+              0
+            ]
+          }
+        ]
+      },
+      "autonomous vehicle": {
+        "left": 7.4,
+        "right": 8.3,
+        "delta": -0.9,
+        "ci95": [
+          -2,
+          0
+        ],
+        "n_cases": 10,
+        "eight_question_paired": [
+          {
+            "delta": -0.2,
+            "ci95": [
+              -0.6,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": -0.2,
+            "ci95": [
+              -0.5,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": -0.1,
+            "ci95": [
+              -0.3,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": -0.1,
+            "ci95": [
+              -0.4,
+              0.2
+            ]
+          },
+          {
+            "delta": -0.3,
+            "ci95": [
+              -0.6,
+              0
+            ]
+          }
+        ]
+      },
+      "human": {
+        "left": 7.5,
+        "right": 7.1,
+        "delta": 0.4,
+        "ci95": [
+          -0.5,
+          1.4
+        ],
+        "n_cases": 10,
+        "eight_question_paired": [
+          {
+            "delta": 0.4,
+            "ci95": [
+              -0.2,
+              1
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": -0.1,
+            "ci95": [
+              -0.4,
+              0.2
+            ]
+          },
+          {
+            "delta": -0.1,
+            "ci95": [
+              -0.3,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              -0.3,
+              0.3
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": 0.2,
+            "ci95": [
+              -0.2,
+              0.6
+            ]
+          }
+        ]
+      },
+      "industrial": {
+        "left": 8.9,
+        "right": 9.399999999999999,
+        "delta": -0.5,
+        "ci95": [
+          -1.5,
+          0
+        ],
+        "n_cases": 10,
+        "eight_question_paired": [
+          {
+            "delta": -0.2,
+            "ci95": [
+              -0.6,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": -0.1,
+            "ci95": [
+              -0.3,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": -0.1,
+            "ci95": [
+              -0.3,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": -0.1,
+            "ci95": [
+              -0.3,
+              0
+            ]
+          }
+        ]
+      },
+      "natural": {
+        "left": 9.7,
+        "right": 9.5,
+        "delta": 0.2,
+        "ci95": [
+          0,
+          0.6
+        ],
+        "n_cases": 10,
+        "eight_question_paired": [
+          {
+            "delta": 0.2,
+            "ci95": [
+              0,
+              0.6
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "robotics": {
+        "left": 8.100000000000001,
+        "right": 8,
+        "delta": 0.1,
+        "ci95": [
+          -0.5,
+          0.7
+        ],
+        "n_cases": 10,
+        "eight_question_paired": [
+          {
+            "delta": 0.2,
+            "ci95": [
+              0,
+              0.6
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": -0.1,
+            "ci95": [
+              -0.3,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              -0.3,
+              0.3
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": 0.1,
+            "ci95": [
+              0,
+              0.3
+            ]
+          },
+          {
+            "delta": -0.1,
+            "ci95": [
+              -0.3,
+              0
+            ]
+          }
+        ]
+      },
+      "video games": {
+        "left": 8,
+        "right": 8.399999999999999,
+        "delta": -0.4,
+        "ci95": [
+          -1.4,
+          0.5
+        ],
+        "n_cases": 10,
+        "eight_question_paired": [
+          {
+            "delta": 0.1,
+            "ci95": [
+              -0.4,
+              0.6
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": -0.2,
+            "ci95": [
+              -0.5,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": -0.2,
+            "ci95": [
+              -0.5,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              0,
+              0
+            ]
+          },
+          {
+            "delta": 0,
+            "ci95": [
+              -0.3,
+              0.3
+            ]
+          },
+          {
+            "delta": -0.1,
+            "ci95": [
+              -0.4,
+              0.2
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "budget": {
+    "generation": 30,
+    "score": 12,
+    "total": 42
+  },
+  "source_bundle_sha256": "43b9ab7cf77a4ed9f55eedaca53d126d6b7d6dfb6f68b28b4852dccf0a580252",
+  "budget_amendment_sha256": "ce02d244d9ecd0821d6287d519304e39e26edade87fb62180209993e8e521f20",
+  "quality_false": true,
+  "SOTA": false,
+  "subset_not_full": true,
+  "guards": {
+    "complete_276_required": true,
+    "paired_base_required": true,
+    "generation_cap": 30,
+    "score_cap": 12
+  },
+  "actual_gpu_hours": {
+    "generation": 28.483680308025797,
+    "score": 1.1001517768838032,
+    "total": 29.5838320849096
+  },
+  "preregistered_WM_guard_checks": {
+    "motion_smoothness": true,
+    "subject_consistency": true,
+    "dreamsim": true,
+    "motion_ratio": true
+  },
+  "promotion": {
+    "model_promoted": false,
+    "sota_proven": false,
+    "reason": "Fixed diagnostic subset, not full acceptance; WMB and selected consistency/quality dimensions regress. No change to base default or AR gate."
+  }
+}

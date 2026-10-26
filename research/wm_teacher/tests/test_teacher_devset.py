@@ -4,6 +4,7 @@ import contextlib
 import copy
 import importlib.util
 import json
+import multiprocessing
 import os
 from pathlib import Path
 import signal
@@ -419,6 +420,20 @@ class PrepareTests(Fixture):
         with self.assertRaisesRegex(ValueError, "sum <=24"):
             dev.prepare("alg", self.pf, self.node_sha, 2, 86400, root=self.root)
 
+    def test_runtime_identical_bytes_other_install_mtime_are_allowed(self):
+        path, digest = self.prepare_dev()
+        runtime = smoke.runtime_records()
+        moved = copy.deepcopy(runtime)
+        for row in moved["files"]:
+            row["mtime_ns"] += 1000000000
+        with mock.patch.object(smoke, "runtime_records", return_value=moved):
+            self.verify(path, digest)
+        altered = copy.deepcopy(moved)
+        altered["files"][0]["sha256"] = "0" * 64
+        with mock.patch.object(smoke, "runtime_records", return_value=altered):
+            with self.assertRaisesRegex(ValueError, "Runtime source/version"):
+                self.verify(path, digest)
+
     def test_seed_parameter_source_job_and_base_drift_refused(self):
         path, _ = self.prepare_dev()
         original = path.read_bytes()
@@ -472,6 +487,35 @@ class LedgerTests(Fixture):
                                           end=43301, elapsed_seconds=43201)
         with self.assertRaisesRegex(ValueError, "budget exceeded"):
             dev.validate_ledger(ledger, plan, digest, 0, 2, 0, 43200)
+
+    def test_real_blocking_ledger_lock_remains_deadline_interruptible(self):
+        lock_path = self.base / "blocked_ledger.lock"
+        ctx = multiprocessing.get_context("fork")
+        reports = ctx.Queue()
+        def wait_for_ledger():
+            try:
+                # Close inherited parent description; this process uses its own flock.
+                inherited.close()
+                with lock_path.open("a") as lock:
+                    with dev.deadline(time.monotonic() - 24.8, 60):
+                        dev.fcntl.flock(lock, dev.fcntl.LOCK_EX)
+                reports.put("unexpected acquired")
+            except TimeoutError:
+                reports.put("deadline interrupted")
+        with lock_path.open("a") as inherited:
+            dev.fcntl.flock(inherited, dev.fcntl.LOCK_EX)
+            process = ctx.Process(target=wait_for_ledger)
+            process.start()
+            try:
+                self.assertEqual(reports.get(timeout=5), "deadline interrupted")
+                process.join(timeout=3)
+                self.assertEqual(process.exitcode, 0)
+            finally:
+                if process.is_alive():
+                    process.terminate()
+                    process.join(timeout=3)
+                reports.close()
+                reports.join_thread()
 
     def test_deadline_restores_signal_and_no_timer(self):
         before = signal.getsignal(signal.SIGALRM)
@@ -595,6 +639,73 @@ class GenerationTests(Fixture):
                         0, 0, 2, 43200, self.state, gpu_authorized=True)
         finally:
             sys.path[:] = before_path
+
+    def test_real_two_workers_shared_ledger_transactions_wait_without_lost_updates(self):
+        plan, digest, pipe, fake_torch, generator, context, observer, _ = self.generate()
+        plan["jobs"] = []  # CPU transaction-only fixture; never claims real media.
+        path = Path(plan["output_root"]) / "plan.json"
+        ledger_path = self.base / "concurrent_method_ledger.json"
+        ledger = self.ledger(plan, digest)
+        ledger_path.write_bytes(smoke.encoded(ledger))
+        fake_torch.cuda.device_count = lambda: 1
+        fake_torch.cuda.set_device = lambda _: None
+        fake_torch.cuda.reset_peak_memory_stats = lambda _: None
+        generator.NEG = plan["negative_prompt"]
+        ctx = multiprocessing.get_context("fork")
+        barrier, reports = ctx.Barrier(2), ctx.Queue()
+        original_checkpoint = dev.checkpoint
+        def slow_transaction(target, value):
+            if Path(target) == ledger_path:
+                time.sleep(0.1)  # Force real overlapping read/modify/write transactions.
+            original_checkpoint(target, value)
+        def worker(shard):
+            try:
+                barrier.wait(timeout=5)
+                result = dev.run(path, digest, self.pf, self.node_sha, ledger_path,
+                                 shard, shard, 2, 43200, self.state, gpu_authorized=True)
+                reports.put((shard, result["success"], result["error"]))
+            except BaseException as exc:
+                reports.put((shard, False, f"{type(exc).__name__}: {exc}"))
+                raise
+        processes = []
+        try:
+            with mock.patch.dict(sys.modules, {"torch": fake_torch, "gen_jobs": generator,
+                                               "teacher_alg": types.SimpleNamespace(teacher_alg=context)}), \
+                    mock.patch.object(dev, "verify_plan", return_value=(plan, [])), \
+                    mock.patch.object(dev, "managed_scope", return_value="GPU-CPU-fixture"), \
+                    mock.patch.object(smoke, "build_pipe", return_value=pipe), \
+                    mock.patch.object(dev, "checkpoint", side_effect=slow_transaction):
+                processes = [ctx.Process(target=worker, args=(shard,)) for shard in (0, 1)]
+                for process in processes:
+                    process.start()
+                results = [reports.get(timeout=10) for _ in processes]
+                for process in processes:
+                    process.join(timeout=5)
+                    self.assertEqual(process.exitcode, 0)
+            self.assertTrue(all(success for _, success, _ in results), results)
+            updated = json.loads(ledger_path.read_bytes())
+            self.assertEqual(len(updated["allocations"]), 2)
+            for shard, process in enumerate(processes):
+                item = updated["allocations"][shard]
+                self.assertEqual(item["worker_pid"], process.pid)
+                self.assertEqual(item["status"], "running")
+                self.assertTrue(item["worker_complete"])
+                self.assertTrue(item["worker_success"])
+                self.assertNotIn("end", item)  # Worker completion is still not free finalization.
+                self.assertEqual(item["cap_seconds"], 43200)
+                self.assertGreater(item["worker_elapsed_seconds"], 0)
+                receipt = Path(plan["output_root"]) / f"shard{shard}.finished.json"
+                self.assertEqual(item["receipt_sha256"], smoke.sha(receipt.read_bytes()))
+        finally:
+            for process in processes:
+                if process.is_alive():
+                    process.terminate()
+                    process.join(timeout=3)
+                if process.is_alive():
+                    process.kill()
+                    process.join(timeout=3)
+            reports.close()
+            reports.join_thread()
 
     def test_exclusive_case_claim_not_stolen(self):
         plan, digest, pipe, torch, generator, context, observer, _ = self.generate()

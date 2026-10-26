@@ -1,0 +1,48 @@
+{
+  "protocol": "Fixed independent ALG/DyMoS dual-seed development generation",
+  "cases_per_seed": 94,
+  "seeds": [
+    0,
+    1
+  ],
+  "videos_per_method": 188,
+  "shards_per_method": 16,
+  "gpus_per_shard": 1,
+  "cap_seconds_per_shard": 5400,
+  "generation_gpu_hours_cap": 24,
+  "score_gpu_hours_cap": 16,
+  "failure_gpu_hours_cap": 4,
+  "total_including_smoke_cap": 45,
+  "method_params": {
+    "alg": {
+      "factor": 0.4,
+      "active_steps": 10
+    },
+    "dymos": {
+      "gamma": 0.6,
+      "phi": 1,
+      "active_steps": 10
+    }
+  },
+  "plan_sha256": {
+    "alg": "dc0ed07418cb3abdcced0ea3a490c8acd0a87a03e22b254dadeec70e5c05f2a0",
+    "dymos": "7c5fd96ab7d4303d6edd64ea07c35a42544b49fac6aed5f073aa376fb23439b8"
+  },
+  "node_allocation": {
+    "alg": [
+      1,
+      2
+    ],
+    "dymos": [
+      0,
+      3
+    ]
+  },
+  "latest_method_smoke_passed": true,
+  "measured_throughput_passed": true,
+  "base_historical_provenance_complete": false,
+  "generation_started": false,
+  "quality_pass": false,
+  "sota_proven": false,
+  "runtime_identity": "Freshly verified version, paths, sizes and content hashes; installation mtime alone is not cross-node identity"
+}
