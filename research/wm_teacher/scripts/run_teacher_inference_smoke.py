@@ -14,6 +14,7 @@ import hashlib
 import importlib.metadata
 import io
 import json
+import math
 import os
 from pathlib import Path
 import shutil
@@ -327,7 +328,7 @@ def run(path, approved_sha, gpu, supervisor_pid, state_dir, gpu_authorized=False
     state_dir = Path(state_dir)
     uuid = supervisor_scope(state_dir, supervisor_pid, gpu)
     folder = Path(request["request_dir"])
-    require(not any((folder / n).exists() for n in ("launch.json", "finished.json", "worker.json", "video.mp4", "progress.json")), "Old run exists; never resume/overwrite")
+    require(not any((folder / n).exists() for n in ("launch.json", "finished.json", "worker.json", "video.mp4", "progress.json", "throughput.json")), "Old run exists; never resume/overwrite")
     child, flag, started, wall_start = None, None, None, None
     error, interrupted, timed_out, released = None, None, False, True
     old = {}
@@ -392,11 +393,30 @@ def run(path, approved_sha, gpu, supervisor_pid, state_dir, gpu_authorized=False
             except (OSError, ValueError) as exc:
                 error = f"Invalid worker evidence: {exc}"
             success = (child is not None and child.returncode == 0 and worker.get("success") is True
-                       and worker.get("mechanism_PASS") is True and not timed_out and interrupted is None
+                       and worker.get("mechanism_PASS") is True and worker.get("measured") is True
+                       and (folder / "worker.json").is_file() and not timed_out and interrupted is None
                        and error is None and released and elapsed <= BUDGET["outer_cap_seconds"])
+            if success:
+                try:
+                    require(worker["method"] == request["method"] and worker["request_sha256"] == approved_sha
+                            and worker["completed_steps"] == 50 and worker["parameters_unchanged"] is True
+                            and worker["parameters_before"] == worker["parameters_after"], "Unbound/incomplete worker evidence")
+                    validate_stats(request["method"], worker["stats"]["method"], worker["stats"]["observed"])
+                    media = worker["video"]
+                    require(media["decoded_frames"] == 121 and media["width"] == 1280 and media["height"] == 704
+                            and media["fps"] == 24 and media["full_decode_xerror"] is True
+                            and media["file"]["path"] == str(folder / "video.mp4"), "Incomplete video evidence")
+                    check_record(media["file"], nonempty=True)
+                    segments = [worker[k] for k in ("load_seconds", "parameter_hashes_before_seconds",
+                                "inference_seconds", "parameter_hashes_after_seconds", "save_decode_seconds", "final_hash_seconds")]
+                    require(all(type(v) in (int, float) and math.isfinite(v) and v > 0 for v in segments)
+                            and sum(segments) <= worker["worker_elapsed_seconds"] <= worker["elapsed_seconds"] <= elapsed,
+                            "Invalid measured allocation segments")
+                except (KeyError, TypeError, ValueError, OSError) as exc:
+                    success, error = False, f"Invalid measured worker evidence: {exc}"
             receipt = dict(schema="teacher_smoke_receipt_v1", method=request["method"], request_sha256=approved_sha,
                            gpu=gpu, gpu_uuid=uuid, allocated_gpus=1, start=wall_start, end=time.time(), elapsed_seconds=elapsed,
-                           elapsed_GPUh=elapsed / 3600, success=success, failure=not success, mechanism_PASS=success,
+                           elapsed_GPUh=elapsed / 3600, success=success, failure=not success, mechanism_PASS=success, measured=success,
                            quality_pass=False, sota_claim=False, exit_code=child.returncode if child else None,
                            timed_out=timed_out or bool(child and child.returncode in (124, 137)), interrupted_signal=interrupted,
                            error=error or worker.get("error"), peak_memory_bytes=worker.get("peak_memory_bytes"),
@@ -404,6 +424,15 @@ def run(path, approved_sha, gpu, supervisor_pid, state_dir, gpu_authorized=False
                            budget=BUDGET, budget_exceeded=elapsed > BUDGET["outer_cap_seconds"])
             try:
                 exclusive(folder / "finished.json", receipt)
+                if success:
+                    finished_record = record(folder / "finished.json", nonempty=True)
+                    worker_record = record(folder / "worker.json", nonempty=True)
+                    exclusive(folder / "throughput.json", dict(
+                        schema="teacher_smoke_throughput_v1", method=request["method"], request_sha256=approved_sha,
+                        finished_sha256=finished_record["sha256"], measured=True, completed_steps=50,
+                        load_seconds=worker["load_seconds"], inference_seconds=worker["inference_seconds"],
+                        save_decode_seconds=worker["save_decode_seconds"],
+                        measurement_sources=[worker_record, finished_record]))
             finally:
                 for signum, handler in old.items():
                     signal.signal(signum, handler)
@@ -535,11 +564,16 @@ def worker_scope(request, gpu, supervisor_pid, state_dir, start):
 
 
 def execute_worker(request, start, approved_sha):
+    worker_started = time.monotonic()
     folder = Path(request["request_dir"])
-    evidence = dict(success=False, failure=True, mechanism_PASS=False, quality_pass=False, sota_claim=False,
+    evidence = dict(schema="teacher_smoke_worker_v1", method=request["method"], request_sha256=approved_sha,
+                    success=False, failure=True, mechanism_PASS=False, quality_pass=False, sota_claim=False,
                     stats=dict(observed=dict(model_forwards=0, scheduler_steps=0, progress_steps=0, finite_checks=0), method={}),
                     peak_memory_bytes=None, parameters_before=None, parameters_after=None, parameters_unchanged=False,
-                    video=None, error=None)
+                    video=None, error=None, measured=False, completed_steps=0,
+                    load_seconds=None, parameter_hashes_before_seconds=None, inference_seconds=None,
+                    parameter_hashes_after_seconds=None, save_decode_seconds=None, final_hash_seconds=None,
+                    worker_elapsed_seconds=None)
     torch, pipe, before = None, None, None
     def budget_check():
         require(time.monotonic() - start < BUDGET["internal_stop_seconds"], "Internal 3350s budget stop")
@@ -573,9 +607,17 @@ def execute_worker(request, start, approved_sha):
         sys.path.insert(0, str(Path(request["root"]) / "scripts"))
         import gen_jobs
         require(gen_jobs.NEG == request["negative_prompt"], "Imported original NEG drift")
-        pipe = build_pipe("NONE", request["models"], gen_jobs)
+        load_started = time.monotonic()
+        try:
+            pipe = build_pipe("NONE", request["models"], gen_jobs)
+        finally:
+            evidence["load_seconds"] = time.monotonic() - load_started
         budget_check()
-        before = parameter_hashes(pipe.dit, torch)
+        hash_started = time.monotonic()
+        try:
+            before = parameter_hashes(pipe.dit, torch)
+        finally:
+            evidence["parameter_hashes_before_seconds"] = time.monotonic() - hash_started
         evidence["parameters_before"] = before
         kwargs = dict(request["call"], prompt=request["case"]["prompt"], negative_prompt=request["negative_prompt"],
                       input_image=gen_jobs.load_image(request["image"]["path"]), progress_bar_cmd=progress)
@@ -588,18 +630,35 @@ def execute_worker(request, start, approved_sha):
         with observe(pipe, torch, evidence["stats"]["observed"], budget_check):
             with method(pipe, call_kwargs=kwargs, checkpoint="NONE", **request["parameters"]) as stats:
                 evidence["stats"]["method"] = stats
-                video = pipe(**kwargs)
+                inference_started = time.monotonic()
+                try:
+                    video = pipe(**kwargs)
+                finally:
+                    evidence["inference_seconds"] = time.monotonic() - inference_started
         budget_check()
         require(len(video) == 121, "Generated frame count differs from full specification")
-        after = parameter_hashes(pipe.dit, torch)
+        hash_started = time.monotonic()
+        try:
+            after = parameter_hashes(pipe.dit, torch)
+        finally:
+            evidence["parameter_hashes_after_seconds"] = time.monotonic() - hash_started
         evidence["parameters_after"], evidence["parameters_unchanged"] = after, before == after
         require(before == after, "DiT parameters changed; baseline isolation failed")
         validate_stats(request["method"], evidence["stats"]["method"], evidence["stats"]["observed"])
-        gen_jobs.save_video(video, str(folder / "video.mp4"), fps=24, quality=5)
-        os.chmod(folder / "video.mp4", 0o600)
-        evidence["video"] = validate_video(folder / "video.mp4", request["runtime"]["tools"])
+        evidence["completed_steps"] = evidence["stats"]["observed"]["scheduler_steps"]
+        save_started = time.monotonic()
+        try:
+            gen_jobs.save_video(video, str(folder / "video.mp4"), fps=24, quality=5)
+            os.chmod(folder / "video.mp4", 0o600)
+            evidence["video"] = validate_video(folder / "video.mp4", request["runtime"]["tools"])
+        finally:
+            evidence["save_decode_seconds"] = time.monotonic() - save_started
         budget_check()
-        verify_request(folder / "request.json", approved_sha)
+        hash_started = time.monotonic()
+        try:
+            verify_request(folder / "request.json", approved_sha)
+        finally:
+            evidence["final_hash_seconds"] = time.monotonic() - hash_started
         budget_check()
         evidence.update(success=True, failure=False, mechanism_PASS=True)
     except BaseException as exc:
@@ -607,16 +666,30 @@ def execute_worker(request, start, approved_sha):
     finally:
         try:
             if pipe is not None and before is not None and evidence["parameters_after"] is None:
-                after = parameter_hashes(pipe.dit, torch)
+                hash_started = time.monotonic()
+                try:
+                    after = parameter_hashes(pipe.dit, torch)
+                finally:
+                    evidence["parameter_hashes_after_seconds"] = time.monotonic() - hash_started
                 evidence["parameters_after"], evidence["parameters_unchanged"] = after, before == after
             if torch is not None:
                 evidence["peak_memory_bytes"] = int(torch.cuda.max_memory_allocated(0))
         except BaseException as exc:
             evidence.update(success=False, failure=True, mechanism_PASS=False, error=f"Final evidence failure: {exc}")
-        evidence["elapsed_seconds"] = time.monotonic() - start
+        worker_finished = time.monotonic()
+        evidence["worker_elapsed_seconds"] = worker_finished - worker_started
+        evidence["elapsed_seconds"] = worker_finished - start
         evidence["elapsed_GPUh"] = evidence["elapsed_seconds"] / 3600
         if evidence["elapsed_seconds"] >= BUDGET["internal_stop_seconds"]:
             evidence.update(success=False, failure=True, mechanism_PASS=False, error=evidence["error"] or "Internal budget exceeded")
+        if evidence["success"]:
+            segments = [evidence[k] for k in ("load_seconds", "parameter_hashes_before_seconds",
+                        "inference_seconds", "parameter_hashes_after_seconds", "save_decode_seconds", "final_hash_seconds")]
+            valid_timing = (all(type(v) in (int, float) and math.isfinite(v) and v > 0 for v in segments)
+                            and sum(segments) <= evidence["worker_elapsed_seconds"] <= evidence["elapsed_seconds"])
+            if not valid_timing:
+                evidence.update(success=False, failure=True, mechanism_PASS=False, error="Invalid observed worker timing")
+        evidence["measured"] = evidence["success"]
         try:
             exclusive(folder / "worker.json", evidence)
         finally:

@@ -515,6 +515,190 @@ class MechanismTests(Fixture):
             stack.enter_context(mock.patch.object(torch.cuda, name, return_value=value))
         return stack, fake_pipe
 
+    def timed_runtime(self, request, **changes):
+        stack, pipe = self.fake_runtime(request, **changes)
+        clock = [100.0]
+        def advance(seconds, operation, *args, **kwargs):
+            try:
+                return operation(*args, **kwargs)
+            finally:
+                clock[0] += seconds
+        original_call = type(pipe).__call__
+        original_hashes = smoke.parameter_hashes
+        original_verify = smoke.verify_request
+        hash_increments = iter((3, 5))
+        generator = sys.modules["gen_jobs"]
+        def save(video, path, **kwargs):
+            self.assertEqual(len(video), 121)
+            self.assertEqual(kwargs, dict(fps=24, quality=5))
+            Path(path).write_bytes(b"explicit CPU timing fixture; decode is mocked")
+        def decode(path, tools):
+            return dict(file=smoke.record(path, nonempty=True), decoded_frames=121, width=1280,
+                        height=704, fps=24, full_decode_xerror=True)
+        stack.enter_context(mock.patch.object(smoke.time, "monotonic", side_effect=lambda: clock[0]))
+        stack.enter_context(mock.patch.object(smoke, "build_pipe", side_effect=lambda *a, **kw: advance(2, lambda: pipe)))
+        stack.enter_context(mock.patch.object(type(pipe), "__call__", lambda obj, **kw: advance(7, original_call, obj, **kw)))
+        stack.enter_context(mock.patch.object(smoke, "parameter_hashes", side_effect=lambda *a: advance(next(hash_increments), original_hashes, *a)))
+        stack.enter_context(mock.patch.object(generator, "save_video", side_effect=lambda *a, **kw: advance(11, save, *a, **kw)))
+        stack.enter_context(mock.patch.object(smoke, "validate_video", side_effect=lambda *a: advance(13, decode, *a)))
+        stack.enter_context(mock.patch.object(smoke, "verify_request", side_effect=lambda *a: advance(17, original_verify, *a)))
+        return stack, pipe, clock
+
+    def timed_outer(self, path, digest, request, *, exit_code=0, alter_worker=None, **changes):
+        stack, _, clock = self.timed_runtime(request, **changes)
+        def launch(command, **kwargs):
+            start = float(command[command.index("--allocation-start") + 1])
+            smoke.execute_worker(request, start, digest)
+            if alter_worker:
+                worker_path = path.parent / "worker.json"
+                worker = json.loads(worker_path.read_bytes())
+                alter_worker(worker)
+                worker_path.write_bytes(smoke.encoded(worker))
+            return types.SimpleNamespace(pid=99999999, returncode=exit_code, poll=lambda: exit_code, wait=lambda **kw: exit_code)
+        with stack, mock.patch.object(smoke, "supervisor_scope", return_value="GPU-fixture"), \
+                mock.patch.object(smoke.subprocess, "Popen", side_effect=launch), mock.patch.object(smoke, "stop_group"):
+            result = smoke.run(path, digest, 2, 12345, self.state, True)
+        return result, clock[0]
+
+    def test_segmented_monotonic_values_are_independent_and_not_wall_guesses(self):
+        for method in ("alg", "dymos"):
+            with self.subTest(method=method):
+                path, digest = self.prepare(method, method + "03")
+                request = smoke.verify_request(path, digest)
+                stack, _, _ = self.timed_runtime(request)
+                with stack:
+                    evidence = smoke.execute_worker(request, 90.0, digest)
+                self.assertTrue(evidence["success"], evidence["error"])
+                expected = dict(load_seconds=2, parameter_hashes_before_seconds=3, inference_seconds=7,
+                                parameter_hashes_after_seconds=5, save_decode_seconds=24, final_hash_seconds=17)
+                self.assertEqual({k: evidence[k] for k in expected}, expected)
+                self.assertEqual(evidence["worker_elapsed_seconds"], sum(expected.values()))
+                self.assertEqual(evidence["elapsed_seconds"], sum(expected.values()) + 10)
+                self.assertTrue(evidence["measured"])
+                self.assertEqual(evidence["completed_steps"], 50)
+                self.assertFalse((path.parent / "throughput.json").exists())
+
+    def test_partial_inference_records_duration_but_never_measured(self):
+        path, digest = self.prepare()
+        request = smoke.verify_request(path, digest)
+        stack, _, _ = self.timed_runtime(request, fail_at=3)
+        with stack:
+            evidence = smoke.execute_worker(request, 100.0, digest)
+        self.assertFalse(evidence["measured"])
+        self.assertFalse(evidence["success"])
+        self.assertEqual(evidence["inference_seconds"], 7)
+        self.assertEqual(evidence["parameter_hashes_after_seconds"], 5)
+        self.assertIsNone(evidence["save_decode_seconds"])
+        self.assertIsNone(evidence["final_hash_seconds"])
+
+    def test_success_sidecar_binds_actual_worker_and_finished_not_self_hash(self):
+        path, digest = self.prepare(name="smoke03")
+        request = smoke.verify_request(path, digest)
+        receipt, _ = self.timed_outer(path, digest, request)
+        self.assertTrue(receipt["success"], receipt["error"])
+        timing_path = path.parent / "throughput.json"
+        timing = json.loads(timing_path.read_bytes())
+        self.assertEqual(timing["schema"], "teacher_smoke_throughput_v1")
+        self.assertEqual(timing["request_sha256"], digest)
+        self.assertEqual(timing["finished_sha256"], smoke.sha((path.parent / "finished.json").read_bytes()))
+        self.assertEqual(timing["measurement_sources"], [smoke.record(path.parent / "worker.json"), smoke.record(path.parent / "finished.json")])
+        self.assertTrue(timing["measured"])
+        self.assertEqual(timing["completed_steps"], 50)
+        segments = sum(timing[k] for k in ("load_seconds", "inference_seconds", "save_decode_seconds"))
+        self.assertLessEqual(segments, receipt["evidence"]["worker_elapsed_seconds"])
+        self.assertLessEqual(receipt["evidence"]["worker_elapsed_seconds"], receipt["elapsed_seconds"])
+        self.assertEqual(receipt["elapsed_seconds"], 58)
+        self.assertEqual(timing_path.stat().st_mode & 0o077, 0)
+        self.assertNotIn("sha256", timing)
+
+    def test_outer_partial_failure_is_charged_without_throughput_sidecar(self):
+        path, digest = self.prepare()
+        request = smoke.verify_request(path, digest)
+        receipt, _ = self.timed_outer(path, digest, request, exit_code=1, fail_at=3)
+        self.assertFalse(receipt["success"])
+        self.assertFalse(receipt["evidence"]["measured"])
+        self.assertGreater(receipt["elapsed_GPUh"], 0)
+        self.assertFalse((path.parent / "throughput.json").exists())
+
+    def test_nonzero_exit_with_complete_worker_never_writes_sidecar(self):
+        path, digest = self.prepare()
+        request = smoke.verify_request(path, digest)
+        receipt, _ = self.timed_outer(path, digest, request, exit_code=1)
+        self.assertTrue(receipt["evidence"]["success"])
+        self.assertFalse(receipt["success"])
+        self.assertFalse(receipt["measured"])
+        self.assertFalse((path.parent / "throughput.json").exists())
+
+    def test_invalid_worker_segment_is_rejected_not_clamped(self):
+        for bad in (-1, 0, 999):
+            with self.subTest(bad=bad):
+                path, digest = self.prepare(name="bad" + str(bad))
+                request = smoke.verify_request(path, digest)
+                receipt, _ = self.timed_outer(path, digest, request, alter_worker=lambda w: w.update(load_seconds=bad))
+                self.assertFalse(receipt["success"])
+                self.assertEqual(receipt["evidence"]["load_seconds"], bad)
+                self.assertIn("Invalid measured", receipt["error"])
+                self.assertFalse((path.parent / "throughput.json").exists())
+
+    def test_final_request_hash_failure_keeps_observed_timings_but_not_measured(self):
+        path, digest = self.prepare()
+        request = smoke.verify_request(path, digest)
+        stack, _, clock = self.timed_runtime(request)
+        def fail_verify(*args):
+            clock[0] += 17
+            raise ValueError("fixture final request/source hash drift")
+        with stack, mock.patch.object(smoke, "verify_request", side_effect=fail_verify):
+            evidence = smoke.execute_worker(request, 100.0, digest)
+        self.assertFalse(evidence["success"])
+        self.assertFalse(evidence["measured"])
+        self.assertEqual(evidence["save_decode_seconds"], 24)
+        self.assertEqual(evidence["final_hash_seconds"], 17)
+        self.assertEqual(evidence["worker_elapsed_seconds"], 58)
+        self.assertIn("hash drift", evidence["error"])
+        self.assertFalse((path.parent / "throughput.json").exists())
+
+    def test_decode_failure_keeps_observed_save_duration_but_not_measured(self):
+        path, digest = self.prepare()
+        request = smoke.verify_request(path, digest)
+        stack, _, clock = self.timed_runtime(request)
+        def fail_decode(*args):
+            clock[0] += 13
+            raise ValueError("fixture full decode failure")
+        with stack, mock.patch.object(smoke, "validate_video", side_effect=fail_decode):
+            evidence = smoke.execute_worker(request, 100.0, digest)
+        self.assertFalse(evidence["success"])
+        self.assertFalse(evidence["measured"])
+        self.assertEqual(evidence["save_decode_seconds"], 24)
+        self.assertIsNone(evidence["video"])
+        self.assertIsNone(evidence["final_hash_seconds"])
+        self.assertIn("decode failure", evidence["error"])
+
+    def test_existing_throughput_refuses_launch_and_never_overwrites(self):
+        path, digest = self.prepare()
+        timing_path = path.parent / "throughput.json"
+        smoke.exclusive(timing_path, {"old": True})
+        before = timing_path.read_bytes()
+        with mock.patch.object(smoke, "supervisor_scope", return_value="GPU-fixture"), \
+                mock.patch.object(smoke.subprocess, "Popen", side_effect=AssertionError("must not launch")), \
+                self.assertRaisesRegex(ValueError, "Old run"):
+            smoke.run(path, digest, 2, 12345, self.state, True)
+        self.assertEqual(timing_path.read_bytes(), before)
+
+    def test_new03_completion_keeps_old02_request_and_receipts_unchanged(self):
+        old = self.base / "smoke02"
+        old.mkdir()
+        for name in ("request.json", "finished.json", "worker.json"):
+            smoke.exclusive(old / name, {"old02": name})
+        before = {p.name: smoke.record(p) for p in old.iterdir()}
+        path, digest = self.prepare(name="smoke03")
+        request = smoke.verify_request(path, digest)
+        receipt, _ = self.timed_outer(path, digest, request)
+        self.assertTrue(receipt["success"], receipt["error"])
+        self.assertEqual({p.name: smoke.record(p) for p in old.iterdir()}, before)
+        self.assertFalse((old / "throughput.json").exists())
+        with self.assertRaisesRegex(ValueError, "already exists"):
+            self.prepare(name="smoke03")
+
     def execute(self, method="alg", **changes):
         path, digest = self.prepare(method)
         request = smoke.verify_request(path, digest)

@@ -48,6 +48,7 @@ FILES = [
     "docs/53_标签解析修复与偏好训练门禁.md",
     "docs/54_C276预算修订与一次收尾授权.md",
     "docs/55_ALG与DyMoS真实机制Smoke结论.md",
+    "docs/56_双策略性能复验与双seed开发评测准入.md",
     "eval/diag/teacher_inference_smoke_public_results_20261026.json",
     "eval/diag/teacher_C276_generation_public_20261026.json",
     "eval/diag/e3_recaption_schema_public_20261025.json",
@@ -89,6 +90,7 @@ FILES = [
     "prepare_e3_subset.py", "run_e3_subset_node.py", "score_e3_subset.py", "gpu_hold.py",
     "run_e3_subset_recovery.py", "run_e3_subset_completion.py", "run_e3_subset_scoring.py",
     "teacher_alg.py", "teacher_dymos.py", "run_teacher_inference_smoke.py",
+    "measure_teacher_throughput.py", "run_teacher_devset.py",
     "build_teacher_review.py", "build_demo.py", "serve_demo.py", "merge_ckpt.py",
     "build_round1_mixture.py", "build_round2_mixture.py", "build_round3_mixture.py",
     "build_round4_mixture.py", "build_round5_mixture.py", "build_ft2_mixture.py",
@@ -104,6 +106,7 @@ FILES = [
     "test_e3_subset.py", "test_e3_subset_node.py", "test_e3_subset_score.py",
     "test_e3_subset_recovery.py", "test_e3_subset_completion.py", "test_e3_subset_scoring_driver.py",
     "test_teacher_alg.py", "test_teacher_dymos.py", "test_teacher_inference_smoke.py",
+    "test_teacher_throughput.py", "test_teacher_devset.py",
     "test_e3_train.py", "test_recaption_e3.py", "test_e3_data.py",
 )] + ["eval/diag/" + name for name in (
     "ft2_paired_bootstrap.json", "merge_integrity.json", "physiq_paired_bootstrap.json",

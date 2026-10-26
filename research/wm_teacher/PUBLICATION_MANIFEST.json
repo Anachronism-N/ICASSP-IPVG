@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "5f045cf9a48d968a0e79a6fa8ed56687772de87ebb2af081fe3cead4246c3be2",
-      "snapshot_sha256": "5f045cf9a48d968a0e79a6fa8ed56687772de87ebb2af081fe3cead4246c3be2"
+      "source_sha256": "d90ec043c5f59716244c91b1cfcde15b2b7e06b45bce9ad28a6fab553b7495aa",
+      "snapshot_sha256": "d90ec043c5f59716244c91b1cfcde15b2b7e06b45bce9ad28a6fab553b7495aa"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -844,8 +844,8 @@
     },
     {
       "path": "scripts/run_teacher_inference_smoke.py",
-      "source_sha256": "c334d87d96f43a9e6e3c0c9bce5e9ce5a60e97bd456bbbd977859c96e81e51e4",
-      "snapshot_sha256": "c334d87d96f43a9e6e3c0c9bce5e9ce5a60e97bd456bbbd977859c96e81e51e4"
+      "source_sha256": "5804b840212765443791f68f5d6316c878e8b4ebed41acab218bd078b564e15d",
+      "snapshot_sha256": "5804b840212765443791f68f5d6316c878e8b4ebed41acab218bd078b564e15d"
     },
     {
       "path": "tests/test_teacher_dymos.py",
@@ -854,8 +854,8 @@
     },
     {
       "path": "tests/test_teacher_inference_smoke.py",
-      "source_sha256": "99748e85cab3c1e4b957f78ce6c7151752b417830ec9661d4ce317f1880d1798",
-      "snapshot_sha256": "99748e85cab3c1e4b957f78ce6c7151752b417830ec9661d4ce317f1880d1798"
+      "source_sha256": "76b5a8b0235531df5ffe8f46da76478e14afcb3b648adbf0ab9d4fbb176b5c1e",
+      "snapshot_sha256": "76b5a8b0235531df5ffe8f46da76478e14afcb3b648adbf0ab9d4fbb176b5c1e"
     },
     {
       "path": "DiffSynth-Studio/diffsynth/models/wan_video_dit.py",
@@ -926,6 +926,31 @@
       "path": "eval/diag/teacher_C276_generation_public_20261026.json",
       "source_sha256": "467a9714435d1ad276813c07b655117ceda6e7c9c3609bb324e381a9a35219a2",
       "snapshot_sha256": "467a9714435d1ad276813c07b655117ceda6e7c9c3609bb324e381a9a35219a2"
+    },
+    {
+      "path": "scripts/measure_teacher_throughput.py",
+      "source_sha256": "3ff4563c0ba4e0bb33d648758ce84f3f41a9e2ad0536831a09b618e7af4fd822",
+      "snapshot_sha256": "3ff4563c0ba4e0bb33d648758ce84f3f41a9e2ad0536831a09b618e7af4fd822"
+    },
+    {
+      "path": "scripts/run_teacher_devset.py",
+      "source_sha256": "9d7dd7633060b44b5a18f5dcf003befde858641025c1063e8c7dab1d95847b75",
+      "snapshot_sha256": "9d7dd7633060b44b5a18f5dcf003befde858641025c1063e8c7dab1d95847b75"
+    },
+    {
+      "path": "tests/test_teacher_throughput.py",
+      "source_sha256": "a49e8d6ff394bcda47abb487a493abe20ce7b4de662f174d7db8015e91a066e4",
+      "snapshot_sha256": "a49e8d6ff394bcda47abb487a493abe20ce7b4de662f174d7db8015e91a066e4"
+    },
+    {
+      "path": "tests/test_teacher_devset.py",
+      "source_sha256": "79ccac2498b348cebab4e5be726644ea26befbb043b783ddc881550497157e7a",
+      "snapshot_sha256": "79ccac2498b348cebab4e5be726644ea26befbb043b783ddc881550497157e7a"
+    },
+    {
+      "path": "docs/56_双策略性能复验与双seed开发评测准入.md",
+      "source_sha256": "eb8c7e1a94b113e8d93e4a1b41a7c6c24cd289787f787e429baec0762e6fb589",
+      "snapshot_sha256": "eb8c7e1a94b113e8d93e4a1b41a7c6c24cd289787f787e429baec0762e6fb589"
     }
   ],
   "experiment_progress": {
