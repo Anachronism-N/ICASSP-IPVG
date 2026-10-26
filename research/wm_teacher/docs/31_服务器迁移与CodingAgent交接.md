@@ -1,12 +1,12 @@
 # 最新现场续接（2026-10-26）
 
 - E3 seed0和seed1三臂各282视频及全部评分/独立配对已完成，固定C不重选；C两seed Total*差均值−0.120900pp，尚无全面收益或SOTA晋级。
-- C276分层子集已256/276；原六次真实生成26.54288025532849 GPUh、20缺片/20已结束claim。用户明确批准生成30＋评分12＝42，独立budget_amendment_42.json绑定原plan SHA afd1cd967ae03088930a1637ea93f66053f2adcaeae3b213f38e1c7160e57254。原plan/所有失败receipt/原视频不改；下一步用rank0 GPUs2/3/4一次有界补齐与全276解码，不能将旧退出130改成功。
-- 全局完成器/engine/driver正修授权侧车与Unicode输入哈希/同节点本地stage，最新CPU64项通过。未完成全局生成/评分，不宣称子集成功。
-- ALG/DyMoS真实attempt01已运行并失败：分别0.0265768358与0.0259549985 GPUh，原模型hash不变；首帧FP32 raw参考赋值BF16需effective cast，scheduler在__call__初始化。正在修真实接口，旧request/receipt保留，后续attempt02累计每method烟测≤1 GPUh，不把CPU/smoke当质量晋级。
+- C276全部视频已补齐并全帧验收：276/276、33396帧、source/local SHA和零残留通过，global_completion_a1真实exit0。生成累计28.483680308GPUh（旧6次26.542880255＋一次修复1.940800053）≤批准30；评分预算仍12、总42。原plan和旧失败记录保留，禁止重生成。当前raw/po各8维已完成，其余WM/Physics/WMB评分在运行。
+- 全局完成器和评分预算接口修复已eccfdb1远端13文件/182manifest字节验收，64相关CPU回归、697公开回归通过。活评分托管任务KlfuMW（句柄仅当前会话），最终summary及结论发布未完成，不宣称质量通过。
+- ALG/DyMoS真实修复后attempt02均运行机制PASS：各50步/前10步active/121帧/全解码，基座逐参数前后SHA相等。含attempt01失败累计ALG0.171741013、DyMoS0.164733928GPUh均<1。结果fc445d8远端5文件/184manifest验收。仍无94双seed质量结论，开发评测需真实吞吐准入，不能捏造旧分段计时。
 - recaption完整根扫描/attrs=list[str]/v2 resume门禁修复24CPU通过，旧1854中571根fragment＋36 hands=null结构拒绝607，旧数据不重写。schema不是human gold，DenseDPO真实偏好标签/新独立语义review仍未通过，不盲训。
 - 四节点空卡已按用户要求持续计算占卡（interval0、约1GiB、6小时硬限）；让位真实实验、占卡费用单列，不称实验有效利用率。SSH三远端均root@且36000。
-- 最近远端验收：88856fc E3/四seed；ca880e8 子集代码；faaee9e恢复/ALG/SOTA协议；89e0e3a seed1与双策略机制；b8c23ea解析修复与42授权记录。各次白名单/公开全回归/远端字节回执保留。新的运行接口修复尚未发布，先冻结与四关再GPU。
+- 最近远端验收：88856fc E3/四seed；ca880e8 子集代码；faaee9e恢复/ALG/SOTA协议；89e0e3a seed1与双策略机制；b8c23ea解析修复与42授权记录。另eccfdb1运行接口修复、fc445d8真实烟测结果均远端逐字节验收。各次白名单/公开全回归/回执保留；C276最终评分和开发策略质量验收未完成。
 
 ---
 

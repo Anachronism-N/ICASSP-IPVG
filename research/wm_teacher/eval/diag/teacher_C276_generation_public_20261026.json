@@ -1,0 +1,20 @@
+{
+  "actual_prior_gpu_hours": 26.54288025532849,
+  "actual_repair_gpu_hours": 1.9408000526973046,
+  "total_generation_gpu_hours": 28.483680308025797,
+  "decode_ok": 276,
+  "total_frames": 33396,
+  "zeroextra": true,
+  "zeroempty": true,
+  "noactiveclaims_tmp": true,
+  "plan_sha256": "afd1cd967ae03088930a1637ea93f66053f2adcaeae3b213f38e1c7160e57254",
+  "budget_amendment_sha256": "ce02d244d9ecd0821d6287d519304e39e26edade87fb62180209993e8e521f20",
+  "protocol": "C fixed 276 stratified diagnostic generation and full-frame verification; not benchmark-quality acceptance",
+  "generation_exit_code": 0,
+  "budget_generation": 30,
+  "budget_score": 12,
+  "budget_total": 42,
+  "quality_claim": false,
+  "sota_proven": false,
+  "original_timeout_and_failures_preserved": true
+}

@@ -48,8 +48,8 @@
     },
     {
       "path": "docs/31_服务器迁移与CodingAgent交接.md",
-      "source_sha256": "5d705714f2874c5ab3f01586d762b4ef5f4f9612ed22cc96d79919c377a9b3fe",
-      "snapshot_sha256": "7bded3660817c900819f1951d572426ef248831110babea427149f81d0aa06a5"
+      "source_sha256": "d27acebac3bc595cef096c3d833f150afb755bb13042d0e4b38d26170db379f2",
+      "snapshot_sha256": "6d24cd88e8d0cc791d496b079e2e0353750a9cd2239b39af1b22ad20491fb607"
     },
     {
       "path": "patches/diffsynth_studio_fb337fb.patch",
@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "8a6eb02eb94ebd862f1573dc0df7453bdf41c18e194fb8242df3226b0ef98b17",
-      "snapshot_sha256": "8a6eb02eb94ebd862f1573dc0df7453bdf41c18e194fb8242df3226b0ef98b17"
+      "source_sha256": "5f045cf9a48d968a0e79a6fa8ed56687772de87ebb2af081fe3cead4246c3be2",
+      "snapshot_sha256": "5f045cf9a48d968a0e79a6fa8ed56687772de87ebb2af081fe3cead4246c3be2"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -719,8 +719,8 @@
     },
     {
       "path": "docs/50_C臂276条分层子集诊断预注册.md",
-      "source_sha256": "00fe27dbe6680c6fe7822f74beda96a66982ac98cbc5d0d49ff9d03e0f963fa5",
-      "snapshot_sha256": "00fe27dbe6680c6fe7822f74beda96a66982ac98cbc5d0d49ff9d03e0f963fa5"
+      "source_sha256": "bee92a00a4ee48ee4f0e5edb00ecba9153236076591297c1bcf971b7691751b8",
+      "snapshot_sha256": "bee92a00a4ee48ee4f0e5edb00ecba9153236076591297c1bcf971b7691751b8"
     },
     {
       "path": "eval/diag/teacher_e3_devset_public_summary_20261025.json",
@@ -921,6 +921,11 @@
       "path": "eval/diag/teacher_inference_smoke_public_results_20261026.json",
       "source_sha256": "235bcb96fe787e6212054413f1c616d1b45cf4ffbceb3d58076d9df342c00570",
       "snapshot_sha256": "235bcb96fe787e6212054413f1c616d1b45cf4ffbceb3d58076d9df342c00570"
+    },
+    {
+      "path": "eval/diag/teacher_C276_generation_public_20261026.json",
+      "source_sha256": "467a9714435d1ad276813c07b655117ceda6e7c9c3609bb324e381a9a35219a2",
+      "snapshot_sha256": "467a9714435d1ad276813c07b655117ceda6e7c9c3609bb324e381a9a35219a2"
     }
   ],
   "experiment_progress": {
