@@ -278,7 +278,8 @@ class ScoreTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             ledger = Path(tmp) / "ledger.json"
             initial = {"budget_gpu_hours": {"generation": 28, "score": 12, "total": 40},
-                       "generation_gpu_hours": 20, "score_gpu_hours": 1, "active": None, "runs": []}
+                       "generation_gpu_hours": 20, "score_gpu_hours": 1, "active": None,
+                       "runs": [{"phase": "score", "gpus": 1, "used_gpu_hours": 1}]}
             ledger.write_text(json.dumps(initial))
             args = SimpleNamespace(gpu_authorized=True, supervisor_pid=12345, gpu_ledger=ledger,
                                    max_gpu_seconds=60, occupied_gpus=1)
@@ -292,7 +293,7 @@ class ScoreTests(unittest.TestCase):
                     score.gpu_run(["synthetic-original-scorer"], args)
             actual = json.loads(ledger.read_text())
             self.assertIsNone(actual["active"])
-            self.assertFalse(actual["runs"][0]["success"])
+            self.assertFalse(actual["runs"][-1]["success"])
             self.assertAlmostEqual(actual["score_gpu_hours"], 1 + 10 / 3600)
             ledger.write_text(json.dumps(initial))
             args.occupied_gpus = 8
@@ -301,13 +302,71 @@ class ScoreTests(unittest.TestCase):
                     score.gpu_run(["synthetic-original-scorer"], args)
             actual = json.loads(ledger.read_text())
             self.assertAlmostEqual(actual["score_gpu_hours"], 1 + 80 / 3600)
-            self.assertEqual(actual["runs"][0]["gpus"], 8)
+            self.assertEqual(actual["runs"][-1]["gpus"], 8)
             actual["active"] = {"phase": "other"}
             ledger.write_text(json.dumps(actual))
             with patch.dict(score.os.environ, {"CUDA_VISIBLE_DEVICES": "1"}), \
                  patch.object(score.os, "kill"), patch.object(score.subprocess, "Popen") as spawn:
                 with self.assertRaises(RuntimeError):
                     score.gpu_run(["synthetic-original-scorer"], args)
+                spawn.assert_not_called()
+
+    def test_amended_gpu_ledger_exact_authorization_42_failure_billing_and_cap_without_gpu(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch, MagicMock
+        import run_e3_subset_completion as completion
+        with tempfile.TemporaryDirectory() as tmp:
+            experiment = Path(tmp)
+            plan = experiment / "plan.json"
+            plan.write_text('{}')
+            plan_sha = score.sha256(plan)
+            amendment = experiment / completion.AMENDMENT_FILE
+            auth = dict(schema="e3_subset_budget_amendment_v1", parent_plan_sha256=plan_sha,
+                        original=completion.ORIGINAL_BUDGET, approved=completion.AMENDED_BUDGET,
+                        user_authorized=True, approved_additional_generation_gpu_hours=2)
+            amendment.write_text(json.dumps(auth))
+            args = SimpleNamespace(experiment=experiment, plan_sha256=plan_sha,
+                budget_amendment_sha256=score.sha256(amendment), score_source_sha256=score.sha256(score.__file__),
+                gpu_authorized=True, supervisor_pid=12345, gpu_ledger=experiment / "ledger.json",
+                max_gpu_seconds=60, occupied_gpus=1)
+            initial = dict(phase="score", plan_sha256=plan_sha, score_source_sha256=args.score_source_sha256,
+                budget_gpu_hours=completion.AMENDED_BUDGET, budget_amendment_sha256=args.budget_amendment_sha256,
+                generation_gpu_hours=29.5, score_gpu_hours=11.9, active=None,
+                runs=[dict(phase="score", gpus=1, used_gpu_hours=11.9)])
+            args.gpu_ledger.write_text(json.dumps(initial))
+            process = MagicMock(returncode=1)
+            process.poll.return_value = 1
+            with patch.object(completion, "PLAN_SHA", plan_sha), patch.dict(score.os.environ, {"CUDA_VISIBLE_DEVICES": "0"}), \
+                 patch.object(score.os, "kill"), patch.object(score.subprocess, "Popen", return_value=process) as spawn, \
+                 patch.object(score.time, "monotonic", side_effect=[0, 10]):
+                with self.assertRaisesRegex(RuntimeError, "exited 1"):
+                    score.gpu_run(["synthetic-original-scorer"], args)
+                spawn.assert_called_once()
+            actual = score.read_json(args.gpu_ledger)
+            self.assertAlmostEqual(actual["score_gpu_hours"], 11.9 + 10 / 3600)
+            self.assertFalse(actual["runs"][-1]["success"])
+            self.assertEqual(actual["generation_gpu_hours"], 29.5)
+            self.assertIsNone(actual["active"])
+            for changes in (dict(budget_amendment_sha256="0" * 64),
+                            dict(budget_gpu_hours=dict(generation=31, score=12, total=43)),
+                            dict(budget_gpu_hours=dict(generation=30, score=13, total=43)),
+                            dict(score_gpu_hours=11.99, runs=[dict(phase="score", gpus=1, used_gpu_hours=11.99)]),
+                            dict(generation_gpu_hours=30.1), dict(runs=[])):
+                args.gpu_ledger.write_text(json.dumps(dict(initial, **changes)))
+                before = args.gpu_ledger.read_bytes()
+                with patch.object(completion, "PLAN_SHA", plan_sha), patch.dict(score.os.environ, {"CUDA_VISIBLE_DEVICES": "0"}), \
+                     patch.object(score.os, "kill"), patch.object(score.subprocess, "Popen") as spawn:
+                    with self.assertRaises(RuntimeError):
+                        score.gpu_run(["never-start"], args)
+                    spawn.assert_not_called()
+                self.assertEqual(args.gpu_ledger.read_bytes(), before)
+            args.gpu_ledger.write_text(json.dumps(initial))
+            amendment.write_text(json.dumps(dict(auth, user_authorized=False)))
+            args.budget_amendment_sha256 = score.sha256(amendment)
+            with patch.object(completion, "PLAN_SHA", plan_sha), patch.dict(score.os.environ, {"CUDA_VISIBLE_DEVICES": "0"}), \
+                 patch.object(score.os, "kill"), patch.object(score.subprocess, "Popen") as spawn:
+                with self.assertRaisesRegex(RuntimeError, "authorization"):
+                    score.gpu_run(["never-start"], args)
                 spawn.assert_not_called()
 
     def test_complete_synthetic_summary_all_dimensions_gtref_physics_wmb_domains(self):

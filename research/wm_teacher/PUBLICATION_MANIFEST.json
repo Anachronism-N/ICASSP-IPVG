@@ -48,8 +48,8 @@
     },
     {
       "path": "docs/31_服务器迁移与CodingAgent交接.md",
-      "source_sha256": "6157d98f66878705917f2ee4a15c7ef5c5069bc5428a08c65372cd6d0eaa5da1",
-      "snapshot_sha256": "8707102dcff2fea0e5a0f359b2ed35b6416f0bfbe7c552c7de2ec01df7ecfa77"
+      "source_sha256": "5d705714f2874c5ab3f01586d762b4ef5f4f9612ed22cc96d79919c377a9b3fe",
+      "snapshot_sha256": "7bded3660817c900819f1951d572426ef248831110babea427149f81d0aa06a5"
     },
     {
       "path": "patches/diffsynth_studio_fb337fb.patch",
@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "6933412740410018235d2d1f4d94a023e86401319c134d1db31aba36e9fcfd15",
-      "snapshot_sha256": "6933412740410018235d2d1f4d94a023e86401319c134d1db31aba36e9fcfd15"
+      "source_sha256": "885a83b9b8b389a25a5184839b902d542a88d675490c83b6b13ec8b3b7981319",
+      "snapshot_sha256": "885a83b9b8b389a25a5184839b902d542a88d675490c83b6b13ec8b3b7981319"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -769,8 +769,8 @@
     },
     {
       "path": "scripts/score_e3_subset.py",
-      "source_sha256": "b8940de1ad0a8f59749e5e0866f98902d0879b6cfc8b278f7a32fabcc6533eef",
-      "snapshot_sha256": "b8940de1ad0a8f59749e5e0866f98902d0879b6cfc8b278f7a32fabcc6533eef"
+      "source_sha256": "5d7d5241e22a93294acb1610fb85b838791df0c4298364ce6b9e660413774203",
+      "snapshot_sha256": "5d7d5241e22a93294acb1610fb85b838791df0c4298364ce6b9e660413774203"
     },
     {
       "path": "scripts/gpu_hold.py",
@@ -789,8 +789,8 @@
     },
     {
       "path": "tests/test_e3_subset_score.py",
-      "source_sha256": "f53ed7e692802961386c48383b09f9f28ed4a14197297a92536b1245c475e425",
-      "snapshot_sha256": "f53ed7e692802961386c48383b09f9f28ed4a14197297a92536b1245c475e425"
+      "source_sha256": "8b361d30c280afb32d7a4801a305618a51b5287075b7ba33f3612d26afc4af26",
+      "snapshot_sha256": "8b361d30c280afb32d7a4801a305618a51b5287075b7ba33f3612d26afc4af26"
     },
     {
       "path": "eval/diag/teacher_e3_subset_preregistered_public_20261025.json",
@@ -809,13 +809,13 @@
     },
     {
       "path": "scripts/teacher_alg.py",
-      "source_sha256": "3f040f65e8ede76c998472581b9be1d0ad2bff486b4cac77f2d1385fa368761e",
-      "snapshot_sha256": "3f040f65e8ede76c998472581b9be1d0ad2bff486b4cac77f2d1385fa368761e"
+      "source_sha256": "6cd6d1c79dcbb36c609b7a4fc2014eabc657661e6959b82af5eee45f0595724f",
+      "snapshot_sha256": "6cd6d1c79dcbb36c609b7a4fc2014eabc657661e6959b82af5eee45f0595724f"
     },
     {
       "path": "tests/test_teacher_alg.py",
-      "source_sha256": "1e6a220b3d75dddafe9e57b889e305fe9be66b163829b6323200d79d83eeef8d",
-      "snapshot_sha256": "1e6a220b3d75dddafe9e57b889e305fe9be66b163829b6323200d79d83eeef8d"
+      "source_sha256": "bdfc117c3cb4e5e6ed130b6403b4f63cbd049c8cd564a9f7dfaee40750462367",
+      "snapshot_sha256": "bdfc117c3cb4e5e6ed130b6403b4f63cbd049c8cd564a9f7dfaee40750462367"
     },
     {
       "path": "docs/51_免训练Teacher多维策略有限实验预注册.md",
@@ -839,8 +839,8 @@
     },
     {
       "path": "scripts/teacher_dymos.py",
-      "source_sha256": "cb5ad112672d775240037f24eef98557ea5ea15aab5d7b83e0c6b4f5fc9b49a6",
-      "snapshot_sha256": "cb5ad112672d775240037f24eef98557ea5ea15aab5d7b83e0c6b4f5fc9b49a6"
+      "source_sha256": "dbef196d3e9db42182dca8bb3ab34e5b324ee6999136ea0359b533b44a509faa",
+      "snapshot_sha256": "dbef196d3e9db42182dca8bb3ab34e5b324ee6999136ea0359b533b44a509faa"
     },
     {
       "path": "scripts/run_teacher_inference_smoke.py",
@@ -849,8 +849,8 @@
     },
     {
       "path": "tests/test_teacher_dymos.py",
-      "source_sha256": "4247eb65a28e176a67e29f1c875b008e8e8d898f04a956b71d00c51fe015d8da",
-      "snapshot_sha256": "4247eb65a28e176a67e29f1c875b008e8e8d898f04a956b71d00c51fe015d8da"
+      "source_sha256": "274cdd2a6f3307d1e44cc59bb2108fc1a67b731883d2980a362be2f9a718fcec",
+      "snapshot_sha256": "274cdd2a6f3307d1e44cc59bb2108fc1a67b731883d2980a362be2f9a718fcec"
     },
     {
       "path": "tests/test_teacher_inference_smoke.py",
@@ -891,6 +891,26 @@
       "path": "docs/54_C276预算修订与一次收尾授权.md",
       "source_sha256": "62b6f2c7acff47507b407fd3c50e480434d71c7a67490c6984e8b47a67843aa7",
       "snapshot_sha256": "62b6f2c7acff47507b407fd3c50e480434d71c7a67490c6984e8b47a67843aa7"
+    },
+    {
+      "path": "scripts/run_e3_subset_completion.py",
+      "source_sha256": "364fb7c101dc93e327cb7e2c7a2b92ea011913159d8c861a95f328e9127ca8fd",
+      "snapshot_sha256": "364fb7c101dc93e327cb7e2c7a2b92ea011913159d8c861a95f328e9127ca8fd"
+    },
+    {
+      "path": "scripts/run_e3_subset_scoring.py",
+      "source_sha256": "2f494c6f595def2945bd3fda7183820d7c0036bbf60e818c79d97adea870b238",
+      "snapshot_sha256": "2f494c6f595def2945bd3fda7183820d7c0036bbf60e818c79d97adea870b238"
+    },
+    {
+      "path": "tests/test_e3_subset_completion.py",
+      "source_sha256": "417b54f9a7633ecf803d7cda01881d0c24d64cf3418ed8f8d226448687ab75e4",
+      "snapshot_sha256": "417b54f9a7633ecf803d7cda01881d0c24d64cf3418ed8f8d226448687ab75e4"
+    },
+    {
+      "path": "tests/test_e3_subset_scoring_driver.py",
+      "source_sha256": "8ce672284e7c7edd78d67134a9aee95960baa77a8b90acdd22d3acbea4773876",
+      "snapshot_sha256": "8ce672284e7c7edd78d67134a9aee95960baa77a8b90acdd22d3acbea4773876"
     }
   ],
   "experiment_progress": {

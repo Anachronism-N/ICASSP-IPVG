@@ -472,5 +472,157 @@ class ActualWanLoopTests(unittest.TestCase):
         self.assertNotIn("prompt", p.records[1]["kwargs"])
 
 
+class MixedReferenceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        path = ROOT / "DiffSynth-Studio/diffsynth/pipelines/wan_video.py"
+        tree = ast.parse(path.read_text())
+        scope = {"torch": torch, "tqdm": lambda values: values}
+        for class_name, method_name in (("WanVideoPipeline", "__call__"),
+                                        ("WanVideoUnit_ImageEmbedderFused", "process")):
+            klass = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == class_name)
+            method = next(n for n in klass.body if isinstance(n, ast.FunctionDef) and n.name == method_name)
+            method.decorator_list, method.returns = [], None
+            for arg in method.args.args + method.args.kwonlyargs:
+                arg.annotation = None
+            exec(compile(ast.fix_missing_locations(ast.Module(body=[method], type_ignores=[])),
+                         str(path), "exec"), scope)
+        cls.call_upstream = staticmethod(scope["__call__"])
+        cls.fuse_upstream = staticmethod(scope["process"])
+
+    def fixture(self):
+        pipe = FakePipeline(torch.bfloat16)
+        pipe.z = torch.arange(pipe.z.numel(), dtype=torch.float32).reshape_as(pipe.z) / 79 + 0.001
+        pipe.initial[:, :, :1] = pipe.z
+        return pipe
+
+    def test_real_fused_unit_preserves_raw_fp32_and_casts_only_assignment(self):
+        pipe = self.fixture()
+        before = pipe.z.clone()
+        pipe.preprocess_image = mock.Mock(return_value=torch.ones(1, 3, 10, 12))
+        pipe.load_models_to_device = mock.Mock()
+        pipe.vae = types.SimpleNamespace(encode=mock.Mock(return_value=pipe.z))
+        pipe.device = "cpu"
+        image = types.SimpleNamespace(resize=mock.Mock(return_value=object()))
+        x = torch.zeros_like(pipe.initial)
+        result = self.fuse_upstream(types.SimpleNamespace(onload_model_names=("vae",)),
+                                    pipe, image, x, 10, 12, False, (10, 12), (5, 6))
+        effective = pipe.z.to(dtype=x.dtype, device=x.device)
+        self.assertIs(result["first_frame_latents"], pipe.z)
+        self.assertIs(result["latents"], x)
+        self.assertEqual(pipe.z.dtype, torch.float32)
+        self.assertEqual(x.dtype, torch.bfloat16)
+        self.assertTrue(alg._same_bits(pipe.z, before))
+        self.assertTrue(alg._same_bits(x[:, :, :1], effective))
+        self.assertFalse(torch.equal(pipe.z, effective.float()))
+        self.assertTrue(torch.equal(x[:, :, 1:], torch.zeros_like(x[:, :, 1:])))
+        image.resize.assert_called_once_with((12, 10))
+        pipe.vae.encode.assert_called_once()
+
+    def test_mixed_dtype_full_run_lowpass_effective_and_raw_hashes(self):
+        pipe = self.fixture()
+        before = pipe.z.clone()
+        effective = pipe.z.to(pipe.initial)
+        with mock.patch.object(alg, "lowpass_first_latent", wraps=alg.lowpass_first_latent) as lowpass:
+            with alg.teacher_alg(pipe, call_kwargs=CALL, checkpoint="NONE") as stats:
+                result = pipe.run()
+        self.assertTrue(alg._same_bits(lowpass.call_args.args[0], effective))
+        lp = alg.lowpass_first_latent(effective)
+        self.assertTrue(alg._same_bits(pipe.records[0]["x"][:, :, :1], lp))
+        self.assertTrue(alg._same_bits(pipe.records[2]["x"][:, :, :1], lp))
+        self.assertTrue(alg._same_bits(pipe.records[1]["x"][:, :, :1], effective))
+        self.assertTrue(alg._same_bits(pipe.z, before))
+        self.assertTrue(alg._same_bits(result[:, :, :1], effective))
+        self.assertEqual(stats["model_forwards"], 110)
+        self.assertEqual(stats["active_steps"], 10)
+        self.assertEqual(stats["raw_first_frame_dtype"], "torch.float32")
+        self.assertEqual(stats["effective_first_frame_dtype"], "torch.bfloat16")
+        self.assertEqual(stats["raw_first_frame_sha256"], stats["first_frame_sha256"])
+        self.assertEqual(stats["raw_first_frame_sha256"], hashlib.sha256(before.view(torch.uint8).numpy().tobytes()).hexdigest())
+        self.assertEqual(stats["effective_first_frame_sha256"], hashlib.sha256(effective.view(torch.uint8).numpy().tobytes()).hexdigest())
+        self.assertNotEqual(stats["raw_first_frame_sha256"], stats["effective_first_frame_sha256"])
+        self.assertTrue(all(alg._same_bits(record["sample"][:, :, :1], effective) for record in pipe.scheduler.records))
+        self.assertTrue(all(record["kwargs"]["first_frame_latents"] is pipe.z for record in pipe.records))
+
+    def test_mixed_dtype_real_call_initializes_fresh_scheduler_after_context_registration(self):
+        pipe = self.fixture()
+        flow_path = ROOT / "DiffSynth-Studio/diffsynth/diffusion/flow_match.py"
+        spec = importlib.util.spec_from_file_location("alg_fresh_flow", flow_path)
+        flow = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(flow)
+        pipe.scheduler = flow.FlowMatchScheduler("Wan")
+        self.assertFalse(hasattr(pipe.scheduler, "timesteps"))
+        original_set = pipe.scheduler.set_timesteps
+        initialized = []
+        def set_timesteps(n, **kwargs):
+            self.assertIn(id(pipe), alg._ACTIVE_PIPELINES)
+            self.assertEqual(pipe.model_fn.__self__.__class__, alg._ALGHook)
+            initialized.append((n, kwargs))
+            original_set(n, **kwargs)
+        pipe.scheduler.set_timesteps = set_timesteps
+        pipe.torch_dtype, pipe.device = torch.bfloat16, "cpu"
+        pipe.dit2 = pipe.vace2 = None
+        pipe.in_iteration_models = ("dit",)
+        unit = types.SimpleNamespace(onload_model_names=("vae",))
+        pipe.units, pipe.post_units = [unit], []
+        pipe.load_models_to_device = lambda names: None
+        pipe.preprocess_image = lambda image: torch.ones(1, 3, 10, 12)
+        pipe.vae = types.SimpleNamespace(encode=lambda *a, **kw: pipe.z, decode=lambda x, **kw: x)
+        image = types.SimpleNamespace(resize=lambda size: object())
+        def unit_runner(unit, p, shared, positive, negative):
+            shared.update(self.fuse_upstream(unit, p, image, p.initial.clone(),
+                                            shared["height"], shared["width"], False, (10, 12), (5, 6)))
+            positive["context"] = negative["context"] = torch.ones(1, 2, 3)
+            return shared, positive, negative
+        pipe.unit_runner = unit_runner
+        before = pipe.z.clone()
+        original_model, original_step = pipe.model_fn, pipe.scheduler.step
+        with alg.teacher_alg(pipe, call_kwargs=CALL, checkpoint="NONE") as stats:
+            result = self.call_upstream(pipe, **CALL, input_image=image, output_type="floatpoint")
+        self.assertEqual(initialized, [(50, dict(denoising_strength=1.0, shift=5.0))])
+        self.assertEqual(stats["completed_steps"], 50)
+        self.assertEqual(stats["model_forwards"], 110)
+        self.assertTrue(alg._same_bits(pipe.z, before))
+        self.assertTrue(alg._same_bits(result[:, :, :1], before.to(result)))
+        self.assertIs(pipe.model_fn, original_model)
+        self.assertEqual(pipe.scheduler.step, original_step)
+        self.assertIs(pipe.scheduler.set_timesteps, set_timesteps)
+
+    def test_mixed_dtype_raw_mutation_hidden_by_cast_and_effective_first_frame_corruption_rejected(self):
+        for raw_mutation in (True, False):
+            pipe = self.fixture()
+            original_model, original_step = pipe.model_fn, pipe.scheduler.step
+            x = pipe.initial.clone()
+            with self.subTest(raw_mutation=raw_mutation), self.assertRaises(ValueError):
+                with alg.teacher_alg(pipe, call_kwargs=CALL, checkpoint="NONE"):
+                    pipe.model_fn(**pipe.inputs(x, 0, True))
+                    if raw_mutation:
+                        effective = pipe.z.to(x).clone()
+                        pipe.z[0, 0, 0, 1, 1] += 1e-6
+                        self.assertTrue(alg._same_bits(pipe.z.to(x), effective))
+                    else:
+                        x[0, 0, 0, 1, 1] += 1
+                    pipe.model_fn(**pipe.inputs(x, 0, False))
+            self.assertIs(pipe.model_fn, original_model)
+            self.assertEqual(pipe.scheduler.step, original_step)
+            self.assertNotIn(id(pipe), alg._ACTIVE_PIPELINES)
+
+    def test_last_scheduler_mutation_of_raw_reference_is_rejected_and_restored(self):
+        pipe = self.fixture()
+        original_model, step = pipe.model_fn, pipe.scheduler.step
+        def mutate(prediction, timestep, sample):
+            result = step(prediction, timestep, sample)
+            if len(pipe.scheduler.records) == 50:
+                pipe.z[0, 0, 0, 1, 1] += 1e-6
+            return result
+        pipe.scheduler.step = mutate
+        with self.assertRaisesRegex(ValueError, "changed during scheduler.step"):
+            with alg.teacher_alg(pipe, call_kwargs=CALL, checkpoint="NONE"):
+                pipe.run()
+        self.assertIs(pipe.model_fn, original_model)
+        self.assertIs(pipe.scheduler.step, mutate)
+        self.assertNotIn(id(pipe), alg._ACTIVE_PIPELINES)
+
+
 if __name__ == "__main__":
     unittest.main()

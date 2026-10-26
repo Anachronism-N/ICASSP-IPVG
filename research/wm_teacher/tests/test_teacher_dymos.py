@@ -8,6 +8,7 @@ Actual torch2.7.1/A100 correctness, memory and speed remain smoke blockers.
 """
 import ast
 import importlib.util
+import hashlib
 import math
 import os
 from pathlib import Path
@@ -59,6 +60,17 @@ class TinyAttention(torch.nn.Module):
         return q + v
 
 
+class FixtureScheduler:
+    def __init__(self):
+        self.set_timesteps(50)
+
+    def set_timesteps(self, num_inference_steps, **kwargs):
+        self.timesteps = torch.linspace(1000, 20, num_inference_steps)
+
+    def step(self, prediction, timestep, sample):
+        return sample - prediction * 0.001
+
+
 class FixturePipe:
     def __init__(self, tiny=False, seed=0):
         self.dit = torch.nn.Module()
@@ -77,7 +89,7 @@ class FixturePipe:
             block.cross_attn.attn = TinyAttention()
             self.dit.blocks.append(block)
         self.vae = types.SimpleNamespace(upsampling_factor=16)
-        self.scheduler = types.SimpleNamespace(timesteps=torch.linspace(1000, 20, 50))
+        self.scheduler = FixtureScheduler()
         self.call = dict(TINY if tiny else CALL, seed=seed)
         f, h, w = (self.call["num_frames"] - 1) // 4 + 1, self.call["height"] // 16, self.call["width"] // 16
         # Expanded production-shape fixtures consume O(1) storage until clone of z.
@@ -498,6 +510,176 @@ class TestExtractedUpstreamCPU(unittest.TestCase):
             self.assertTrue(dymos._same_bits(positive["latents"][:, :, :1], pipe.z))
             self.assertIs(positive["latents"], stepped[i][0])
             torch.testing.assert_close(stepped[i][1], negative["latents"], rtol=0, atol=0)
+
+
+class TestMixedReferenceAndFreshScheduler(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        tree = ast.parse(WAN_SOURCE.read_text())
+        scope = {"torch": torch, "tqdm": lambda values: values}
+        for class_name, method_name in (("WanVideoPipeline", "__call__"),
+                                        ("WanVideoUnit_ImageEmbedderFused", "process")):
+            klass = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == class_name)
+            method = next(n for n in klass.body if isinstance(n, ast.FunctionDef) and n.name == method_name)
+            method.decorator_list, method.returns = [], None
+            for arg in method.args.args + method.args.kwonlyargs:
+                arg.annotation = None
+            exec(compile(ast.fix_missing_locations(ast.Module(body=[method], type_ignores=[])),
+                         str(WAN_SOURCE), "exec"), scope)
+        cls.call_upstream = staticmethod(scope["__call__"])
+        cls.fuse_upstream = staticmethod(scope["process"])
+
+    def fixture(self):
+        pipe = FixturePipe(tiny=True)
+        pipe.z = torch.arange(pipe.z.numel(), dtype=torch.float32).reshape_as(pipe.z) / 79 + 0.001
+        pipe.x = pipe.x.to(torch.bfloat16).clone()
+        pipe.x[:, :, :1] = pipe.z
+        return pipe
+
+    def test_boundary_accepts_fresh_real_scheduler_but_rejects_missing_callables(self):
+        path = ROOT / "DiffSynth-Studio/diffsynth/diffusion/flow_match.py"
+        spec = importlib.util.spec_from_file_location("dymos_fresh_flow", path)
+        flow = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(flow)
+        pipe = FixturePipe()
+        pipe.scheduler = flow.FlowMatchScheduler("Wan")
+        self.assertFalse(hasattr(pipe.scheduler, "timesteps"))
+        self.assertEqual(len(dymos._validate_boundary(pipe, CALL, "NONE")), 30)
+        for name in ("step", "set_timesteps"):
+            with self.subTest(name=name), mock.patch.object(pipe.scheduler, name, None):
+                with self.assertRaisesRegex(ValueError, "callable"):
+                    dymos._validate_boundary(pipe, CALL, "NONE")
+
+    def test_first_forward_requires_initialized_exact50_and_timestep_order(self):
+        for kind in ("unset", "49", "51", "wrong_order"):
+            pipe = self.fixture()
+            kwargs = pipe.kwargs()
+            if kind == "unset":
+                del pipe.scheduler.timesteps
+            elif kind in ("49", "51"):
+                pipe.scheduler.set_timesteps(int(kind))
+            else:
+                kwargs["timestep"] = pipe.scheduler.timesteps[1:2]
+            original = pipe.model_fn
+            with mock.patch.dict(dymos._FIXED_CALL, TINY_FIXED), self.subTest(kind=kind):
+                with self.assertRaisesRegex(ValueError, "50-step|timestep order"):
+                    with dymos.teacher_dymos(pipe, call_kwargs=pipe.call, checkpoint="NONE"):
+                        pipe.model_fn(**kwargs)
+            self.assertEqual(pipe.records, [])
+            self.assertEqual(pipe.model_fn, original)
+            self.assertNotIn(id(pipe), dymos._ACTIVE_PIPELINES)
+            self.assertTrue(all("forward" not in vars(b.self_attn.attn) for b in pipe.dit.blocks))
+
+    def test_real_fused_unit_and_ast_call_set_timesteps_inside_registered_context(self):
+        pipe = self.fixture()
+        path = ROOT / "DiffSynth-Studio/diffsynth/diffusion/flow_match.py"
+        spec = importlib.util.spec_from_file_location("dymos_ast_flow", path)
+        flow = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(flow)
+        pipe.scheduler = flow.FlowMatchScheduler("Wan")
+        self.assertFalse(hasattr(pipe.scheduler, "timesteps"))
+        original_set = pipe.scheduler.set_timesteps
+        initialized = []
+        def set_timesteps(n, **kwargs):
+            self.assertIn(id(pipe), dymos._ACTIVE_PIPELINES)
+            self.assertEqual(pipe.model_fn.__self__.__class__, dymos._DyMoSHook)
+            initialized.append((n, kwargs))
+            original_set(n, **kwargs)
+        pipe.scheduler.set_timesteps = set_timesteps
+        stepped = []
+        original_step = pipe.scheduler.step
+        def step(noise, timestep, sample):
+            stepped.append(sample)
+            return original_step(noise, timestep, sample)
+        pipe.scheduler.step = step
+        pipe.torch_dtype, pipe.device = torch.bfloat16, "cpu"
+        pipe.dit2 = pipe.vace2 = None
+        pipe.in_iteration_models = ("dit",)
+        unit = types.SimpleNamespace(onload_model_names=("vae",))
+        pipe.units, pipe.post_units = [unit], []
+        pipe.load_models_to_device = lambda names: None
+        pipe.preprocess_image = lambda image: torch.ones(1, 3, 4, 6)
+        pipe.vae.encode = lambda *a, **kw: pipe.z
+        pipe.vae.decode = lambda x, **kw: x
+        image = types.SimpleNamespace(resize=lambda size: object())
+        def unit_runner(unit, p, shared, positive, negative):
+            shared.update(self.fuse_upstream(unit, p, image, p.x.clone(),
+                                            shared["height"], shared["width"], False, (4, 6), (2, 3)))
+            positive["context"] = negative["context"] = torch.ones(1, 4, 2)
+            return shared, positive, negative
+        pipe.unit_runner = unit_runner
+        before = pipe.z.clone()
+        effective = pipe.z.to(pipe.x)
+        original_model = pipe.model_fn
+        with mock.patch.dict(dymos._FIXED_CALL, TINY_FIXED), mock.patch.object(dymos._FusedAttention, "__call__", side_effect=lambda q, k, v, *args: q + v):
+            with dymos.teacher_dymos(pipe, call_kwargs=pipe.call, checkpoint="NONE") as stats:
+                result = self.call_upstream(pipe, **pipe.call, input_image=image, output_type="floatpoint")
+        self.assertEqual(initialized, [(50, dict(denoising_strength=1.0, shift=5.0))])
+        self.assertEqual(stats["completed_steps"], 50)
+        self.assertEqual(stats["model_forwards"], 100)
+        self.assertEqual(stats["biased_attention_calls"], 300)
+        self.assertEqual(stats["original_attention_calls"], 2700)
+        self.assertEqual(stats["raw_first_frame_dtype"], "torch.float32")
+        self.assertEqual(stats["effective_first_frame_dtype"], "torch.bfloat16")
+        self.assertEqual(stats["raw_first_frame_sha256"], hashlib.sha256(before.view(torch.uint8).numpy().tobytes()).hexdigest())
+        self.assertEqual(stats["effective_first_frame_sha256"], hashlib.sha256(effective.view(torch.uint8).numpy().tobytes()).hexdigest())
+        self.assertNotEqual(stats["raw_first_frame_sha256"], stats["effective_first_frame_sha256"])
+        self.assertTrue(dymos._same_bits(pipe.z, before))
+        self.assertTrue(dymos._same_bits(result[:, :, :1], effective))
+        self.assertEqual(len(stepped), 50)
+        self.assertTrue(all(dymos._same_bits(x[:, :, :1], effective) for x in stepped))
+        self.assertTrue(all(record["first_frame_latents"] is pipe.z for record in pipe.records))
+        self.assertEqual(pipe.model_fn, original_model)
+        self.assertIs(pipe.scheduler.step, step)
+        self.assertIs(pipe.scheduler.set_timesteps, set_timesteps)
+        self.assertTrue(all("forward" not in vars(b.self_attn.attn) for b in pipe.dit.blocks))
+
+    def test_raw_mutation_hidden_by_cast_and_effective_first_frame_corruption_rejected(self):
+        for raw_mutation in (True, False):
+            pipe = self.fixture()
+            original = pipe.model_fn
+            with mock.patch.dict(dymos._FIXED_CALL, TINY_FIXED), mock.patch.object(dymos._FusedAttention, "__call__", side_effect=lambda q, *args: q):
+                with self.subTest(raw_mutation=raw_mutation), self.assertRaises(ValueError):
+                    with dymos.teacher_dymos(pipe, call_kwargs=pipe.call, checkpoint="NONE"):
+                        pipe.model_fn(**pipe.kwargs())
+                        if raw_mutation:
+                            effective = pipe.z.to(pipe.x).clone()
+                            pipe.z[0, 0, 0, 1, 1] += 1e-6
+                            self.assertTrue(dymos._same_bits(pipe.z.to(pipe.x), effective))
+                        else:
+                            pipe.x[0, 0, 0, 1, 1] += 1
+                        pipe.model_fn(**pipe.kwargs(positive=False))
+            self.assertEqual(pipe.model_fn, original)
+            self.assertNotIn(id(pipe), dymos._ACTIVE_PIPELINES)
+            self.assertTrue(all("forward" not in vars(b.self_attn.attn) for b in pipe.dit.blocks))
+
+    def test_last_raw_mutation_after_scheduler_is_rejected_without_wrapping_scheduler(self):
+        pipe = self.fixture()
+        original_model, original_step = pipe.model_fn, pipe.scheduler.step
+        with mock.patch.dict(dymos._FIXED_CALL, TINY_FIXED), mock.patch.object(dymos._FusedAttention, "__call__", side_effect=lambda q, *args: q):
+            with self.assertRaisesRegex(ValueError, "after the last model forward"):
+                with dymos.teacher_dymos(pipe, call_kwargs=pipe.call, checkpoint="NONE"):
+                    pipe.run()
+                    pipe.scheduler.step(torch.zeros_like(pipe.x), pipe.scheduler.timesteps[-1], pipe.x)
+                    pipe.z[0, 0, 0, 1, 1] += 1e-6
+        self.assertEqual(pipe.model_fn, original_model)
+        self.assertEqual(pipe.scheduler.step, original_step)
+        self.assertNotIn(id(pipe), dymos._ACTIVE_PIPELINES)
+
+    def test_mixed_dtype_forward_exception_restores_model_and_attention(self):
+        pipe = self.fixture()
+        pipe.fail = True
+        original_model, original_step = pipe.model_fn, pipe.scheduler.step
+        before = pipe.z.clone()
+        with mock.patch.dict(dymos._FIXED_CALL, TINY_FIXED):
+            with self.assertRaisesRegex(RuntimeError, "model failure"):
+                with dymos.teacher_dymos(pipe, call_kwargs=pipe.call, checkpoint="NONE"):
+                    pipe.model_fn(**pipe.kwargs())
+        self.assertTrue(dymos._same_bits(pipe.z, before))
+        self.assertEqual(pipe.model_fn, original_model)
+        self.assertEqual(pipe.scheduler.step, original_step)
+        self.assertNotIn(id(pipe), dymos._ACTIVE_PIPELINES)
+        self.assertTrue(all("forward" not in vars(b.self_attn.attn) for b in pipe.dit.blocks))
 
 
 if __name__ == "__main__":

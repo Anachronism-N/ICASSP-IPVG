@@ -376,6 +376,24 @@ def stage_jobs(jobs, suite, model, work, source="out", decoder=decode_local):
     return videos, outputs
 
 
+def ledger_budget(ledger, args):
+    import run_e3_subset_completion as completion
+    try:
+        budget, amendment_sha = completion.budget_contract(
+            Path(getattr(args, "experiment", Path(args.gpu_ledger).parent)),
+            getattr(args, "plan_sha256", None), getattr(args, "budget_amendment_sha256", None))
+    except Exception as error:
+        require(False, "Budget amendment verification failed: " + str(error))
+    require(ledger.get("budget_gpu_hours") == budget and
+            ledger.get("budget_amendment_sha256") == amendment_sha,
+            "Ledger must enforce approved gen28/score12/40 or exact authorized gen30/score12/42 amendment")
+    if amendment_sha is not None:
+        require(ledger.get("phase") == "score" and ledger.get("plan_sha256") == args.plan_sha256 and
+                ledger.get("score_source_sha256") == getattr(args, "score_source_sha256", None) == sha256(__file__),
+                "Amended ledger phase/plan/source identity mismatch")
+    return budget
+
+
 def gpu_run(command, args, cwd=None, env=None):
     require(args.gpu_authorized and args.supervisor_pid and args.gpu_ledger,
             "GPU scoring requires --gpu-authorized, live --supervisor-pid, and shared --gpu-ledger")
@@ -393,14 +411,19 @@ def gpu_run(command, args, cwd=None, env=None):
     with ledger_path.open("r+") as h:
         fcntl.flock(h, fcntl.LOCK_EX)
         ledger = json.load(h)
-        require(ledger.get("budget_gpu_hours") == {"generation": 28, "score": 12, "total": 40},
-                "Ledger must enforce frozen gen28+score12=40, including failures and all occupied GPUs")
+        budget = ledger_budget(ledger, args)
         gen, scoring = ledger.get("generation_gpu_hours"), ledger.get("score_gpu_hours")
-        require(finite(gen) and finite(scoring) and 0 <= gen <= 28 and 0 <= scoring <= 12,
+        require(finite(gen) and finite(scoring) and 0 <= gen <= budget["generation"] and 0 <= scoring <= budget["score"],
                 "Missing/invalid recorded GPU usage")
         require(not ledger.get("active"), "Another occupied/reserved GPU operation is active")
+        runs = ledger.get("runs")
+        require(isinstance(runs, list) and all(r.get("phase") == "score" and
+                type(r.get("gpus")) is int and r["gpus"] > 0 and finite(r.get("used_gpu_hours")) and
+                r["used_gpu_hours"] >= 0 for r in runs) and
+                math.isclose(scoring, sum(r["used_gpu_hours"] for r in runs), abs_tol=1e-8),
+                "Invalid/unaccounted score cost history")
         reserve = args.occupied_gpus * (args.max_gpu_seconds + 15) / 3600
-        require(scoring + reserve <= 12 and gen + scoring + reserve <= 40, "Insufficient remaining GPU budget")
+        require(scoring + reserve <= budget["score"] and gen + scoring + reserve <= budget["total"], "Insufficient remaining GPU budget")
         token = f"score-{os.getpid()}-{time.time_ns()}"
         ledger["active"] = {"token": token, "phase": "score", "gpus": args.occupied_gpus, "reserved_gpu_hours": reserve,
                             "pid": os.getpid(), "supervisor_pid": args.supervisor_pid, "command": command,
@@ -437,7 +460,9 @@ def gpu_run(command, args, cwd=None, env=None):
                                                   "success": succeeded, "end_epoch": time.time()})
             ledger["active"] = None
             h.seek(0); json.dump(ledger, h, indent=2, allow_nan=False); h.truncate(); h.flush(); os.fsync(h.fileno())
-            require(ledger["score_gpu_hours"] <= 12 and ledger["generation_gpu_hours"] + ledger["score_gpu_hours"] <= 40,
+            require(ledger_budget(ledger, args) == budget, "GPU budget contract changed during scoring")
+            require(ledger["score_gpu_hours"] <= budget["score"] and
+                    ledger["generation_gpu_hours"] + ledger["score_gpu_hours"] <= budget["total"],
                     "GPU budget exceeded; actual full occupancy retained in ledger")
 
 
@@ -836,6 +861,7 @@ def main():
     parser.add_argument("--judge", default="/dockerdata/wm_eval/bench/judges/vila-ewm-qwen2-1.5b")
     parser.add_argument("--gpu-authorized", action="store_true")
     parser.add_argument("--gpu-ledger", type=Path)
+    parser.add_argument("--approved-budget-amendment-sha256", dest="budget_amendment_sha256")
     parser.add_argument("--supervisor-pid", type=int)
     parser.add_argument("--max-gpu-seconds", type=float)
     parser.add_argument("--occupied-gpus", type=int, help="All allocated/reserved GPUs, not only CUDA-visible devices")

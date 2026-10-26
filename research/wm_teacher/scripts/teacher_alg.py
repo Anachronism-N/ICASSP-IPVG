@@ -131,14 +131,17 @@ class _ALGHook:
         self.original_step = pipe.scheduler.step
         self.step_index = 0
         self.phase = "positive"
-        self.z = None
+        self.z = self.raw_z = self.effective_z = None
         self.z_lowpass = None
         self.sample = None
         self.c_lowpass = None
         self.u_original = None
         self.u_lowpass = None
         self.stats = {"completed_steps": 0, "active_steps": 0, "model_forwards": 0,
-                      "first_frame_sha256": None, "bypassed": False}
+                      "first_frame_sha256": None, "raw_first_frame_sha256": None,
+                      "effective_first_frame_sha256": None,
+                      "raw_first_frame_dtype": None, "effective_first_frame_dtype": None,
+                      "bypassed": False}
 
     def _timestep(self, timestep, model_call=False):
         timesteps = self.pipe.scheduler.timesteps
@@ -167,20 +170,31 @@ class _ALGHook:
         _finite_tensor(z, "first_frame_latents")
         if x.ndim != 5 or x.shape[0] != 1 or x.shape[2] < 2 or z.shape != x[:, :, 0:1].shape:
             raise ValueError("ALG requires batch-one fused first frame and future frames")
-        if z.dtype != x.dtype or z.device != x.device or not _same_bits(x[:, :, 0:1], z):
-            raise ValueError("ALG original first frame must equal the locked original z")
+        # ImageEmbedderFused casts the assignment into x, but keeps raw z in kwargs.
+        effective_z = z.to(dtype=x.dtype, device=x.device)
+        if not _same_bits(x[:, :, 0:1], effective_z):
+            raise ValueError("ALG original first frame must equal the locked effective original z")
         context = kwargs.get("context")
         _finite_tensor(context, "context")
         if context.ndim != 3 or context.shape[0] != 1:
             raise ValueError("ALG requires unmerged batch-one text context")
         self._timestep(kwargs.get("timestep"), model_call=True)
         if self.z is None:
+            self.raw_z = z
             self.z = z.detach().clone()
-            self.z_lowpass = lowpass_first_latent(z, self.factor)
+            self.effective_z = effective_z.detach().clone()
+            self.z_lowpass = lowpass_first_latent(effective_z, self.factor)
             raw = self.z.contiguous().view(torch.uint8).cpu().numpy().tobytes()
-            self.stats["first_frame_sha256"] = hashlib.sha256(raw).hexdigest()
-        elif not _same_bits(z, self.z):
+            effective = self.effective_z.contiguous().view(torch.uint8).cpu().numpy().tobytes()
+            self.stats.update(first_frame_sha256=hashlib.sha256(raw).hexdigest(),
+                              raw_first_frame_sha256=hashlib.sha256(raw).hexdigest(),
+                              effective_first_frame_sha256=hashlib.sha256(effective).hexdigest(),
+                              raw_first_frame_dtype=str(z.dtype),
+                              effective_first_frame_dtype=str(x.dtype))
+        elif not _same_bits(z, self.z) or not _same_bits(self.raw_z, self.z):
             raise ValueError("ALG original first_frame_latents changed during the run")
+        elif not _same_bits(effective_z, self.effective_z):
+            raise ValueError("ALG effective original first_frame_latents changed during the run")
         return x
 
     def _forward(self, kwargs, lowpass=False):
@@ -193,6 +207,11 @@ class _ALGHook:
         self.stats["model_forwards"] += 1
         _finite_tensor(output, "model prediction")
         x = kwargs["latents"]
+        if not _same_bits(kwargs["first_frame_latents"], self.z) or not _same_bits(self.raw_z, self.z):
+            raise ValueError("ALG original first_frame_latents changed during model forward")
+        expected_z = self.z_lowpass if lowpass else self.effective_z
+        if not _same_bits(x[:, :, 0:1], expected_z):
+            raise ValueError("ALG model forward changed the fused first frame")
         if output.shape != x.shape or output.dtype != x.dtype or output.device != x.device:
             raise ValueError("ALG model prediction must match latents shape/dtype/device")
         return output
@@ -231,7 +250,8 @@ class _ALGHook:
         if self.phase != "scheduler":
             raise ValueError("ALG scheduler.step requires exactly positive/negative calls")
         self._timestep(timestep)
-        if sample is not self.sample or not _same_bits(sample[:, :, 0:1], self.z):
+        if (sample is not self.sample or not _same_bits(sample[:, :, 0:1], self.effective_z)
+                or not _same_bits(self.raw_z, self.z)):
             raise ValueError("ALG scheduler must step the original sample with original z")
         _finite_tensor(sample, "scheduler sample")
         _finite_tensor(model_output, "incoming CFG prediction")
@@ -239,6 +259,8 @@ class _ALGHook:
             model_output = self.u_original + self.call_kwargs["cfg_scale"] * (self.c_lowpass - self.u_lowpass)
             _finite_tensor(model_output, "ALG guidance")
         result = self.original_step(model_output, timestep, sample, *args, **kwargs)
+        if not _same_bits(self.raw_z, self.z):
+            raise ValueError("ALG original first_frame_latents changed during scheduler.step")
         _finite_tensor(result, "scheduler output")
         if result.shape != sample.shape or result.dtype != sample.dtype or result.device != sample.device:
             raise ValueError("ALG scheduler output must match original sample")
@@ -280,6 +302,8 @@ def teacher_alg(pipe, *, call_kwargs, checkpoint, enabled=True, factor=0.4):
         yield hook.stats
         if hook.step_index != 50 or hook.phase != "positive":
             raise ValueError("ALG context exited without one complete 50-step run")
+        if not _same_bits(hook.raw_z, hook.z):
+            raise ValueError("ALG original first_frame_latents changed after the last scheduler.step")
     finally:
         if wrapped:
             if model_owned:

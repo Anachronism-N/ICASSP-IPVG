@@ -17,6 +17,7 @@ is changed. Original RMSNorm/RoPE/projections remain upstream of the hook.
 
 from collections.abc import Mapping
 from contextlib import contextmanager
+import hashlib
 import math
 
 import torch
@@ -115,8 +116,10 @@ def _validate_boundary(pipe, call_kwargs, checkpoint):
         if any(value for name, value in vars(module).items() if name.startswith("wantodance_enable_")):
             raise ValueError("DyMoS does not support WanToDance adapters")
     model_fn = getattr(pipe, "model_fn", None)
-    if not callable(model_fn) or not hasattr(getattr(pipe, "scheduler", None), "timesteps"):
-        raise ValueError("DyMoS requires model_fn and scheduler.timesteps")
+    scheduler = getattr(pipe, "scheduler", None)
+    if (not callable(model_fn) or not callable(getattr(scheduler, "step", None))
+            or not callable(getattr(scheduler, "set_timesteps", None))):
+        raise ValueError("DyMoS requires callable model_fn, scheduler.step and scheduler.set_timesteps")
     if getattr(model_fn, "__self__", pipe) is not pipe:
         raise ValueError("DyMoS rejects another teacher/model_fn hook")
     return attention
@@ -196,11 +199,14 @@ class _DyMoSHook:
         self.phase = "positive"
         self.active = False
         self.reference_tokens = self.sequence_tokens = None
-        self.z = self.sample = None
+        self.z = self.raw_z = self.effective_z = self.sample = None
         self.seen_layers = set()
         self.stats = {"completed_steps": 0, "active_steps": 0, "model_forwards": 0,
                       "biased_attention_calls": 0, "original_attention_calls": 0,
-                      "reference_tokens": None, "sequence_tokens": None, "bypassed": False}
+                      "reference_tokens": None, "sequence_tokens": None,
+                      "raw_first_frame_sha256": None, "effective_first_frame_sha256": None,
+                      "raw_first_frame_dtype": None, "effective_first_frame_dtype": None,
+                      "bypassed": False}
 
     def attention_forward(self, index, attn, original):
         def forward(q, k, v):
@@ -237,22 +243,37 @@ class _DyMoSHook:
             raise ValueError("DyMoS runtime seed differs from registered call")
         if kwargs.get("dit") is not self.pipe.dit or kwargs.get("fuse_vae_embedding_in_latents") is not True:
             raise ValueError("DyMoS rejects switched DiT/non-fused conditioning")
-        timesteps, timestep = self.pipe.scheduler.timesteps, kwargs.get("timestep")
-        if len(timesteps) != 50 or self.step_index >= 50:
+        timesteps = getattr(self.pipe.scheduler, "timesteps", None)
+        timestep = kwargs.get("timestep")
+        if timesteps is None or len(timesteps) != 50 or self.step_index >= 50:
             raise ValueError("DyMoS requires exactly one 50-step run per context")
         if (not isinstance(timestep, torch.Tensor) or timestep.shape != (1,)
                 or not torch.equal(timestep.reshape(()), timesteps[self.step_index].to(timestep).reshape(()))):
             raise ValueError("DyMoS model timestep order mismatch")
         x, z, context = kwargs.get("latents"), kwargs.get("first_frame_latents"), kwargs.get("context")
         reference, sequence = _reference_span(self.pipe.dit, self.pipe.vae, x, self.call_kwargs)
-        if not isinstance(z, torch.Tensor) or not _same_bits(x[:, :, 0:1], z):
-            raise ValueError("DyMoS first_frame_latents must equal the original locked first frame")
+        if not isinstance(z, torch.Tensor) or not z.is_floating_point():
+            raise ValueError("DyMoS requires floating first_frame_latents")
+        # ImageEmbedderFused casts the assignment into x, but keeps raw z in kwargs.
+        effective_z = z.to(dtype=x.dtype, device=x.device)
+        if not _same_bits(x[:, :, 0:1], effective_z):
+            raise ValueError("DyMoS first_frame_latents must equal the effective original locked first frame")
         if self.z is None:
+            self.raw_z = z
             self.z = z.detach().clone()
+            self.effective_z = effective_z.detach().clone()
             self.reference_tokens, self.sequence_tokens = reference, sequence
-            self.stats.update(reference_tokens=reference, sequence_tokens=sequence)
-        elif not _same_bits(z, self.z):
+            raw = self.z.contiguous().view(torch.uint8).cpu().numpy().tobytes()
+            effective = self.effective_z.contiguous().view(torch.uint8).cpu().numpy().tobytes()
+            self.stats.update(reference_tokens=reference, sequence_tokens=sequence,
+                              raw_first_frame_sha256=hashlib.sha256(raw).hexdigest(),
+                              effective_first_frame_sha256=hashlib.sha256(effective).hexdigest(),
+                              raw_first_frame_dtype=str(z.dtype),
+                              effective_first_frame_dtype=str(x.dtype))
+        elif not _same_bits(z, self.z) or not _same_bits(self.raw_z, self.z):
             raise ValueError("DyMoS locked reference changed during the run")
+        elif not _same_bits(effective_z, self.effective_z):
+            raise ValueError("DyMoS effective locked reference changed during the run")
         if (not isinstance(context, torch.Tensor) or not context.is_floating_point()
                 or context.ndim != 3 or context.shape[0] != 1):
             raise ValueError("DyMoS requires unmerged batch-one text context")
@@ -264,6 +285,10 @@ class _DyMoSHook:
         self.seen_layers.clear()
         try:
             output = self.original_model_fn(**kwargs)
+            if not _same_bits(z, self.z) or not _same_bits(self.raw_z, self.z):
+                raise ValueError("DyMoS locked reference changed during model forward")
+            if not _same_bits(x[:, :, 0:1], self.effective_z):
+                raise ValueError("DyMoS model forward changed the fused first frame")
             if self.active and len(self.seen_layers) != 30:
                 raise ValueError("DyMoS active forward must visit all 30 self-attention layers")
         finally:
@@ -306,6 +331,8 @@ def teacher_dymos(pipe, *, call_kwargs, checkpoint, enabled=True, gamma=0.6, phi
         yield hook.stats
         if hook.step_index != 50 or hook.phase != "positive":
             raise ValueError("DyMoS context exited without exactly 50 positive/negative pairs")
+        if not _same_bits(hook.raw_z, hook.z):
+            raise ValueError("DyMoS locked reference changed after the last model forward")
     finally:
         hook.active = False
         if wrapped:
