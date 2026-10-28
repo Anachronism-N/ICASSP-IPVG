@@ -16,6 +16,7 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import run_teacher_devset_node as node
+import recover_teacher_devset_ledger as recovery
 
 
 class Fixture(unittest.TestCase):
@@ -367,14 +368,13 @@ class ChargingTests(Fixture):
                           " Path(" + repr(str(self.root / "paused-after-clock")) + ").write_text('CPU mock')\n"
                           "real.pause=pause\nreal.main()\n")
         worker.write_text("import sys\nsys.path.insert(0, " + repr(str(ROOT / "scripts")) + ")\n"
-                          "import run_teacher_devset as d, fcntl, json, os\nfrom pathlib import Path\n"
+                          "import run_teacher_devset as d, json, os\nfrom pathlib import Path\n"
                           "assert 'torch' not in sys.modules\n"
                           "p=Path(" + repr(str(node.ledger_file(self.path))) + ")\n"
                           "r=Path(" + repr(str(self.folder / "shard0.finished.json")) + ")\n"
                           "d.exclusive(r,dict(schema='teacher_devset_shard_receipt_v1',method='alg',plan_sha256="
                           + repr(self.digest) + ",shard=0,nshards=16,success=True))\n"
-                          "with p.with_suffix('.json.lock').open('a') as lock:\n"
-                          " fcntl.flock(lock,fcntl.LOCK_EX)\n"
+                          "with d.ledger_locked(p):\n"
                           " ledger=json.loads(p.read_bytes())\n"
                           " ledger['allocations'][0].update(status='running',worker_complete=True,worker_success=True,receipt_sha256=d.sha(r.read_bytes()))\n"
                           " d.checkpoint(p,ledger)\n")
@@ -466,7 +466,7 @@ class NodeTests(Fixture):
         self.assertEqual(len(launches), 8)
         self.assertTrue(all(k["start_new_session"] for _, k in launches))
         self.assertEqual(result["owned_shards"], list(range(8)))
-        self.assertGreater(result["true_elapsed_GPUh"], 0)
+        self.assertGreater(result["actual_known_GPUh"], 0)
         self.assertTrue(all(a["status"] == "reserved" for a in self.ledger()["allocations"][8:]))
 
     def test_parent_spawn_failure_finalizes_started_not_unstarted(self):
@@ -480,7 +480,7 @@ class NodeTests(Fixture):
             result = node.run_node(self.args())
         child = spawned[0]
         self.assertFalse(result["success"])
-        self.assertGreater(result["true_elapsed_GPUh"], 0)
+        self.assertGreater(result["actual_known_GPUh"], 0)
         self.assertEqual(self.ledger()["allocations"][0]["status"], "finished")
         self.assertEqual(self.ledger()["allocations"][1]["status"], "reserved")
         self.cleanup.assert_called_once()
@@ -496,7 +496,7 @@ class NodeTests(Fixture):
             result = node.run_node(self.args())
         self.assertFalse(result["success"])
         self.assertEqual(result["interrupted_signal"], signal.SIGTERM)
-        self.assertGreater(result["true_elapsed_GPUh"], 0)
+        self.assertGreater(result["actual_known_GPUh"], 0)
         self.assertEqual(self.cleanup.call_args.args[0], spawned[0].pid)
         self.assertFalse(any(c.args[0] == 987654 for c in self.kills.call_args_list))
 
@@ -515,12 +515,113 @@ class NodeTests(Fixture):
         self.assertEqual(self.ledger()["allocations"][0]["status"], "running")
         self.assertNotIn("end", self.ledger()["allocations"][0])
 
+    def test_corrupt_ledger_cannot_skip_cleanup_or_forge_final_receipt(self):
+        spawned = []
+        corrupt = b'{"allocations": ['
+        def popen(*args, **kwargs):
+            if len(spawned) == 2:
+                node.ledger_file(self.path).write_bytes(corrupt)
+                raise OSError("failed after two owned supervisors")
+            child = self.fake_child(len(spawned), rc=1)
+            spawned.append(child)
+            return child
+        before_handlers = {sig: signal.getsignal(sig) for sig in (signal.SIGTERM, signal.SIGINT)}
+        with mock.patch.object(node.subprocess, "Popen", side_effect=popen):
+            result = node.run_node(self.args())
+        self.assertFalse(result["success"])
+        self.assertIsNone(result["true_elapsed_GPUh"])
+        self.assertTrue(result["actual_cost_unknown"])
+        self.assertEqual(result["unfinalized_shards"], list(range(8)))
+        self.assertEqual(result["charged_upper_GPUh"], 12)
+        self.assertEqual([call.args[0] for call in self.cleanup.call_args_list], [c.pid for c in spawned])
+        self.assertFalse(any(call.args[0] == 987654 for call in self.kills.call_args_list))
+        self.assertEqual(node.ledger_file(self.path).read_bytes(), corrupt)
+        self.assertTrue(node.node_file(self.path, 1, "finished").exists())
+        self.assertFalse(json.loads(node.node_file(self.path, 1, "finished").read_bytes())["success"])
+        for sig, handler in before_handlers.items():
+            self.assertIs(signal.getsignal(sig), handler)
+
     def test_parent_duplicate_one_shot_launch_not_overwritten(self):
         old = node.node_file(self.path, 1, "launch")
         old.write_text("old launch")
         with self.assertRaises(FileExistsError):
             node.run_node(self.args())
         self.assertEqual(old.read_text(), "old launch")
+
+
+class RecoveryAuditTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.folder = self.root / "oldrun"
+        self.folder.mkdir()
+        self.plan_path = self.folder / "plan.json"
+        plan = dict(method="alg", nshards=16, shard_cap_seconds=[5400] * 16,
+                    phase_seconds=node.dev.PHASE_SECONDS, total_seconds=node.dev.TOTAL_SECONDS,
+                    admission=dict(charged_or_reserved_seconds=120), seeds=[0, 1], video_count=188)
+        self.plan_path.write_bytes(node.encoded(plan))
+        self.digest = node.sha(self.plan_path.read_bytes())
+        rows = [dict(phase="generation", shard=shard, status="reserved") for shard in range(16)]
+        rows += [dict(phase="score", cap_seconds=90), dict(phase="failure", cap_seconds=15)]
+        self.ledger = self.folder / "allocations.json"
+        self.ledger.write_bytes(node.encoded(dict(allocations=rows)) + b"trailing partial writer")
+        (self.folder / "shard0.launch.json").write_bytes(node.encoded(dict(plan_sha256=self.digest, shard=0)))
+        (self.folder / "shard1.launch.json").write_bytes(node.encoded(dict(plan_sha256=self.digest, shard=1)))
+        (self.folder / "video.mp4").write_bytes(b"old-media-no-decode")
+        (self.folder / "shard0.ready.json").write_bytes(b"original readiness")
+        receipt = dict(schema="teacher_devset_supervised_receipt_v1", method="alg", plan_sha256=self.digest,
+                       nshards=16, cap_seconds=5400, shard=0, allocated_gpus=1, allocation_released=True,
+                       owned_tree_released=True, elapsed_seconds=20, start=100, end=120, success=False)
+        (self.folder / "shard0.supervised.json").write_bytes(node.encoded(receipt))
+
+    def test_corrupt_candidate_not_complete_and_all_phase_bytes_preserved(self):
+        before = {p: p.read_bytes() for p in self.folder.rglob("*") if p.is_file()}
+        result = recovery.audit(self.plan_path, {1: 70})
+        self.assertIsNotNone(result["strict_parse_error"])
+        self.assertEqual(result["trailing_bytes"]["bytes"], len(b"\ntrailing partial writer"))
+        self.assertIn("DISCOVERY ONLY", result["candidate_warning"])
+        self.assertEqual([len(result["all_phase_rows_untrusted"][p]) for p in ("generation", "score", "failure")],
+                         [16, 1, 1])
+        self.assertEqual(result["shards"][0]["cost_upper_bound_seconds"], 20)
+        self.assertEqual(result["shards"][1]["cost_upper_bound_seconds"], 70)
+        self.assertEqual(result["shards"][2]["cost_upper_bound_seconds"], 70)
+        self.assertTrue(result["shards"][2]["actual_cost_unknown"])
+        self.assertEqual(result["known_launched_cost_upper_bound_seconds"], 90)
+        self.assertEqual(result["unknown_shards"], list(range(8, 16)))
+        self.assertEqual(result["all_shards_conservative_cost_upper_bound_seconds"], 20 + 7 * 70)
+        self.assertFalse(result["GPU_used"])
+        self.assertFalse(result["recovery_written"])
+        self.assertEqual(before, {p: p.read_bytes() for p in self.folder.rglob("*") if p.is_file()})
+
+    def test_missing_bound_or_bad_receipt_remains_unknown_not_zero(self):
+        receipt = self.folder / "shard0.supervised.json"
+        value = json.loads(receipt.read_bytes())
+        value["plan_sha256"] = "wrong"
+        receipt.write_bytes(node.encoded(value))
+        result = recovery.audit(self.plan_path)
+        self.assertIsNone(result["shards"][0]["cost_upper_bound_seconds"])
+        self.assertIn(0, result["unknown_shards"])
+        for bound in (0, -1, float("nan")):
+            with self.assertRaises(ValueError):
+                recovery.audit(self.plan_path, {1: bound})
+        self.ledger.write_bytes(b'{"unterminated')
+        result = recovery.audit(self.plan_path)
+        self.assertIsNone(result["ledger_candidate_untrusted"])
+        self.assertEqual(result["trailing_bytes"]["bytes"], len(b'{"unterminated'))
+        self.assertEqual(len(result["unknown_shards"]), 16)
+
+    def test_output_is_private_exclusive_and_never_inside_original_run(self):
+        result = recovery.audit(self.plan_path)
+        with self.assertRaises(ValueError):
+            recovery.write_audit(self.folder / "audit.json", result, self.folder)
+        output = self.root / "audit.json"
+        recovery.write_audit(output, result, self.folder)
+        self.assertEqual(output.stat().st_mode & 0o077, 0)
+        before = output.read_bytes()
+        with self.assertRaises(FileExistsError):
+            recovery.write_audit(output, result, self.folder)
+        self.assertEqual(output.read_bytes(), before)
 
 
 class ProcessTests(unittest.TestCase):

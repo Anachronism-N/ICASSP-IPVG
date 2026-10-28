@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """CPU reservation and one-shot eight-GPU supervision; no extra generation budget."""
 import argparse
-import contextlib
-import fcntl
 import json
 import os
 from pathlib import Path
@@ -37,13 +35,7 @@ def ledger_file(plan_path):
     return Path(plan_path).parent / "allocations.json"
 
 
-@contextlib.contextmanager
-def locked(path):
-    path = Path(path).absolute()
-    require(path.resolve() == path, "Ledger symlink forbidden")
-    with path.with_suffix(path.suffix + ".lock").open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
-        yield
+locked = dev.ledger_locked
 
 
 def verify_inputs(method, path, digest, pf_path, pf_sha, rank, offset, approved_source=None):
@@ -249,7 +241,15 @@ def finish_allocation(path, digest, shard, owner_pid, state_dir, exit_code, time
         item = next(a for a in ledger["allocations"] if a["phase"] == "generation" and a["shard"] == shard)
         require(item.get("node_supervisor_pid") == owner_pid and "start" in item
                 and item["status"] != "finished", "Cannot finalize unowned/unstarted allocation")
-        released = not session_processes(owner_pid, (owner_pid,)) and gpu_released(item, state_dir)
+        before = dict(item)
+    released = not session_processes(owner_pid, (owner_pid,)) and gpu_released(before, state_dir)
+    with locked(ledger_file(path)):
+        ledger = json.loads(ledger_file(path).read_bytes())
+        require(ledger["plan_sha256"] == digest, "Ledger changed during release check")
+        item = next(a for a in ledger["allocations"] if a["phase"] == "generation" and a["shard"] == shard)
+        require(item["status"] != "finished" and all(item.get(key) == before.get(key) for key in
+                ("node_supervisor_pid", "start", "allocation_start_monotonic", "gpu_uuid", "holder_supervisor_pid")),
+                "Owned allocation changed during release check")
         if not released:
             item.update(release_confirmed=False, cleanup_error=error or "Owned tree/GPU release unproven",
                         cost_status="reserved cap; allocation clock still open")
@@ -422,15 +422,24 @@ def run_node(args):
                 except ProcessLookupError:
                     pass
         for shard, c in children:
+            deadline = time.monotonic() + 30
             try:
                 ledger = json.loads(ledger_file(args.plan).read_bytes())
                 item = next(a for a in ledger["allocations"] if a["phase"] == "generation" and a["shard"] == shard)
-                deadline = item.get("allocation_start_monotonic", time.monotonic()) + CAP
-                grace = min(time.monotonic() + 30, deadline)
-                while c.poll() is None and time.monotonic() < grace:
+                if "allocation_start_monotonic" in item:
+                    deadline = min(deadline, item["allocation_start_monotonic"] + CAP)
+            except BaseException as exc:
+                error = f"Cleanup ledger unavailable; cost unknown: {type(exc).__name__}: {exc}"
+            try:
+                # Stopping owned sessions must not depend on a readable shared ledger.
+                while c.poll() is None and time.monotonic() < deadline:
                     time.sleep(0.02)
                 stop_session(c.pid, min(deadline, time.monotonic() + 1))
                 c.wait(timeout=1)
+            except BaseException as exc:
+                error = f"Cleanup: {type(exc).__name__}: {exc}"
+                continue
+            try:
                 ledger = json.loads(ledger_file(args.plan).read_bytes())
                 item = next(a for a in ledger["allocations"] if a["phase"] == "generation" and a["shard"] == shard)
                 if "start" in item and item["status"] != "finished":
@@ -441,14 +450,27 @@ def run_node(args):
                 error = f"Cleanup: {type(exc).__name__}: {exc}"
         for sig, handler in old.items():
             signal.signal(sig, handler)
-    ledger = json.loads(ledger_file(args.plan).read_bytes())
-    own_final = [a for a in ledger["allocations"] if a["phase"] == "generation" and a["node_rank"] == args.rank]
-    success = error is None and interrupted is None and len(children) == 8
-    success = success and all(a["status"] == "finished" and a.get("success") is True for a in own_final)
+    try:
+        ledger = json.loads(ledger_file(args.plan).read_bytes())
+        own_final = [a for a in ledger["allocations"] if a["phase"] == "generation" and a["node_rank"] == args.rank]
+        require({a["shard"] for a in own_final} == {a["shard"] for a in own} and len(own_final) == 8,
+                "Incomplete final owned ledger coverage")
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        error = f"Final ledger unavailable; actual cost unknown: {type(exc).__name__}: {exc}"
+        own_final = [dict(a, status="reserved") for a in own]
+    finalized = [a for a in own_final if a["status"] == "finished" and a.get("release_confirmed") is True
+                 and dev.finite_number(a.get("elapsed_seconds")) and a["elapsed_seconds"] >= 0]
+    unknown = [a["shard"] for a in own_final if a not in finalized]
+    known_seconds = sum(a["elapsed_seconds"] for a in finalized)
+    charged_seconds = known_seconds + sum(a["cap_seconds"] for a in own_final if a not in finalized)
+    success = error is None and interrupted is None and len(children) == 8 and not unknown
+    success = success and all(a.get("success") is True for a in finalized)
     result = dict(method=args.method, rank=args.rank, success=success, interrupted_signal=interrupted, error=error,
                   owned_shards=[a["shard"] for a in own_final], allocated_gpus=8, reserved_generation_GPUh=24,
-                  true_elapsed_GPUh=sum(a.get("elapsed_GPUh", 0) for a in own_final if a["status"] == "finished"),
-                  unfinalized_shards=[a["shard"] for a in own_final if a["status"] != "finished"],
+                  true_elapsed_GPUh=known_seconds / 3600 if not unknown else None,
+                  actual_known_GPUh=known_seconds / 3600, charged_upper_GPUh=charged_seconds / 3600,
+                  unfinalized_shards=unknown, actual_cost_unknown=bool(unknown),
+                  cost_caveat="Unknown reservations retain caps; known elapsed is not complete actual cost",
                   quality_pass=False, sota_claim=False)
     dev.exclusive(node_file(args.plan, args.rank, "finished"), result)
     return result

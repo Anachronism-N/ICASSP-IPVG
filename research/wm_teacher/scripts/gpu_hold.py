@@ -117,8 +117,9 @@ def supervisor(args, folder, gpus):
     signal.signal(signal.SIGTERM, lambda *_: stopping.set())
     signal.signal(signal.SIGINT, lambda *_: stopping.set())
     mapping = query_gpus()
+    monitor_only = getattr(args, 'monitor_only', False)
     for gpu in gpus:
-        if gpu not in mapping or args.memory_gib * 1024 > mapping[gpu]['total_mib'] - 1024:
+        if gpu not in mapping or (not monitor_only and args.memory_gib * 1024 > mapping[gpu]['total_mib'] - 1024):
             raise ValueError(f'GPU {gpu} unavailable or insufficient capacity')
     children, idle_since, retry_at = {}, {}, {}
     try:
@@ -151,7 +152,8 @@ def supervisor(args, folder, gpus):
                 else:
                     now = time.monotonic()
                     idle_since.setdefault(gpu, now)
-                    if child is None and now - idle_since[gpu] >= args.idle_seconds and now >= retry_at.get(gpu, 0):
+                    if (not monitor_only and child is None and now - idle_since[gpu] >= args.idle_seconds
+                            and now >= retry_at.get(gpu, 0)):
                         available = mapping[gpu]['total_mib'] - mapping[gpu]['used_mib']
                         if available > args.memory_gib * 1024 + 512:
                             log = (folder / f'worker.{gpu}.log').open('a')
@@ -164,9 +166,10 @@ def supervisor(args, folder, gpus):
                             print(f'GPU {gpu}: holder started PID {child.pid}', flush=True)
                 status[str(gpu)] = {'paused': paused, 'external_pids': sorted(external),
                                     'holder_pid': child.pid if child else None,
-                                    'gpu_uuid': mapping[gpu]['uuid'], 'memory_gib_target': args.memory_gib}
+                                    'gpu_uuid': mapping[gpu]['uuid'],
+                                    'memory_gib_target': 0 if monitor_only else args.memory_gib}
             write_state(folder, {'pid': os.getpid(), 'running': True, 'updated_at': time.time(), 'query_ok': query_ok,
-                                 'error': error, 'gpus': status})
+                                 'error': error, 'gpus': status, 'monitor_only': monitor_only})
             stopping.wait(1)
     finally:
         for child in list(children.values()):
@@ -201,8 +204,11 @@ def main():
     parser.add_argument('--memory-gib', type=float, default=30)
     parser.add_argument('--interval', type=float, default=0.0)
     parser.add_argument('--idle-seconds', type=float, default=5)
+    parser.add_argument('--monitor-only', action='store_true', help='Manage GPU identities/leases without CUDA holder workers')
     parser.add_argument('command', nargs=argparse.REMAINDER)
     args = parser.parse_args()
+    if args.monitor_only and args.action != 'run':
+        parser.error('--monitor-only is only valid for the CPU supervisor run action')
     if args.memory_gib <= 0 or args.interval < 0 or args.idle_seconds < 0:
         parser.error('Invalid memory, interval or idle settings')
     if args.action == 'worker':

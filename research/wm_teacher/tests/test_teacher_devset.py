@@ -10,6 +10,7 @@ from pathlib import Path
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 import types
 import unittest
@@ -461,6 +462,160 @@ class PrepareTests(Fixture):
         self.assertEqual(old.read_bytes(), b"do not delete")
 
 
+class SharedLedgerIOTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.path = Path(self.temp.name) / "allocations.json"
+
+    def test_devset_helpers_are_local_and_node_uses_identical_lock(self):
+        import run_teacher_devset_node as node
+        self.assertIs(node.locked, node.dev.ledger_locked)
+        self.assertIsNot(dev.checkpoint, smoke.checkpoint)
+
+    def test_exception_releases_only_owned_claim_and_preserves_ledger(self):
+        self.path.write_bytes(b'{"old": true}\n')
+        before = self.path.read_bytes()
+        with self.assertRaisesRegex(RuntimeError, "fixture"):
+            with dev.ledger_locked(self.path):
+                raise RuntimeError("fixture")
+        self.assertEqual(self.path.read_bytes(), before)
+        self.assertFalse(self.path.with_suffix(".json.claim-lock").exists())
+
+    def test_failed_acquisition_fakeclock_never_removes_owner(self):
+        with dev.ledger_locked(self.path):
+            claim = self.path.with_suffix(".json.claim-lock")
+            marker = claim
+            before = marker.read_bytes()
+            with mock.patch.object(dev.time, "monotonic", side_effect=[10, 10, 10.2]), \
+                    mock.patch.object(dev.time, "sleep"):
+                with self.assertRaisesRegex(TimeoutError, "never reclaim"):
+                    with dev.ledger_locked(self.path, timeout_seconds=.1):
+                        self.fail("acquired another owner")
+            self.assertEqual(marker.read_bytes(), before)
+
+    def test_substituted_owner_token_is_not_removed(self):
+        with dev.ledger_locked(self.path):
+            claim = self.path.with_suffix(".json.claim-lock")
+            marker = claim
+            other = dev.encoded(dict(token="different-owner"))
+            marker.write_bytes(other)
+        self.assertEqual(marker.read_bytes(), other)
+        self.assertTrue(claim.exists())
+
+    def test_failed_release_preserves_other_unique_token(self):
+        with dev.ledger_locked(self.path):
+            claim = self.path.with_suffix(".json.claim-lock")
+            original = claim.read_bytes()
+            claim.write_bytes(b"different owner")
+        self.assertEqual(claim.read_bytes(), b"different owner")
+        self.assertNotEqual(claim.read_bytes(), original)
+
+    def test_replaced_claim_inode_cannot_delete_successor(self):
+        with dev.ledger_locked(self.path):
+            claim = self.path.with_suffix(".json.claim-lock")
+            claim.rename(claim.with_name("prior-owner"))
+            claim.write_bytes(b"other owner")
+        self.assertEqual(claim.read_bytes(), b"other owner")
+
+    def test_checkpoint_errors_preserve_original_and_unique_legacy_tmp(self):
+        self.path.write_bytes(b'{"old": true}\n')
+        legacy = self.path.with_suffix(".json.tmp")
+        legacy.write_bytes(b"old unrelated tmp")
+        before = self.path.read_bytes()
+        for name in ("fsync", "replace"):
+            with mock.patch.object(dev.os, name, side_effect=OSError("fixture")):
+                with self.assertRaisesRegex(OSError, "fixture"):
+                    dev.checkpoint(self.path, dict(new=True))
+            self.assertEqual(self.path.read_bytes(), before)
+            self.assertEqual(legacy.read_bytes(), b"old unrelated tmp")
+            self.assertEqual(list(self.path.parent.glob(".allocations.json.*.tmp")), [])
+        with self.assertRaises(ValueError):
+            dev.checkpoint(self.path, dict(nan=float("nan")))
+        self.assertEqual(self.path.read_bytes(), before)
+        dev.checkpoint(self.path, dict(new=True))
+        self.assertEqual(json.loads(self.path.read_bytes()), dict(new=True))
+        self.assertEqual(self.path.stat().st_mode & 0o077, 0)
+
+    def test_two_simulated_hosts_no_flock_exclusion_no_lost_updates(self):
+        import run_teacher_devset_node as node
+        ctx = multiprocessing.get_context("fork")
+        barrier, reports = ctx.Barrier(4), ctx.Queue()
+        dev.checkpoint(self.path, dict(allocations=[]))
+        def writer(index):
+            try:
+                # Simulate independent hosts where flock offers no shared exclusion.
+                with mock.patch("fcntl.flock", return_value=None), \
+                        mock.patch.object(dev.os, "uname", return_value=types.SimpleNamespace(nodename=f"host{index % 2}")):
+                    barrier.wait(timeout=5)
+                    for update in range(20):
+                        lock = dev.ledger_locked if index % 2 else node.locked
+                        with lock(self.path):
+                            ledger = json.loads(self.path.read_bytes())
+                            time.sleep(.001)
+                            ledger["allocations"].append(dict(writer=index, update=update))
+                            dev.checkpoint(self.path, ledger)
+                reports.put(None)
+            except BaseException as exc:
+                reports.put(repr(exc))
+                raise
+        processes = [ctx.Process(target=writer, args=(index,)) for index in range(4)]
+        try:
+            for process in processes:
+                process.start()
+            until = time.monotonic() + 10
+            reads = 0
+            while any(process.is_alive() for process in processes) and time.monotonic() < until:
+                json.loads(self.path.read_bytes())  # Readers must never see a truncated document.
+                reads += 1
+                time.sleep(.001)
+            for process in processes:
+                process.join(timeout=1)
+                self.assertEqual(process.exitcode, 0)
+            self.assertEqual([reports.get(timeout=1) for _ in processes], [None] * 4)
+            allocations = json.loads(self.path.read_bytes())["allocations"]
+            self.assertEqual(len(allocations), 80)
+            self.assertEqual({(a["writer"], a["update"]) for a in allocations},
+                             {(writer, update) for writer in range(4) for update in range(20)})
+            self.assertGreater(reads, 0)
+            self.assertFalse(self.path.with_suffix(".json.claim-lock").exists())
+        finally:
+            for process in processes:
+                if process.is_alive():
+                    process.terminate()
+                    process.join(timeout=3)
+            reports.close()
+            reports.join_thread()
+
+    def test_concurrent_checkpoints_without_shared_tmp_never_truncate_json(self):
+        ctx = multiprocessing.get_context("fork")
+        barrier = ctx.Barrier(2)
+        dev.checkpoint(self.path, dict(writer=-1, padding="old"))
+        def writer(index):
+            barrier.wait(timeout=5)
+            for update in range(40):
+                dev.checkpoint(self.path, dict(writer=index, update=update, padding=str(index) * 20000))
+        processes = [ctx.Process(target=writer, args=(index,)) for index in (0, 1)]
+        try:
+            for process in processes:
+                process.start()
+            until = time.monotonic() + 10
+            while any(process.is_alive() for process in processes) and time.monotonic() < until:
+                value = json.loads(self.path.read_bytes())
+                if value["writer"] >= 0:
+                    self.assertEqual(value["padding"], str(value["writer"]) * 20000)
+                time.sleep(.001)
+            for process in processes:
+                process.join(timeout=1)
+                self.assertEqual(process.exitcode, 0)
+            self.assertEqual(list(self.path.parent.glob(".allocations.json.*.tmp")), [])
+        finally:
+            for process in processes:
+                if process.is_alive():
+                    process.terminate()
+                    process.join(timeout=3)
+
+
 class LedgerTests(Fixture):
     def test_all_shards_reserved_and_phase_caps_independent(self):
         path, digest = self.prepare_dev()
@@ -489,27 +644,26 @@ class LedgerTests(Fixture):
             dev.validate_ledger(ledger, plan, digest, 0, 2, 0, 43200)
 
     def test_real_blocking_ledger_lock_remains_deadline_interruptible(self):
-        lock_path = self.base / "blocked_ledger.lock"
+        ledger_path = self.base / "blocked_ledger.json"
         ctx = multiprocessing.get_context("fork")
         reports = ctx.Queue()
         def wait_for_ledger():
             try:
-                # Close inherited parent description; this process uses its own flock.
-                inherited.close()
-                with lock_path.open("a") as lock:
-                    with dev.deadline(time.monotonic() - 24.8, 60):
-                        dev.fcntl.flock(lock, dev.fcntl.LOCK_EX)
-                reports.put("unexpected acquired")
+                with dev.deadline(time.monotonic() - 24.8, 60):
+                    with dev.ledger_locked(ledger_path):
+                        reports.put("unexpected acquired")
             except TimeoutError:
                 reports.put("deadline interrupted")
-        with lock_path.open("a") as inherited:
-            dev.fcntl.flock(inherited, dev.fcntl.LOCK_EX)
+        with dev.ledger_locked(ledger_path):
+            marker = ledger_path.with_suffix(".json.claim-lock")
+            before = marker.read_bytes()
             process = ctx.Process(target=wait_for_ledger)
             process.start()
             try:
                 self.assertEqual(reports.get(timeout=5), "deadline interrupted")
                 process.join(timeout=3)
                 self.assertEqual(process.exitcode, 0)
+                self.assertEqual(marker.read_bytes(), before)
             finally:
                 if process.is_alive():
                     process.terminate()

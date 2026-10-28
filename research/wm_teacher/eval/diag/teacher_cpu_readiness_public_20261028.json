@@ -1,0 +1,115 @@
+{
+  "schema": "teacher_cpu_components_public_v1",
+  "date": "2026-10-28",
+  "GPU_used": false,
+  "GPU_resume_authorized": false,
+  "new_generated_videos": {
+    "base": 0,
+    "alg": 0,
+    "dymos": 0
+  },
+  "components": [
+    "node-local fixed-inode fcntl and fsync/rename protocol",
+    "independent fixed16 quotas and prior generation upper bounds",
+    "native NONE base and common content contracts",
+    "SHA-bound scoring/cache preparation and two-seed qualification",
+    "monitor-only manager without CUDA holder workers"
+  ],
+  "real_two_node_CPU_probe": {
+    "passed": true,
+    "nodes": [
+      {
+        "rank": 1,
+        "counter": 40,
+        "unique_entries": 40,
+        "strict_reader_checks": 414,
+        "exit_codes": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "source_sha256": "7256abbc0842ea9ba31fc86be494186d83b30626c38ba9f509bef24ddd527d01",
+        "test_sha256": "cc5c783f6c9c28e8f4f83899250060aa9b3dcd75d8257de396a5231b9f4b53b8"
+      },
+      {
+        "rank": 2,
+        "counter": 40,
+        "unique_entries": 40,
+        "strict_reader_checks": 350,
+        "exit_codes": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "source_sha256": "7256abbc0842ea9ba31fc86be494186d83b30626c38ba9f509bef24ddd527d01",
+        "test_sha256": "cc5c783f6c9c28e8f4f83899250060aa9b3dcd75d8257de396a5231b9f4b53b8"
+      }
+    ],
+    "scope": "Real node-local CPU lock/write primitives, not complete GPU driver or generation/quality acceptance"
+  },
+  "independent_edge_tests": {
+    "passed": 11,
+    "failed": 0,
+    "scope": "Synthetic CPU attacks and fail-closed checks; no actual models, GPUs or quality evaluation"
+  },
+  "prior_generation_upper_GPUh": {
+    "alg": 1.6461976177604973,
+    "dymos": 2.655524471504614
+  },
+  "recovery_reserved_generation_upper_GPUh": {
+    "alg": 23.868419839982717,
+    "dymos": 23.988857804837945
+  },
+  "old_actual_generation_GPUh": {
+    "alg": null,
+    "dymos": null
+  },
+  "fixed_stage_caps_GPUh": {
+    "candidate": {
+      "smoke": 1,
+      "generation": 24,
+      "score": 16,
+      "failure": 4,
+      "total": 45
+    },
+    "native_base": {
+      "generation": 20,
+      "score": 5,
+      "total": 25
+    }
+  },
+  "parent_release_verifier_integrated": false,
+  "generation_completion_verifier_integrated": false,
+  "scoring_execution_verifier_integrated": false,
+  "native_throughput_pass": false,
+  "old_reservations_retired": false,
+  "final_related_CPU_regression": {
+    "passed": 265,
+    "failed": 0,
+    "exit_code": 0
+  },
+  "real_GPU_driver_ready": false,
+  "real_comparison_ready": false,
+  "quality_pass": false,
+  "SOTA_proven": false,
+  "AR_allowed": false,
+  "review": "Frozen local blind review protocol only; no real review completed; schema is not human gold",
+  "caveat": "CPU module tests and node-local probes are not GPU authorization, fair completed comparison, semantic correctness or SOTA. Missing/unverified receipts retain quota upper bounds; prior unknown costs are never zeroed.",
+  "public_full_CPU_regression": {
+    "passed": 826,
+    "skipped": 3,
+    "failed": 0,
+    "exit_code": 0,
+    "new_component_tests_in_default_collection": 138
+  },
+  "independent_final_edge_tests": {
+    "passed": 15,
+    "failed": 0,
+    "exit_code": 0,
+    "parent_release_mocked": false,
+    "source_unchanged": true,
+    "scope": "Original9 attacks plus6 mocked manager scope checks; no real models or GPUs"
+  }
+}

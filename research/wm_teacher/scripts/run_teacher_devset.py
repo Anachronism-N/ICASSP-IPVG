@@ -8,14 +8,15 @@ score_e1.cmd_vbench/cmd_gtref APIs; no CONFIGS mutation or scoring here.
 """
 import argparse
 import contextlib
-import fcntl
 import json
 import math
 import os
 from pathlib import Path
 import signal
 import sys
+import tempfile
 import time
+import uuid
 
 import run_teacher_inference_smoke as smoke
 import measure_teacher_throughput as performance
@@ -30,7 +31,62 @@ CASES_SHA256 = "0873b163284a92b207ac248cc41ff934cf73615f1f9af073eca8bfb2073e5aed
 BASE_ROOTS = {"seed0": CASE_ROOT, "seed1": "eval/e1_seed1_20261023"}
 require, encoded, sha = smoke.require, smoke.encoded, smoke.sha
 record, check_record = smoke.record, smoke.check_record
-exclusive, checkpoint = smoke.exclusive, smoke.checkpoint
+exclusive = smoke.exclusive
+
+
+def checkpoint(path, value):
+    path = Path(path).absolute()
+    require(path.resolve() == path, "Checkpoint symlink forbidden")
+    payload = encoded(value)
+    fd, name = tempfile.mkstemp(prefix="." + path.name + ".", suffix=".tmp", dir=path.parent)
+    tmp = Path(name)
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp, path)
+    finally:
+        try:
+            tmp.unlink()
+        except FileNotFoundError:
+            pass
+
+
+@contextlib.contextmanager
+def ledger_locked(path, timeout_seconds=30):
+    path = Path(path).absolute()
+    require(path.resolve() == path, "Ledger symlink forbidden")
+    require(finite_number(timeout_seconds) and timeout_seconds >= 0, "Invalid ledger lock timeout")
+    claim = path.with_suffix(path.suffix + ".claim-lock")
+    owner = encoded(dict(token=uuid.uuid4().hex, hostname=os.uname().nodename, pid=os.getpid()))
+    until = time.monotonic() + timeout_seconds
+    while True:
+        try:
+            fd = os.open(claim, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            break
+        except FileExistsError:
+            remaining = until - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError("Shared ledger lock timeout; never reclaim another owner")
+            time.sleep(min(0.02, remaining))
+    identity = os.fstat(fd)
+    try:
+        # O_EXCL is cross-host atomic; no stale-owner stealing or shared temp path.
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(owner)
+            handle.flush()
+            os.fsync(handle.fileno())
+        yield
+    finally:
+        try:
+            current = claim.lstat()
+            if ((current.st_dev, current.st_ino) == (identity.st_dev, identity.st_ino)
+                    and claim.read_bytes() == owner):
+                claim.unlink()
+        except FileNotFoundError:
+            pass
+
 
 
 def finite_number(value):
@@ -527,12 +583,15 @@ def _run(path, approved_sha, node_preflight, approved_node_sha, ledger_path, gpu
     plan, models = verify_plan(path, approved_sha, node_preflight, approved_node_sha)
     ledger_path = Path(ledger_path).absolute()
     require(ledger_path.is_file(), "Caller must preregister reserved allocation ledger")
-    lock_path = ledger_path.with_suffix(ledger_path.suffix + ".lock")
-    with lock_path.open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
+    with ledger_locked(ledger_path):
+        ledger = json.loads(ledger_path.read_bytes())
+        initial_item, _ = validate_ledger(ledger, plan, approved_sha, shard, nshards, gpu_index, gen_cap_seconds)
+    uuid = managed_scope(initial_item, state_dir, gpu_index)
+    with ledger_locked(ledger_path):
         ledger = json.loads(ledger_path.read_bytes())
         item, _ = validate_ledger(ledger, plan, approved_sha, shard, nshards, gpu_index, gen_cap_seconds)
-        uuid, start = managed_scope(item, state_dir, gpu_index), item["allocation_start_monotonic"]
+        require(item == initial_item, "Allocation changed during scope check; never steal")
+        start = item["allocation_start_monotonic"]
         require(finite_number(start) and 0 <= time.monotonic() - start < gen_cap_seconds - 35
                 and finite_number(item["start"]) and abs(time.time() - item["start"] - (time.monotonic() - start)) < 5,
                 "Invalid/exhausted caller reservation clock")
@@ -594,8 +653,7 @@ def _run(path, approved_sha, node_preflight, approved_node_sha, ledger_path, gpu
         receipt["success"] = receipt["success"] and not receipt["budget_exceeded"]
         receipt["failure"] = not receipt["success"]
         exclusive(folder / f"shard{shard}.finished.json", receipt)
-        with lock_path.open("a") as lock:
-            fcntl.flock(lock, fcntl.LOCK_EX)
+        with ledger_locked(ledger_path):
             ledger = json.loads(ledger_path.read_bytes())
             matching = [a for a in ledger["allocations"] if a["phase"] == "generation" and a["shard"] == shard]
             require(len(matching) == 1 and matching[0].get("worker_pid") == os.getpid()
