@@ -48,8 +48,8 @@
     },
     {
       "path": "docs/31_服务器迁移与CodingAgent交接.md",
-      "source_sha256": "3f9955a24870d02d5718be99e02040c6bf5393d672667a24584e5b162ec8eab0",
-      "snapshot_sha256": "6c25c6913082a4f0d8f394b1d1ea5f001e5dd2750e776b67d1038acaa0c48b96"
+      "source_sha256": "c02853f73e751d91d0567d5237f9fe9497e25c9fe6f4c6352ea98b7777c32f12",
+      "snapshot_sha256": "b372f3715014b13fca6ad06521c1c01c30b661cd146a44fb2b1d293cf215f357"
     },
     {
       "path": "patches/diffsynth_studio_fb337fb.patch",
@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "0c5d59e3463e3a08e544a2e5ec731ab63978edde49e8e99b6314856fb68e98e2",
-      "snapshot_sha256": "0c5d59e3463e3a08e544a2e5ec731ab63978edde49e8e99b6314856fb68e98e2"
+      "source_sha256": "5257499bf3b60e169413e2753cd33917f455b13f680d40d8ca3318f872b30661",
+      "snapshot_sha256": "5257499bf3b60e169413e2753cd33917f455b13f680d40d8ca3318f872b30661"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -1059,13 +1059,13 @@
     },
     {
       "path": "scripts/run_teacher_generation.py",
-      "source_sha256": "3ba70af8040507cea52a8877c9d6b28fd802fcda4768fea278d1e1676f9fec22",
-      "snapshot_sha256": "3ba70af8040507cea52a8877c9d6b28fd802fcda4768fea278d1e1676f9fec22"
+      "source_sha256": "bc545a69fea854616681f15cb6d764f503e90f71bfd81cccbc780183e9aeb7b8",
+      "snapshot_sha256": "bc545a69fea854616681f15cb6d764f503e90f71bfd81cccbc780183e9aeb7b8"
     },
     {
       "path": "tests/test_teacher_generation.py",
-      "source_sha256": "00e5507ffaf0219c4113f080d0cd9d71f7c05cb90f7c63d03806506ff6d28543",
-      "snapshot_sha256": "00e5507ffaf0219c4113f080d0cd9d71f7c05cb90f7c63d03806506ff6d28543"
+      "source_sha256": "bd702faf223f9dc5e0878334f074ddd4066b75fcbb646a8f41486a54af4e4acf",
+      "snapshot_sha256": "bd702faf223f9dc5e0878334f074ddd4066b75fcbb646a8f41486a54af4e4acf"
     },
     {
       "path": "scripts/run_teacher_scoring.py",
@@ -1091,6 +1091,21 @@
       "path": "eval/diag/teacher_execution_resume_public_20261029.json",
       "source_sha256": "951a766c01d340e001463ec74d7777c3ac275c2eb1438bbced08570f6bfb8843",
       "snapshot_sha256": "951a766c01d340e001463ec74d7777c3ac275c2eb1438bbced08570f6bfb8843"
+    },
+    {
+      "path": "scripts/prepare_teacher_one_recovery.py",
+      "source_sha256": "c0f1c6cb5d8a706594a0f3e158b8b29b2e547235702c45e5829e5c10ec6d4ff9",
+      "snapshot_sha256": "c0f1c6cb5d8a706594a0f3e158b8b29b2e547235702c45e5829e5c10ec6d4ff9"
+    },
+    {
+      "path": "tests/test_teacher_one_recovery.py",
+      "source_sha256": "e2a8711d908cd0fc3dc5d12194bc93b049cb7eb05cdafb36869abc346bbb706c",
+      "snapshot_sha256": "e2a8711d908cd0fc3dc5d12194bc93b049cb7eb05cdafb36869abc346bbb706c"
+    },
+    {
+      "path": "eval/diag/teacher_canary_failure_public_20261029.json",
+      "source_sha256": "65dd625214a15d6a66b9d2b2aa0d74614f9b78685eed42b8dc647f7a34c7120d",
+      "snapshot_sha256": "65dd625214a15d6a66b9d2b2aa0d74614f9b78685eed42b8dc647f7a34c7120d"
     }
   ],
   "experiment_progress": {
@@ -1221,5 +1236,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "Authorized fixed Teacher experiments: actual supervised generation, host-scoped content proofs and bounded official scoring; no completed GPU/quality claim"
+  "latest_increment_scope": "Actual failed canary costs and one budget-preserving recovery preparation; generation-only worker validation, no new GPU or quality claim"
 }

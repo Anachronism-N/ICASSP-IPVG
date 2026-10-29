@@ -40,6 +40,97 @@ class GenerationTests(unittest.TestCase):
             generation.cleanup_owned(child, row, time.monotonic() + 3)
         child.wait(timeout=3)
 
+    def test_bound_json_single_read_keeps_sha_duplicate_and_finite_gates(self):
+        row = self.record_json('single.json', {'bound': 1})
+        original = Path.read_bytes
+        reads = []
+        def observed(path):
+            reads.append(str(path))
+            return original(path)
+        with mock.patch.object(Path, 'read_bytes', observed):
+            self.assertEqual(generation.read_bound(row), {'bound': 1})
+        self.assertEqual(reads, [row['path']])
+        path = Path(row['path'])
+        stat = path.stat()
+        path.write_bytes(b'x' * row['bytes'])
+        os.utime(path, ns=(stat.st_atime_ns, stat.st_mtime_ns))
+        with self.assertRaises(ValueError):
+            generation.read_bound(row)
+        for raw in (b'{"x":1,"x":2}', b'{"x":NaN}'):
+            path.write_bytes(raw)
+            with self.assertRaises(ValueError):
+                generation.read_bound(recovery.record(path, nonempty=True))
+
+    def worker_preflight_fixture(self):
+        allocation = dict(shard=0, node_rank=0, gpu_index=0, allocated_gpus=1, cap_seconds=4500)
+        plans = {m: self.record_json('worker-plan-' + m + '.json', dict(root=str(ROOT), method=m))
+                 for m in generation.METHODS}
+        value = dict(plans=plans, allocations={'base': [allocation]}, comparison=dict(path='approved-metadata', sha256='c'*64),
+                     common_execution_sha256='d'*64, score_bundle={'sha256':'e'*64}, retirement={'alg':{},'dymos':{}},
+                     source_files=[recovery.record(p, nonempty=True) for p in generation.sources(ROOT)])
+        execution = self.record_json('worker-execution.json', value)
+        args = [sys.executable, str(ROOT/'scripts/run_teacher_generation.py'), '--run', '--gpu-authorized',
+                '--execution', execution['path'], '--approved-execution-sha256', execution['sha256'],
+                '--method', 'base', '--shard', '0', '--rank', '0']
+        owner = dict(pid=12345, ppid=1, pgid=12345, session=12345, start_ticks=777, state='S', argv=args)
+        launch = dict(execution=execution, execution_sha256=execution['sha256'], method='base', shard=0,
+                      allocation=allocation, plan=plans['base'], owner=owner)
+        common = {k:value[k] for k in ('plans','common_execution_sha256','score_bundle')}
+        return value, execution, launch, common
+
+    def worker_preflight_patches(self, common, owner):
+        import contextlib
+        import prepare_teacher_comparison as comparison
+        stack = contextlib.ExitStack()
+        stack.enter_context(mock.patch.object(generation, 'validate_sidecar', side_effect=lambda v:v))
+        stack.enter_context(mock.patch.object(generation, 'validate_authorization'))
+        stack.enter_context(mock.patch.object(generation, 'verify_scoring_owner'))
+        stack.enter_context(mock.patch.object(generation, 'verify_retirement'))
+        stack.enter_context(mock.patch.object(generation, 'same_process', return_value=True))
+        stack.enter_context(mock.patch.object(generation, 'identity', return_value=owner))
+        stack.enter_context(mock.patch.object(comparison, 'verify_metadata', return_value=common))
+        stack.enter_context(mock.patch.object(comparison, 'verify', side_effect=AssertionError('Worker must not reload scoring assets')))
+        return stack
+
+    def test_generation_worker_never_rehashes_scoring_host_assets(self):
+        value, row, launch, common = self.worker_preflight_fixture()
+        import score_teacher_devset as scoring
+        with self.worker_preflight_patches(common, launch['owner']), \
+             mock.patch.object(scoring, 'verify_bundle', side_effect=AssertionError('No full metric environment verification inside generation')):
+            self.assertEqual(generation.verify_worker_execution(row['path'],row['sha256'],launch),value)
+        # Own generation model/runtime SHA checks are mandatory immediately before CUDA.
+        import ast
+        tree=ast.parse((ROOT/'scripts/run_teacher_generation.py').read_text())
+        worker=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='execute_worker')
+        calls=[n.func.id for n in ast.walk(worker) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name)]
+        self.assertIn('current_local_content',calls)
+        self.assertIn('verify_worker_execution',calls)
+
+    def test_generation_worker_reused_or_unapproved_parent_is_rejected(self):
+        _value,row,launch,common=self.worker_preflight_fixture()
+        for flag,bad in (('--method','alg'),('--shard','1'),('--approved-execution-sha256','f'*64)):
+            owner=copy.deepcopy(launch['owner']);owner['argv'][owner['argv'].index(flag)+1]=bad
+            with self.worker_preflight_patches(common,owner), self.assertRaises(ValueError):
+                generation.verify_worker_execution(row['path'],row['sha256'],launch)
+        with self.worker_preflight_patches(common,launch['owner']), \
+             mock.patch.object(generation,'same_process',return_value=False), self.assertRaises(ValueError):
+            generation.verify_worker_execution(row['path'],row['sha256'],launch)
+
+    def test_generation_worker_source_same_size_drift_is_rejected(self):
+        value,row,launch,common=self.worker_preflight_fixture()
+        source=self.root/'worker-runtime.py';source.write_bytes(b'original')
+        value['source_files'][0]=recovery.record(source,nonempty=True)
+        # Keep the expected source set isolated, while actual file content hashing remains real.
+        row=self.record_json('worker-execution-source.json',value)
+        launch['execution']=row;launch['execution_sha256']=row['sha256']
+        owner=copy.deepcopy(launch['owner']);owner['argv'][owner['argv'].index('--execution')+1]=row['path']
+        owner['argv'][owner['argv'].index('--approved-execution-sha256')+1]=row['sha256'];launch['owner']=owner
+        stat=source.stat();source.write_bytes(b'modified');os.utime(source,ns=(stat.st_atime_ns,stat.st_mtime_ns))
+        with self.worker_preflight_patches(common,owner), \
+             mock.patch.object(generation,'sources',return_value=[Path(r['path']) for r in value['source_files']]), \
+             self.assertRaises(ValueError):
+            generation.verify_worker_execution(row['path'],row['sha256'],launch)
+
     def test_no_cuda_import_and_explicit_execution_sha_required(self):
         result = subprocess.run([sys.executable, '-c',
             "import sys; sys.path.insert(0, 'scripts'); import prepare_teacher_recovery, run_teacher_generation; "

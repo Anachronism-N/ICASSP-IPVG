@@ -31,7 +31,14 @@ QUERY_COMMAND = ['nvidia-smi', '--query-compute-apps=gpu_uuid,pid', '--format=cs
 
 
 def read_bound(row):
-    recovery.check_content(row)
+    path = Path(row['path']).absolute()
+    require(path.resolve() == path, 'Evidence symlink forbidden')
+    before = path.stat()
+    raw = path.read_bytes()
+    after = path.stat()
+    require((before.st_size, before.st_mtime_ns) == (after.st_size, after.st_mtime_ns)
+            and len(raw) == row['bytes'] and sha(raw) == row['sha256'],
+            'Evidence content drift during single-pass read')
     def pairs(items):
         result = {}
         for key, value in items:
@@ -40,12 +47,10 @@ def read_bound(row):
         return result
     def constant(_value):
         raise ValueError('Nonfinite evidence JSON constant')
-    value = json.loads(Path(row['path']).read_bytes(), object_pairs_hook=pairs, parse_constant=constant)
+    value = json.loads(raw, object_pairs_hook=pairs, parse_constant=constant)
     import prepare_teacher_comparison as comparison
     comparison.finite_evidence(value)
-    recovery.check_content(row)
     return value
-
 
 def identity(pid):
     fields = (Path('/proc') / str(pid) / 'stat').read_text().rsplit(')', 1)[1].split()
@@ -353,6 +358,50 @@ def verify_execution(path, approved_sha, verify_content=True):
         require(len(value['source_files']) == len(expected)
                 and {r['path'] for r in value['source_files']} == {str(p) for p in expected}, 'Driver/test source freeze required')
     require(record(path, nonempty=True) == row, 'Execution changed during verification')
+    return value
+
+
+def verify_worker_execution(path, approved_sha, launch):
+    """Generation-only validation under a live, approved full-preflight parent.
+
+    Scoring-host assets are not used during generation. The worker separately
+    rehashes its own generation models, runtime, sources and inputs before CUDA.
+    """
+    row = record(path, nonempty=True)
+    require(row['sha256'] == approved_sha and launch['execution'] == row
+            and launch['execution_sha256'] == approved_sha, 'Worker approved execution binding drift')
+    value = validate_sidecar(read_bound(row))
+    require(Path(path).resolve() == Path(path).absolute() and Path(path).stat().st_mode & 0o077 == 0,
+            'Worker execution must be private and immutable')
+    validate_authorization(value)
+    verify_scoring_owner(value)
+    import prepare_teacher_comparison as comparison
+    common = comparison.verify_metadata(value['comparison']['path'], value['comparison']['sha256'])
+    require(common['plans'] == value['plans'] and common['common_execution_sha256'] == value['common_execution_sha256']
+            and common['score_bundle'] == value['score_bundle'], 'Worker common contract drift')
+    method, shard, rank = launch['method'], launch['shard'], launch['allocation']['node_rank']
+    require(method in METHODS and type(shard) is int and 0 <= shard < 16
+            and value['allocations'][method][shard] == launch['allocation']
+            and launch['plan'] == value['plans'][method], 'Worker method/shard/plan drift')
+    require(same_process(launch['owner']), 'Live full-preflight parent is missing or reused')
+    parent = identity(launch['owner']['pid'])
+    require(all(parent[k] == launch['owner'][k] for k in ('pid', 'ppid', 'pgid', 'session', 'start_ticks', 'argv')),
+            'Worker parent identity changed after full preflight')
+    args = parent['argv']
+    require(str(Path(__file__).resolve()) in args and '--run' in args and '--gpu-authorized' in args,
+            'Worker parent is not the approved generation supervisor')
+    for flag, expected in (('--execution', str(Path(path).absolute())), ('--approved-execution-sha256', approved_sha),
+                           ('--method', method), ('--shard', str(shard)), ('--rank', str(rank))):
+        require(args.count(flag) == 1 and args[args.index(flag) + 1] == expected,
+                'Worker parent CLI does not match the immutable launch')
+    require(set(value['retirement']) == {'alg', 'dymos'}, 'Both historical retirement proofs required')
+    for candidate in ('alg', 'dymos'):
+        verify_retirement(value['retirement'][candidate], candidate, read_bound(value['plans'][candidate]))
+    require({r['path'] for r in value['source_files']} == {str(p) for p in sources(read_bound(value['plans']['base'])['root'])},
+            'Worker supervisor source set drift')
+    for source in value['source_files']:
+        recovery.check_content(source)
+    require(record(path, nonempty=True) == row, 'Worker execution changed during verification')
     return value
 
 
@@ -816,7 +865,7 @@ def execute_worker(path, digest, method, shard, rank, launch_path, state_dir):
                 and abs((time.time() - launch['start_epoch']) - (time.monotonic() - start)) < 5,
                 'Worker allocation clock exhausted/drifted')
     check()
-    execution = verify_execution(path, digest)
+    execution = verify_worker_execution(path, digest, launch)
     require(launch['execution_sha256'] == digest and launch['execution'] == record(path, nonempty=True), 'Worker launch binding drift')
     supervised_path = Path(launch_path).parent / 'supervised.json'
     while not supervised_path.exists():

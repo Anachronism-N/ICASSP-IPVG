@@ -1,0 +1,122 @@
+{
+  "schema": "teacher_canary_actual_failure_public_v1",
+  "date": "2026-10-29",
+  "methods": {
+    "base": {
+      "expected_canary_videos": 12,
+      "complete_videos": 10,
+      "fully_decoded_frames": 1210,
+      "complete_media_and_parameter_SHA_verified": true,
+      "allocated_seconds": 4387.127680046484,
+      "actual_new_GPUh": 1.2186465777906899,
+      "generation_remaining_GPUh": 18.78135342220931,
+      "full_canary_pass": false
+    },
+    "alg": {
+      "expected_canary_videos": 12,
+      "complete_videos": 10,
+      "fully_decoded_frames": 1210,
+      "complete_media_parameter_and_mechanism_stats_verified": true,
+      "allocated_seconds": 4879.150361155625,
+      "actual_new_GPUh": 1.3553195447654516,
+      "old_actual_GPUh": null,
+      "old_generation_upper_GPUh": 1.6461976177604973,
+      "generation_charged_upper_GPUh": 3.001517162525949,
+      "generation_remaining_GPUh": 20.99848283747405,
+      "full_canary_pass": false
+    },
+    "dymos": {
+      "new_generated_videos": 0,
+      "old_actual_GPUh": null,
+      "old_generation_upper_GPUh": 2.655524471504614,
+      "generation_remaining_GPUh": 21.344475528495387
+    }
+  },
+  "worker_failure": "Allocated wall exhausted; loading/content verification/wait/failed generation/cleanup are all charged",
+  "all_owned_trees_and_GPUs_released": true,
+  "remaining15_dispatched": false,
+  "quality_scores_inspected": false,
+  "quality_pass": false,
+  "SOTA_proven": false,
+  "AR_allowed": false,
+  "one_recovery_user_authorized": true,
+  "budget_increase_authorized": false,
+  "proposed_recovery": {
+    "status": "BLOCKED",
+    "planned_videos_per_method": 188,
+    "planned_seeds": [
+      0,
+      1
+    ],
+    "old_complete_diagnostic_videos_preserved": 20,
+    "old_diagnostic_videos_silently_reused": false,
+    "prior_failed_costs_zeroed": false,
+    "generated_variants_mixed_for_strict_comparison": false,
+    "shard_caps_seconds": {
+      "base": [
+        4300,
+        4300,
+        4300,
+        4300,
+        4300,
+        4300,
+        4300,
+        4300,
+        4300,
+        4300,
+        4300,
+        4300,
+        4000,
+        4000,
+        4000,
+        4000
+      ],
+      "alg": [
+        4775,
+        4775,
+        4775,
+        4775,
+        4775,
+        4775,
+        4775,
+        4775,
+        4775,
+        4775,
+        4775,
+        4775,
+        4475,
+        4475,
+        4475,
+        4475
+      ],
+      "dymos": [
+        4800,
+        4800,
+        4800,
+        4800,
+        4800,
+        4800,
+        4800,
+        4800,
+        4800,
+        4800,
+        4800,
+        4800,
+        4800,
+        4800,
+        4800,
+        4800
+      ]
+    },
+    "original_phase_budgets_preserved": true,
+    "retry_after_new_failure": false
+  },
+  "repair_scope": "Single-pass SHA-bound JSON read and generation-only worker contract under live full-preflight parent; own generation assets/runtime/inputs remain rehashed before CUDA. Actual scoring rechecks its metric assets; no content gate removed.",
+  "caveat": "Budget arithmetic is not measured recovery feasibility. New execution authorization, frozen source/assets, all16 revised reservations, real canary completion and independent review remain required.",
+  "repair_related_CPU_regression": {
+    "passed": 326,
+    "failed": 0,
+    "exit_code": 0,
+    "GPU_used": false
+  }
+}

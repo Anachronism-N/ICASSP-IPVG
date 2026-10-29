@@ -1,3 +1,38 @@
+# 一次恢复授权与代码修复（2026-10-29，尚未再次GPU执行）
+
+用户交互明确选择“允许一次恢复，预算不变”。已保留base/ALG各10完整视频及全部失败账本，未重跑任何分片。新私有预算侧车eval/teacher_once_recovery_20261029/budget.blocked.json绑定实际失败audit与原费用上界，仍BLOCKED，不作为GPU执行授权。
+
+- 新代码run_teacher_generation.read_bound仅一次读JSON字节，保留实际SHA/size/前后文件metadata及duplicate/nonfinite拒绝；不从stat推测内容。
+- 新verify_worker_execution使用共享已批准合同＋live原父PID/start/完整CLI匹配，不在生成worker加载或重复hash评分host的模型/整个评分环境；CUDA之前仍调用current_local_content对自有9模型、运行库、源码、原图/GT等实际内容重核。真实评分本身继续完整metric资产核验，未跳哈希。CPU相关生成与恢复115测试通过，尚无新CUDA吞吐证明。
+- 原完整10+10片仅作为保留诊断，不混进新的严格三组对照；拟一次恢复时三方法各94×双seed188均在新共同版本生成，任何不足不加第三seed或减规格。
+- 新静态分片预算草案：base12片×4300＋4片×4000=67600秒，加旧4387.127680=71987.127680≤原72000；ALG12×4775＋4×4475=75200秒，加旧总10805.461785=86005.461785≤86400；Dy16×4800＋旧9559.888097=86359.888097≤86400。这里只是算术可容纳，不保证实际全生命周期吞吐；原130秒收尾余量与原评分阶段5/16GPUh不变。
+- 仍需将新一次恢复预算接入实际执行验证、freeze新模型/runtime/源码/评分bundle及owner证据、公开树完整回归/远端字节门后才再次GPU。旧exec sidecar不可直接使用，因为源已修改；不能原地reset旧账或自动重试。
+
+---
+
+# 真实首分片失败：自动余量续跑已停止（2026-10-29）
+
+- 四方法节点的运行账本预留已实际完成；固定base rank0/ALG rank1 shard0确已执行，不再是CPU派发阶段。HAXbcT在base canary失败后退出；84LCt7按冻结规则停止，未派发任何余15分片或DyMoS。
+- base实际完成10/12条，独立逐条全121帧解码、media SHA及参数前后map核验10/10通过，共1210帧。parent实际allocated4387.127680046484秒=1.218646577790690GPUh，4500秒cap内退出但timed_out=True、worker第11条因clock耗尽失败，因此不能称完整canary/188通过。原生成20GPUh剩18.781353422209310，失败/等待/清理全计，不清零。
+- base10条完整case实测总3399.0457430984825秒；模型load10.643452368676662秒；第11条失败case174.22086614836007秒；未单独分段的残余803.2176184309646秒。首条receipt mtime估计生成前等待/验证约781.589秒（仅描述性推断，不是新造phase timer）。推理每条约319–321秒，含参数/hash/save/decode单条总338–342秒，纯推理速度不保证含完整重复核验的12条cap可行。
+- ALG原父已按自己的hard deadline退出，实际完成10/12条、独立1210帧全解码/SHA/参数及机制计数通过，但worker allocation clock exhausted，因此canary失败。allocated4879.150361155625秒=1.355319544765452GPUh，parent owned tree/GPU释放原查询及当前实际无GPU计算进程核实。加旧未知生成费用保守上界后累计3.001517162525949GPUh≤24，剩20.998482837474051GPUh；旧actual仍未知不清零。实际审计first_actual_alg_attempt_audit.json；10视频只是完整部分产物，不是188成功或质量通过。
+- 自动retry_allowed=False与borrow_allowed=False仍有效。未授权一次新的恢复之前不重跑首分片、不删坏片/claim、不重置账本或追加seed。后续修复需先核实际剩额、明确端到端验证开销，并重新冻结恢复授权；已有完整片保留，但不同执行wrapper版本复用必须披露和认证，不能偷称严格同版本比较。
+- 实际审计：eval/teacher_execution_recovery_a1/first_actual_base_attempt_audit.json；worker/parent/failedcase/progress完整保留。不查看质量分数、不将部分视频当完成或Teacher晋级，AR/Student/蒸馏仍关闭。
+
+---
+
+# 当前实际启动状态（2026-10-29，部署修复后受控推进）
+
+- 最终公开源码8476a3cbe95f5911b99ab9d04f74d6f8b349dc7e：974公开CPU通过/3既有条件skip；20增量GitHub字节及218manifestSHA核验、发布树干净。私有本地bfa08cd不推送到公开分支；任何后续修改不能用旧commit冒验收。
+- 实际最终执行sidecar已全量验证并批准：eval/teacher_execution_recovery_a1/execution.json SHA0e79d71b2abac4b210267b2807b4ae270a1b667b29df43eebe366c3f744c3a09。三计划同94×双seed与固定预算，旧actual未知/上界不清零，6个owner实际核验通过。
+- 首controller B1vLyv仅在CPU运行账本预留阶段失败：远端缺少主机原历史日志，没有GPU attempt。rank0原生base/DyMoS已完成运行账本全reserved，保留不reset；四个远端账本尚缺。已精确复制固定8原日志到三远端，SHA与原mtime逐字节/原生整数匹配，存在不同字节则拒覆盖；不改旧日志、模型或费用。
+- HAXbcT受控续接仅补缺失四份CPU预留，成功后base rank0/ALG rank1各固定shard0的12视频正式canary；原188内计费，无额外smoke，不看中途质量。84LCt7继续等待真实first_canaries_complete，然后原准入全部通过才运行base/ALG各余15及DyMoS正式首分片/余15，任一失败停且保留证据、不重试/不改参数/不借额度。任务句柄只在本会话有效，接手实查PID/receipt不能复用旧running消息。
+- 仍未核实GPU生成开始（以真实launch/worker/compute-apps为准，不把controller派发算完成）。四节点自有--monitor-only管理器已在无分配时钟、无CUDA作业时维护为24h硬上限，zero holder_workers、不占卡；避免管理器旧6h期限中途到期破坏释放证明。不是GPU实验利用率或额外GPUh。
+- 前次控制端JS重编码mtime_ns造成6/5纳秒精度误差：已从每node原生probe文件无损复制，6个owner派生仅修纳秒编码，全部真实40更新/内容SHA/runtime/model相同，旧证据保留。native_probe_precision_correction.json为校正依据；不删除actualproof或改生产门禁。
+- 真实评分、完整188输出、吞吐准入、人审或SOTA尚未完成。Teacher默认base、AR/Student/蒸馏保持关闭；资源授权不等于质量晋级。
+
+---
+
 # 正式恢复准备实证（2026-10-29，GPU资源已获授权）
 
 - 四节点各9模型当前真实内容核验完成，共36资产，统一digest 501bbc43c93e55695a1ded0e6910621027f6c055967c76caafbbfdfa0b9423ff；外套32占卡已按另行明确授权精准TERM，旧文件/其他项目未改。
