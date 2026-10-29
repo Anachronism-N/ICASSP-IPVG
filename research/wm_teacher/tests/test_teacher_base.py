@@ -21,9 +21,11 @@ import run_teacher_base as base
 class Fixture(DevFixture):
     def setUp(self):
         super().setUp()
-        for name in ("run_teacher_base.py", "prepare_teacher_comparison.py"):
+        for name in ("run_teacher_base.py", "prepare_teacher_comparison.py", "run_teacher_generation.py",
+                     "verify_teacher_history.py"):
             (self.root / "scripts" / name).write_text("# Synthetic CPU source fixture\n")
-        for name in ("test_teacher_base.py", "test_prepare_teacher_comparison.py"):
+        for name in ("test_teacher_base.py", "test_prepare_teacher_comparison.py", "test_teacher_generation.py",
+                     "test_verify_teacher_history.py"):
             (self.root / "tests" / name).write_text("# Synthetic CPU test fixture\n")
         for patch in (mock.patch.object(base, "dev", dev), mock.patch.object(base, "smoke", smoke)):
             patch.start()
@@ -38,6 +40,7 @@ class Fixture(DevFixture):
         self.addCleanup(patch.stop)
 
     def prepare_base(self, **kwargs):
+        kwargs.setdefault("node_ranks", [0, 1])
         return base.prepare(self.pf, self.node_sha, self.bundle, self.bundle_sha, root=self.root, **kwargs)
 
     def verify_base(self, path, digest):
@@ -79,15 +82,40 @@ class PrepareTests(Fixture):
     def test_default_cli_is_cpu_prepare(self):
         with mock.patch.object(base, "prepare", return_value=(Path("plan.BLOCKED.json"), "a"*64)) as fn, mock.patch("builtins.print"):
             base.main(["--node-preflight", str(self.pf), "--approved-node-preflight-sha256", self.node_sha,
-                       "--score-bundle", str(self.bundle), "--approved-score-bundle-sha256", self.bundle_sha])
+                       "--score-bundle", str(self.bundle), "--approved-score-bundle-sha256", self.bundle_sha, "--node-ranks", "0", "1"])
         fn.assert_called_once()
 
     def test_no_gpu_run_or_direct_worker_even_with_authorization(self):
         with self.assertRaisesRegex(ValueError, "gpu-authorized"):
             base.run()
-        for args in (["--run", "--gpu-authorized"], ["--worker", "--gpu-authorized"]):
-            with self.subTest(args=args), self.assertRaisesRegex(ValueError, "BLOCKED"):
-                base.main(args)
+        with self.assertRaisesRegex(ValueError, "BLOCKED"):
+            base.main(["--run", "--gpu-authorized"])
+        with mock.patch("sys.stderr", new_callable=io.StringIO), self.assertRaises(SystemExit):
+            base.main(["--worker", "--gpu-authorized"])
+
+    def test_authorized_native_run_delegates_only_to_hash_approved_managed_parent(self):
+        generic = types.ModuleType("run_teacher_generation")
+        generic.supervise = mock.Mock(return_value=(Path("private/parent.json"), "b"*64))
+        with mock.patch.dict(sys.modules, {"run_teacher_generation": generic}):
+            result = base.run(Path("private/execution.json"), "a"*64, 0, 1, gpu_authorized=True,
+                              state_dir=Path("local/gpu_hold"), local_root=Path("local"))
+            self.assertEqual(result, (Path("private/parent.json"), "b"*64))
+            generic.supervise.assert_called_once_with(Path("private/execution.json"), "a"*64, "base", 0, 1,
+                gpu_authorized=True, state_dir=Path("local/gpu_hold"), local_root=Path("local"))
+            generic.supervise.reset_mock()
+            for shard, rank in ((True, 0), (16, 0), (0, True), (0, 4)):
+                with self.assertRaises(ValueError):
+                    base.run(Path("private/execution.json"), "a"*64, shard, rank, gpu_authorized=True)
+            generic.supervise.assert_not_called()
+
+    def test_native_node_mapping_requires_explicit_two_distinct_owners(self):
+        for ranks in (None, [0,0], [0,4], [True,1], [0], [0,1,2]):
+            with self.assertRaises(ValueError):
+                base.allocations(ranks)
+        rows = base.allocations([2,3])
+        self.assertEqual(len(rows), 16)
+        self.assertEqual([r["shard"] for r in rows], list(range(16)))
+        self.assertEqual(sum(r["cap_seconds"] for r in rows), 72000)
 
     def test_prepare_rejects_gpu_arguments(self):
         with mock.patch("sys.stderr", new_callable=io.StringIO), self.assertRaises(SystemExit):
@@ -108,7 +136,7 @@ class PrepareTests(Fixture):
 
     def test_approved_bundle_sha_and_content_failure_rejected_before_output(self):
         with self.assertRaisesRegex(ValueError, "score bundle SHA"):
-            base.prepare(self.pf, self.node_sha, self.bundle, "f"*64, root=self.root)
+            base.prepare(self.pf, self.node_sha, self.bundle, "f"*64, root=self.root, node_ranks=[0,1])
         self.scoring.verify_bundle.side_effect = ValueError("score content drift")
         with self.assertRaisesRegex(ValueError, "content drift"):
             self.prepare_base()
@@ -273,6 +301,77 @@ class NativeTests(Fixture):
         receipt = json.loads(Path(job["output"]).with_suffix(".receipt.json").read_bytes())
         self.assertFalse(receipt["parameters_unchanged"])
         self.assertFalse(Path(job["output"]).exists())
+
+    def test_native_finite_counter_is_observed_not_a_synthetic550_threshold(self):
+        base.validate_native_stats(dict(model_forwards=100, scheduler_steps=50, progress_steps=50, finite_checks=1))
+        for bad in (0, False, float("nan")):
+            with self.assertRaises(ValueError):
+                base.validate_native_stats(dict(model_forwards=100, scheduler_steps=50, progress_steps=50, finite_checks=bad))
+
+    def canary_fixture(self):
+        path, digest = self.prepare_base()
+        plan = json.loads(path.read_bytes())
+        params = dict(w=dict(shape=[2,2], dtype="torch.bfloat16", sha256="a"*64))
+        receipts = [dict(schema="teacher_base_case_receipt_v1", method="base", checkpoint="NONE",
+            method_context_installed=False, active_steps=0, job=j, success=True, failure=False, error=None,
+            plan_sha256=digest, score_bundle_sha256=self.bundle_sha, parameters_before=params, parameters_after=params,
+            stats=dict(model_forwards=100, scheduler_steps=50, progress_steps=50, finite_checks=1), elapsed_seconds=350.)
+            for j in plan["jobs"] if j["index"] % 16 == 0]
+        return plan, receipts
+
+    def test_native_formal_canary_is12of188_charged_in20gpuh(self):
+        plan, receipts = self.canary_fixture()
+        result = base.native_canary_estimate(plan, receipts, load_seconds=10., allocated_elapsed_seconds=4245.)
+        self.assertEqual(result["status"], "READY")
+        self.assertEqual(result["canary_jobs"], 12)
+        self.assertLessEqual(result["estimated_generation_seconds"], 72000)
+        self.assertTrue(all(s <= 4500 for s in result["estimated_shard_seconds"]))
+        self.assertFalse(result["quality_pass"])
+        self.assertFalse(result["estimate_is_guarantee"])
+
+    def test_native_canary_cannot_borrow_dymos_or_zero_timing(self):
+        plan, receipts = self.canary_fixture()
+        original = copy.deepcopy(receipts)
+        for change in (lambda rs: rs[0].update(method="dymos"),
+                       lambda rs: rs[0].update(elapsed_seconds=0),
+                       lambda rs: rs[0].update(elapsed_seconds=float("inf")),
+                       lambda rs: rs.pop(), lambda rs: rs.reverse(),
+                       lambda rs: rs[0].update(parameters_after={"w": "forged boolean proof"})):
+            changed = copy.deepcopy(original)
+            change(changed)
+            with self.assertRaises(ValueError):
+                base.native_canary_estimate(plan, changed, load_seconds=10., allocated_elapsed_seconds=4245.)
+
+    def test_canary_slow_seed_blocks_remaining_shards_without_spec_reduction(self):
+        plan, receipts = self.canary_fixture()
+        receipts[0]["elapsed_seconds"] = 400.
+        result = base.native_canary_estimate(plan, receipts, load_seconds=10., allocated_elapsed_seconds=4295.)
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertFalse(result["native_throughput_PASS"])
+        self.assertTrue(any(s > 4500 for s in result["estimated_shard_seconds"]))
+        self.assertEqual(plan["call"]["num_inference_steps"], 50)
+
+    def test_canary_reserves_driver_cleanup_and_worker_margin_for_tail_jobs(self):
+        plan, receipts = self.canary_fixture()
+        for receipt, seconds in zip(receipts, [360.]*11+[200.]):
+            receipt["elapsed_seconds"] = seconds
+        result = base.native_canary_estimate(plan, receipts, load_seconds=100., allocated_elapsed_seconds=4270.)
+        self.assertEqual(result["cleanup_seconds"], 120)
+        self.assertEqual(result["worker_margin_seconds"], 10)
+        self.assertGreaterEqual(result["allocation_residual_seconds"], 130)
+        self.assertEqual(result["estimated_body_seconds"][0], 4420)
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertFalse(result["native_throughput_PASS"])
+        self.assertEqual(plan["phase_seconds"]["generation"], 72000)
+        result = base.native_canary_estimate(plan, receipts, load_seconds=50., allocated_elapsed_seconds=4220.)
+        self.assertEqual(result["estimated_body_seconds"][0], 4370)
+        self.assertEqual(result["status"], "BLOCKED")
+
+    def test_canary_allocation_over_cap_and_overlapping_timer_rejected(self):
+        plan, receipts = self.canary_fixture()
+        for elapsed in (4501., 4000., float("nan")):
+            with self.assertRaises(ValueError):
+                base.native_canary_estimate(plan, receipts, load_seconds=10., allocated_elapsed_seconds=elapsed)
 
     def test_native_existing_output_preserved(self):
         path, digest = self.prepare_base()

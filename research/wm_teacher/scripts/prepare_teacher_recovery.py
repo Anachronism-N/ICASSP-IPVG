@@ -32,7 +32,8 @@ def finite(value):
 
 
 def check_content(expected):
-    actual = record(expected['path'], nonempty=True)
+    empty_source = expected.get('bytes') == 0 and Path(expected['path']).suffix == '.py'
+    actual = record(expected['path'], nonempty=not empty_source)
     require(all(actual[k] == expected[k] for k in ('path', 'bytes', 'sha256')), 'Evidence content drift')
     return actual
 
@@ -142,7 +143,9 @@ def validate_plan(plan):
 
 def sources(root):
     return sorted(set(dev.sources(Path(root))) | {Path(root) / name for name in (
-        'scripts/prepare_teacher_recovery.py', 'tests/test_teacher_recovery.py')})
+        'scripts/prepare_teacher_recovery.py', 'tests/test_teacher_recovery.py',
+        'scripts/run_teacher_generation.py', 'tests/test_teacher_generation.py',
+        'scripts/verify_teacher_history.py', 'tests/test_verify_teacher_history.py')})
 
 
 def freeze_common_contract(value, node_preflight, approved_node_sha, score_bundle, approved_score_sha):
@@ -307,7 +310,8 @@ def local_transaction(path, plan, digest, rank, local_root=LOCAL_ROOT):
 
 
 def verify_parent_release(receipt, plan):
-    raise ValueError('Independent parent release/owner/clock evidence verifier is not integrated; receipt booleans cannot release quotas')
+    import run_teacher_generation as execution
+    return execution.verify_parent_release(receipt, plan)
 
 
 def collect_costs(plan, digest, receipts):
@@ -324,7 +328,7 @@ def collect_costs(plan, digest, receipts):
                 receipt = json.loads(Path(receipts[shard]['path']).read_bytes())
             except (OSError, ValueError, UnicodeError):
                 receipt = None
-        bound = bool(isinstance(receipt, dict) and receipt.get('schema') == 'teacher_recovery_parent_receipt_v1'
+        bound = bool(isinstance(receipt, dict) and receipt.get('schema') in ('teacher_recovery_parent_receipt_v1', 'teacher_generation_parent_receipt_v1')
                      and receipt.get('execution_id') == EXECUTION_ID and receipt.get('method') == plan['method']
                      and receipt.get('plan_sha256') == digest and all(receipt.get(k) == v for k, v in fixed.items())
                      and type(receipt.get('owner_pid')) is int and receipt['owner_pid'] > 1
@@ -333,11 +337,16 @@ def collect_costs(plan, digest, receipts):
                      and all(finite(receipt.get(k)) for k in ('start', 'end', 'elapsed_seconds'))
                      and receipt['elapsed_seconds'] > 0 and receipt['start'] > 0
                      and abs(receipt['end'] - receipt['start'] - receipt['elapsed_seconds']) < 5)
-        reported = receipt['elapsed_seconds'] if bound else None
+        reported = None
+        if (isinstance(receipt, dict) and receipt.get('plan_sha256') == digest
+                and receipt.get('execution_id') == EXECUTION_ID and receipt.get('method') == plan['method']
+                and all(receipt.get(k) == v for k, v in fixed.items())
+                and finite(receipt.get('elapsed_seconds')) and receipt['elapsed_seconds'] > 0):
+            reported = receipt['elapsed_seconds']
         if bound:
             try:
                 require(verify_parent_release(receipt, plan) is True, 'Parent release evidence remains unverified')
-            except (ValueError, OSError):
+            except (ValueError, OSError, KeyError, TypeError, IndexError):
                 bound = False
         if not bound:
             unknown.append(shard)
@@ -391,9 +400,30 @@ def main(argv=None):
     parser.add_argument('--approved-node-preflight-sha256')
     parser.add_argument('--score-bundle', type=Path)
     parser.add_argument('--approved-score-bundle-sha256')
+    parser.add_argument('--execution', type=Path)
+    parser.add_argument('--approved-execution-sha256')
+    parser.add_argument('--gpu-authorized', action='store_true')
+    parser.add_argument('--shard', type=int)
+    parser.add_argument('--state-dir', default='/dockerdata/wm_logs/gpu_hold')
     args = parser.parse_args(argv)
-    require(not args.run, 'GPU recovery blocked: CPU protocol is not a supervised execution driver')
     os.umask(0o077)
+    if args.run:
+        require(args.execution and args.approved_execution_sha256 and args.plan and args.approved_plan_sha256
+                and args.rank is not None and args.shard is not None and args.gpu_authorized,
+                'GPU recovery blocked: explicit verified execution sidecar/plan/GPU authorization required')
+        import run_teacher_generation as generation
+        plan_row = record(args.plan, nonempty=True)
+        require(plan_row['sha256'] == args.approved_plan_sha256, 'Approved recovery run plan SHA mismatch')
+        plan = validate_plan(generation.read_bound(plan_row))
+        execution = generation.verify_execution(args.execution, args.approved_execution_sha256)
+        require(execution['plans'][plan['method']] == record(args.plan, nonempty=True),
+                'Execution does not bind this immutable blocked CPU plan')
+        path, digest = generation.supervise(args.execution, args.approved_execution_sha256, plan['method'],
+            args.shard, args.rank, gpu_authorized=args.gpu_authorized, state_dir=args.state_dir)
+        print(json.dumps(dict(parent=str(path), sha256=digest)))
+        return
+    require(not args.gpu_authorized and not args.execution and not args.approved_execution_sha256,
+            'CPU protocol does not accept execution/GPU flags without --run')
     if args.plan:
         require(args.approved_plan_sha256, 'Approved immutable plan SHA required')
         plan = verify(args.plan, args.approved_plan_sha256)

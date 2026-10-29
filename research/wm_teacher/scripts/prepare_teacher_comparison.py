@@ -8,6 +8,7 @@ validated preparation is still BLOCKED for GPU execution/quality conclusions.
 """
 import argparse
 import json
+import math
 from pathlib import Path
 
 import run_teacher_base as base
@@ -22,7 +23,9 @@ METHODS = ("base", "alg", "dymos")
 
 def common_contract(plan):
     root = Path(plan["root"])
-    common_paths = {str(p) for p in dev.sources(root)}
+    common_paths = {str(p) for p in dev.sources(root)} | {str(root / name) for name in (
+        "scripts/run_teacher_generation.py", "tests/test_teacher_generation.py",
+        "scripts/verify_teacher_history.py", "tests/test_verify_teacher_history.py")}
     rows = plan["source_files"]
     require(len(rows) == len({r["path"] for r in rows})
             and common_paths <= {r["path"] for r in rows}, "Missing/duplicate common generation sources")
@@ -36,7 +39,7 @@ def common_contract(plan):
         score_bundle_sha256=plan["score_bundle"]["sha256"])
 
 
-def validate_plan_content(plan, method, score_binding):
+def _validate_shared_plan_content(plan, method, score_binding):
     require(plan.get("method") == method and plan.get("private") is True, "Wrong approved comparison method")
     if method == "base":
         base.validate_contract(plan)
@@ -70,7 +73,13 @@ def validate_plan_content(plan, method, score_binding):
     require(len(plan["source_files"]) == len(expected_sources)
             and {r["path"] for r in plan["source_files"]} == {str(p) for p in expected_sources},
             "Missing/duplicate common generation sources or unapproved source set")
-    for row in plan["source_files"] + plan["runtime"]["files"]:
+    for row in plan["source_files"]:
+        check_record(row)
+
+
+def validate_plan_content(plan, method, score_binding):
+    _validate_shared_plan_content(plan, method, score_binding)
+    for row in plan["runtime"]["files"]:
         check_record(row)
     for row in plan["models"]:
         check_record({k: row[k] for k in ("path", "bytes", "mtime_ns", "sha256")}, nonempty=True)
@@ -155,10 +164,265 @@ def verify(path, approved_sha):
     return value
 
 
+def verify_metadata(path, approved_sha):
+    """Shared bytes plus frozen asset metadata, never a local asset attestation.
+
+    Generation consumers must additionally authenticate the approved full score
+    owner proof and rehash their own node models/runtime before any GPU dispatch.
+    The default prepare/verify APIs retain complete local asset verification.
+    """
+    value, expected = read_evidence(path, approved_sha)
+    require(Path(path).stat().st_mode & 0o077 == 0 and Path(path).parent.stat().st_mode & 0o077 == 0,
+            "Frozen comparison view must be private")
+    require(value.get("schema") == SCHEMA and value.get("private") is True
+            and value.get("status") == "BLOCKED" and value.get("runnable") is False
+            and value.get("GPU_used") is False and value.get("quality_pass") is False
+            and value.get("sota_claim") is False and value.get("strict_baseline_reuse_allowed") is False
+            and set(value["plans"]) == set(METHODS), "Frozen metadata view is not execution/quality authorization")
+    bundle, bundle_record = read_evidence(value["score_bundle"]["path"], value["score_bundle"]["sha256"])
+    require(bundle_record == value["score_bundle"], "Frozen score bundle JSON binding drift")
+    import score_teacher_devset as scoring
+    require(bundle.get("schema") == scoring.BUNDLE_SCHEMA and bundle.get("private") is True
+            and bundle.get("metric_protocol") == "score_e1_all8_gt_v1"
+            and bundle.get("dimensions") == scoring.e1.DIMS and bundle.get("gt_keys") == list(scoring.e1.GT_KEYS),
+            "Frozen score bundle metric metadata drift")
+    require(len(bundle["sources"]) == len(scoring.required_sources())
+            and {r["path"] for r in bundle["sources"]} == set(scoring.required_sources()),
+            "Frozen scoring shared source coverage drift")
+    shared_records = [expected, bundle_record]
+    for row in bundle["sources"]:
+        actual = record(row["path"])
+        require(all(actual[k] == row[k] for k in ("path", "bytes", "sha256")), "Frozen scoring source content drift")
+        shared_records.append(actual)
+    plans = {}
+    for method in METHODS:
+        row = value["plans"][method]
+        plan, plan_record = read_evidence(row["path"], row["sha256"])
+        require(plan_record == row and Path(row["path"]).stat().st_mode & 0o077 == 0, "Frozen private plan JSON binding drift")
+        _validate_shared_plan_content(plan, method, bundle_record)
+        expected_path = (base.output_root(plan["root"]) / "plan.BLOCKED.json" if method == "base"
+                         else recovery.plan_folder(plan["root"], method) / "plan.blocked.json")
+        require(Path(row["path"]) == expected_path, "Frozen plan location drift")
+        metadata_rows = plan["models"] + plan["runtime"]["files"]
+        for metadata in metadata_rows:
+            require(isinstance(metadata.get("path"), str) and Path(metadata["path"]).is_absolute()
+                    and type(metadata.get("bytes")) is int and metadata["bytes"] > 0
+                    and isinstance(metadata.get("sha256"), str) and len(metadata["sha256"]) == 64
+                    and all(c in "0123456789abcdef" for c in metadata["sha256"]),
+                    "Invalid frozen model/runtime metadata record")
+        require(len(plan["runtime"]["files"]) == len({r["path"] for r in plan["runtime"]["files"]}),
+                "Duplicate frozen runtime metadata")
+        shared_records.extend([plan_record, plan["cases_file"]] + plan["source_files"])
+        for row in plan["inputs"]:
+            shared_records.extend([row["image"], row["gt"]])
+        plans[method] = plan
+    common = common_contract(plans["base"])
+    require(all(common_contract(plans[m]) == common for m in METHODS)
+            and value["common_execution"] == common and value["common_execution_sha256"] == sha(encoded(common)),
+            "Frozen common cases/models/runtime/source/score metadata mismatch")
+    require(all(r.get("allowed") is False for r in plans["base"]["historical_base_reuse"].values())
+            and value["prior_generation"] == {m: plans[m]["prior_generation"] for m in ("alg", "dymos")}
+            and value["generation_charged_upper_seconds"] == {m: sum(plans[m]["shard_cap_seconds"])
+                + (0 if m == "base" else plans[m]["prior_generation"]["upper_seconds"]) for m in METHODS}
+            and value["phase_seconds"] == {m: plans[m]["phase_seconds"] for m in METHODS}
+            and value["total_seconds"] == {m: plans[m]["total_seconds"] for m in METHODS}
+            and value["interventions"] == {m: dict(parameters=plans[m]["parameters"], active_steps=plans[m]["active_steps"],
+                method_context_installed=m != "base") for m in METHODS}
+            and value["blockers"] == base.BLOCKERS, "Frozen intervention/budget/historical reuse drift")
+    for row in shared_records:
+        check_record(row)
+    return {**value, "frozen_contract_view": dict(shared_content_verified=True,
+        actual_model_runtime_score_assets_verified=False, requires_full_score_owner_proof=True, GPU_authorized=False)}
+
+
+def read_evidence(path, approved_sha):
+    expected = record(path, nonempty=True)
+    require(expected["sha256"] == approved_sha, "Unapproved generation evidence SHA")
+    require(Path(path).absolute().resolve() == Path(path).absolute(), "Symlink generation evidence forbidden")
+    def unique(pairs):
+        value = {}
+        for key, child in pairs:
+            require(key not in value, "Duplicate generation evidence JSON key")
+            value[key] = child
+        return value
+    value = json.loads(Path(path).read_bytes(), object_pairs_hook=unique)
+    require(isinstance(value, dict), "Generation evidence root must be an object")
+    finite_evidence(value)
+    require(record(path, nonempty=True) == expected, "Generation evidence changed during read")
+    return value, expected
+
+
+def validate_parameter_maps(before, after):
+    require(isinstance(before, dict) and before and before == after, "Missing or changed actual DiT parameter SHA maps")
+    for name, row in before.items():
+        require(isinstance(name, str) and name and isinstance(row, dict)
+                and set(row) == {"shape", "dtype", "sha256"}
+                and isinstance(row["shape"], list) and all(type(x) is int and x >= 0 for x in row["shape"])
+                and isinstance(row["dtype"], str) and row["dtype"]
+                and isinstance(row["sha256"], str) and len(row["sha256"]) == 64
+                and all(c in "0123456789abcdef" for c in row["sha256"]), "Invalid actual DiT parameter SHA record")
+    return before
+
+
+def finite_evidence(value):
+    if isinstance(value, dict):
+        for child in value.values():
+            finite_evidence(child)
+    elif isinstance(value, list):
+        for child in value:
+            finite_evidence(child)
+    elif type(value) is float:
+        require(math.isfinite(value), "Nonfinite generation evidence")
+
+
+def verify_case_receipt(path, approved_sha, *, plan, plan_sha256, job,
+                        parameters_before, parameters_after, input_binding):
+    """Recompute one native/method helper's original input, parameter and media evidence."""
+    require(job in plan["jobs"] and Path(path).absolute() == Path(job["output"]).with_suffix(".receipt.json"),
+            "Unexpected generation case receipt/job location")
+    receipt, expected = read_evidence(path, approved_sha)
+    method = plan["method"]
+    schema = "teacher_base_case_receipt_v1" if method == "base" else "teacher_devset_case_receipt_v1"
+    require(receipt.get("schema") == schema and receipt.get("method") == method
+            and receipt.get("plan_sha256") == plan_sha256 and receipt.get("job") == job
+            and receipt.get("success") is True and receipt.get("failure") is False
+            and receipt.get("parameters_unchanged") is True and receipt.get("error") is None,
+            "Incomplete or wrong-method generation case evidence")
+    params = validate_parameter_maps(parameters_before, parameters_after)
+    case = plan["cases"][job["index"] % 94]
+    require(case["id"] == job["case_id"] and case["prompt_sha256"] == sha(case["prompt"].encode()),
+            "Generation original case/prompt mismatch")
+    expected_input = dict(case_id=case["id"], prompt_sha256=case["prompt_sha256"],
+        image=record(case["image"], nonempty=True), gt=record(case["gt"], nonempty=True))
+    require(input_binding == expected_input and input_binding["image"]["sha256"] == case["image_sha256"]
+            and input_binding["gt"]["sha256"] == case["video_sha256"], "Generation original image/GT input binding drift")
+    frozen_input = next(r for r in plan["inputs"] if r["id"] == case["id"])
+    require(input_binding["image"] == frozen_input["image"] and input_binding["gt"] == frozen_input["gt"],
+            "Generation source inputs differ from frozen plan")
+    if method == "base":
+        require(receipt.get("checkpoint") == "NONE" and receipt.get("method_context_installed") is False
+                and receipt.get("active_steps") == 0 and receipt.get("score_bundle_sha256") == plan["score_bundle"]["sha256"]
+                and receipt.get("input_binding") == input_binding
+                and receipt.get("parameters_before") == params and receipt.get("parameters_after") == params,
+                "Native case must contain actual NONE/input/parameter SHA evidence")
+        base.validate_native_stats(receipt["stats"])
+    else:
+        smoke.validate_stats(method, receipt["stats"]["method"], receipt["stats"]["observed"])
+    elapsed = receipt.get("elapsed_seconds")
+    require(type(elapsed) in (int, float) and math.isfinite(elapsed) and elapsed > 0, "Invalid generation case elapsed time")
+    video_path = Path(job["output"])
+    before_media = record(video_path, nonempty=True)
+    require(receipt["video"]["file"] == before_media, "Generation media byte SHA/metadata drift")
+    video = smoke.validate_video(video_path, plan["runtime"]["tools"])
+    require(video == receipt["video"] and record(video_path, nonempty=True) == before_media,
+            "Generation full121f/1280x704/24fps decode/hash drift")
+    for row in (input_binding["image"], input_binding["gt"]):
+        check_record(row, nonempty=True)
+    require(record(path, nonempty=True) == expected, "Generation case receipt changed during verification")
+    return dict(job=job, receipt=expected, video=video, parameters=params, elapsed_seconds=elapsed)
+
+
 def verify_generation_completion(path, approved_sha, *, common_execution_sha256, score_bundle_sha256, method):
-    """Reserved scorer interface; no synthetic case/manifest can authorize scoring."""
+    """Verify all188 outputs and all16 managed parent chains; never trust PASS booleans alone."""
     require(method in METHODS, "Unknown completion method")
-    raise ValueError("BLOCKED: supervised 188-video completion verification is unimplemented; CPU plans/case receipts are not completion PASS")
+    require(Path(path).absolute().resolve() == Path(path).absolute()
+            and Path(path).stat().st_mode & 0o077 == 0, "Private non-symlink generation completion required")
+    value, completion_record = read_evidence(path, approved_sha)
+    require(value.get("schema") == "teacher_generation_completion_v1" and value.get("private") is True
+            and value.get("method") == method and value.get("generation_complete") is True
+            and value.get("GPU_used") is True and value.get("quality_pass") is False and value.get("sota_claim") is False
+            and value.get("common_execution_sha256") == common_execution_sha256
+            and value.get("score_bundle_sha256") == score_bundle_sha256
+            and all(k in value for k in ("execution", "plan", "plan_sha256", "parent_receipts", "cases", "costs")),
+            "Incomplete or wrong common generation completion; PASS booleans are not execution evidence")
+    import run_teacher_generation as generation
+    # The generic verifier authenticates dispatch, ancestry, owner identity, raw
+    # release-query records and full allocated clocks. Recheck inputs/media here.
+    verified = generation.verify_generation_completion(path, approved_sha, common_execution_sha256=common_execution_sha256,
+        score_bundle_sha256=score_bundle_sha256, method=method)
+    require(verified == value, "Managed completion verifier/content disagreement")
+    execution = generation.verify_execution(value["execution"]["path"], value["execution"]["sha256"])
+    require(execution["common_execution_sha256"] == common_execution_sha256
+            and execution["score_bundle"]["sha256"] == score_bundle_sha256
+            and execution["plans"][method] == value["plan"] and value["plan_sha256"] == value["plan"]["sha256"],
+            "Generation execution/plan/common content binding drift")
+    plan, plan_record = read_evidence(value["plan"]["path"], value["plan"]["sha256"])
+    require(plan.get("method") == method and plan.get("seeds") == [0, 1] and plan.get("video_count") == 188
+            and len(value["parent_receipts"]) == 16 and len(value["cases"]) == 188,
+            "Generation completion requires exactly188 cases and16 parent receipts")
+    evidence_records = [completion_record, plan_record, value["execution"]]
+    cases, parents, workers, baseline, elapsed = [], {}, {}, None, 0.0
+    case_seconds = [0.0] * 16
+    for row in value["parent_receipts"]:
+        parent, parent_record = read_evidence(row["path"], row["sha256"])
+        shard = parent.get("shard")
+        require(type(shard) is int and 0 <= shard < 16 and shard not in parents
+                and parent.get("success") is True and parent.get("exit_code") == 0
+                and parent.get("error") is None and parent.get("interrupted") is None and parent.get("timed_out") is False,
+                "Missing, duplicate, extra or failed generation parent")
+        allocation = execution["allocations"][method][shard]
+        require(all(parent.get(k) == v for k, v in allocation.items()) and allocation["allocated_gpus"] == 1
+                and type(parent.get("elapsed_seconds")) in (int, float)
+                and 0 < parent["elapsed_seconds"] <= allocation["cap_seconds"], "Generation parent stagecap/single-GPU scope exceeded")
+        worker, worker_record = read_evidence(parent["worker"]["path"], parent["worker"]["sha256"])
+        require(worker.get("success") is True and worker.get("error") is None
+                and worker.get("common_execution_sha256") == common_execution_sha256
+                and worker.get("score_bundle_sha256") == score_bundle_sha256
+                and [r["job"] for r in worker["cases"]] == plan["jobs"][shard::16], "Generation worker/shard/common coverage drift")
+        cases.extend(worker["cases"])
+        parents[shard], workers[shard] = parent, worker
+        elapsed += parent["elapsed_seconds"]
+        evidence_records.extend([parent_record, worker_record, parent["launch"], parent["supervised"]])
+    require(set(parents) == set(range(16)), "All16 distinct supervised parents required")
+    cases.sort(key=lambda row: row["job"]["index"])
+    require(cases == value["cases"] and [row["job"] for row in cases] == plan["jobs"], "All94x2seed exact job coverage drift")
+    prior = 0.0 if method == "base" else plan["prior_generation"]["upper_seconds"]
+    require(prior + elapsed <= plan["phase_seconds"]["generation"]
+            and type(value["costs"].get("generation_charged_upper_seconds")) in (int, float)
+            and math.isclose(value["costs"]["generation_charged_upper_seconds"], prior + elapsed, abs_tol=1e-8),
+            "Prior generation plus real parent costs exceed independent stage or mismatch completion cost")
+    for row in cases:
+        require("input_binding" in row, "Generation case must bind original image/GT/prompt evidence")
+        proof = verify_case_receipt(row["case_receipt"]["path"], row["case_receipt"]["sha256"], plan=plan,
+            plan_sha256=value["plan_sha256"], job=row["job"], parameters_before=row["parameters_before"],
+            parameters_after=row["parameters_after"], input_binding=row["input_binding"])
+        require(row["video"] == proof["video"] and (baseline is None or proof["parameters"] == baseline),
+                "Generation media or global native baseline parameter maps differ")
+        baseline = proof["parameters"]
+        if method != "base":
+            shard = row["job"]["index"] % 16
+            claim_path = Path(row["job"]["output"]).with_suffix(".claim.json")
+            require("claim" in row and row["claim"]["path"] == str(claim_path), "Candidate claim must bind its exact per-job file")
+            claim, claim_record = read_evidence(claim_path, row["claim"]["sha256"])
+            require(claim == dict(plan_sha256=value["plan_sha256"], job=row["job"],
+                                  pid=workers[shard]["owner"]["pid"], hostname=parents[shard]["hostname"])
+                    and type(claim["pid"]) is int and claim["pid"] > 1,
+                    "Candidate persistent claim differs from actual worker/job/plan/hostname proof")
+            evidence_records.append(claim_record)
+        else:
+            require("claim" not in row, "Native base cannot import a candidate intervention claim")
+        case_seconds[row["job"]["index"] % 16] += proof["elapsed_seconds"]
+        evidence_records.extend([proof["receipt"], proof["video"]["file"], row["input_binding"]["image"], row["input_binding"]["gt"]])
+    for shard, worker in workers.items():
+        load = worker.get("load_seconds")
+        require(type(load) in (int, float) and math.isfinite(load) and load > 0
+                and load + case_seconds[shard] <= parents[shard]["elapsed_seconds"] + 1e-6,
+                "Generation measured load/case timers overlap or exceed charged parent allocation")
+    for seed in (0, 1):
+        video_root = Path(plan["output_root"]) / f"seed{seed}/videos/{method}"
+        expected_files = {Path(j["output"]) for j in plan["jobs"] if j["seed"] == seed}
+        expected_media = set(expected_files)
+        expected_files |= {p.with_suffix(".receipt.json") for p in expected_media}
+        if method != "base":
+            expected_files |= {p.with_suffix(".claim.json") for p in expected_media}
+        require(video_root.resolve() == video_root
+                and {p for p in video_root.rglob("*") if p.is_file() or p.is_symlink()} == expected_files,
+                "Extra, partial, missing or symlink generation output forbids completion")
+    for row in evidence_records:
+        check_record(row, nonempty=True)
+    require(generation.verify_execution(value["execution"]["path"], value["execution"]["sha256"]) == execution,
+            "Generation models/runtime/sources/execution changed during completion verification")
+    return value
 
 
 def main(argv=None):

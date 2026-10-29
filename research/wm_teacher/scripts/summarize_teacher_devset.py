@@ -158,7 +158,7 @@ def validate_review_protocol(protocol, plan, plan_sha):
 def freeze_review(plan_path, approved_plan_sha, assignments_path, output):
     require(score.sha256(plan_path) == approved_plan_sha, "Unapproved scoring plan")
     plan = score.read_json(plan_path)
-    score.validate_plan(plan, verify_generation=False, verify_bundle_content=False)
+    score.validate_plan(plan)
     for method in score.METHODS:
         for seed in score.SEEDS:
             root = Path(plan["groups"][method]["seeds"][seed]["root"])
@@ -239,7 +239,9 @@ def summarize(plan_path, approved_sha, protocol_path, approved_protocol_sha, rev
             receipts.append(receipt)
         require(sum(r["allocated_gpu_seconds"] for r in receipts if r["method"] == method) <= score.SCORE_CAP_SECONDS[method],
                 "Two-seed scoring exceeded independent fixed stage cap")
-    visual = review_status(protocol, review_receipt, approved_protocol_sha)
+    review_schema_status = review_status(protocol, review_receipt, approved_protocol_sha)
+    # Structured JSON is not proof that independent reviewers watched the media.
+    visual = {method: "pending" for method in CANDIDATES}
     means = {m: {s: e1.mean_stats(rows[m][s]) for s in score.SEEDS} for m in score.METHODS}
     keep = {c["id"] for c in cases if c["dataset"] != "egoexo4d"}
     datasets = defaultdict(list)
@@ -261,8 +263,10 @@ def summarize(plan_path, approved_sha, protocol_path, approved_protocol_sha, rev
                       "unit": "resolved parent groups; both seeds of every case sampled together; UNKNOWN6 case fallback disclosed",
                       "same_draws_every_metric": True, "not_188_independent": True,
                       "limitation": "Two seeds do not estimate population variance adequately; descriptive intervals only"},
-        "quality_status": visual, "review_schema_not_human_gold": True,
-        "qualification_pending_without_review": review_receipt is None,
+        "quality_status": visual, "review_schema_status": review_schema_status, "review_schema_not_human_gold": True,
+        "review_execution_authenticated": False,
+        "qualification_pending_without_verified_review": True,
+        "qualification_pending_without_review": True,
         "release_scope": "Aggregate diagnostics only; no private media/IDs/prompts and no fullbench/SOTA/AR acceptance",
     }
     require(score.sha256(plan_path) == approved_sha and score.sha256(protocol_path) == approved_protocol_sha,
@@ -271,6 +275,8 @@ def summarize(plan_path, approved_sha, protocol_path, approved_protocol_sha, rev
 
 
 def main(argv=None):
+    import os
+    os.umask(0o077)
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
     p = sub.add_parser("freeze-review")

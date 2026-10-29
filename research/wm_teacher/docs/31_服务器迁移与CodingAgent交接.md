@@ -1,4 +1,27 @@
-# CPU阶段实施更新（2026-10-28）：GPU仍暂停
+# 正式恢复准备实证（2026-10-29，GPU资源已获授权）
+
+- 四节点各9模型当前真实内容核验完成，共36资产，统一digest 501bbc43c93e55695a1ded0e6910621027f6c055967c76caafbbfdfa0b9423ff；外套32占卡已按另行明确授权精准TERM，旧文件/其他项目未改。
+- 新真实生成/评分代码完成PID重用、身份读取失败清理、正时长/顺序释放查询、原子账本、硬截止后费用失败证据、native已知路径/真实filedescriptor、130秒尾buffer/候选最坏case投影及host-scoped评分owner验证；最终相关295项CPU回归通过。仅支持已声明受控loader入口，不声称任意native IO/预捕获函数别名都被拦。
+- 实际评分venv与模型/依赖全内容冻结完成：52模型/缓存文件、16804依赖文件、106169环境库文件；最终v3 bundle SHA 7ccd524bbbcb55d8f0ba5b99e2c9b0b1e04ebf1f39a05cabeeb36a62a5ea2887。官方local=True及新本地缓存路径固定，数学/8维/GT K12不改。实际发现空trusted_list属于TorchHub缓存元数据，只为该元数据及合法源码限定例外，空权重/工具/媒体仍拒。
+- root0实际scoring_owner内容证明已通过CPU全核构造；非评分node不复制整套env，仅核已批准shared证明，自己的9模型/runtime/source/输入继续实际SHA核。四node本地CPU探针各40唯一更新、退出0，对应最终recovery源码。
+- 前一版仅CPU预冻结计划因真实owner字段与local/cache合同不兼容已原字节归档，记录teacher_prelaunch_source_amendment_1793223312547205996.json；没有GPU attempt、没有实验输出、没有删除或覆盖原始证据。当前重新冻结同94×seed0/1、同原预算，执行仍只有recovery_a1一次，不借旧失败费用或变参数。
+- 正式生成尚未启动；需要先完成公开树全回归/推送/远端字节核验、三计划comparison和6个owner CPUproof/全16配额sidecar，再受控执行原生base/ALG/DyMoS正式分片0，各12视频计入原188、只读机制/吞吐不看中途质量，合格后才剩余15。人审实际认证未完成，数值可报告但JSON结构不自动晋级/不启AR。
+
+---
+
+# 当前资源恢复与正式执行准备（UTC 2026-10-28T19:51:00.719Z）
+
+用户明确“四节点都可以使用、继续实验”，解除下方历史GPU暂停；另明确批准释放ms_gpu_hold_20261028_v1占卡。已精确停止32个该脚本worker及rank0专属shell看护，仅SIGTERM、无强制kill、无文件删除，不终止tmux服务器或其他项目任务。实际无GPU计算进程，初始显存/利用率退场采样需要后续启动前再查，不把瞬时低显存数当长期空闲保证。
+
+本轮仅恢复已授权Teacher固定94×双seed/原预算：base20生成+5评分；ALG/Dy各smoke1/gen24/score16/failure4。旧失败费用上界继续扣生成，实际未知不能清零。新真实生成/parent释放/有界评分接口正在补齐并独立CPU审查，必须新source/实际模型runtime/原日志退役proof及完整公开测试发布通过后才GPU；不是一条资源授权就绕过BLOCKED。三个正式plan目录尚未创建、不重启旧共享账本任务、不盲训AR/Student/蒸馏。
+
+拟冻结base ranks0/3、ALG ranks1/2第一批；DyMoS ranks0/3在base释放后执行，各方法固定首正式分片12视频作机制/费用准入，计入原188、不额外smoke、不看中途质量。准入不通过即停止对应方法，不能重挑参数/case或借阶段预算。实际sourcefreeze和dispatch sidecar最终为准。资源授权私有记录/srv/wm_teacher/eval/diag/teacher_resource_resume_1793217060719.json，不公开节点私有日志。
+
+---
+
+# CPU阶段实施更新（2026-10-28）：以下GPU暂停状态为上一快照
+
+> 发布后本地回执补记：CPU快照3b3f3b2f05b536c07d55128e8322a16de6e847b6已正常推送，21增量文件远端字节＋211manifest SHA通过，发布树干净。回执/dockerdata/wm_tmp/remote_cpu_components_20261028_3b3f3b2.json。本行仅为提交后的本地运维记录；公开内容以该commit及manifest为准，不冒称此行已在该commit中。
 
 用户“请继续推进”按紧接调研建议仅执行CPU工程与验收，不解释为解除资源让位。未启动CUDA、训练、生成、实际评分、占卡或管理监督器；旧视频、模型、缓存、失败账本与旧计划保留。**当前新生成数仍base/ALG/DyMoS各0；Teacher默认仍base s5_c5，AR/Student/蒸馏门禁关闭。**
 

@@ -48,8 +48,8 @@
     },
     {
       "path": "docs/31_服务器迁移与CodingAgent交接.md",
-      "source_sha256": "e8f97d533ade265363d51dc5ba84eb721ba4fe7e71008d71d2bbd4b9989b5f51",
-      "snapshot_sha256": "5fdfe9725249ce591885f720c3859ea4ca2930a7b92fbf1f21a5145fe3e85a7b"
+      "source_sha256": "3f9955a24870d02d5718be99e02040c6bf5393d672667a24584e5b162ec8eab0",
+      "snapshot_sha256": "6c25c6913082a4f0d8f394b1d1ea5f001e5dd2750e776b67d1038acaa0c48b96"
     },
     {
       "path": "patches/diffsynth_studio_fb337fb.patch",
@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "744b0b2e3a8e16b22bcf601e7a60c4cdf8e245512375e4976837af77c3a49fb3",
-      "snapshot_sha256": "744b0b2e3a8e16b22bcf601e7a60c4cdf8e245512375e4976837af77c3a49fb3"
+      "source_sha256": "0c5d59e3463e3a08e544a2e5ec731ab63978edde49e8e99b6314856fb68e98e2",
+      "snapshot_sha256": "0c5d59e3463e3a08e544a2e5ec731ab63978edde49e8e99b6314856fb68e98e2"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -994,13 +994,13 @@
     },
     {
       "path": "scripts/prepare_teacher_recovery.py",
-      "source_sha256": "7256abbc0842ea9ba31fc86be494186d83b30626c38ba9f509bef24ddd527d01",
-      "snapshot_sha256": "7256abbc0842ea9ba31fc86be494186d83b30626c38ba9f509bef24ddd527d01"
+      "source_sha256": "d2d90bc720f8498630640ed5295bf2c94f8d5c2a0e9d672932cf723e495ed5b8",
+      "snapshot_sha256": "d2d90bc720f8498630640ed5295bf2c94f8d5c2a0e9d672932cf723e495ed5b8"
     },
     {
       "path": "tests/test_teacher_recovery.py",
-      "source_sha256": "cc5c783f6c9c28e8f4f83899250060aa9b3dcd75d8257de396a5231b9f4b53b8",
-      "snapshot_sha256": "cc5c783f6c9c28e8f4f83899250060aa9b3dcd75d8257de396a5231b9f4b53b8"
+      "source_sha256": "cd608df1d7e395b30b039206a8c26b68e5d84a054b0ece6104e68bf02f4df721",
+      "snapshot_sha256": "cd608df1d7e395b30b039206a8c26b68e5d84a054b0ece6104e68bf02f4df721"
     },
     {
       "path": "tests/test_gpu_hold_monitor.py",
@@ -1009,43 +1009,43 @@
     },
     {
       "path": "scripts/run_teacher_base.py",
-      "source_sha256": "b0b65181e030d119a4009c2a3629dbcd59231eae13a4df63ee4dbc652712d236",
-      "snapshot_sha256": "b0b65181e030d119a4009c2a3629dbcd59231eae13a4df63ee4dbc652712d236"
+      "source_sha256": "25dea301439877816c3fd771b1c41984b1f871f72960bb59e59613acdff9b369",
+      "snapshot_sha256": "25dea301439877816c3fd771b1c41984b1f871f72960bb59e59613acdff9b369"
     },
     {
       "path": "tests/test_teacher_base.py",
-      "source_sha256": "00e4e245db97536645c2a22ec7a644f6b485d2f177a56f91b152537ea900e915",
-      "snapshot_sha256": "00e4e245db97536645c2a22ec7a644f6b485d2f177a56f91b152537ea900e915"
+      "source_sha256": "62f6f16691805ad904315d3060fb1041079316c460fff6af454a551e82e4b4d8",
+      "snapshot_sha256": "62f6f16691805ad904315d3060fb1041079316c460fff6af454a551e82e4b4d8"
     },
     {
       "path": "scripts/prepare_teacher_comparison.py",
-      "source_sha256": "79c9e4b2179e438a753764c78a4c10779bacc178c239575136c2009dcb5ff312",
-      "snapshot_sha256": "79c9e4b2179e438a753764c78a4c10779bacc178c239575136c2009dcb5ff312"
+      "source_sha256": "c7489a4546dcf0a2f55aae7b4639e9b6aa5c35246733418d352d2ae2f629d5cd",
+      "snapshot_sha256": "c7489a4546dcf0a2f55aae7b4639e9b6aa5c35246733418d352d2ae2f629d5cd"
     },
     {
       "path": "tests/test_prepare_teacher_comparison.py",
-      "source_sha256": "7ba80b888be8e6d30edef677c9d3b49bedb5ef4768b10e7d4c2a1d3ca9e7bd0f",
-      "snapshot_sha256": "7ba80b888be8e6d30edef677c9d3b49bedb5ef4768b10e7d4c2a1d3ca9e7bd0f"
+      "source_sha256": "0d927ececbbab3cadd4b4215bd15924b182409e12fbbbf967177b628dea0323d",
+      "snapshot_sha256": "0d927ececbbab3cadd4b4215bd15924b182409e12fbbbf967177b628dea0323d"
     },
     {
       "path": "scripts/score_teacher_devset.py",
-      "source_sha256": "178236ea810ff8b91cf72403f7a800972e3710567a50a28da53cc1d422a99738",
-      "snapshot_sha256": "178236ea810ff8b91cf72403f7a800972e3710567a50a28da53cc1d422a99738"
+      "source_sha256": "951e27a0dd88e55653831c28f9a4705e709a5ff4144bb4a0d3803a7c75f63970",
+      "snapshot_sha256": "951e27a0dd88e55653831c28f9a4705e709a5ff4144bb4a0d3803a7c75f63970"
     },
     {
       "path": "tests/test_score_teacher_devset.py",
-      "source_sha256": "b4f429f684b6e76972922fbecb8799b151b29a156b712349316e390784c247fa",
-      "snapshot_sha256": "b4f429f684b6e76972922fbecb8799b151b29a156b712349316e390784c247fa"
+      "source_sha256": "a616954b49a92fa94b4ec8a455a9f0211589c1d797159907aaa42844308438db",
+      "snapshot_sha256": "a616954b49a92fa94b4ec8a455a9f0211589c1d797159907aaa42844308438db"
     },
     {
       "path": "scripts/summarize_teacher_devset.py",
-      "source_sha256": "ab1964bf769909af77b99a53093f977a014e8dbe785a93682cbc86e14f74472f",
-      "snapshot_sha256": "ab1964bf769909af77b99a53093f977a014e8dbe785a93682cbc86e14f74472f"
+      "source_sha256": "5063972e7c69c355ef494cf9624d344b2604469451c88546fbe5d85f15234e3f",
+      "snapshot_sha256": "5063972e7c69c355ef494cf9624d344b2604469451c88546fbe5d85f15234e3f"
     },
     {
       "path": "tests/test_summarize_teacher_devset.py",
-      "source_sha256": "ca09318f8d450bf383a09569264d926a727c2a76106dcc5e2230c6b466fed25d",
-      "snapshot_sha256": "ca09318f8d450bf383a09569264d926a727c2a76106dcc5e2230c6b466fed25d"
+      "source_sha256": "b2c87ce2c26d8daed521a3826a16b4347604d298f6db8fd30af1ad22b4bfdb29",
+      "snapshot_sha256": "b2c87ce2c26d8daed521a3826a16b4347604d298f6db8fd30af1ad22b4bfdb29"
     },
     {
       "path": "eval/diag/teacher_cpu_readiness_public_20261028.json",
@@ -1056,6 +1056,41 @@
       "path": "scripts/recover_teacher_devset_ledger.py",
       "source_sha256": "0a5ab9e1ef72d292a12fb8f3354790dc85acc10639998cf51317284d0476ea46",
       "snapshot_sha256": "0a5ab9e1ef72d292a12fb8f3354790dc85acc10639998cf51317284d0476ea46"
+    },
+    {
+      "path": "scripts/run_teacher_generation.py",
+      "source_sha256": "3ba70af8040507cea52a8877c9d6b28fd802fcda4768fea278d1e1676f9fec22",
+      "snapshot_sha256": "3ba70af8040507cea52a8877c9d6b28fd802fcda4768fea278d1e1676f9fec22"
+    },
+    {
+      "path": "tests/test_teacher_generation.py",
+      "source_sha256": "00e5507ffaf0219c4113f080d0cd9d71f7c05cb90f7c63d03806506ff6d28543",
+      "snapshot_sha256": "00e5507ffaf0219c4113f080d0cd9d71f7c05cb90f7c63d03806506ff6d28543"
+    },
+    {
+      "path": "scripts/run_teacher_scoring.py",
+      "source_sha256": "340f043283590389e8d07e506e4c9f4b79d39c2f9a3e26bc6f22581268ff0c7c",
+      "snapshot_sha256": "340f043283590389e8d07e506e4c9f4b79d39c2f9a3e26bc6f22581268ff0c7c"
+    },
+    {
+      "path": "tests/test_run_teacher_scoring.py",
+      "source_sha256": "b5b4f99f31d17748e8e381f9eeec1439ef870a5a60ed1c0b95737d6969fe85eb",
+      "snapshot_sha256": "b5b4f99f31d17748e8e381f9eeec1439ef870a5a60ed1c0b95737d6969fe85eb"
+    },
+    {
+      "path": "scripts/verify_teacher_history.py",
+      "source_sha256": "c97bf9bc39f3b18e54db28381bab30a83f6269431b58a72ca1b1e84b893a0dba",
+      "snapshot_sha256": "c97bf9bc39f3b18e54db28381bab30a83f6269431b58a72ca1b1e84b893a0dba"
+    },
+    {
+      "path": "tests/test_verify_teacher_history.py",
+      "source_sha256": "65e0664aa6d3ab75377042cf9cca2100647fceae0717ccc9402b65eceb49a2b6",
+      "snapshot_sha256": "65e0664aa6d3ab75377042cf9cca2100647fceae0717ccc9402b65eceb49a2b6"
+    },
+    {
+      "path": "eval/diag/teacher_execution_resume_public_20261029.json",
+      "source_sha256": "951a766c01d340e001463ec74d7777c3ac275c2eb1438bbced08570f6bfb8843",
+      "snapshot_sha256": "951a766c01d340e001463ec74d7777c3ac275c2eb1438bbced08570f6bfb8843"
     }
   ],
   "experiment_progress": {
@@ -1186,5 +1221,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "CPU-only node-local protocol, native base/common content/scoring/qualification components and monitor-only manager; real GPU/receipt verifiers remain CLOSED"
+  "latest_increment_scope": "Authorized fixed Teacher experiments: actual supervised generation, host-scoped content proofs and bounded official scoring; no completed GPU/quality claim"
 }

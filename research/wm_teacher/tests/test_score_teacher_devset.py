@@ -26,6 +26,19 @@ def small_file(path, data=b"synthetic"):
     return score.file_record(path)
 
 
+@pytest.fixture(autouse=True)
+def stable_source_inventory(tmp_path, monkeypatch):
+    # Source-role unit fixtures must not race another teammate's active edits.
+    # Production source coverage/SHA checks are unchanged; real source freeze is separate.
+    original = score.required_sources()
+    paths = []
+    for index, source in enumerate(original):
+        path = tmp_path / "source-fixture" / Path(source).name
+        small_file(path, ("synthetic-source-" + str(index).zfill(2)).encode())
+        paths.append(str(path))
+    monkeypatch.setattr(score, "required_sources", lambda: paths)
+
+
 def make_bundle(tmp):
     dependency_roots, dependencies = {}, []
     for name in sorted(score.DEPENDENCIES):
@@ -45,6 +58,23 @@ def make_bundle(tmp):
             "model_roots": model_roots, "models": models,
             "runtime": {"versions": {name: "synthetic-fixture" for name in score.RUNTIME_PACKAGES},
                         "files": runtime_files, "tools": {Path(r["path"]).name: r["path"] for r in runtime_files}}}
+
+
+def test_empty_torchhub_trusted_list_is_metadata_not_model_weight(tmp_path):
+    bundle = make_bundle(tmp_path)
+    path = Path(bundle["model_roots"]["dreamsim"]) / "trusted_list"
+    path.write_bytes(b"")
+    bundle["models"].append(score.file_record(path, allow_empty=True))
+    score.validate_bundle(bundle)
+    with pytest.raises(RuntimeError):
+        score.file_record(path)
+    path.unlink()
+    bundle["models"].pop()
+    weight = Path(bundle["model_roots"]["dreamsim"]) / "empty.pt"
+    weight.write_bytes(b"")
+    bundle["models"].append(score.file_record(weight, allow_empty=True))
+    with pytest.raises(RuntimeError):
+        score.validate_bundle(bundle)
 
 
 def make_plan(tmp):
@@ -157,7 +187,7 @@ def test_bundle_no_arbitrary_model_size_cap(tmp_path, monkeypatch):
     bundle["models"][0]["bytes"] = 128 * 1024 * 1024
     calls = []
     # Symbolic size only: no real large model is opened or hashed in this CPU test.
-    monkeypatch.setattr(score, "check_record", lambda record, content=True: calls.append((record, content)))
+    monkeypatch.setattr(score, "check_record", lambda record, content=True, allow_empty=False: calls.append((record, content)))
     assert score.validate_bundle(bundle) == bundle
     assert any(record["bytes"] == 128 * 1024 * 1024 and content for record, content in calls)
 
@@ -338,14 +368,14 @@ def test_strict_score_receipt_rejects_drift(plan, kind):
 
 def test_booleans_do_not_prove_real_scoring_execution(plan):
     path = make_scores(plan, "2" * 64, "base", "seed0")
-    with pytest.raises(RuntimeError, match="evidence verifier is not integrated"):
+    with pytest.raises(RuntimeError, match="Independent scoring evidence missing"):
         score.verify_score_receipt(plan, "2" * 64, "base", "seed0", path)
 
 
 def test_real_run_failclosed_no_cli_authorization():
-    with pytest.raises(RuntimeError, match="Real scoring is closed"):
+    with pytest.raises(RuntimeError, match="Explicit approved scoring"):
         score.real_score(gpu_authorized=True)
-    with pytest.raises(RuntimeError, match="Real scoring is closed"):
+    with pytest.raises(RuntimeError, match="Explicit approved scoring"):
         score.main(["run"])
 
 
@@ -356,9 +386,84 @@ def test_frozen_original_case_sha_not_replaceable(plan, monkeypatch):
 
 
 def test_generation_completion_adapter_currently_blocked(plan):
-    with pytest.raises(ValueError, match="completion verification is unimplemented"):
+    with pytest.raises(RuntimeError, match="Assembled real comparison"):
         score.validate_plan(plan)
 
 
 def test_configs_not_mutated():
     assert "base" not in e1.CONFIGS and "alg" not in e1.CONFIGS and "dymos" not in e1.CONFIGS
+
+
+def test_source_sha_same_size_restored_mtime_refused(tmp_path):
+    bundle = make_bundle(tmp_path)
+    record = bundle["sources"][0]
+    path = Path(record["path"])
+    before = path.stat()
+    path.write_bytes(b"X" * record["bytes"])
+    os.utime(path, ns=(before.st_atime_ns, before.st_mtime_ns))
+    assert path.stat().st_size == record["bytes"] and path.stat().st_mtime_ns == before.st_mtime_ns
+    with pytest.raises(RuntimeError, match="SHA drift"):
+        score.validate_bundle(bundle)
+
+
+def test_empty_file_record_is_explicit_only_and_content_bound(tmp_path):
+    path = tmp_path / "__init__.py"; path.write_bytes(b"")
+    with pytest.raises(RuntimeError, match="empty"):
+        score.file_record(path)
+    row = score.file_record(path, allow_empty=True)
+    assert row["bytes"] == 0 and row["sha256"] == hashlib.sha256(b"").hexdigest()
+    with pytest.raises(RuntimeError, match="size/SHA"):
+        score.check_record(row)
+    assert score.check_record(row, allow_empty=True) == path
+    path.write_bytes(b"x")
+    with pytest.raises(RuntimeError, match="size drift"):
+        score.check_record(row, allow_empty=True)
+
+
+@pytest.mark.parametrize("scope", ["sources", "dependencies", "model_source"])
+def test_bundle_accepts_frozen_empty_source_scopes(tmp_path, scope):
+    bundle = make_bundle(tmp_path)
+    if scope == "model_source":
+        path = Path(bundle["model_roots"]["vbench"]) / "__init__.py"
+        path.write_bytes(b"")
+        bundle["models"].append(score.file_record(path, allow_empty=True))
+    else:
+        path = Path(bundle[scope][0]["path"])
+        path.write_bytes(b"")
+        bundle[scope][0] = score.file_record(path, allow_empty=True)
+    assert score.validate_bundle(bundle) == bundle
+
+
+@pytest.mark.parametrize("scope", ["model_weight", "aesthetic_reader", "tool"])
+def test_bundle_empty_asset_not_accepted_as_source(tmp_path, scope):
+    bundle = make_bundle(tmp_path)
+    if scope == "tool":
+        path = Path(bundle["runtime"]["files"][0]["path"])
+        path.write_bytes(b"")
+        bundle["runtime"]["files"][0] = score.file_record(path, allow_empty=True)
+    else:
+        name = "empty.pt" if scope == "model_weight" else "aesthetic_reader"
+        path = Path(bundle["model_roots"]["vbench"]) / name
+        path.write_bytes(b"")
+        bundle["models"].append(score.file_record(path, allow_empty=True))
+    with pytest.raises(RuntimeError, match="size/SHA"):
+        score.validate_bundle(bundle)
+
+
+@pytest.mark.parametrize("suffix", [".mp4", ".png", ".pt"])
+def test_empty_media_image_or_weight_default_still_rejected(tmp_path, suffix):
+    path = tmp_path / ("empty" + suffix); path.write_bytes(b"")
+    with pytest.raises(RuntimeError, match="empty"):
+        score.file_record(path)
+
+
+def test_overlap_empty_source_cannot_override_strict_model_asset(tmp_path):
+    bundle = make_bundle(tmp_path)
+    path = Path(bundle["sources"][0]["path"])
+    # A model-role non-source alias to a source inventory entry must stay strict.
+    path.write_bytes(b"")
+    row = score.file_record(path, allow_empty=True)
+    bundle["sources"][0] = row
+    bundle["runtime"]["files"].append(row)
+    with pytest.raises(RuntimeError, match="size/SHA"):
+        score.validate_bundle(bundle)

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""CPU-only frozen Teacher scoring contract; real scoring is deliberately closed.
+"""Frozen Teacher scoring contract and strict receipt verification.
 
-Explicit supplier records are not proof of a scoring runtime or GPU authorization.
-No command loads a metric model, invokes VBench, or modifies old plans/ledgers.
+CPU/schema preparation is not scoring authorization. Real actions additionally
+require approved completion, runtime, local budget and bounded live GPU scope.
 """
 import argparse
 import hashlib
@@ -11,6 +11,8 @@ import math
 import os
 from pathlib import Path
 import shutil
+import subprocess
+import sys
 import tempfile
 
 import score_e1 as e1
@@ -79,9 +81,9 @@ def read_cases(path):
     return rows
 
 
-def file_record(path):
+def file_record(path, allow_empty=False):
     path = Path(path).absolute()
-    require(path.resolve() == path and path.is_file() and path.stat().st_size > 0,
+    require(path.resolve() == path and path.is_file() and (path.stat().st_size > 0 or allow_empty and path.stat().st_size == 0),
             "Missing/empty/symlink file: " + str(path))
     before = path.stat()
     result = {"path": str(path), "bytes": before.st_size, "sha256": sha256(path)}
@@ -90,14 +92,14 @@ def file_record(path):
     return result
 
 
-def check_record(record, content=True):
+def check_record(record, content=True, allow_empty=False):
     require(isinstance(record, dict) and set(record) == {"path", "bytes", "sha256"}, "Invalid file record schema")
     path = Path(record["path"])
     require(path.is_absolute() and path.resolve() == path and path.is_file(), "Missing/symlink recorded file")
-    require(type(record["bytes"]) is int and record["bytes"] > 0 and is_sha(record["sha256"]), "Invalid file size/SHA")
+    require(type(record["bytes"]) is int and (record["bytes"] > 0 or allow_empty and record["bytes"] == 0) and is_sha(record["sha256"]), "Invalid file size/SHA")
     require(path.stat().st_size == record["bytes"], "Recorded file size drift")
     if content:
-        require(file_record(path) == record, "Recorded file SHA drift: " + str(path))
+        require(file_record(path, allow_empty=allow_empty) == record, "Recorded file SHA drift: " + str(path))
     return path
 
 
@@ -126,7 +128,11 @@ def write_new(path, value):
 def required_sources():
     return [str(ROOT / "scripts" / name) for name in (
         "score_teacher_devset.py", "summarize_teacher_devset.py", "score_e1.py",
-        "build_e1_jobs.py", "summarize_eval.py", "gt_ref_metrics.py", "vbench_eval.py")]
+        "build_e1_jobs.py", "summarize_eval.py", "gt_ref_metrics.py", "vbench_eval.py",
+        "run_teacher_scoring.py", "gpu_hold.py", "run_teacher_inference_smoke.py",
+        "run_teacher_generation.py", "prepare_teacher_recovery.py", "run_teacher_devset.py",
+        "measure_teacher_throughput.py", "prepare_teacher_comparison.py", "run_teacher_base.py",
+        "verify_teacher_history.py")]
 
 
 def coverage(roots, records, roles, label):
@@ -160,15 +166,21 @@ def validate_bundle(bundle, verify_content=True):
             "Missing runtime executable paths")
     paths = [r["path"] for r in runtime["files"]]
     require(len(paths) == len(set(paths)) and set(runtime["tools"].values()) <= set(paths), "Unbound runtime executable files")
-    records = bundle["sources"] + bundle["dependencies"] + bundle["models"] + runtime["files"]
-    by_path = {}
-    for record in records:
+    records = [(r, True) for r in bundle["sources"] + bundle["dependencies"]]
+    records += [(r, Path(r["path"]).suffix == ".py" or Path(r["path"]).name == "trusted_list") for r in bundle["models"]]
+    records += [(r, False) for r in runtime["files"]]
+    by_path, empty_allowed = {}, {}
+    for record, allow_empty in records:
         require(record["path"] not in by_path or by_path[record["path"]] == record, "Conflicting overlapping record")
         by_path[record["path"]] = record
-        check_record(record, content=False)
+        empty_allowed[record["path"]] = empty_allowed.get(record["path"], True) and allow_empty
+        check_record(record, content=False, allow_empty=allow_empty)
     if verify_content:
-        for record in by_path.values():
-            check_record(record)
+        for path, record in by_path.items():
+            check_record(record, allow_empty=empty_allowed[path])
+    if "execution" in bundle:
+        from run_teacher_scoring import validate_execution_bundle
+        validate_execution_bundle(bundle, observe=verify_content, verify_content=verify_content)
     return bundle
 
 
@@ -226,12 +238,15 @@ def validate_plan(plan, verify_generation=True, verify_bundle_content=True):
     require(plan["cases"]["sha256"] == FROZEN_CASES_SHA256, "Frozen original cases byte SHA drift")
     check_record(plan["cases"])
     cases = read_cases(plan["cases"]["path"])
+    if verify_generation:
+        verify_comparison_binding(plan)
     require(set(plan["groups"]) == set(METHODS), "All three methods must be frozen before scoring")
     for method, group in plan["groups"].items():
         require(set(group["seeds"]) == set(SEEDS), "Exactly two seeds required")
         check_record(group["generation_completion"])
         if verify_generation:
-            verify_completion(group["generation_completion"], method, plan["common_execution_sha256"], plan["bundle"]["sha256"])
+            completed = verify_completion(group["generation_completion"], method, plan["common_execution_sha256"], plan["bundle"]["sha256"])
+            verify_completion_media(completed, group)
         for seed, entry in group["seeds"].items():
             require(entry["config"] == method and Path(entry["root"]).is_absolute(), "Method/root identity drift")
             metadata = file_record(Path(entry["root"]) / "cases.jsonl")
@@ -243,6 +258,82 @@ def validate_plan(plan, verify_generation=True, verify_bundle_content=True):
                 require(row["file"]["path"] == expected, "Generated media path/seed mismatch")
                 check_record(row["file"])
     return cases
+
+
+def verify_completion_media(completed, group):
+    require(isinstance(completed, dict) and "plan" in completed and "cases" in completed and
+            {key: completed["plan"][key] for key in ("path", "bytes", "sha256")} == group["generation_plan"],
+            "Generation completion belongs to a different approved plan")
+    expected = {(seed, row["case_id"]): row["file"] for seed, entry in group["seeds"].items() for row in entry["media"]}
+    got = {}
+    for row in completed["cases"]:
+        job = row["job"]
+        key = ("seed" + str(job["seed"]), job["case_id"])
+        require(key not in got, "Duplicate completion media case/seed")
+        got[key] = {name: row["video"]["file"][name] for name in ("path", "bytes", "sha256")}
+    require(got == expected, "Completion188 media bytes/SHA/seed/path differ from scoring source")
+    return True
+
+
+def assemble_plan(comparison_path, approved_comparison_sha, completions, owner, allocations, output):
+    from prepare_teacher_comparison import verify as verify_comparison
+    comparison = verify_comparison(comparison_path, approved_comparison_sha)
+    require(set(completions) == set(METHODS), "All three real generation completions required before any scoring freeze")
+    bundle_record = {key: comparison["score_bundle"][key] for key in ("path", "bytes", "sha256")}
+    bundle = verify_bundle(bundle_record["path"], bundle_record["sha256"])
+    from run_teacher_scoring import validate_execution_bundle, validate_schedule
+    validate_execution_bundle(bundle)
+    require(isinstance(owner, dict) and set(owner) == {"hostname", "ledger_path"}, "Explicit fixed score owner required")
+    validate_schedule(allocations)
+    groups, cases_record = {}, None
+    for method in METHODS:
+        record = completions[method]
+        verified = verify_completion(record, method, comparison["common_execution_sha256"], bundle_record["sha256"])
+        require(isinstance(verified, dict), "Completion verifier must return independently verified receipt data")
+        generation_plan_record = comparison["plans"][method]
+        generation_plan = read_json(generation_plan_record["path"])
+        root = Path(generation_plan["output_root"])
+        group = {"generation_completion": record, "generation_plan": {key: generation_plan_record[key] for key in ("path", "bytes", "sha256")}, "seeds": {}}
+        for seed in SEEDS:
+            seed_root = root / seed
+            metadata = file_record(seed_root / "cases.jsonl")
+            require(metadata["sha256"] == FROZEN_CASES_SHA256, "Generation output cases metadata byte SHA drift")
+            if cases_record is None:
+                cases_record = metadata
+            cases = read_cases(metadata["path"])
+            media = [{"case_id": c["id"], "file": file_record(seed_root / "videos" / method / (c["id"] + ".mp4"))} for c in cases]
+            group["seeds"][seed] = {"root": str(seed_root), "config": method, "media": media}
+        verify_completion_media(verified, group)
+        groups[method] = group
+    plan = {"schema": PLAN_SCHEMA, "private": True, "score_cap_seconds": SCORE_CAP_SECONDS, "seeds": list(SEEDS),
+            "comparison": file_record(comparison_path), "common_execution_sha256": comparison["common_execution_sha256"],
+            "bundle": bundle_record, "cases": cases_record, "groups": groups, "score_owner": owner,
+            "score_allocations": allocations}
+    validate_plan(plan)
+    return write_new(output, plan)
+
+
+def verify_comparison_binding(plan):
+    from prepare_teacher_comparison import verify as verify_comparison
+    require("comparison" in plan and "score_owner" in plan and "score_allocations" in plan,
+            "Assembled real comparison/common execution/score owner contract required")
+    check_record(plan["comparison"])
+    value = verify_comparison(plan["comparison"]["path"], plan["comparison"]["sha256"])
+    require(value["common_execution_sha256"] == plan["common_execution_sha256"] and
+            value["score_bundle"]["sha256"] == plan["bundle"]["sha256"], "Comparison common execution/bundle drift")
+    from run_teacher_scoring import validate_schedule
+    validate_schedule(plan["score_allocations"])
+    owner = plan["score_owner"]
+    require(set(owner) == {"hostname", "ledger_path"} and isinstance(owner["hostname"], str) and owner["hostname"] and
+            Path(owner["ledger_path"]).is_absolute(), "Frozen score host/local ledger identity required")
+    for method, group in plan["groups"].items():
+        record = {key: value["plans"][method][key] for key in ("path", "bytes", "sha256")}
+        require(group.get("generation_plan") == record, "Unbound generation plan in assembled score contract")
+        check_record(record)
+        generation = read_json(record["path"])
+        for seed in SEEDS:
+            require(group["seeds"][seed]["root"] == str(Path(generation["output_root"]) / seed), "Generated root/seed/common contract drift")
+    return value
 
 
 def prepare_plan(contract_path, output):
@@ -277,8 +368,8 @@ def verify_cache(plan, method, seed, binding_path):
 
 
 def verify_scoring_execution(receipt, plan):
-    raise RuntimeError("Scoring execution evidence verifier is not integrated: parent release, fixed stage budget, "
-                       "and occupied GPU scope must be independently verified; receipt booleans are not authorization")
+    from run_teacher_scoring import verify_execution
+    return verify_execution(receipt, plan)
 
 
 def verify_score_receipt(plan, plan_sha, method, seed, receipt_path, verify_execution=True):
@@ -324,15 +415,26 @@ def verify_score_receipt(plan, plan_sha, method, seed, receipt_path, verify_exec
 
 
 def real_score(*args, **kwargs):
-    raise RuntimeError("Real scoring is closed: independent parent release, node-local stage ledger, occupied GPU scope, "
-                       "and complete scoring-runtime/model content verification are not integrated; CLI flags are not authorization")
+    require(not kwargs and len(args) == 1 and isinstance(args[0], list) and args[0],
+            "Explicit approved scoring plan/action/runtime/ledger and live GPU scope arguments required; flags are not authorization")
+    argv = args[0][1:] if args[0][:1] == ["--"] else args[0]
+    require(argv, "Explicit approved scoring action required")
+    return subprocess.run([sys.executable, "-B", str(ROOT / "scripts/run_teacher_scoring.py"), *argv], check=True)
 
 
 def main(argv=None):
+    os.umask(0o077)
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
     p = sub.add_parser("freeze-bundle")
     p.add_argument("--records", required=True, type=Path)
+    p.add_argument("--out", required=True, type=Path)
+    p = sub.add_parser("assemble")
+    p.add_argument("--comparison", required=True, type=Path)
+    p.add_argument("--approved-comparison-sha256", required=True)
+    p.add_argument("--completion-records", required=True, type=Path)
+    p.add_argument("--owner", required=True, type=Path)
+    p.add_argument("--allocations", required=True, type=Path)
     p.add_argument("--out", required=True, type=Path)
     p = sub.add_parser("prepare")
     p.add_argument("--contract", required=True, type=Path)
@@ -343,12 +445,16 @@ def main(argv=None):
     p = sub.add_parser("verify")
     p.add_argument("--plan", required=True, type=Path)
     p.add_argument("--approved-sha256", required=True)
-    sub.add_parser("run")
+    p = sub.add_parser("run")
+    p.add_argument("scoring_args", nargs=argparse.REMAINDER)
     args = parser.parse_args(argv)
     if args.command == "run":
-        real_score()
+        real_score(args.scoring_args)
     elif args.command == "freeze-bundle":
         freeze_bundle(args.records, args.out)
+    elif args.command == "assemble":
+        assemble_plan(args.comparison, args.approved_comparison_sha256, read_json(args.completion_records),
+                      read_json(args.owner), read_json(args.allocations), args.out)
     elif args.command == "prepare":
         prepare_plan(args.contract, args.out)
     elif args.command == "verify-bundle":

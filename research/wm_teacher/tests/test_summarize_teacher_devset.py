@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import score_e1 as e1
 import score_teacher_devset as score
 import summarize_teacher_devset as summary
-from test_score_teacher_devset import dump, make_plan, make_scores, small_file
+from test_score_teacher_devset import dump, make_plan, make_scores, small_file, stable_source_inventory
 
 
 def means_fixture():
@@ -233,7 +233,10 @@ def test_independent_conflict_adjudication_required(plan, tmp_path):
     assert summary.review_status(protocol, receipt) == {"alg": "failed", "dymos": "passed"}
 
 
-def test_freeze_review_before_scores_preserves_existing(plan, tmp_path):
+def test_freeze_review_before_scores_preserves_existing(plan, tmp_path, monkeypatch):
+    monkeypatch.setattr(score, "verify_comparison_binding", lambda *args, **kwargs: True)
+    monkeypatch.setattr(score, "verify_completion_media", lambda *args, **kwargs: True)
+    monkeypatch.setattr(score, "verify_completion", lambda *args, **kwargs: True)
     record = dump(tmp_path / "plan.json", plan)
     protocol = protocol_fixture(plan, record["sha256"])
     assignments = dump(tmp_path / "assignments.json", {k: protocol[k] for k in ("media", "inputs", "reviewers", "adjudicator")})
@@ -252,6 +255,8 @@ def complete_fixture(plan, tmp_path, monkeypatch):
     protocol_record = dump(tmp_path / "review.protocol.json", protocol)
     # Only this synthetic fixture replaces unavailable real execution evidence verifiers.
     monkeypatch.setattr(score, "verify_completion", lambda *args, **kwargs: True)
+    monkeypatch.setattr(score, "verify_comparison_binding", lambda *args, **kwargs: True)
+    monkeypatch.setattr(score, "verify_completion_media", lambda *args, **kwargs: True)
     monkeypatch.setattr(score, "verify_scoring_execution", lambda *args, **kwargs: True)
     for method in score.METHODS:
         for seed in score.SEEDS:
@@ -270,13 +275,17 @@ def test_complete_cpu_summary_pending_not_qualified_no_identifiers(plan, tmp_pat
     assert "case000" not in str(result) and "parent0" not in str(result) and "synthetic action" not in str(result)
 
 
-def test_complete_synthetic_summary_review_exact_tie_dymos(plan, tmp_path, monkeypatch):
+def test_complete_synthetic_summary_review_schema_does_not_qualify(plan, tmp_path, monkeypatch):
     record, protocol_record, protocol = complete_fixture(plan, tmp_path, monkeypatch)
     review_value = review_fixture(protocol)
     review_value["protocol_sha256"] = protocol_record["sha256"]
     review = dump(tmp_path / "review.json", review_value)
     result = summary.summarize(record["path"], record["sha256"], protocol_record["path"], protocol_record["sha256"], review)
-    assert result["selection"]["selected"] == "dymos"
+    assert result["selection"]["selected"] is None
+    assert result["review_schema_status"] == {"alg": "passed", "dymos": "passed"}
+    assert result["quality_status"] == {"alg": "pending", "dymos": "pending"}
+    assert result["review_execution_authenticated"] is False
+    assert result["qualification_pending_without_verified_review"]
 
 
 def test_total_score_caps_across_bothseeds(plan, tmp_path, monkeypatch):

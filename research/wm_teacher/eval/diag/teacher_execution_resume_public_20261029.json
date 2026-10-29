@@ -1,0 +1,116 @@
+{
+  "schema": "teacher_execution_resume_public_v1",
+  "date": "2026-10-29",
+  "resource_resume_authorized": true,
+  "n_nodes": 4,
+  "n_GPUs": 32,
+  "formal_generation_started": false,
+  "generated_videos": {
+    "base": 0,
+    "alg": 0,
+    "dymos": 0
+  },
+  "current_model_content_validation": {
+    "nodes_verified": 4,
+    "assets_per_node": 9,
+    "content_sha256": "501bbc43c93e55695a1ded0e6910621027f6c055967c76caafbbfdfa0b9423ff"
+  },
+  "old_reservation_retirement": {
+    "full_original_tool_logs_authenticated": true,
+    "old_owners_currently_inactive": true,
+    "old_generation_actual_GPUh": {
+      "alg": null,
+      "dymos": null
+    },
+    "old_generation_upper_GPUh": {
+      "alg": 1.6461976177604973,
+      "dymos": 2.655524471504614
+    }
+  },
+  "local_metric_cache": {
+    "files_verified": 33,
+    "bytes": 3509670764,
+    "source_destination_SHA_equal": true,
+    "old_cache_modified": false
+  },
+  "fixed_protocol": {
+    "cases": 94,
+    "seeds": [
+      0,
+      1
+    ],
+    "videos_per_method": 188,
+    "sigma_shift": 5,
+    "cfg_scale": 5,
+    "steps": 50,
+    "frames": 121,
+    "width": 1280,
+    "height": 704,
+    "fps": 24,
+    "checkpoint": "NONE"
+  },
+  "phase_caps_GPUh": {
+    "base": {
+      "generation": 20,
+      "score": 5,
+      "total": 25
+    },
+    "alg": {
+      "smoke": 1,
+      "generation": 24,
+      "score": 16,
+      "failure": 4,
+      "total": 45
+    },
+    "dymos": {
+      "smoke": 1,
+      "generation": 24,
+      "score": 16,
+      "failure": 4,
+      "total": 45
+    }
+  },
+  "formal_canary": {
+    "shard": 0,
+    "jobs": 12,
+    "counts_towards_188": true,
+    "quality_scores_not_used": true,
+    "extra_smoke_videos": 0
+  },
+  "execution_safety": [
+    "independent approved all16 immutable quota sidecar",
+    "node-local stable-inode fcntl with atomic fsync/rename",
+    "PID/starttime-safe cleanup and positive full allocation clocks",
+    "known native loader path/file-descriptor content guards",
+    "distinct chronological raw GPU release queries",
+    "failed allocation keeps unknown actual/max reserved-observed upper",
+    "official VBench local cache loading; metric formulas unchanged",
+    "peer uses approved scoring-owner proof; each generation node rechecks its own local model bytes"
+  ],
+  "review_execution_authenticated": false,
+  "quality_pass": false,
+  "SOTA_proven": false,
+  "AR_allowed": false,
+  "caveat": "Resource authorization and CPU components do not attest completed generation/scoring/canary or human review. Initial real environment collection exposed legitimate empty TorchHub cache metadata; only that metadata/code exception was added, never empty model weights or media. Scoring bundle must match final published source and actual host evidence before execution.",
+  "related_CPU_regression": {
+    "passed": 296,
+    "failed": 0,
+    "exit_code": 0,
+    "scope": "Final source namespace and pinned history/public portability fixes; no actual generation claim"
+  },
+  "actual_scoring_environment": {
+    "models_and_cache_files": 52,
+    "dependency_files": 16804,
+    "library_files": 106169,
+    "bundle_bytes": 31471003,
+    "bundle_sha256": "7ccd524bbbcb55d8f0ba5b99e2c9b0b1e04ebf1f39a05cabeeb36a62a5ea2887",
+    "actual_full_content_verified": true,
+    "model_inference_performed": false
+  },
+  "real_node_local_CPU_probes": {
+    "nodes": 4,
+    "updates_per_node": 40,
+    "unique_entries_per_node": 40,
+    "exit_codes_zero": true
+  }
+}

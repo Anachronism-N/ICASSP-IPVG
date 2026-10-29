@@ -1,5 +1,7 @@
 """CPU-only tests of recovery budget and actual node-local lock/write primitives."""
+import contextlib
 import copy
+import io
 import json
 import multiprocessing
 import os
@@ -89,6 +91,19 @@ class RecoveryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             with recovery.local_transaction(path, self.plan, self.digest, 2, self.local):
                 pass
+
+    def test_empty_namespace_source_is_not_an_empty_model_asset(self):
+        source = self.local / '__init__.py'
+        source.write_bytes(b'')
+        expected = recovery.record(source)
+        self.assertEqual(recovery.check_content(expected)['bytes'], 0)
+        model = self.local / 'weights.safetensors'
+        model.write_bytes(b'')
+        with self.assertRaises(ValueError):
+            recovery.check_content(recovery.record(model))
+        source.write_bytes(b'changed')
+        with self.assertRaises(ValueError):
+            recovery.check_content(expected)
 
     def test_same_size_mtime_content_drift_rejected(self):
         path = self.local / 'source'
@@ -207,6 +222,27 @@ class RecoveryTests(unittest.TestCase):
         result = recovery.collect_costs(self.plan, self.digest, {0: recovery.record(path, nonempty=True)})
         self.assertEqual(len(result['unknown_shards']), 16)
         self.assertEqual(result['generation_charged_upper_seconds'], self.plan['prior_generation']['upper_seconds'] + 80000)
+
+    def test_explicit_execution_adapter_binds_immutable_cpu_plan_without_promoting_it(self):
+        import run_teacher_generation as generation
+        path = self.local / 'plan.blocked.json'
+        recovery.dev.exclusive(path, self.plan)
+        before = path.read_bytes()
+        execution = dict(plans={'alg': recovery.record(path, nonempty=True)})
+        arguments = ['--run', '--plan', str(path), '--approved-plan-sha256', self.digest,
+            '--execution', str(self.local / 'execution.json'), '--approved-execution-sha256', 'a' * 64,
+            '--rank', '1', '--shard', '0', '--gpu-authorized']
+        with mock.patch.object(recovery, 'verify', return_value=self.plan), \
+             mock.patch.object(generation, 'verify_execution', return_value=execution), \
+             mock.patch.object(generation, 'supervise', return_value=(self.local / 'parent.json', 'b' * 64)) as supervise, \
+             contextlib.redirect_stdout(io.StringIO()):
+            recovery.main(arguments)
+        supervise.assert_called_once_with(self.local / 'execution.json', 'a' * 64, 'alg', 0, 1,
+            gpu_authorized=True, state_dir='/dockerdata/wm_logs/gpu_hold')
+        self.assertEqual(path.read_bytes(), before)
+        self.assertFalse(self.plan['GPU_authorized'])
+        self.assertFalse(self.plan['old_reservations_retired'])
+        self.assertEqual(self.plan['status'], 'BLOCKED')
 
     def test_cli_run_fails_before_preparing_anything(self):
         with self.assertRaisesRegex(ValueError, 'GPU recovery blocked'):
