@@ -1,3 +1,37 @@
+# 一次恢复已结束：首分片再次失败，禁止再自动重试（2026-10-29）
+
+用户只批准“一次恢复、预算不变”；recovery_a2该权限现已使用。base与ALG均未完成固定12条canary，HSKGvY与6XkiW6按预注册规则退出，未派发任何余15或DyMoS。已核实四节点无GPU计算进程，四个自有monitor-only管理器均正常停止，未启动占卡、删视频或改历史账本。不得因原goal/四节点可用而再次恢复或请求更多seed救结果。
+
+| 方法 | 本次完整视频/帧 | 实际本次allocated GPUh | 含全部历史生成费用的累计/上界GPUh | 原生成阶段剩余GPUh |
+|---|---:|---:|---:|---:|
+| base | 9 / 1089 | 1.161940884963 | 2.380587462753 | 17.619412537247 |
+| ALG | 10 / 1210 | 1.292506020726 | 4.294023183252（历史actual部分未知） | 19.705976816748 |
+| DyMoS | 0 / 0 | 无新尝试 | 2.655524471505（历史上界） | 21.344475528495 |
+
+- base parent真实4182.987185865641秒、cap4300、timed_out=True，GPU/tree释放通过。worker.json为零字节（SHA为空文件SHA），原样保留，不从progress重建为成功worker。9条已完成case均单独完整decode/SHA/参数核验；不是完整12/188。
+- ALG parent真实4653.021674613003秒、cap4775、exit1、worker allocation clock exhausted；parent和worker均失败，GPU/tree原查询及当前现场释放核实。10条完整视频单独全121帧、参数/机制统计及内容SHA审计通过；不是完整12/188或质量通过。
+- 上轮诊断20条完整视频继续保留，本次新19条完整视频继续保留，共39条诊断视频；绝不混为同版本完整对照。首次与本次失败/预留/原worker/parent/坏JSON/完整日志均保留，加载、内容核验、等待、失败推理、保存解码和清理费用不清零。
+- base首条receipt文件mtime减实测caseelapsed显示约809.906秒pre-first-case开销；ALG同类估算约836.156秒。仅为描述性边界推断，未给每个操作造分段计时。单条推理速度不是全生命周期12条可完成的保证；本次修复未消除端到端准入失败，不能因此宣称优化成功。
+- 质量分数未读取，未进行不完整188评分、未选择候选、未Teacher晋级或SOTA宣称。数值/Human/AR/Student/蒸馏门仍关闭，现有整体默认base s5_c5不变。
+- 实际私有审计eval/teacher_once_recovery_20261029/final_failed_attempt_{base,alg}.json；公开无身份结果eval/diag/teacher_once_failure_public_20261029.json。完整公开测试/推送/远端字节门通过后才能声称此终结结果已发布；本段写出不是新实验许可。
+- 后续任何GPU尝试需要新明确实验范围/恢复授权，而不是消耗余额就可自动继续。可继续CPU诊断端到端验证开销及设计更可靠调度，但不跳SHA、不删证据、不回改预注册门槛。
+
+---
+
+# 一次恢复实际冻结状态（2026-10-29，接线完成，尚未新GPU生成）
+
+新recovery_a2执行接线已实际完成且通过330相关CPU与完整公开987测试/3既有条件skip，正常公开提交7b8361def2e73a1fb59e811cf8713318fa8c34e3及远端12文件/222manifest逐字节通过。预算仍原阶段，旧base/ALG各10完整片保留，不混入新fresh188×3严格比较。私有本地旧commit不推公开。
+
+- 三方法新teacher_one_recovery_plan_v1实际CPU构造成功：base SHAebc3414a9fbc83b50878d6ce803ae4ab5d692cd180887c2d4ab08d13c8ee9b7b；ALG748f77405f0f89bf9ad334ac089e1c8dd29487dff5c8533546232ca224986b95；Dy303d68b271626a2c56da0b2c0ffe65d776c177743c8b3e752a56de1446a45705。均绑定同预算ad273a...与固定16新caps/原spec/实际model/runtime/source。
+- 四节点实际40更新CPU探针与6份新owner证明构造均退出0，原始JSON整数原字节保存，不经JS重编码；本地prefixowner_cpu_recovery_a2独立新inode，不reset旧a1运行账。
+- 实际评分资产全内容再次核验，source包含一次恢复验证程序；同32MB评分metadata SHA1b9963c9fa52a2fff195f30cc5b393aff7aeadd3d83567dcdbd056766ffefd90已按原字节/原mtime复制四node本地，新localpath供sharedview校验避免CephJSON反复读；评分env仍只rank0，实际评分继续fullmetric内容检查。
+- QYn4gT当前真实共同比较已冻结SHAb9f8278d829db44c9a5d9a90efaab83cb37e16a3e7dda84ecf29ecc513a41de6，后续实际root0评分owner/旧日志退役及一次恢复权限完整核验在运行。HSKGvY托管新首分片队列，只有新execution_approval真实存在且全部源/预算/本地运行预留通过才分配GPU；6XkiW6等待新first_canaries_complete才运行余15与Dy。任何新失败不二次恢复、借额度或改seed。
+- 当前没有新GPU尝试，不能把CPU构造、比较冻结或队列等待说成12/188完成。上条metadata等待controller ci7PUZ因误引用旧a1失败目录在GPU前退出，已只修临时队列引用为新once_recovery根，原日志保留；它没有启动或重复任何GPU作业，不计为恢复尝试。
+
+本段是发布后的本地运行记录，不冒称已包含在7b8361d公开commit中。正式执行结果、质量与人审仍待完整事实；Teacher/SOTA/AR门保持关闭。
+
+---
+
 # 一次恢复执行合同接线（2026-10-29，源冻结与门禁进行中）
 
 recovery_a2已接入新独立teacher_one_recovery_plan_v1与现有受控runner/严格比较/原生canary/费用汇总：所有新计划必须绑定同一个已批准budget.blocked记录、同94×双seed完整188、固定method与物理owner、差异化16caps；base失败费用4387.127680、ALG原上界＋本次4879.150361、Dy原上界全部只扣一次，不能置零或移phase。旧a1计划与20诊断视频不修改、不混入新严格同版本比较。

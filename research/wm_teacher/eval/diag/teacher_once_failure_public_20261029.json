@@ -1,0 +1,70 @@
+{
+  "schema": "teacher_once_recovery_failed_results_public_v1",
+  "date": "2026-10-29",
+  "execution_id": "recovery_a2",
+  "methods": {
+    "base": {
+      "expected_canary_videos": 12,
+      "complete_videos": 9,
+      "fully_decoded_frames": 1089,
+      "media_and_parameter_SHA_verified": true,
+      "allocated_seconds": 4182.987185865641,
+      "actual_new_GPUh": 1.161940884962678,
+      "cumulative_generation_charge_upper_GPUh": 2.380587462753368,
+      "remaining_generation_GPUh": 17.61941253724663,
+      "timed_out": true,
+      "final_worker_record_parsed": false,
+      "final_worker_record_bytes": 0,
+      "worker_error": null,
+      "load_seconds": 10.611590335145593,
+      "completed_case_seconds": 3062.198152515106,
+      "uninstrumented_residual_including_incomplete_work_and_cleanup_seconds": 1110.1774430153891,
+      "full_canary_pass": false
+    },
+    "alg": {
+      "expected_canary_videos": 12,
+      "complete_videos": 10,
+      "fully_decoded_frames": 1210,
+      "media_and_parameter_SHA_verified": true,
+      "allocated_seconds": 4653.021674613003,
+      "actual_new_GPUh": 1.292506020725834,
+      "cumulative_generation_charge_upper_GPUh": 4.294023183251783,
+      "remaining_generation_GPUh": 19.705976816748215,
+      "timed_out": false,
+      "final_worker_record_parsed": true,
+      "final_worker_record_bytes": 2618870,
+      "worker_error": "ValueError: Worker allocation clock exhausted/drifted",
+      "load_seconds": 5.660898226313293,
+      "completed_case_seconds": 3717.2091342890635,
+      "uninstrumented_residual_including_incomplete_work_and_cleanup_seconds": 930.1516420976259,
+      "full_canary_pass": false
+    },
+    "dymos": {
+      "new_generated_videos": 0,
+      "previous_generation_actual_GPUh": null,
+      "previous_generation_upper_GPUh": 2.655524471504614,
+      "new_GPU_attempts": 0
+    }
+  },
+  "previous_diagnostic_videos_preserved": 20,
+  "new_diagnostic_videos_preserved": 19,
+  "strict_new188_per_method_completed": false,
+  "quality_scores_inspected": false,
+  "quality_pass": false,
+  "SOTA_proven": false,
+  "AR_allowed": false,
+  "remaining15_dispatched": false,
+  "additional_retry_authorized": false,
+  "user_authorized_one_recovery_used": true,
+  "all_final_owned_trees_and_GPUs_released": true,
+  "files_or_failed_ledgers_deleted": false,
+  "measured_inference_speed_not_a_complete_allocation_budget_guarantee": true,
+  "conclusion": "One budget-preserving recovery failed its full12-job canary gates; fixed rollout stopped. No further retry is authorized.",
+  "limitations": [
+    "Source/file hashes and full decoding attest preserved partial videos, not a completed benchmark or quality improvement.",
+    "Failed final worker JSON is preserved as missing/invalid evidence, not reconstructed from partial progress.",
+    "Residual wall time is measured by subtraction, not an instrumented attribution to any individual operation.",
+    "Runtime checks, local/shared JSON reading, incomplete inference, save/decode and cleanup remain charged.",
+    "No base/ALG/DyMoS quality ranking or SOTA claim can be inferred from the canary videos."
+  ]
+}

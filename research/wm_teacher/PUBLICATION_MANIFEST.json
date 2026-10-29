@@ -48,8 +48,8 @@
     },
     {
       "path": "docs/31_服务器迁移与CodingAgent交接.md",
-      "source_sha256": "069754d2fd7d0c4bcf30397517cd7f70992a51fed4d7a4fa71292ea46ef950e1",
-      "snapshot_sha256": "1d9cad8277fe840adad1e5006885cbe7294d2692f44b93dc23db72a22faede3d"
+      "source_sha256": "e803ebfd18dcabde1bf5201d157d4928187728b795a4251beaec4f9ba7492591",
+      "snapshot_sha256": "c5aec0e64d5dd518d38e7e0bfc97e7760b1b544f8f4a1518503f49a5867da024"
     },
     {
       "path": "patches/diffsynth_studio_fb337fb.patch",
@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "a3e2ee65cec01ff7c18eb4ca8cce9a18adab9d86acdec6bda7d09717255875d4",
-      "snapshot_sha256": "a3e2ee65cec01ff7c18eb4ca8cce9a18adab9d86acdec6bda7d09717255875d4"
+      "source_sha256": "77b63769a54568985d6018f60a8fd1af174fb5d5e933a5d83d092736f34821e9",
+      "snapshot_sha256": "77b63769a54568985d6018f60a8fd1af174fb5d5e933a5d83d092736f34821e9"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -1111,6 +1111,11 @@
       "path": "eval/diag/teacher_once_execution_public_20261029.json",
       "source_sha256": "39d87ece20610838ba5d8bbd9581293e0cb5e126045e9304867562ec3301869e",
       "snapshot_sha256": "39d87ece20610838ba5d8bbd9581293e0cb5e126045e9304867562ec3301869e"
+    },
+    {
+      "path": "eval/diag/teacher_once_failure_public_20261029.json",
+      "source_sha256": "af2f3bcd9012dfef1cdc8c8359b459736ad0f7897d67d17ecfe665878a261558",
+      "snapshot_sha256": "af2f3bcd9012dfef1cdc8c8359b459736ad0f7897d67d17ecfe665878a261558"
     }
   ],
   "experiment_progress": {
@@ -1241,5 +1246,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "One explicitly authorized recovery: fixed residual budgets and new execution contracts; no new GPU or quality claim"
+  "latest_increment_scope": "Actual one-recovery canary failures and charged costs; no further retry or full quality acceptance"
 }
