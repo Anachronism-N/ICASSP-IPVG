@@ -106,6 +106,9 @@ def allocations(method):
 
 
 def validate_plan(plan):
+    if plan.get('schema') == 'teacher_one_recovery_plan_v1':
+        import prepare_teacher_one_recovery as once
+        return once.validate_plan(plan)
     method = plan['method']
     require(method in CAPS and plan['schema'] == SCHEMA and plan['execution_id'] == EXECUTION_ID,
             'Wrong fixed recovery method/execution')

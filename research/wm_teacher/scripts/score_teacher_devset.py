@@ -132,7 +132,7 @@ def required_sources():
         "run_teacher_scoring.py", "gpu_hold.py", "run_teacher_inference_smoke.py",
         "run_teacher_generation.py", "prepare_teacher_recovery.py", "run_teacher_devset.py",
         "measure_teacher_throughput.py", "prepare_teacher_comparison.py", "run_teacher_base.py",
-        "verify_teacher_history.py")]
+        "verify_teacher_history.py", "prepare_teacher_one_recovery.py")]
 
 
 def coverage(roots, records, roles, label):

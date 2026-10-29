@@ -60,6 +60,7 @@ FILES = [
     "scripts/prepare_teacher_recovery.py", "tests/test_teacher_recovery.py",
     "scripts/run_teacher_generation.py", "tests/test_teacher_generation.py",
     "scripts/prepare_teacher_one_recovery.py", "tests/test_teacher_one_recovery.py",
+    "eval/diag/teacher_once_execution_public_20261029.json",
     "eval/diag/teacher_canary_failure_public_20261029.json",
     "scripts/run_teacher_scoring.py", "tests/test_run_teacher_scoring.py",
     "scripts/verify_teacher_history.py", "tests/test_verify_teacher_history.py",

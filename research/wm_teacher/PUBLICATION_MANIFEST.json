@@ -48,8 +48,8 @@
     },
     {
       "path": "docs/31_服务器迁移与CodingAgent交接.md",
-      "source_sha256": "c02853f73e751d91d0567d5237f9fe9497e25c9fe6f4c6352ea98b7777c32f12",
-      "snapshot_sha256": "b372f3715014b13fca6ad06521c1c01c30b661cd146a44fb2b1d293cf215f357"
+      "source_sha256": "069754d2fd7d0c4bcf30397517cd7f70992a51fed4d7a4fa71292ea46ef950e1",
+      "snapshot_sha256": "1d9cad8277fe840adad1e5006885cbe7294d2692f44b93dc23db72a22faede3d"
     },
     {
       "path": "patches/diffsynth_studio_fb337fb.patch",
@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "5257499bf3b60e169413e2753cd33917f455b13f680d40d8ca3318f872b30661",
-      "snapshot_sha256": "5257499bf3b60e169413e2753cd33917f455b13f680d40d8ca3318f872b30661"
+      "source_sha256": "a3e2ee65cec01ff7c18eb4ca8cce9a18adab9d86acdec6bda7d09717255875d4",
+      "snapshot_sha256": "a3e2ee65cec01ff7c18eb4ca8cce9a18adab9d86acdec6bda7d09717255875d4"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -994,8 +994,8 @@
     },
     {
       "path": "scripts/prepare_teacher_recovery.py",
-      "source_sha256": "d2d90bc720f8498630640ed5295bf2c94f8d5c2a0e9d672932cf723e495ed5b8",
-      "snapshot_sha256": "d2d90bc720f8498630640ed5295bf2c94f8d5c2a0e9d672932cf723e495ed5b8"
+      "source_sha256": "eaa2a8bc6cfeda8b9746322f9797ca8b4d12e00541e82d4be1d6f8d6256e469b",
+      "snapshot_sha256": "eaa2a8bc6cfeda8b9746322f9797ca8b4d12e00541e82d4be1d6f8d6256e469b"
     },
     {
       "path": "tests/test_teacher_recovery.py",
@@ -1009,8 +1009,8 @@
     },
     {
       "path": "scripts/run_teacher_base.py",
-      "source_sha256": "25dea301439877816c3fd771b1c41984b1f871f72960bb59e59613acdff9b369",
-      "snapshot_sha256": "25dea301439877816c3fd771b1c41984b1f871f72960bb59e59613acdff9b369"
+      "source_sha256": "33e4c880d331c82a4563af70a1a8f8b7600e1a699f9b5306d28174bd2d6189f7",
+      "snapshot_sha256": "33e4c880d331c82a4563af70a1a8f8b7600e1a699f9b5306d28174bd2d6189f7"
     },
     {
       "path": "tests/test_teacher_base.py",
@@ -1019,8 +1019,8 @@
     },
     {
       "path": "scripts/prepare_teacher_comparison.py",
-      "source_sha256": "c7489a4546dcf0a2f55aae7b4639e9b6aa5c35246733418d352d2ae2f629d5cd",
-      "snapshot_sha256": "c7489a4546dcf0a2f55aae7b4639e9b6aa5c35246733418d352d2ae2f629d5cd"
+      "source_sha256": "3249a69c96df40d3d0be5b78025abb7ecb319f7743238f2fa54aeec821a08f00",
+      "snapshot_sha256": "3249a69c96df40d3d0be5b78025abb7ecb319f7743238f2fa54aeec821a08f00"
     },
     {
       "path": "tests/test_prepare_teacher_comparison.py",
@@ -1029,8 +1029,8 @@
     },
     {
       "path": "scripts/score_teacher_devset.py",
-      "source_sha256": "951e27a0dd88e55653831c28f9a4705e709a5ff4144bb4a0d3803a7c75f63970",
-      "snapshot_sha256": "951e27a0dd88e55653831c28f9a4705e709a5ff4144bb4a0d3803a7c75f63970"
+      "source_sha256": "1c54a5c7d5b7da0ab46828558fc6693d932e6f27d3b941983b4962611a2094da",
+      "snapshot_sha256": "1c54a5c7d5b7da0ab46828558fc6693d932e6f27d3b941983b4962611a2094da"
     },
     {
       "path": "tests/test_score_teacher_devset.py",
@@ -1059,13 +1059,13 @@
     },
     {
       "path": "scripts/run_teacher_generation.py",
-      "source_sha256": "bc545a69fea854616681f15cb6d764f503e90f71bfd81cccbc780183e9aeb7b8",
-      "snapshot_sha256": "bc545a69fea854616681f15cb6d764f503e90f71bfd81cccbc780183e9aeb7b8"
+      "source_sha256": "6b11a57de620fcffe3bc027d39509db2acb599b93f50d93c536bc95b318ba751",
+      "snapshot_sha256": "6b11a57de620fcffe3bc027d39509db2acb599b93f50d93c536bc95b318ba751"
     },
     {
       "path": "tests/test_teacher_generation.py",
-      "source_sha256": "bd702faf223f9dc5e0878334f074ddd4066b75fcbb646a8f41486a54af4e4acf",
-      "snapshot_sha256": "bd702faf223f9dc5e0878334f074ddd4066b75fcbb646a8f41486a54af4e4acf"
+      "source_sha256": "c8f808b3366ee23d098e725db35d57a9ebecbd09c2ecd160281a0d26e7593960",
+      "snapshot_sha256": "c8f808b3366ee23d098e725db35d57a9ebecbd09c2ecd160281a0d26e7593960"
     },
     {
       "path": "scripts/run_teacher_scoring.py",
@@ -1094,18 +1094,23 @@
     },
     {
       "path": "scripts/prepare_teacher_one_recovery.py",
-      "source_sha256": "c0f1c6cb5d8a706594a0f3e158b8b29b2e547235702c45e5829e5c10ec6d4ff9",
-      "snapshot_sha256": "c0f1c6cb5d8a706594a0f3e158b8b29b2e547235702c45e5829e5c10ec6d4ff9"
+      "source_sha256": "43344c7e515ed2bfd900e3b42a9ffea1a3121463e3ea006300d7907e647fdd83",
+      "snapshot_sha256": "43344c7e515ed2bfd900e3b42a9ffea1a3121463e3ea006300d7907e647fdd83"
     },
     {
       "path": "tests/test_teacher_one_recovery.py",
-      "source_sha256": "e2a8711d908cd0fc3dc5d12194bc93b049cb7eb05cdafb36869abc346bbb706c",
-      "snapshot_sha256": "e2a8711d908cd0fc3dc5d12194bc93b049cb7eb05cdafb36869abc346bbb706c"
+      "source_sha256": "5259ffad2bc99d3e2c15da85784b19941f09bab4331104b54ad6b0615842a06c",
+      "snapshot_sha256": "5259ffad2bc99d3e2c15da85784b19941f09bab4331104b54ad6b0615842a06c"
     },
     {
       "path": "eval/diag/teacher_canary_failure_public_20261029.json",
       "source_sha256": "65dd625214a15d6a66b9d2b2aa0d74614f9b78685eed42b8dc647f7a34c7120d",
       "snapshot_sha256": "65dd625214a15d6a66b9d2b2aa0d74614f9b78685eed42b8dc647f7a34c7120d"
+    },
+    {
+      "path": "eval/diag/teacher_once_execution_public_20261029.json",
+      "source_sha256": "39d87ece20610838ba5d8bbd9581293e0cb5e126045e9304867562ec3301869e",
+      "snapshot_sha256": "39d87ece20610838ba5d8bbd9581293e0cb5e126045e9304867562ec3301869e"
     }
   ],
   "experiment_progress": {
@@ -1236,5 +1241,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "Actual failed canary costs and one budget-preserving recovery preparation; generation-only worker validation, no new GPU or quality claim"
+  "latest_increment_scope": "One explicitly authorized recovery: fixed residual budgets and new execution contracts; no new GPU or quality claim"
 }

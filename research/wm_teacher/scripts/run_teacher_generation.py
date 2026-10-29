@@ -132,7 +132,19 @@ def cleanup_owned(child, owner, deadline, tracked=None):
     return signalled
 
 
+def execution_id(plan):
+    return plan.get('execution_id', recovery.EXECUTION_ID)
+
+
+def prior_charge(plan):
+    return plan['prior_generation']['upper_seconds'] if 'prior_generation' in plan else 0.0
+
+
 def fixed_allocations(plan):
+    if plan.get('schema') == 'teacher_one_recovery_plan_v1':
+        import prepare_teacher_one_recovery as once
+        once.validate_plan(plan)
+        return plan['allocations']
     if plan['method'] != 'base':
         return recovery.allocations(plan['method'])
     require('allocations' in plan, 'Native base needs its explicitly frozen physical node mapping')
@@ -153,7 +165,7 @@ def sources(root):
 
 def validate_sidecar(value):
     require(value.get('schema') == SCHEMA and value.get('private') is True
-            and value.get('execution_id') == recovery.EXECUTION_ID and value.get('GPU_authorized') is True
+            and value.get('execution_id') in (recovery.EXECUTION_ID, 'recovery_a2') and value.get('GPU_authorized') is True
             and value.get('GPU_used') is False and value.get('quality_pass') is False
             and value.get('sota_claim') is False, 'Explicit independent execution authorization required')
     require(set(value['plans']) == set(METHODS) and set(value['allocations']) == set(METHODS)
@@ -169,10 +181,11 @@ def validate_sidecar(value):
             base.validate_contract(plan)
         else:
             recovery.validate_plan(plan)
+        require(execution_id(plan) == value['execution_id'], 'Plan/sidecar recovery execution mismatch')
         require(plan.get('common_contract_frozen', method == 'base') is True, 'Unfrozen CPU common contract')
         require(value['allocations'][method] == fixed_allocations(plan), 'All16 immutable caps/owner drift')
         require(sum(a['cap_seconds'] for a in value['allocations'][method])
-                + (0 if method == 'base' else recovery.PRIOR[method][2]) <= plan['phase_seconds']['generation'],
+                + prior_charge(plan) <= plan['phase_seconds']['generation'],
                 'Prior upper charged exactly once; no borrowed budget')
         owners = value['owners'][method]
         require(len(owners) == 2 and {r['node_rank'] for r in owners} == {a['node_rank'] for a in value['allocations'][method]}
@@ -193,7 +206,7 @@ def validate_sidecar(value):
                     hostname=owner['hostname'], GPU_used=False,
                     allocations=[dict(a, status='reserved', GPU_used=False) for a in expected]),
                     'Both real node-local CPU owner reservation snapshots are required')
-            expected_local = recovery.LOCAL_ROOT / f'teacher_{method}_owner_cpu_{recovery.EXECUTION_ID}/reservations.json'
+            expected_local = recovery.LOCAL_ROOT / f'teacher_{method}_owner_cpu_{value["execution_id"]}/reservations.json'
             require(proof['local_reservations']['path'] == str(expected_local)
                     and proof['local_reservations']['sha256'] == sha(encoded(reservation))
                     and proof['local_reservations']['bytes'] == len(encoded(reservation))
@@ -231,6 +244,12 @@ def validate_sidecar(value):
             frozen_sources = read_bound(value['plans']['alg'])['source_files']
             require(probe['source'] in frozen_sources and probe['test_source'] in frozen_sources,
                     'CPU probe must bind exactly frozen protocol/test sources')
+    if value['execution_id'] == 'recovery_a2':
+        import prepare_teacher_one_recovery as once
+        budgets=[read_bound(value['plans'][m])['recovery_budget'] for m in METHODS]
+        require(all(b==budgets[0] for b in budgets) and value.get('recovery_budget')==budgets[0],
+                'All three recovery methods require the same approved once-only budget')
+        once.validate_budget_record(budgets[0])
     return value
 
 
@@ -243,11 +262,16 @@ def verify_retirement(row, method, plan):
 def validate_authorization(value):
     authorization = read_bound(value['authorization'])
     require(authorization.get('schema') == 'teacher_generation_authorization_v1'
-            and authorization.get('GPU_authorized') is True and authorization['execution_id'] == recovery.EXECUTION_ID
+            and authorization.get('GPU_authorized') is True and authorization['execution_id'] == value['execution_id']
             and authorization['methods'] == list(METHODS) and authorization['comparison'] == value['comparison']
             and authorization['allocations'] == value['allocations'] and authorization['canary_shard'] == 0
             and authorization['retry_allowed'] is False and authorization['borrow_allowed'] is False,
             'CLI boolean is not approved user execution authorization')
+    if value['execution_id']=='recovery_a2':
+        require(authorization.get('recovery_budget')==value.get('recovery_budget'),
+                'New execution authorization must explicitly bind the one-recovery budget')
+        import prepare_teacher_one_recovery as once
+        once.validate_budget_record(value['recovery_budget'])
     return authorization
 
 
@@ -409,7 +433,7 @@ def reserve_owner_cpu(plan, digest, rank, local_root=recovery.LOCAL_ROOT):
     require(sha(encoded(plan)) == digest, 'CPU owner reservation plan digest drift')
     fixed = [a for a in fixed_allocations(plan) if a['node_rank'] == rank]
     require(len(fixed) == 8, 'Only own8 CPU reservations may be created')
-    path = recovery.local_path(Path(local_root) / f'teacher_{plan["method"]}_owner_cpu_{recovery.EXECUTION_ID}' / 'reservations.json', local_root)
+    path = recovery.local_path(Path(local_root) / f'teacher_{plan["method"]}_owner_cpu_{execution_id(plan)}' / 'reservations.json', local_root)
     require(not path.parent.exists(), 'CPU owner reservation exists; never reset or retry')
     path.parent.mkdir(mode=0o700)
     value = dict(schema='teacher_generation_owner_cpu_allocations_v1', plan_sha256=digest, method=plan['method'],
@@ -477,7 +501,7 @@ def prepare_execution(comparison_path, approved_comparison_sha, authorization, a
     require(owner['hostname'] == os.uname().nodename and owner['node_rank'] == 0, 'Full execution preparation belongs to rank0 scoring host')
     common = comparison.verify(comparison_path, approved_comparison_sha)
     plans = {m: read_bound(common['plans'][m]) for m in METHODS}
-    value = dict(schema=SCHEMA, private=True, execution_id=recovery.EXECUTION_ID, GPU_authorized=True,
+    value = dict(schema=SCHEMA, private=True, execution_id=execution_id(plans['base']), GPU_authorized=True,
         GPU_used=False, quality_pass=False, sota_claim=False, comparison=record(comparison_path, nonempty=True),
         plans=common['plans'], allocations={m: fixed_allocations(p) for m, p in plans.items()}, owners=owners,
         authorization=record(authorization, nonempty=True), retirement=retirement,
@@ -487,6 +511,8 @@ def prepare_execution(comparison_path, approved_comparison_sha, authorization, a
         cleanup_seconds=CLEANUP_SECONDS, worker_margin_seconds=WORKER_MARGIN_SECONDS, kill_seconds=KILL_SECONDS,
         canary_shard=0, canary_job_count=12,
         retry_allowed=False, borrow_allowed=False)
+    if value['execution_id']=='recovery_a2':
+        value['recovery_budget']=plans['base']['recovery_budget']
     require(value['authorization']['sha256'] == approved_authorization_sha, 'Explicit approved authorization SHA required')
     validate_sidecar(value)
     verify_scoring_owner(value, full_content=True)
@@ -787,7 +813,7 @@ def supervise(path, approved_sha, method, shard, rank, *, gpu_authorized=False,
                            and interrupted is None and error is None and not timed_out and end - start <= cap)
         except (OSError, ValueError, KeyError, AttributeError):
             pass
-        receipt = dict(allocation, schema=RECEIPT_SCHEMA, execution_id=recovery.EXECUTION_ID, method=method,
+        receipt = dict(allocation, schema=RECEIPT_SCHEMA, execution_id=execution['execution_id'], method=method,
             execution=record(path, nonempty=True), execution_sha256=approved_sha, plan_sha256=execution['plans'][method]['sha256'],
             hostname=os.uname().nodename, owner_pid=owner['pid'], owner=owner, session=session,
             start=epoch, end=end_epoch, start_monotonic=start, end_monotonic=end, elapsed_seconds=end - start,
@@ -990,7 +1016,7 @@ def verify_case(row, plan, plan_sha, decode=True):
 
 
 def verify_parent_release(receipt, plan):
-    require(receipt.get('schema') == RECEIPT_SCHEMA and receipt.get('execution_id') == recovery.EXECUTION_ID
+    require(receipt.get('schema') == RECEIPT_SCHEMA and receipt.get('execution_id') == execution_id(plan)
             and receipt.get('method') == plan['method'], 'Not a supervised execution parent receipt')
     execution = verify_execution(receipt['execution']['path'], receipt['execution']['sha256'])
     recovery.check_content(receipt['execution'])
@@ -1081,7 +1107,7 @@ def verify_parent_release(receipt, plan):
 
 def collect_costs(execution, method, receipts):
     plan, digest = read_bound(execution['plans'][method]), execution['plans'][method]['sha256']
-    if method != 'base':
+    if method != 'base' and plan.get('schema') != 'teacher_one_recovery_plan_v1':
         return recovery.collect_costs(plan, digest, receipts)
     unknown, over, actual, charged = [], [], 0., 0.
     require(all(type(k) is int and 0 <= k < 16 for k in receipts), 'Unexpected collector shard')
@@ -1102,8 +1128,9 @@ def collect_costs(execution, method, receipts):
             charged += max(fixed['cap_seconds'], reported or 0)
         if (reported or 0) > fixed['cap_seconds']:
             over.append(fixed['shard'])
-    return dict(new_actual_seconds=actual if not unknown else None, generation_charged_upper_seconds=charged,
-                unknown_shards=unknown, over_cap_shards=over, budget_exceeded=bool(over) or charged > 72000,
+    total=prior_charge(plan)+charged
+    return dict(new_actual_seconds=actual if not unknown else None, generation_charged_upper_seconds=total,
+                unknown_shards=unknown, over_cap_shards=over, budget_exceeded=bool(over) or total > plan['phase_seconds']['generation'],
                 allocation_evidence_complete=not unknown and not over)
 
 

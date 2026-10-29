@@ -73,6 +73,9 @@ def score_bundle_binding(path, approved_sha):
 
 
 def validate_contract(plan):
+    if plan.get('schema') == 'teacher_one_recovery_plan_v1':
+        import prepare_teacher_one_recovery as once
+        return once.validate_plan(plan)
     require(plan.get("schema") == SCHEMA and plan.get("private") is True
             and plan.get("method") == "base" and plan.get("checkpoint") == "NONE"
             and plan.get("parameters") == {} and plan.get("active_steps") == 0
@@ -264,7 +267,7 @@ def native_canary_estimate(plan, case_receipts, *, load_seconds, allocated_elaps
     validate_contract(plan)
     require(type(load_seconds) in (int, float) and math.isfinite(load_seconds) and load_seconds > 0
             and type(allocated_elapsed_seconds) in (int, float) and math.isfinite(allocated_elapsed_seconds)
-            and 0 < allocated_elapsed_seconds <= CAP_SECONDS, "Invalid native canary allocation/load timing")
+            and 0 < allocated_elapsed_seconds <= plan["shard_cap_seconds"][0], "Invalid native canary allocation/load timing")
     expected_jobs = [j for j in plan["jobs"] if j["index"] % NSHARDS == CANARY_SHARD]
     require(len(expected_jobs) == 12 and len(case_receipts) == 12
             and [r.get("job") for r in case_receipts] == expected_jobs, "Native canary is the fixed12 formal shard0 jobs")
@@ -301,8 +304,10 @@ def native_canary_estimate(plan, case_receipts, *, load_seconds, allocated_elaps
                     for s in range(NSHARDS)]
     shard_seconds = [body + residual for body in body_seconds]
     total = sum(shard_seconds)
-    ready = all(body < CAP_SECONDS - tail for body in body_seconds)
-    ready = ready and all(s < CAP_SECONDS for s in shard_seconds) and total <= PHASE_SECONDS["generation"]
+    caps=plan["shard_cap_seconds"]
+    prior=plan.get("prior_generation",{}).get("upper_seconds",0.0)
+    ready = all(body < cap - tail for body,cap in zip(body_seconds,caps))
+    ready = ready and all(s < cap for s,cap in zip(shard_seconds,caps)) and prior+total <= PHASE_SECONDS["generation"]
     return dict(schema="teacher_base_native_canary_admission_v1", method="base", canary_shard=CANARY_SHARD,
         canary_jobs=12, measured_allocation_seconds=allocated_elapsed_seconds, load_seconds=load_seconds,
         max_case_seconds=per_case, allocation_residual_seconds=residual, cleanup_seconds=cleanup,

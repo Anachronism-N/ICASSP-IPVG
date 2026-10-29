@@ -1,0 +1,109 @@
+{
+  "schema": "teacher_once_execution_preparation_public_v1",
+  "date": "2026-10-29",
+  "execution_id": "recovery_a2",
+  "one_recovery_explicitly_user_authorized": true,
+  "budget_increase": false,
+  "previous_complete_videos_preserved": 20,
+  "previous_videos_reused_in_strict_comparison": false,
+  "old_actual_GPUh": {
+    "base": 1.2186465777906899,
+    "alg": null,
+    "dymos": null
+  },
+  "prior_generation_charge_GPUh": {
+    "base": 1.2186465777906899,
+    "alg": 3.001517162525949,
+    "dymos": 2.655524471504614
+  },
+  "remaining_stage_GPUh": {
+    "base_generation": 18.78135342220931,
+    "alg_generation": 20.99848283747405,
+    "dymos_generation": 21.344475528495387,
+    "base_score": 5,
+    "candidate_score_each": 16
+  },
+  "fixed_new_shard_caps_seconds": {
+    "base": [
+      4300,
+      4300,
+      4300,
+      4300,
+      4300,
+      4300,
+      4300,
+      4300,
+      4300,
+      4300,
+      4300,
+      4300,
+      4000,
+      4000,
+      4000,
+      4000
+    ],
+    "alg": [
+      4775,
+      4775,
+      4775,
+      4775,
+      4775,
+      4775,
+      4775,
+      4775,
+      4775,
+      4775,
+      4775,
+      4775,
+      4475,
+      4475,
+      4475,
+      4475
+    ],
+    "dymos": [
+      4800,
+      4800,
+      4800,
+      4800,
+      4800,
+      4800,
+      4800,
+      4800,
+      4800,
+      4800,
+      4800,
+      4800,
+      4800,
+      4800,
+      4800,
+      4800
+    ]
+  },
+  "protocol": {
+    "n_cases": 94,
+    "seeds": [
+      0,
+      1
+    ],
+    "fresh_videos_per_method": 188,
+    "steps": 50,
+    "frames": 121,
+    "fps": 24,
+    "width": 1280,
+    "height": 704,
+    "CFG": 5,
+    "sigma_shift": 5,
+    "checkpoint": "NONE"
+  },
+  "scoring_bundle_sha256": "1b9963c9fa52a2fff195f30cc5b393aff7aeadd3d83567dcdbd056766ffefd90",
+  "scoring_bundle_actual_assets_verified": true,
+  "scoring_bundle_metadata_staged_exactly_to_four_nodes": true,
+  "repair": "Single-pass SHA-bound JSON parsing; generation-only worker validation under live exact parent CLI and unchanged mandatory own-generation asset/runtime/input SHA checks",
+  "recovery_plans_preparing": true,
+  "new_GPU_attempt_started": false,
+  "quality_pass": false,
+  "SOTA_proven": false,
+  "AR_allowed": false,
+  "repeat_after_new_failure_allowed": false,
+  "caveat": "Only a new, fully content-frozen execution under these residual caps can run. Prior fees and complete diagnostic videos are preserved. Budget arithmetic, metadata copies and CPU tests do not attest successful new canaries, final scores or real review."
+}

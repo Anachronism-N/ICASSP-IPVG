@@ -1,3 +1,14 @@
+# 一次恢复执行合同接线（2026-10-29，源冻结与门禁进行中）
+
+recovery_a2已接入新独立teacher_one_recovery_plan_v1与现有受控runner/严格比较/原生canary/费用汇总：所有新计划必须绑定同一个已批准budget.blocked记录、同94×双seed完整188、固定method与物理owner、差异化16caps；base失败费用4387.127680、ALG原上界＋本次4879.150361、Dy原上界全部只扣一次，不能置零或移phase。旧a1计划与20诊断视频不修改、不混入新严格同版本比较。
+
+- 自有生成模型/runtime/source/输入在CUDA前实际SHA继续强制；worker只不重复读取/加载评分host资产，live父PID/start/完整CLI与immutable侧车均核。原host评分阶段仍实际全核metric模型/runtime。
+- 实际评分bundle已按当前source/全部权重依赖核过；新增one-recovery验证代码纳入评分bundle，SHA1b9963c9fa52a2fff195f30cc5b393aff7aeadd3d83567dcdbd056766ffefd90。32MB元数据本身被原字节/原mtime复制到四节点同本地路径，原共享JSON保留；这只避免共享读等待，不复制其他节点缺失的评分env，也不把metadata当weight核验。
+- 新prepare_teacher_one_recovery --method CPU实际计划准备已启动，固定新root teacher_{base,alg,dymos}_once_recovery_20261029；旧执行禁止复用。预算算术≤原72000/86400秒，但实际首12job全生命周期与130秒尾buffer仍必须证明，否则停止且禁止第二次恢复。
+- 新source/模型/runtime/CPUowner/比较/授权侧车及完整公开测试/远端字节门全部通过前，无新GPU尝试；人审实际认证未完成，Teacher/SOTA/AR门继续关闭。
+
+---
+
 # 一次恢复授权与代码修复（2026-10-29，尚未再次GPU执行）
 
 用户交互明确选择“允许一次恢复，预算不变”。已保留base/ALG各10完整视频及全部失败账本，未重跑任何分片。新私有预算侧车eval/teacher_once_recovery_20261029/budget.blocked.json绑定实际失败audit与原费用上界，仍BLOCKED，不作为GPU执行授权。

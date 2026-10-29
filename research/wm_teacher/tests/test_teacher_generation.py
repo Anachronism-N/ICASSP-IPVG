@@ -232,6 +232,7 @@ class GenerationTests(unittest.TestCase):
             p.update(method=method, common_contract_frozen=True, source_files=sources,
                 models=models, model_content_sha256='content', runtime=dict(files=[], python='CPU-TEST'))
             if method == 'base':
+                p.pop('prior_generation', None)  # A fresh original base does not inherit the ALG prior fixture.
                 p['allocations'] = [dict(a, cap_seconds=4500) for a in recovery.allocations('alg')]
                 p['phase_seconds'] = dict(generation=72000, score=18000)
             values['plans'][method] = dict(path='plan-' + method, sha256='sha-' + method)

@@ -21,11 +21,29 @@ SCHEMA = "teacher_comparison_plan_v1"
 METHODS = ("base", "alg", "dymos")
 
 
+def plan_output(plan):
+    if plan.get('schema') == 'teacher_one_recovery_plan_v1':
+        import prepare_teacher_one_recovery as once
+        return once.output_root(plan['root'],plan['method'])
+    return base.output_root(plan['root']) if plan['method']=='base' else recovery.plan_folder(plan['root'],plan['method'])
+
+
+def plan_location(plan):
+    name='plan.BLOCKED.json' if plan['method']=='base' and plan.get('schema') != 'teacher_one_recovery_plan_v1' else 'plan.blocked.json'
+    return plan_output(plan)/name
+
+
+def plan_prior(plan):
+    return plan['prior_generation']['upper_seconds'] if 'prior_generation' in plan else 0.0
+
+
 def common_contract(plan):
     root = Path(plan["root"])
     common_paths = {str(p) for p in dev.sources(root)} | {str(root / name) for name in (
         "scripts/run_teacher_generation.py", "tests/test_teacher_generation.py",
         "scripts/verify_teacher_history.py", "tests/test_verify_teacher_history.py")}
+    if plan.get("schema") == "teacher_one_recovery_plan_v1":
+        common_paths |= {str(root/name) for name in ("scripts/prepare_teacher_one_recovery.py", "tests/test_teacher_one_recovery.py")}
     rows = plan["source_files"]
     require(len(rows) == len({r["path"] for r in rows})
             and common_paths <= {r["path"] for r in rows}, "Missing/duplicate common generation sources")
@@ -41,7 +59,10 @@ def common_contract(plan):
 
 def _validate_shared_plan_content(plan, method, score_binding):
     require(plan.get("method") == method and plan.get("private") is True, "Wrong approved comparison method")
-    if method == "base":
+    if plan.get('schema') == 'teacher_one_recovery_plan_v1':
+        import prepare_teacher_one_recovery as once
+        once.validate_plan(plan)
+    elif method == "base":
         base.validate_contract(plan)
     else:
         require(plan.get("schema") == recovery.SCHEMA and plan.get("common_contract_frozen") is True,
@@ -58,7 +79,7 @@ def _validate_shared_plan_content(plan, method, score_binding):
             and plan.get("seeds") == [0, 1] and plan.get("video_count") == 188, "Comparison generation spec drift")
     root = Path(plan["root"])
     require(root.resolve() == root, "Comparison root must be canonical")
-    expected_root = base.output_root(root) if method == "base" else recovery.plan_folder(root, method)
+    expected_root = plan_output(plan)
     require(plan["output_root"] == str(expected_root), "Comparison method output root drift")
     _, cases, inputs, manifest = dev.frozen_cases(root)
     require(plan["cases_file"] == manifest and plan["cases"] == cases and plan["inputs"] == inputs,
@@ -69,7 +90,11 @@ def _validate_shared_plan_content(plan, method, score_binding):
     negative = smoke.generator_negative(root)
     require(plan["negative_prompt"] == negative and plan["negative_sha256"] == sha(negative.encode()), "Comparison NEG mismatch")
     require(plan["model_content_sha256"] == sha(encoded(base.model_identity(plan["models"]))), "Comparison model digest mismatch")
-    expected_sources = base.sources(root) if method == "base" else recovery.sources(root)
+    if plan.get('schema') == 'teacher_one_recovery_plan_v1':
+        import prepare_teacher_one_recovery as once
+        expected_sources=once.sources(root,method)
+    else:
+        expected_sources = base.sources(root) if method == "base" else recovery.sources(root)
     require(len(plan["source_files"]) == len(expected_sources)
             and {r["path"] for r in plan["source_files"]} == {str(p) for p in expected_sources},
             "Missing/duplicate common generation sources or unapproved source set")
@@ -98,8 +123,7 @@ def verify_three_plans(plan_paths, approved_shas, score_bundle, approved_score_s
         require(expected["sha256"] == approved_shas[method], "Approved comparison plan SHA mismatch")
         plan = json.loads(path.read_bytes())
         validate_plan_content(plan, method, score_binding)
-        expected_path = (base.output_root(plan["root"]) / "plan.BLOCKED.json" if method == "base"
-                         else recovery.plan_folder(plan["root"], method) / "plan.blocked.json")
+        expected_path = plan_location(plan)
         require(path == expected_path and path.parent.stat().st_mode & 0o077 == 0,
                 "Strict comparison requires immutable fresh/recovery plan location, not old candidate root")
         require(record(path, nonempty=True) == expected, "Comparison plan changed during verification")
@@ -126,7 +150,7 @@ def prepare(plan_paths, approved_shas, score_bundle, approved_score_sha, output)
         total_seconds={m: plans[m]["total_seconds"] for m in METHODS},
         prior_generation={m: plans[m]["prior_generation"] for m in ("alg", "dymos")},
         generation_charged_upper_seconds={m: sum(plans[m]["shard_cap_seconds"])
-            + (0 if m == "base" else plans[m]["prior_generation"]["upper_seconds"]) for m in METHODS},
+            + plan_prior(plans[m]) for m in METHODS},
         status="BLOCKED", runnable=False, GPU_used=False, quality_pass=False, sota_claim=False,
         blockers=list(base.BLOCKERS), strict_baseline_reuse_allowed=False,
         restriction="CPU common contract only; require all 3x188 real generation receipts and score content bindings before comparison")
@@ -154,7 +178,7 @@ def verify(path, approved_sha):
             "Comparison contract/hash drift")
     require(value["prior_generation"] == {m: plans[m]["prior_generation"] for m in ("alg", "dymos")}
             and value["generation_charged_upper_seconds"] == {m: sum(plans[m]["shard_cap_seconds"])
-                + (0 if m == "base" else plans[m]["prior_generation"]["upper_seconds"]) for m in METHODS},
+                + plan_prior(plans[m]) for m in METHODS},
             "Comparison historical prior plus recovery caps drift")
     require(value["blockers"] == base.BLOCKERS and value["phase_seconds"] == {m: plans[m]["phase_seconds"] for m in METHODS}
             and value["total_seconds"] == {m: plans[m]["total_seconds"] for m in METHODS}
@@ -200,8 +224,7 @@ def verify_metadata(path, approved_sha):
         plan, plan_record = read_evidence(row["path"], row["sha256"])
         require(plan_record == row and Path(row["path"]).stat().st_mode & 0o077 == 0, "Frozen private plan JSON binding drift")
         _validate_shared_plan_content(plan, method, bundle_record)
-        expected_path = (base.output_root(plan["root"]) / "plan.BLOCKED.json" if method == "base"
-                         else recovery.plan_folder(plan["root"], method) / "plan.blocked.json")
+        expected_path = plan_location(plan)
         require(Path(row["path"]) == expected_path, "Frozen plan location drift")
         metadata_rows = plan["models"] + plan["runtime"]["files"]
         for metadata in metadata_rows:
@@ -223,7 +246,7 @@ def verify_metadata(path, approved_sha):
     require(all(r.get("allowed") is False for r in plans["base"]["historical_base_reuse"].values())
             and value["prior_generation"] == {m: plans[m]["prior_generation"] for m in ("alg", "dymos")}
             and value["generation_charged_upper_seconds"] == {m: sum(plans[m]["shard_cap_seconds"])
-                + (0 if m == "base" else plans[m]["prior_generation"]["upper_seconds"]) for m in METHODS}
+                + plan_prior(plans[m]) for m in METHODS}
             and value["phase_seconds"] == {m: plans[m]["phase_seconds"] for m in METHODS}
             and value["total_seconds"] == {m: plans[m]["total_seconds"] for m in METHODS}
             and value["interventions"] == {m: dict(parameters=plans[m]["parameters"], active_steps=plans[m]["active_steps"],
@@ -376,7 +399,7 @@ def verify_generation_completion(path, approved_sha, *, common_execution_sha256,
     require(set(parents) == set(range(16)), "All16 distinct supervised parents required")
     cases.sort(key=lambda row: row["job"]["index"])
     require(cases == value["cases"] and [row["job"] for row in cases] == plan["jobs"], "All94x2seed exact job coverage drift")
-    prior = 0.0 if method == "base" else plan["prior_generation"]["upper_seconds"]
+    prior = plan_prior(plan)
     require(prior + elapsed <= plan["phase_seconds"]["generation"]
             and type(value["costs"].get("generation_charged_upper_seconds")) in (int, float)
             and math.isclose(value["costs"]["generation_charged_upper_seconds"], prior + elapsed, abs_tol=1e-8),
