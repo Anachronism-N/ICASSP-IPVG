@@ -35,22 +35,41 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 MODEL_PATH = Path(os.environ.get("E3_RECAPTION_MODEL") or ROOT / "models" / "Qwen2.5-VL-7B-Instruct")
-PROMPT_VERSION = "e3-grounded-recaption-v2"
+PROMPT_VERSION = "e3-grounded-recaption-v3"
 N_FRAMES = 8
 HELD_RE = re.compile(r"\b(hold(?:s|ing|s)?|holding|grasp(?:s|ing)?|grip(?:s|ping)?|picks? up|carries|in (?:his|her|their) hand)\b", re.I)
 
-FACT_PROMPT = """You are watching a {n}-frame video sampled uniformly from a 5-second clip. List ONLY what is clearly visible.
+FRAME_NUMBER_PATTERN = (
+    r"(?:[+-]?[0-9]+(?:st|nd|rd|th)?|zero|one|two|three|four|five|six|seven|eight|nine|ten|"
+    r"eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|"
+    r"first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth|"
+    r"thirteenth|fourteenth|fifteenth|sixteenth|seventeenth|eighteenth|nineteenth|twentieth)"
+)
+FRAME_META_RE = re.compile(
+    r"\bframes?\b\s*(?:(?:number|numbers|index|indices|no\.?|from)\s*)?[:=#\[(]?\s*"
+    + FRAME_NUMBER_PATTERN + r"\b|\b" + FRAME_NUMBER_PATTERN + r"\s+frames?\b", re.I,
+)
+FRAME_OBJECT_DIMENSION_RE = re.compile(
+    r"\b(?:picture|photo|photograph) frame\s+"
+    r"(?:[0-9]+(?:\.[0-9]+)?|zero|one|two|three|four|five|six|seven|eight|nine|ten|"
+    r"eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\s+"
+    r"(?:inches|inch|meters?|metres?|centimeters?|centimetres?|millimeters?|millimetres?|"
+    r"feet|foot|cm|mm|ft|m)\b", re.I,
+)
+
+FACT_PROMPT = """You are viewing {n} sampled images from a 5-second clip, not the full video. List ONLY what is clearly visible.
 Return STRICT JSON (double quotes, no comments, no trailing commas) with exactly these keys:
 "scene": string; "rendered_or_screen": boolean (is this gameplay/CGI/screen recording?);
 "entities": list of objects with keys "desc" (string, generic term if unclear) and "attrs" (list of strings, only clearly visible attributes);
 "hands": object with keys "visible" (boolean) and "held_object" (string ONLY if hand-object contact is clearly visible in at least 2 frames, else null);
-"actions_by_time": list of objects with keys "frames" (string, e.g. "0-3", indices of the displayed sampled images, NOT original video frame numbers) and "action" (string, visible motion only);
-"start_end_difference": string (what changed from first to last frame, or "no visible change").
-Rules: do not guess object types you cannot identify; do not state gender/age/hair/clothing colors unless clearly visible; do not invent an ending; prefer fewer, safer statements."""
+"actions_by_time": list of objects with keys "frames" (string, a single index or inclusive range such as "0-3", indices of the displayed sampled images, NOT original video frame numbers; only 0..7, never 8 or 9) and "action" (string, include the visible subject description, visible action and direction when observable);
+"start_end_difference": string (what visibly changed from the first to last displayed sample, or "no visible change" only if supported).
+Rules: use entities.desc to distinguish people by visible hats, clothing or screen position in each action. If the subject cannot be distinguished, use a generic subject, do not guess. Keep each held object attached to its visibly supported holder; never transfer an object or action between people. Describe visible hand/arm/tool movements, head turns and posture changes; a static background does not mean a static subject. Panning or zooming a static photograph is not object motion; do not invent dynamic actions from an unchanged pose. Do not infer continuous actions, a pause/resumption, or a new held object between samples without visible support.
+Do not guess object types, brands, OCR text, ingredients, occupations, emotions or internal states; use generic visible descriptions or omit uncertain details. Do not state gender/age/hair/clothing colors unless clearly visible. Do not invent an ending or events outside the samples; prefer fewer, safer statements."""
 
-WRITE_PROMPT = """Write ONE English caption paragraph (40-120 words) for video-model training, using ONLY these confirmed facts:
+WRITE_PROMPT = """Write ONE English caption paragraph (40-120 words), using ONLY these visible facts:
 {facts}
-Rules: mention a held object ONLY if "held_object" is non-null; use generic terms for unidentifiable things; say the scene stays mostly still if that is what the facts show; do NOT describe camera movement (added separately); do NOT add any fact absent above; shorter is better than guessing. Output the paragraph only."""
+Rules: preserve the exact visible subject for each action and held object, using the distinguishing descriptions in entities and actions_by_time. Never transfer actions or held objects between people. Do not omit actions supported by the facts, including hand/arm/tool movements, head turns and posture changes. Mention a held object ONLY if "held_object" is non-null. Use generic terms or omit uncertain object types, brands, OCR text and ingredients; do not infer emotions or internal states. Do NOT describe camera movement (added separately); do NOT add any fact absent above or invent events outside the samples. Do NOT mention frame/frames, sample indices or numbering, timestamps, facts tables, model training or other meta information. Do not add "mostly still" or any other fact to meet a length target; a static background does not mean a static subject. Shorter is better than guessing. Output the paragraph only."""
 
 VERIFY_PROMPT = """Look at these frames from one video. Question: does the person visibly hold or grip the object described as "{claim}" in at least one frame? Answer exactly one word: yes / no / unclear."""
 
@@ -198,6 +217,13 @@ def validate_facts(facts):
             raise ValueError("each action must contain frames and action")
         if not isinstance(action["frames"], str) or not isinstance(action["action"], str):
             raise ValueError("action frames and action must be strings")
+        interval = re.fullmatch(r"(0|[1-9][0-9]*)(?:-(0|[1-9][0-9]*))?", action["frames"])
+        if interval is None:
+            raise ValueError("action frames must be a displayed index or inclusive start-end range")
+        start = int(interval.group(1))
+        end = int(interval.group(2)) if interval.group(2) is not None else start
+        if not 0 <= start <= end < N_FRAMES:
+            raise ValueError("action frames outside the displayed sampled-frame range")
     return facts
 
 
@@ -247,6 +273,10 @@ def recaption_one(model, processor, video, device):
     # decode prompts sometimes leak; keep only the assistant tail after the last 'assistant' marker
     if "assistant" in caption:
         caption = caption.rsplit("assistant", 1)[-1].strip()
+    dimension_spans = [m.span() for m in FRAME_OBJECT_DIMENSION_RE.finditer(caption)]
+    if any(not any(start <= m.start() and m.end() <= end for start, end in dimension_spans)
+           for m in FRAME_META_RE.finditer(caption)):
+        raise ValueError("caption contains displayed-frame index metadata")
     # Hard post-filter: writing stage sometimes adds hold-verbs even when facts say null.
     removed = []
     if not held_claims(facts):
@@ -260,7 +290,7 @@ def recaption_one(model, processor, video, device):
     caption = re.sub(r"[^.!?]*\b(?:video-model training|video model training|using only these confirmed facts|as an ai\b)[^.!?]*[.!?]?\s*", "", caption, flags=re.I)
     caption = re.sub(r"([.!?])(?=[A-Z])", r"\1 ", caption).strip()  # spacing between kept sentences
     if len(caption) < 40:
-        caption = "A mostly still scene. " + caption
+        raise ValueError("caption is shorter than 40 characters after filtering")
     # second pass: verify held-object claims on 4 frames
     for claim in held_claims(facts):
         vimgs = [f.resize((640, 352)) for f in frames[::2][:4]]
@@ -280,7 +310,7 @@ def recaption_one(model, processor, video, device):
             removed.append({"claim": claim, "verdict": ans[:40]})
     caption = re.sub(r"([.!?])(?=[A-Z])", r"\1 ", caption).strip()
     if len(caption) < 40:
-        caption = "A mostly still scene. " + caption
+        raise ValueError("caption is shorter than 40 characters after filtering")
     return facts, caption, removed
 
 

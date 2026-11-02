@@ -33,7 +33,8 @@
     "weight_shards_each": 5,
     "common_content_sha256": "b400159941dc7fcc823a66641f0e6fcc7c928fa9831cea540ad942d09fa8d617",
     "new_remote_directories_staged_from_verified_local_source": true,
-    "CUDA_initialized": false
+    "CUDA_initialized": true,
+    "scope": "Original prelaunch four-node CPU model content proof; subsequent successful pilot ran Qwen CUDA"
   },
   "label_pilot": {
     "selected": 16,
@@ -44,12 +45,59 @@
     "metadata_safety_is_visual_truth": false,
     "GPUs_per_node": 1,
     "jobs_per_node": 4,
-    "hard_cap_seconds_per_node": 900,
+    "hard_cap_seconds_per_node": 860,
     "total_pilot_cap_GPUh": 1,
     "charged_to_phase": "label_rebuild_and_cache",
-    "labels_completed": 0,
+    "labels_completed": 16,
     "semantic_review_pass": false,
-    "formal_training_allowed": false
+    "formal_training_allowed": false,
+    "original_v2_structure_valid": 16,
+    "parent_success_nodes": 4,
+    "GPU_released_nodes": 4,
+    "new_allocated_seconds": 259.7616256037727,
+    "previous_failed_seconds": 70.82982997084036,
+    "cumulative_allocated_GPUh": 0.09183095988183697,
+    "remaining_label_cache_stage_GPUh": 23.908169040118164,
+    "independent_completion_checks": 228,
+    "original_byte_copies_verified": 44,
+    "temporal_index_audit": {
+      "records": 16,
+      "out_of_sampled_frame_range": 9,
+      "in_range": 7,
+      "valid_displayed_frame_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "semantic_validation": false
+    },
+    "visual_AI_review_status": "complete; semantic admission failed",
+    "full_label_rebuild_allowed_after_this_pilot": false,
+    "visual_AI_review": {
+      "reviewed_cases": 16,
+      "adequate": 2,
+      "needs_edit": 14,
+      "supported_claims": 44,
+      "unsupported_claims": 30,
+      "uncertain_claims": 34,
+      "scope": "8_sampled_frames_not_full_video",
+      "reviewer_type": "AI_independent",
+      "human_review_performed": false,
+      "semantic_training_approval": false,
+      "full_video_review": false,
+      "defect_categories": [
+        "subject and held-object attribution",
+        "omitted visible motion",
+        "unsupported object type or brand OCR",
+        "invented temporal range or ending",
+        "camera/image reframe confused with subject motion"
+      ]
+    }
   },
   "CPU_training_components": {
     "topology_four_nodes_eight_GPUs_each": 32,
@@ -62,7 +110,23 @@
       "Bounded pre-spawn through final-release allocation ledger",
       "Validated v2 training labels/cache and independent semantic review",
       "Frozen formal candidate training budget"
-    ]
+    ],
+    "single_gpu_smoke_resume": {
+      "source_sha256": "f91310f16cfb5ae15e429ad3e3cebaed3f0ed6ee376b437d2fb7512b7e28f0e0",
+      "tests_sha256": "3e597d0ad67467c082536b2cf24b4e3341dbe909e4282919803a15bffb0158db",
+      "CPU_tests_passed": 39,
+      "CPU_tests_skipped": 0,
+      "includes_new_resume_tests": 6,
+      "independent_verification_status": "passed CPU targeted six + independent fresh process complete RNG trajectory and strict num_samples; not CUDA",
+      "actual_CUDA_resume_proven": false,
+      "smoke_partial_success_rejected": true,
+      "synthetic_smoke_CLI_python_rng_seed_fixed": true,
+      "adapter_initial_final_hashes": true,
+      "actual_trainer_pid_start_ticks_recorded": true,
+      "source_bound_explicit_resume_proof": true,
+      "phase_scope": "single_gpu_training_resume; synthetic technical only",
+      "proof_authorizes_allocation": false
+    }
   },
   "CPU_pilot_safety_repairs": [
     "Exact five model shards plus nine config/tokenizer files bound to the actual loading root",
@@ -70,17 +134,76 @@
     "Repeated TERM/INT latched through owned cleanup and cost receipt saving",
     "Separate final cost record includes parent-save overhead"
   ],
-  "real_GPU_pilot_started": false,
+  "real_GPU_pilot_started": true,
   "real_training_started": false,
   "quality_pass": false,
   "SOTA_proven": false,
   "AR_allowed": false,
   "student_distillation_allowed": false,
-  "caveat": "Metadata, model bytes and CPU tests are not caption visual correctness, validated training labels, successful CUDA training or SOTA. All real pilot/technical work is bounded within the explicitly approved separate stages.",
+  "caveat": "16/16 passed original six-root field-type structure checks, NOT semantic quality: 9/16 later show out-of-range temporal indices; sparse-frame AI review is not human gold. No full rebuild or formal training released. Exact new pilot GPU cost includes prior failures; final cost-file write duration was not independently timed.",
   "related_CPU_tests": {
     "passed": 151,
     "failed": 0,
     "exit_code": 0,
     "scope": "Label CPU metadata/reservation,13 real-pilot CPU gates,33 trainer CPU/Gloo tests, recaption parser and export contracts"
+  },
+  "label_protocol_repair": {
+    "prospective_version": "e3-grounded-recaption-v3",
+    "temporal_indices": "single displayed index or inclusive interval, 0..7 only",
+    "unsupported_short_caption_fallback_removed": true,
+    "actual_visual_validation_pass": false,
+    "independent_CPU_validation_status": "112 tests + 76 mock recaption probes + 3 CLI probes passed in same final freeze",
+    "old_v2_labels_unchanged": true,
+    "new_GPU_attempt_started": false,
+    "source_sha256": "524d6dbc51b3455090fb469b3acee08e95c4ececb9fb55b60c75055690662161",
+    "v3_one_recovery": {
+      "user_approved": true,
+      "cap_seconds_per_node": 810,
+      "prior_charged_seconds": 330.59145557461306,
+      "reserved_new_seconds": 3240,
+      "cumulative_upper_seconds": 3570.591455574613,
+      "one_pilot_cap_seconds": 3600,
+      "source_sha256": "f9feb37a5dce280a99b0fd64516a0bb745949fc1d60ed43e43f40607324f3c83",
+      "tests_sha256": "b4d783ad7270cf6d0ee89387e2f89703f6801a6452f9b2f01fb3600955c5b14a",
+      "CPU_label_tests_passed": 123,
+      "actual_labels": 0,
+      "semantic_approval": false
+    }
+  },
+  "single_gpu_technical_protocol": {
+    "phase": "single_gpu_training_resume",
+    "cap_GPUh": 2,
+    "allocated_GPUs": 1,
+    "input_kind": "synthetic technical-only; no caption quality claim",
+    "logical_trajectory_updates": 4,
+    "reference_updates": 4,
+    "prefix_updates": 2,
+    "new_process_continuation_updates": 2,
+    "physical_AdamW_updates_including_validation_replay": 8,
+    "offload_modes": [
+      "on"
+    ],
+    "anchor_lambda": 0.5,
+    "seed": 20261102,
+    "lr": 0.00005,
+    "warmup": 1,
+    "horizon": 4,
+    "comparison": "Exact adapter/AdamW/Python+CPU+CUDA RNG state and same sample/t/noise/LR trajectory; failure on mismatch, no posthoc tolerance relaxation",
+    "single_parent_phase_clock": true,
+    "no_extra_budget_for_restart": true,
+    "implementation_status": "Trainer CPU implementation39 passed; independent review and complete allocation supervisor pending",
+    "CPU_tests_are_GPU_proof": false,
+    "actual_GPU_updates": 0,
+    "formal_training": false,
+    "supervisor": {
+      "source_sha256": "56ab14fa3911d43138847befa5b5ce38d59f0b85f85f9d93573881256e34cd14",
+      "tests_sha256": "02b3bf2df158e8162bd6cee8bc8e2c0f2421eb8a23d23111aa570ae8387a326d",
+      "self_tests_passed": 22,
+      "integration_resume_tests_passed": 6,
+      "previous_independent_failures": 2,
+      "cost_protocol": "Immutable provisional full-cap reservation, separate verified cost.closure; failure marker overrides",
+      "actual_GPU_run": false,
+      "independent_new_revision_acceptance": "main verification pending"
+    }
   }
 }

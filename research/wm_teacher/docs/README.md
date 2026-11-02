@@ -1,3 +1,5 @@
+> 2026-10-19最新：P1完整生成/评分/发布已验收；A07低CFG路线否定，Teacher自动FAIL、人审pending。后续看文档34；以下10-18状态是历史快照。
+
 # Full-Duplex Multimodal Interactive World Model — 数据文档
 
 > 以人为中心的全双工多模态交互世界模型 | Wan2.2 视频生成训练
@@ -7,12 +9,17 @@
 
 ## 核心文档
 
+**2026-11-02最新实验综述：[59_实验全景_最佳Teacher与SOTA差距.md](./59_实验全景_最佳Teacher与SOTA差距.md)**。包含早期训练、E1/E2/E3/C276、默认与局部最佳、刷新官方SOTA参照、去dynamic公式和E2 Physics取错子项勘误。下方旧状态按历史日期解释。
+
 | 文档 | 说明 |
 |------|------|
 | **[下载清单_完整版.md](./下载清单_完整版.md)** | **所有数据集的下载状态、获取方式、优先级** |
 | **[下载进度.md](./下载进度.md)** | **实时下载进度、管线状态、待处理** |
 | [WAN22_TRAINING_PLAN.md](./WAN22_TRAINING_PLAN.md) | Wan2.2 训练数据准备方案 |
 | [PROGRESS.md](../PROGRESS.md) | 项目整体进展 |
+| [34_Teacher_CFG开发消融结论.md](./34_Teacher_CFG开发消融结论.md) | P1完整否定结果、预算及机制/标签审计推进路线 |
+| [33_Teacher优化开发消融计划.md](./33_Teacher优化开发消融计划.md) | 冻结24视频、来源隔离与动作护栏 |
+| [32_插值Teacher完整评测结论.md](./32_插值Teacher完整评测结论.md) | 完整插值评分，Teacher质量FAIL/人工pending |
 | [30_Teacher模型训练实验记录.md](./30_Teacher模型训练实验记录.md) | R1–R4、FT1/FT2与插值阶段实测、统计限制、诊断与文献 |
 | **[31_服务器迁移与CodingAgent交接.md](./31_服务器迁移与CodingAgent交接.md)** | **当前新4节点状态权威入口；另保留旧机冻结/迁移历史与核查步骤** |
 

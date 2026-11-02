@@ -1,8 +1,11 @@
 """CPU-only tests for the E3 cached-input LoRA trainer, cacher and exporter. Never initializes CUDA."""
 import ast
+import copy
+import hashlib
 import json
 import os
 from pathlib import Path
+import random
 import subprocess
 import sys
 import tempfile
@@ -795,6 +798,348 @@ class EndToEndTests(Base):
             self.assertFalse((root / 'run/summary.json').exists())
 
 
+def resume_argv(out, steps=2):
+    return ['--out-dir', str(out), '--max-gpu-hours', '1', '--max-steps', '4', '--warmup', '1', '--seed', '20261102',
+            '--anchor-lambda', '0.5', '--log-every', '1', '--component-grad-every', '2',
+            '--smoke', '--synthetic-inputs', '--smoke-offload', 'on', '--offload', 'on',
+            '--smoke-steps', str(steps)]
+
+
+def bound_json_record(path):
+    raw = Path(path).read_bytes()
+    return {'path': str(Path(path).absolute()), 'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}
+
+
+def resume_proof(root, source):
+    import prepare_teacher_training_admission as admission
+    auth_path = root / 'authorization.json'
+    tr.m1.atomic_json(auth_path, admission.AUTH_EXPECTED)
+    manifest = tr.m1.read_json(source / 'run_manifest.json')
+    summary = tr.m1.read_json(source / 'summary.json')
+    return {'schema': tr.SMOKE_RESUME_SCHEMA, 'phase': 'single_gpu_training_resume',
+            'authorization': bound_json_record(auth_path),
+            'source_run_manifest': bound_json_record(source / 'run_manifest.json'),
+            'source_summary': bound_json_record(source / 'summary.json'), 'checkpoint': summary['checkpoint'],
+            'source_completed_steps': summary['completed_steps'], 'continuation_updates': 2, 'logical_horizon': 4,
+            'config': manifest['config'], 'source': manifest['source'],
+            'synthetic_inputs_allowed': True, 'formal_training_allowed': False}
+
+
+class SmokeResumeTests(Base):
+    def test_cli_python_seed_is_synthetic_smoke_only_before_cuda_setup(self):
+        args = tr.parser().parse_args(resume_argv(Path('/tmp/unused_seed_test')))
+        for smoke, synthetic in [(True, True), (True, False), (False, False)]:
+            scoped = types.SimpleNamespace(**dict(vars(args), smoke=smoke, synthetic_inputs=synthetic))
+            with self.subTest(smoke=smoke, synthetic=synthetic):
+                with patch.object(tr.random, 'seed') as seed, patch.object(
+                        tr, 'setup_distributed', side_effect=RuntimeError('stopped before CUDA setup')):
+                    with self.assertRaisesRegex(RuntimeError, 'before CUDA setup'):
+                        tr.execute(scoped)
+                    if smoke and synthetic:
+                        seed.assert_called_once_with(tr.derive_seed('smoke_python', 20261102))
+                    else:
+                        seed.assert_not_called()
+        ident = tr.trainer_identity()
+        self.assertEqual(ident['pid'], os.getpid())
+        self.assertEqual(ident['start_ticks'], int(Path('/proc/self/stat').read_text().rsplit(')', 1)[1].split()[19]))
+
+    def fixture(self, root):
+        source = root / 'prefix'
+        runner = EndToEndTests()
+        self.assertEqual(runner.run_main(root, resume_argv(source)), 0)
+        return runner, source, resume_proof(root, source)
+
+    def approved_args(self, root, proof, index=0):
+        path = root / ('proof%d.json' % index)
+        tr.m1.atomic_json(path, proof)
+        return tr.parser().parse_args(resume_argv(root / ('resume%d' % index)) +
+                                      ['--smoke-resume-proof', str(path), '--approved-smoke-resume-sha256',
+                                       tr.m1.sha256(path)])
+
+    def validate(self, runner, root, args):
+        import contextlib
+        with contextlib.ExitStack() as stack:
+            for p in runner.patches(root):
+                stack.enter_context(p)
+            return tr.validate_smoke_resume(args)
+
+    def test_fresh_process_execute_four_equals_prefix_two_restore_two(self):
+        torch = self.torch
+        worker = """import sys,torch,json,random
+sys.path.insert(0, %r); sys.path.insert(0, %r)
+import test_e3_train as T, train_e3_lora as tr
+torch.set_num_threads(2)
+trace = []
+real_draw = tr.draw_t_noise
+def draw(*a, **kw):
+    tid, noise = real_draw(*a, **kw)
+    trace.append([a[1], a[2], tid, tr.ts.state_hash(noise), random.random()])
+    return tid, noise
+tr.draw_t_noise = draw
+rc=T.EndToEndTests().run_main(T.Path(sys.argv[1]),sys.argv[2:])
+if rc == 0:
+    out = tr.parser().parse_args(sys.argv[2:]).out_dir
+    (out / 'actual_noise_trace.json').write_text(json.dumps(trace))
+assert not torch.cuda.is_initialized()
+sys.exit(rc)
+""" % (str(SCRIPTS), str(Path(__file__).resolve().parent))
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            def run(argv):
+                p = subprocess.run([sys.executable, '-c', worker, str(root), *argv],
+                                   env=dict(os.environ, CUDA_VISIBLE_DEVICES=''), capture_output=True, text=True, timeout=180)
+                self.assertEqual(p.returncode, 0, p.stderr[-6000:])
+            run(resume_argv(root / 'full', steps=4))
+            run(resume_argv(root / 'prefix'))
+            proof = resume_proof(root, root / 'prefix')
+            args = self.approved_args(root, proof)
+            run(resume_argv(Path(args.out_dir)) + ['--smoke-resume-proof', str(args.smoke_resume_proof),
+                                                  '--approved-smoke-resume-sha256', args.approved_smoke_resume_sha256])
+            full = torch.load(root / 'full/private' / tr.CKPT_NAME, weights_only=True)
+            resumed = torch.load(args.out_dir / 'private' / tr.CKPT_NAME, weights_only=True)
+            self.assertEqual(tr.ts.state_hash(full), tr.ts.state_hash(resumed))
+            self.assertEqual(full['steps'], 4)
+            expected_python = random.Random(tr.derive_seed('smoke_python', 20261102))
+            for _ in range(4):
+                expected_python.random()
+            self.assertEqual(full['rng']['python'], expected_python.getstate())
+            for key in ('adapters', 'optimizer', 'rng', 'config'):
+                self.assertEqual(tr.ts.state_hash(full[key]), tr.ts.state_hash(resumed[key]), key)
+            self.assertEqual(tr.m1.read_json(root / 'full/actual_noise_trace.json'),
+                             tr.m1.read_json(root / 'prefix/actual_noise_trace.json') +
+                             tr.m1.read_json(args.out_dir / 'actual_noise_trace.json'))
+            summary = tr.m1.read_json(args.out_dir / 'summary.json')
+            prefix_summary = tr.m1.read_json(root / 'prefix/summary.json')
+            full_summary = tr.m1.read_json(root / 'full/summary.json')
+            manifest = tr.m1.read_json(args.out_dir / 'run_manifest.json')
+            for out, value in [(root / 'full', full_summary), (root / 'prefix', prefix_summary),
+                               (args.out_dir, summary)]:
+                ck = torch.load(out / 'private' / tr.CKPT_NAME, weights_only=True)
+                self.assertNotEqual(value['adapter_initial_sha256'], value['adapter_final_sha256'])
+                self.assertEqual(value['adapter_final_sha256'], tr.ts.state_hash(ck['adapters']))
+                ident = value['trainer_identity']
+                self.assertEqual(set(ident), {'pid', 'start_ticks'})
+                self.assertTrue(type(ident['pid']) is int and ident['pid'] > 0
+                                and type(ident['start_ticks']) is int and ident['start_ticks'] > 0)
+                self.assertEqual(ident, tr.m1.read_json(out / 'run_manifest.json')['trainer_identity'])
+                self.assertEqual(tr.m1.read_json(out / 'run_manifest.json')['smoke']['python_rng_rule'],
+                                 tr.SMOKE_PYTHON_RNG_RULE)
+            self.assertEqual(len({v['trainer_identity']['pid'] for v in [full_summary, prefix_summary, summary]}), 3)
+            self.assertEqual(full_summary['adapter_initial_sha256'], prefix_summary['adapter_initial_sha256'])
+            self.assertEqual(summary['adapter_initial_sha256'], prefix_summary['adapter_final_sha256'])
+            self.assertEqual(summary['adapter_final_sha256'], full_summary['adapter_final_sha256'])
+            self.assertEqual((summary['segment_executed_updates'], summary['logical_completed_steps'],
+                              summary['completed_steps']), (2, 4, 4))
+            self.assertEqual((manifest['logical_start_step'], manifest['logical_end_step_requested'],
+                              manifest['segment_requested_updates']), (2, 4, 2))
+            self.assertFalse(summary['resume']['allocation_authorized_by_this_proof'])
+            self.assertEqual(summary['frozen_base_sha256'], tr.m1.read_json(root / 'full/summary.json')['frozen_base_sha256'])
+            def rows(out):
+                return [json.loads(line) for line in (out / 'progress.jsonl').read_text().splitlines()]
+            a, b = rows(root / 'full'), rows(root / 'prefix') + rows(args.out_dir)
+            self.assertEqual([r['step'] for r in rows(args.out_dir)], [3, 4])
+            for ra, rb in zip(a, b):
+                for key in ('step', 'lr', 'per_rank', 'loss_fm_mean', 'loss_anchor_mean', 'loss_total_mean',
+                            'grad_norm_total_before_clip', 'grad_norm_fm', 'grad_norm_anchor_weighted'):
+                    self.assertEqual(ra[key], rb[key], key)
+            order = tr.DataOrder(full['config']['seed'], 64)
+            for step in range(4):
+                idx = order.index(step, 0, 1)
+                tid, noise = tr.draw_t_noise(full['config']['seed'], step, idx, TINY_X0)
+                self.assertEqual(a[step]['per_rank'][0]['sample_index'], idx)
+                self.assertEqual(a[step]['per_rank'][0]['timestep_id'], tid)
+                self.assertTrue(torch.equal(noise, tr.draw_t_noise(resumed['config']['seed'], step, idx, TINY_X0)[1]))
+                self.assertEqual(a[step]['lr'], full['config']['lr'] * tr.lr_factor(step + 1, 1, 4))
+            # The next sample/t/noise/LR is also unchanged across the checkpoint boundary.
+            next_idx = order.index(4, 0, 1)
+            self.assertEqual(next_idx, tr.DataOrder(resumed['config']['seed'], 64).index(4, 0, 1))
+            self.assertEqual(tr.lr_factor(5, 1, 4), 0)
+            self.assertTrue(torch.equal(tr.draw_t_noise(full['config']['seed'], 4, next_idx, TINY_X0)[1],
+                                        tr.draw_t_noise(resumed['config']['seed'], 4, next_idx, TINY_X0)[1]))
+
+    def test_proof_cli_scope_world_offload_and_config_drift_are_cpu_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            runner, source, proof = self.fixture(root)
+            args = self.approved_args(root, proof)
+            self.assertEqual(self.validate(runner, root, args)['source_completed_steps'], 2)
+            changes = [('smoke_resume_proof', None), ('approved_smoke_resume_sha256', None),
+                       ('approved_smoke_resume_sha256', 'f' * 64), ('approved_smoke_resume_sha256', 'abc'),
+                       ('smoke', False), ('synthetic_inputs', False), ('cache_index', root / 'fake_cache'),
+                       ('offload', 'off'), ('smoke_offload', ['on', 'off']), ('smoke_offload', ['on', 'on']),
+                       ('skip_model_hash', True), ('skip_frozen_hash', True), ('max_gpu_hours', 2.1),
+                       ('smoke_steps', 3), ('max_steps', 5), ('seed', 42), ('lr', 0.001), ('warmup', 0),
+                       ('weight_decay', 0.02), ('clip', 2.0), ('anchor_lambda', 0.0),
+                       ('anchor_weighting', 'uniform'), ('component_grad_every', 3), ('log_every', 2),
+                       ('caption_version', 'different'), ('models_dir', root / 'different_models'),
+                       ('framework', root / 'different_framework')]
+            for key, value in changes:
+                with self.subTest(key=key), self.assertRaises((ValueError, OSError)):
+                    self.validate(runner, root, types.SimpleNamespace(**dict(vars(args), **{key: value})))
+            with patch.dict(os.environ, WORLD_SIZE='2', LOCAL_WORLD_SIZE='2', RANK='0', LOCAL_RANK='0'):
+                with self.assertRaises(ValueError):
+                    self.validate(runner, root, args)
+            # Main/execute must fail before even the CPU stand-in for CUDA setup is reached.
+            with patch.object(tr, 'setup_distributed', side_effect=AssertionError('CUDA setup reached')):
+                bad = dict(vars(args), approved_smoke_resume_sha256='f' * 64)
+                with self.assertRaises(ValueError):
+                    tr.execute(types.SimpleNamespace(**bad))
+
+    def test_proof_manifest_summary_authorization_source_and_checkpoint_tamper_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            runner, source, proof = self.fixture(root)
+            args = self.approved_args(root, proof)
+            paths = {'manifest': source / 'run_manifest.json', 'summary': source / 'summary.json',
+                     'authorization': Path(proof['authorization']['path'])}
+            originals = {key: path.read_bytes() for key, path in paths.items()}
+            def reject_mutation(key, mutate, index):
+                value = json.loads(originals[key])
+                mutate(value)
+                paths[key].write_bytes(json.dumps(value).encode())
+                changed = copy.deepcopy(proof)
+                rec_key = {'manifest': 'source_run_manifest', 'summary': 'source_summary',
+                           'authorization': 'authorization'}[key]
+                changed[rec_key] = bound_json_record(paths[key])
+                try:
+                    bad_args = self.approved_args(root, changed, index)
+                    with self.assertRaises(ValueError):
+                        self.validate(runner, root, bad_args)
+                    if key == 'manifest' and type(value.get('num_samples')) is not int:
+                        with patch.object(tr, 'setup_distributed') as setup:
+                            with self.assertRaises(ValueError):
+                                tr.execute(bad_args)
+                            setup.assert_not_called()
+                        self.assertFalse(bad_args.out_dir.exists())
+                finally:
+                    paths[key].write_bytes(originals[key])
+            mutations = [
+                ('manifest', lambda v: v['config'].update(seed=999)),
+                ('manifest', lambda v: v['data'].update(version='cached')),
+                ('manifest', lambda v: v['inputs'].update(models_dir='/different/models')),
+                ('manifest', lambda v: v['data'].update(context_set_sha256='wrong')),
+                ('manifest', lambda v: v.update(world_size=2)),
+                ('manifest', lambda v: v.update(num_samples=64.0)),
+                ('manifest', lambda v: v.update(num_samples=True)),
+                ('manifest', lambda v: v['source']['trainer'].update(sha256='f' * 64)),
+                ('manifest', lambda v: v['source'].pop('admission_helper')),
+                ('manifest', lambda v: v['framework'].update(unbound='wrong')),
+                ('manifest', lambda v: v['base_shards'].update(unbound='wrong')),
+                ('manifest', lambda v: v.update(base_shards_hashed=False)),
+                ('manifest', lambda v: v['smoke'].update(offload_modes=['off'])),
+                ('manifest', lambda v: v['smoke'].update(synthetic_inputs=False)),
+                ('manifest', lambda v: v['smoke'].update(python_seed=999)),
+                ('manifest', lambda v: v['smoke'].pop('python_rng_rule')),
+                ('manifest', lambda v: v.pop('smoke')),
+                ('manifest', lambda v: v.update(torch_version='wrong')),
+                ('manifest', lambda v: v.update(order_plan_sha256='f' * 64)),
+                ('summary', lambda v: v.update(status='failed')),
+                ('summary', lambda v: v.update(completed_steps=1)),
+                ('summary', lambda v: v['smoke']['on'].update(stop='oom')),
+                ('summary', lambda v: v['smoke']['on'].update(completed_steps=1)),
+                ('summary', lambda v: v.pop('frozen_base_sha256')),
+                ('authorization', lambda v: v.update(total_cap_GPUh=120)),
+                ('authorization', lambda v: v['stage_caps_GPUh'].update(single_gpu_training_resume=True)),
+                ('authorization', lambda v: v.update(phase_borrowing_allowed=True)),
+                ('authorization', lambda v: v.update(formal_candidate_training_budget_approved=True)),
+                ('authorization', lambda v: v.update(AR_allowed=True)),
+            ]
+            for i, (key, mutate) in enumerate(mutations, 1):
+                with self.subTest(key=key, index=i):
+                    reject_mutation(key, mutate, i)
+            for i, (key, value) in enumerate([('schema', 'legacy'), ('phase', 'label_rebuild_and_cache'),
+                                             ('formal_training_allowed', True), ('synthetic_inputs_allowed', 1),
+                                             ('source_completed_steps', True), ('continuation_updates', 3),
+                                             ('logical_horizon', 5), ('source', {})], 50):
+                changed = copy.deepcopy(proof)
+                changed[key] = value
+                with self.subTest(key=key), self.assertRaises(ValueError):
+                    self.validate(runner, root, self.approved_args(root, changed, i))
+            for key, path in paths.items():
+                raw = path.read_bytes()
+                path.write_bytes(raw + b' ')
+                try:
+                    with self.subTest(raw_hash=key), self.assertRaises(ValueError):
+                        self.validate(runner, root, args)
+                finally:
+                    path.write_bytes(raw)
+            ck_path = Path(proof['checkpoint']['path'])
+            raw = ck_path.read_bytes()
+            ck_path.write_bytes(raw[:-1] + bytes([raw[-1] ^ 1]))
+            with self.assertRaises(ValueError):
+                self.validate(runner, root, args)
+
+    def test_saved_checkpoint_config_and_state_hash_rejected_before_update(self):
+        torch = self.torch
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            runner, source, proof = self.fixture(root)
+            ck_path = Path(proof['checkpoint']['path'])
+            value = torch.load(ck_path, weights_only=True)
+            value['config']['seed'] += 1
+            bad_path = source / 'private/bad.pt'
+            record = tr.save_checkpoint(bad_path, value)
+            # Low-level restoration checks the actual saved config, not just proof/manifest declarations.
+            pipe = build_tiny_pipe()
+            opt = torch.optim.AdamW(tr.adapter_list(pipe.dit), lr=5e-5, weight_decay=0.01)
+            before = tr.ts.state_hash(tr.checkpoint_state(pipe.dit, opt, 0, {}))
+            with self.assertRaisesRegex(ValueError, 'saved config'):
+                tr.load_checkpoint(bad_path, record, pipe.dit, opt, 2, expected_config=proof['config'])
+            self.assertEqual(before, tr.ts.state_hash(tr.checkpoint_state(pipe.dit, opt, 0, {})))
+            # Actual execute revalidates checkpoint state/config after a valid raw-byte proof.
+            ck_path.write_bytes(bad_path.read_bytes())
+            record['path'] = str(ck_path)
+            summary = tr.m1.read_json(source / 'summary.json')
+            summary['checkpoint'] = record
+            (source / 'summary.json').write_text(json.dumps(summary))
+            proof['checkpoint'] = record
+            proof['source_summary'] = bound_json_record(source / 'summary.json')
+            args = self.approved_args(root, proof)
+            with patch.object(tr, 'train_step', side_effect=AssertionError('Update before config validation')):
+                self.assertEqual(runner.run_main(root, resume_argv(args.out_dir) +
+                    ['--smoke-resume-proof', str(args.smoke_resume_proof), '--approved-smoke-resume-sha256',
+                     args.approved_smoke_resume_sha256]), 1)
+            failed = tr.m1.read_json(args.out_dir / 'summary.json')
+            self.assertIn('saved config', failed['error'])
+            self.assertFalse((args.out_dir / 'private' / tr.CKPT_NAME).exists())
+            with self.assertRaisesRegex(ValueError, 'state hash'):
+                tr.load_checkpoint(bad_path, dict(record, state_sha256='f' * 64), pipe.dit, opt, 2)
+
+    def test_real_execute_smoke_oom_and_budget_shortfall_are_failed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            runner = EndToEndTests()
+            # run_loop catches a real torch OOM exception; no optimizer update or false completion.
+            with patch.object(tr, 'e3_losses', side_effect=self.torch.OutOfMemoryError('CPU test out of memory')):
+                self.assertEqual(runner.run_main(root, resume_argv(root / 'oom')), 1)
+            oom = tr.m1.read_json(root / 'oom/summary.json')
+            self.assertEqual((oom['status'], oom['completed_steps'], oom['smoke']['on']['stop']), ('failed', 0, 'oom'))
+            self.assertEqual(oom['smoke']['on']['last_step']['status'], 'oom')
+            self.assertEqual(oom['adapter_initial_sha256'], oom['adapter_final_sha256'])
+            self.assertFalse((root / 'oom/private' / tr.CKPT_NAME).exists())
+            argv = resume_argv(root / 'budget') + ['--max-gpu-hours', '0.01', '--cleanup-grace-seconds', '1',
+                    '--save-reserve-seconds', '5', '--first-step-estimate-seconds', '100']
+            self.assertEqual(runner.run_main(root, argv), 1)
+            stopped = tr.m1.read_json(root / 'budget/summary.json')
+            self.assertEqual(stopped['smoke']['on']['stop'], 'budget_exhausted_before_max_steps')
+            self.assertEqual(stopped['status'], 'failed')
+            self.assertFalse((root / 'budget/private' / tr.CKPT_NAME).exists())
+            # Even nonzero but insufficient successful steps cannot become a completed smoke receipt.
+            real_step = tr.train_step
+            calls = [0]
+            def one_then_oom(*a, **kw):
+                calls[0] += 1
+                if calls[0] == 2:
+                    return {'status': 'oom', 'step': a[5] + 1}
+                return real_step(*a, **kw)
+            with patch.object(tr, 'train_step', side_effect=one_then_oom):
+                self.assertEqual(runner.run_main(root, resume_argv(root / 'partial')), 1)
+            partial = tr.m1.read_json(root / 'partial/summary.json')
+            self.assertEqual((partial['completed_steps'], partial['smoke']['on']['stop']), (1, 'oom'))
+            self.assertNotEqual(partial['adapter_initial_sha256'], partial['adapter_final_sha256'])
+            self.assertFalse((root / 'partial/private' / tr.CKPT_NAME).exists())
+
+
 class CliTests(unittest.TestCase):
     def test_help_and_bad_args_do_not_import_torch(self):
         cases = [('train_e3_lora', ['--help'], 0), ('train_e3_lora', ['--out-dir', '/tmp/never_e3', '--max-gpu-hours', '1'], 1),
@@ -804,6 +1149,10 @@ class CliTests(unittest.TestCase):
                                     '--max-gpu-hours', '999'], 1),
                  ('train_e3_lora', ['--out-dir', '/tmp/never_e3', '--max-gpu-hours', '6',
                                     '--smoke', '--synthetic-inputs', '--teacher-four-node-admission'], 1),
+                 ('train_e3_lora', ['--out-dir', '/tmp/never_e3', '--max-gpu-hours', '1',
+                                    '--smoke', '--synthetic-inputs', '--smoke-resume-proof', '/missing'], 1),
+                 ('train_e3_lora', ['--out-dir', '/tmp/never_e3', '--max-gpu-hours', '1',
+                                    '--smoke', '--synthetic-inputs', '--approved-smoke-resume-sha256', 'f' * 64], 1),
                  ('cache_e3_inputs', ['--help'], 0), ('merge_e3_lora', ['--help'], 0)]
         for mod, argv, expected in cases:
             code = ("import %s as r, sys\ntry: rc=r.main(sys.argv[1:])\nexcept SystemExit as e: rc=e.code\n"

@@ -103,6 +103,16 @@ class ExportSnapshotTests(unittest.TestCase):
         self.assertFalse(self.destination.exists())
         self.assertEqual({path.name for path in self.base.iterdir()}, {"source"})
 
+    def test_private_deployment_root_is_replaced_without_changing_source(self):
+        with mock.patch.object(snapshot, "ROOT", Path("/private_project_root")):
+            text = "ROOT = '/private_project_root'\nfile = '/private_project_root/eval/result.json'\n"
+            actual = snapshot.sanitize("scripts/example.py", text)
+            self.assertNotIn("/private_project_root", actual)
+            self.assertIn("/srv/wm_teacher/eval/result.json", actual)
+            self.assertIn("/private_project_root", text)
+        storage = "/" + "apdcephfs_test/share/private-user/env/bin/python"
+        self.assertEqual(snapshot.sanitize("fixture.py", storage), "/srv/PRIVATE_STORAGE")
+
     def test_exact_allowlist_excludes_git_cookies_data_and_logs(self):
         excluded = [".git/config", "cookies_netscape.txt", "dataset/private.txt",
                     "models/private.safetensors", "dataset/download_logs/private.log",

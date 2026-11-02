@@ -57,10 +57,13 @@ FILES = [
     "eval/diag/teacher_C276_public_results_20261026.json",
     "eval/diag/teacher_C276_independent_audit_public_20261026.json",
     "docs/58_C276四基准子集完整结论.md",
+    "docs/59_实验全景_最佳Teacher与SOTA差距.md",
+    "eval/diag/teacher_experiment_sota_review_20261102.json",
     "scripts/prepare_teacher_label_admission.py", "tests/test_prepare_teacher_label_admission.py",
     "scripts/run_teacher_label_admission.py", "tests/test_run_teacher_label_admission.py",
     "scripts/run_teacher_label_pilot.py", "tests/test_teacher_label_pilot.py",
     "scripts/prepare_teacher_training_admission.py", "tests/test_teacher_training_admission.py",
+    "scripts/run_teacher_single_gpu_admission.py", "tests/test_teacher_single_gpu_admission.py",
     "eval/diag/teacher_training_admission_public_20261102.json",
     "eval/diag/teacher_label_lease_fix_public_20261102.json",
     "DiffSynth-Studio/diffsynth/utils/lora/general.py",
@@ -163,6 +166,8 @@ def sanitize(relative, text):
         if pattern.search(text):
             raise RuntimeError(f"Credential-like content in selected file: {relative}; inspect privately")
     # Internal deployment addresses are not necessary to reproduce the algorithms.
+    text = text.replace(str(ROOT), "/srv/wm_teacher")
+    text = re.sub("/" + "apdcephfs" + r"[^\s\"'`]+", "/srv/PRIVATE_STORAGE", text)
     return re.sub(r"(?<![\w.])11(?:\.\d{1,3}){3}(?![\w.])", "PRIVATE_NODE_ADDRESS", text)
 
 

@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import importlib.metadata
 import json
+import math
 import os
 from pathlib import Path
 import shutil
@@ -17,13 +18,27 @@ import run_teacher_generation as process
 import recaption_e3 as caption
 
 ROOT=Path(__file__).resolve().parents[1]
-LOCAL=Path('/dockerdata/wm_tmp/teacher_label_pilot_20261102_attempt2')
-ATTEMPT_ID='label_pilot_attempt2'
+LOCAL=Path('/dockerdata/wm_tmp/teacher_label_pilot_20261102_v3_recovery')
+OLD_LOCAL_ROOTS=(Path('/dockerdata/wm_tmp/teacher_label_pilot_20261102'),
+                 Path('/dockerdata/wm_tmp/teacher_label_pilot_20261102_attempt2'))
+ATTEMPT_ID='label_v3_one_recovery'
 PRIOR_COST_SECONDS={0:18.143487762659788,1:15.434166906867176,2:19.951568322256207,3:17.300606979057193}
+PRIOR_FIRST_SHA256=('812647e2a361f5eb9627bb9bed307efd29f08d28601391b7ed595dce0a9a6192',
+                    '4c5eecc41dc62bdd73f09f77183d7c4aada93b20e744f223c2c393f04b337b3d',
+                    '895b9e95dc5449b32c55b4ce74f2c4586ea751f486d268fbb14e476d45c3ab85',
+                    'e6075db49e35d158d53c90eded4e4c408385480d88835e7812f53b94a53c95f8')
+EVIDENCE_ROOT=ROOT/'eval/teacher_label_pilot_20261102'
 AUTH=ROOT/'eval/diag/teacher_training_admission_authorization_20261101.json'
+AUTH_SHA256='245e14b3b7a4d3073c6914b7c9c8fba8907261aa85b6f6a3e9a59be7f400c2d9'
+RECOVERY_AUTH=EVIDENCE_ROOT/'v3_one_recovery.authorization.json'
+RECOVERY_AUTH_SHA256='ccc8b7cf3e72e37b4bc32634f6294eeadd0d11a1c26b921e0265e823928b868b'
+OLD_PLAN=EVIDENCE_ROOT/'plan.lease_fix.json'
+OLD_PLAN_SHA256='38236595a602b8e91946d76ddfe07d4cab79c569fd6c40c77714c390ab87d2ad'
+COMPLETED_AUDIT=EVIDENCE_ROOT/'attempt2_collected/completion.audit.json'
+COMPLETED_AUDIT_SHA256='46849ebb36d7cfcc9779532ee9b4e7f72e603a2df11de1d5274c8bde900fe860'
 MANIFEST=ROOT/'training_metadata/e3_recaption_20261022/pool1856_dual_manifest.jsonl'
-SCHEMA='teacher_label_pilot_execution_v2'
-CAP=860
+SCHEMA='teacher_label_pilot_execution_v3'
+CAP=810
 TAIL=90
 MODEL_ROOT=Path('/dockerdata/models_qwen25_local_20261023')
 MODEL_FILES=tuple(f'model-{i:05d}-of-00005.safetensors' for i in range(1,6))+('model.safetensors.index.json','config.json','generation_config.json','preprocessor_config.json','tokenizer_config.json','tokenizer.json','vocab.json','merges.txt','chat_template.json')
@@ -101,11 +116,117 @@ def validate_model_proof(proof,rank):
     return proof
 
 
+def pinned(path,digest):
+    row=record(path);require(row['sha256']==digest,'Immutable original evidence SHA drift')
+    return row
+
+
+def validate_authorizations(auth,recovery):
+    require(auth==pinned(AUTH,AUTH_SHA256) and recovery==pinned(RECOVERY_AUTH,RECOVERY_AUTH_SHA256),
+            'Original and one-recovery authorization bindings required')
+    original=read(auth);contract=read(recovery)
+    require(original['schema']=='teacher_training_admission_authorization_v1'
+            and original['stage_caps_GPUh']=={'label_rebuild_and_cache':24,'single_gpu_training_resume':2,'multi_node_technical_validation':6}
+            and type(original['total_cap_GPUh']) is int and original['total_cap_GPUh']==32
+            and all(original[k] is False for k in ('formal_candidate_training_budget_approved','phase_borrowing_allowed',
+                'AR_allowed','student_or_distillation_allowed','previous_experiment_budgets_reused','training_started'))
+            and original['failed_allocations_charged'] is True,'Training admission authorization drift')
+    expected=dict(schema='teacher_label_v3_one_recovery_authorization_v1',user_choice='批准一次v3恢复',
+        original_training_authorization_path=str(AUTH),original_training_authorization_sha256=AUTH_SHA256,
+        prompt_version='e3-grounded-recaption-v3',fixed_sample_count=16,same_selection_seed=20261101,
+        same_previously_selected_cases=True,allocated_gpus_per_node=1,gpu_index=0,nodes=4,cap_seconds_per_node=810,
+        pilot_total_cap_seconds_including_all_prior=3600,previous_failed_seconds=70.82982997084036,
+        previous_completed_seconds=259.7616256037727,all_previous_costs_preserved=True,
+        charged_to_stage='label_rebuild_and_cache',stage_cap_GPUh=24,new_directory_required=True,
+        new_source_and_publication_gate_required=True,independent_review_required=True,recovery_attempts_allowed=1,
+        automatic_retry_allowed=False,full_label_rebuild_allowed=False,formal_training_allowed=False,
+        AR_allowed=False,student_distillation_allowed=False)
+    require(set(contract)==set(expected)|{'authorized_at'} and isinstance(contract['authorized_at'],str)
+            and all(type(contract[k]) is type(v) and contract[k]==v for k,v in expected.items()),
+            'Single v3 recovery authorization schema/scope drift')
+    require(caption.PROMPT_VERSION==expected['prompt_version'] and prep.SEED==expected['same_selection_seed']
+            and CAP==810 and TAIL==90 and LOCAL not in OLD_LOCAL_ROOTS and LOCAL.resolve()==LOCAL,
+            'Only the fresh v3 recovery root/prompt/cap is permitted')
+    return contract
+
+
+def freeze_history():
+    old_plan=pinned(OLD_PLAN,OLD_PLAN_SHA256);old=read(old_plan)
+    require(old['schema']=='teacher_label_pilot_execution_v2' and old['attempt_id']=='label_pilot_attempt2'
+            and old['prompt_version']=='e3-grounded-recaption-v2'
+            and old['selection_seed']==20261101 and len(old['jobs'])==16,
+            'Original attempt2 identity/selection required, not current-source verification')
+    audit_row=pinned(COMPLETED_AUDIT,COMPLETED_AUDIT_SHA256);audit=read(audit_row)
+    require(audit['schema']=='teacher_label_pilot_actual_completion_v1' and audit['plan']==old_plan
+            and audit['labels_written']==16 and audit['error_records']==0 and audit['label_stage_cap_GPUh']==24
+            and audit['pilot_cap_GPUh']==1 and audit['semantic_review_pass'] is False
+            and audit['formal_training_started'] is False and len(audit['nodes'])==4
+            and [r['index'] for r in audit['records']]==list(range(16)), 'Original completed pilot audit drift')
+    failed=[];completed=[];first_cost=[];second_cost=[]
+    for rank in range(4):
+        first_row=pinned(EVIDENCE_ROOT/f'attempt1_rank{rank}.json',PRIOR_FIRST_SHA256[rank]);first=read(first_row)
+        require(type(first['cost']['rank']) is int and first['cost']['rank']==rank and first['parent']['rank']==rank
+                and first['cost']['charged_upper_seconds']==PRIOR_COST_SECONDS[rank]
+                and first['cost']['release_verified'] is True and first['cost']['budget_exceeded'] is False
+                and first['parent']['released'] is True and first['parent']['success'] is False
+                and first['CUDA_initialized'] is False and first['labels_written']==0,'Original failed allocation charges/release required')
+        failed.append(first_row);first_cost.append(first['cost']['charged_upper_seconds'])
+        entry=audit['nodes'][rank];require(type(entry['rank']) is int and entry['rank']==rank and entry['released'] is True,
+                                        'Original completed node ordering/release drift')
+        base=EVIDENCE_ROOT/f'attempt2_collected/rank{rank}'
+        cost_row=record(base/'cost.json');parent_row=record(base/'parent.json');worker_row=record(base/'worker.json')
+        require(entry['cost']==cost_row and entry['parent']==parent_row,'Original audit cost/parent raw-byte binding drift')
+        cost=read(cost_row);parent=read(parent_row);worker_value=read(worker_row)
+        require(cost['plan']==old_plan and type(cost['rank']) is int and cost['rank']==rank
+                and cost['release_verified'] is True and cost['budget_exceeded'] is False
+                and type(cost['charged_upper_seconds']) in (int,float) and 0<cost['charged_upper_seconds']<=860
+                and cost['charged_upper_seconds']==cost['elapsed_seconds']==entry['charged_seconds']==entry['actual_seconds'],
+                'Original raw completed cost/audit mismatch')
+        require(parent['schema']=='teacher_label_pilot_parent_v1' and parent['plan']==old_plan and parent['rank']==rank
+                and parent['released'] is True and parent['success'] is True and type(parent['exit_code']) is int and parent['exit_code']==0
+                and parent['error'] is None and parent['interrupted_signals']==[] and parent['cap_seconds']==860
+                and parent['semantic_review_pass'] is False and parent['formal_training_allowed'] is False
+                and len(parent['release_queries'])==2 and all(q['pids']==[] and q['returncode']==0 for q in parent['release_queries']),
+                'Original parent successful exit/release required')
+        require(parent['worker']==dict(worker_row,path=str(OLD_LOCAL_ROOTS[1]/'worker.json'))
+                and worker_value['plan']==old_plan and worker_value['rank']==rank and worker_value['success'] is True
+                and worker_value['semantic_review_pass'] is False and worker_value['formal_training_allowed'] is False
+                and len(worker_value['records'])==4, 'Original worker bytes/exit/full coverage required')
+        labels=[]
+        for offset,index in enumerate(range(rank*4,rank*4+4)):
+            entry_label=audit['records'][index];label_row=record(base/f'label{index}.json');label=read(label_row);job=old['jobs'][index]
+            require(entry_label['label']==label_row and entry_label['video']==job['video']
+                    and entry_label['semantic_review_pass'] is False and label==worker_value['records'][offset]
+                    and 'error_type' not in label and label['sample_id']==job['sample_id']
+                    and label['video_sha256']==job['video']['sha256'] and label['original_prompt_sha256']==job['original_prompt_sha256']
+                    and label['prompt_version']=='e3-grounded-recaption-v2' and label['semantic_review_pass'] is False,
+                    'Original label bytes/ordered identity coverage drift')
+            # Historical v2 facts are preserved, never revalidated as v3 or promoted to a semantic pass.
+            labels.append(label_row)
+        completed.append(dict(rank=rank,cost=cost_row,parent=parent_row,worker=worker_row,labels=labels))
+        second_cost.append(cost['charged_upper_seconds'])
+    first_total=sum(first_cost);second_total=sum(second_cost)
+    require(first_total==70.82982997084036==audit['previous_failed_seconds']
+            and second_total==259.7616256037727==audit['new_allocated_seconds']
+            and (first_total+second_total)/3600==audit['cumulative_allocated_GPUh']
+            and first_total+second_total+4*CAP<=3600,'Both original pilot costs must remain inside the original reservation')
+    return dict(original_attempt2_plan=old_plan,prior_failed_attempt_proofs=failed,
+        prior_completed_attempt_audit=audit_row,prior_completed_attempt_rank_proofs=completed,
+        prior_failed_charged_seconds=first_total,prior_completed_charged_seconds=second_total,
+        prior_attempt_charged_seconds=math.fsum(first_cost+second_cost))
+
+
+def validate_same_jobs(jobs,old):
+    keys=('index','rank','sample_id','video','original_prompt_sha256')
+    require(len(jobs)==16 and len(old['jobs'])==16
+            and all({k:j[k] for k in keys}=={k:prior[k] for k in keys} for j,prior in zip(jobs,old['jobs'])),
+            'Exactly the original ordered sixteen sample/video/prompt/rank identities required')
+
+
 def prepare(model_proofs,output):
-    auth=record(AUTH);contract=read(auth)
-    require(contract['stage_caps_GPUh']=={'label_rebuild_and_cache':24,'single_gpu_training_resume':2,'multi_node_technical_validation':6}
-            and contract['total_cap_GPUh']==32 and contract['formal_candidate_training_budget_approved'] is False
-            and contract['phase_borrowing_allowed'] is False,'Training admission authorization drift')
+    auth=pinned(AUTH,AUTH_SHA256);recovery_auth=pinned(RECOVERY_AUTH,RECOVERY_AUTH_SHA256)
+    validate_authorizations(auth,recovery_auth);history=freeze_history()
+    require(not LOCAL.exists(),'Recovery local root already exists; never reset/reuse')
     require(set(model_proofs)==set(range(4)),'All four current model proofs required')
     nodes=[];identity=None
     for rank,path in sorted(model_proofs.items()):
@@ -118,30 +239,24 @@ def prepare(model_proofs,output):
     require(len({n['hostname'] for n in nodes})==4,'Four distinct physical node identities required')
     manifest,rows=prep.manifest_rows(MANIFEST)
     eligible=[r for r in rows if not prep.UNSAFE.search(' '.join([r['sample_id'],Path(r['video']).name,*r['captions'].values()]))]
-    require(len(eligible)>=16,'Not enough metadata-prescreened videos')
+    require(len(rows)==1856 and len(eligible)==1815 and len(rows)-len(eligible)==41,'Original metadata pool/prescreen counts required')
     import random
     selected=random.Random(prep.SEED).sample(eligible,16)
-    prior_rows=[]
-    for rank in range(4):
-        bound=record(ROOT/f'eval/teacher_label_pilot_20261102/attempt1_rank{rank}.json')
-        prior=read(bound)
-        require(prior['cost']['release_verified'] is True, 'Previous allocation release missing')
-        require(prior['parent']['released'] is True and prior['parent']['success'] is False
-                and prior['cost']['charged_upper_seconds']==PRIOR_COST_SECONDS[rank]
-                and prior['CUDA_initialized'] is False and prior['labels_written']==0, 'Prior failed pilot cost cannot be reset')
-        prior_rows.append(bound)
-    require(sum(PRIOR_COST_SECONDS.values())+4*CAP<=3600,'Repeated pilot plus previous cost exceeds original1GPUh pilot reservation')
     jobs=[]
     for index,row in enumerate(selected):
         sid=row['sample_id'];require(sid not in ('.','..') and all(c.isalnum() or c in '_.+-' for c in sid),'Unsafe sample basename')
         video=record(row['video']);jobs.append(dict(index=index,rank=index//4,sample_id=sid,video=video,
             original_prompt_sha256=hashlib.sha256(row['captions']['orig'].encode()).hexdigest(),
             local_video=str(LOCAL/f'video{index}.mp4')))
-    value=dict(schema=SCHEMA,private=True,prompt_version=caption.PROMPT_VERSION,authorization=auth,manifest=manifest,
+    validate_same_jobs(jobs,read(history['original_attempt2_plan']))
+    require(manifest==read(history['original_attempt2_plan'])['manifest'],'Original manifest bytes required')
+    value=dict(schema=SCHEMA,private=True,prompt_version=caption.PROMPT_VERSION,authorization=auth,recovery_authorization=recovery_auth,manifest=manifest,
         source_files=[record(ROOT/n,nonempty=(ROOT/n).stat().st_size>0) for n in SOURCE_NAMES],runtime=runtime(),nodes=nodes,jobs=jobs,
         allocations=[dict(rank=r,gpu_index=0,allocated_gpus=1,cap_seconds=CAP,job_indices=list(range(r*4,r*4+4))) for r in range(4)],
         stage='label_rebuild_and_cache',stage_cap_seconds=86400,pilot_reserved_seconds=3600,
-        attempt_id=ATTEMPT_ID,prior_attempt_proofs=prior_rows,prior_attempt_charged_seconds=sum(PRIOR_COST_SECONDS.values()),new_reserved_seconds=4*CAP,
+        attempt_id=ATTEMPT_ID,local_root=str(LOCAL),**history,new_reserved_seconds=4*CAP,
+        recovery_attempts_allowed=1,full_label_rebuild_allowed=False,AR_allowed=False,student_distillation_allowed=False,
+        metadata_eligible_rows=len(eligible),metadata_rejected_rows=len(rows)-len(eligible),
         schema_validation_is_semantic_review=False,independent_semantic_review_pass=False,formal_training_allowed=False,
         retry_allowed=False,GPU_execution_started=False,selection_seed=prep.SEED,safety_filter_before_selection=True)
     return write_new(output,value)
@@ -152,15 +267,17 @@ def verify(path,digest,rank,local_assets=True):
     require(p['schema']==SCHEMA and p['private'] is True and p['prompt_version']==caption.PROMPT_VERSION
             and p['stage_cap_seconds']==86400 and p['pilot_reserved_seconds']==3600
             and p['retry_allowed'] is False and p['independent_semantic_review_pass'] is False
-            and p['formal_training_allowed'] is False,'Pilot stage/schema drift')
-    require(p['attempt_id']==ATTEMPT_ID and len(p['prior_attempt_proofs'])==4
-            and p['prior_attempt_charged_seconds']==sum(PRIOR_COST_SECONDS.values()) and p['new_reserved_seconds']==4*CAP
-            and p['prior_attempt_charged_seconds']+p['new_reserved_seconds']<=3600, 'Prior failed pilot charges or remaining reservation drift')
-    for prior_rank,proof in enumerate(p['prior_attempt_proofs']):
-        prior=read(proof)
-        require(prior['cost']['charged_upper_seconds']==PRIOR_COST_SECONDS[prior_rank]
-                and prior['cost']['release_verified'] is True and prior['parent']['released'] is True
-                and prior['CUDA_initialized'] is False and prior['labels_written']==0, 'Prior allocation evidence unverified')
+            and p['schema_validation_is_semantic_review'] is False and p['formal_training_allowed'] is False
+            and p['stage']=='label_rebuild_and_cache' and p['GPU_execution_started'] is False
+            and p['full_label_rebuild_allowed'] is False and p['AR_allowed'] is False and p['student_distillation_allowed'] is False
+            and type(p['recovery_attempts_allowed']) is int and p['recovery_attempts_allowed']==1
+            and p['selection_seed']==20261101 and p['safety_filter_before_selection'] is True
+            and p['metadata_eligible_rows']==1815 and p['metadata_rejected_rows']==41,'Pilot stage/schema drift')
+    validate_authorizations(p['authorization'],p['recovery_authorization']);history=freeze_history()
+    require(all(p[k]==v for k,v in history.items()) and p['attempt_id']==ATTEMPT_ID and p['local_root']==str(LOCAL)
+            and p['new_reserved_seconds']==4*CAP and p['prior_attempt_charged_seconds']+p['new_reserved_seconds']<=3600,
+            'Both immutable prior attempts or fresh recovery reservation drift')
+    validate_same_jobs(p['jobs'],read(history['original_attempt2_plan']))
     require(type(rank) is int and rank in range(4) and len(p['jobs'])==16 and len(p['nodes'])==4,'Fixed pilot topology required')
     expected=[dict(rank=r,gpu_index=0,allocated_gpus=1,cap_seconds=CAP,job_indices=list(range(r*4,r*4+4))) for r in range(4)]
     require(len({j['sample_id'] for j in p['jobs']})==16
@@ -168,12 +285,17 @@ def verify(path,digest,rank,local_assets=True):
     require(p['allocations']==expected and [j['index'] for j in p['jobs']]==list(range(16))
             and [j['rank'] for j in p['jobs']]==[i//4 for i in range(16)],'Pilot all-four budget/job mapping drift')
     check(p['authorization']);check(p['manifest'])
-    authorization=read(p['authorization'])
-    require(authorization['stage_caps_GPUh']=={'label_rebuild_and_cache':24,'single_gpu_training_resume':2,'multi_node_technical_validation':6}
-            and authorization['total_cap_GPUh']==32 and authorization['phase_borrowing_allowed'] is False
-            and authorization['formal_candidate_training_budget_approved'] is False, 'Actual stage authorization mismatch')
+    require(p['manifest']==read(history['original_attempt2_plan'])['manifest'],'Original manifest binding drift')
     require({r['path'] for r in p['source_files']}=={str(ROOT/n) for n in SOURCE_NAMES},'Source set drift')
+    require(len(p['source_files'])==len(SOURCE_NAMES),'Exact current source coverage required')
     for source in p['source_files']:check(source)
+    identities=[]
+    for expected_rank,n in enumerate(p['nodes']):
+        check(n['proof']);proof=validate_model_proof(read(n['proof']),expected_rank)
+        require(n['rank']==expected_rank and n['hostname']==proof['hostname'] and n['model_root']==proof['model_root']
+                and n['model_files']==proof['models'],'All four current model proof bindings required')
+        identities.append(canonical_models(proof))
+    require(all(v==identities[0] for v in identities),'Four-node model content differs')
     node=p['nodes'][rank];require(node['rank']==rank and node['hostname']==os.uname().nodename,'Wrong pilot physical host')
     check(node['proof']);proof=read(node['proof'])
     require(proof['schema']=='teacher_label_model_content_v1' and proof['rank']==rank and proof['hostname']==node['hostname']
@@ -218,9 +340,10 @@ def verify_worker_ancestry(launch,p,rank,launch_path,state_dir,ancestors):
         if str(ROOT/'scripts/gpu_hold.py') in prefix:
             leases.append(dict(ancestor,argv=prefix))
     require(leases,'Actual GPU exec ancestry missing')
-    for flag,value in (('--gpus','0'),('--state-dir',str(Path(state_dir).absolute())),('--action','exec')):
-        require(any(a['argv'].count(flag)==1 and a['argv'][a['argv'].index(flag)+1]==value for a in leases),
-                'Wrong actual GPU exec lease/GPU/state')
+    required=(('--gpus','0'),('--state-dir',str(Path(state_dir).absolute())),('--action','exec'))
+    require(any(all(a['argv'].count(flag)==1 and a['argv'].index(flag)+1<len(a['argv'])
+                    and a['argv'][a['argv'].index(flag)+1]==value for flag,value in required) for a in leases),
+            'Wrong actual GPU exec lease/GPU/state')
     return True
 
 
@@ -351,7 +474,9 @@ def main(argv=None):
     p.add_argument('--rank',type=int);p.add_argument('--state-dir',type=Path);p.add_argument('--launch',type=Path);p.add_argument('--gpu-authorized',action='store_true');a=p.parse_args(argv);os.umask(0o077)
     if a.action=='prepare':
         require(not a.gpu_authorized and a.model_proofs,'CPU prepare requires modelproof list, not GPU flags')
-        value=json.loads(a.model_proofs.read_bytes());result=prepare({int(k):v for k,v in value.items()},a.plan)
+        value=prep.strict_json(a.model_proofs.read_bytes())
+        require(isinstance(value,dict) and set(value)=={'0','1','2','3'},'Exact four typed rank modelproof paths required')
+        result=prepare({int(k):v for k,v in value.items()},a.plan)
     else:
         require(a.approved_plan_sha256 and a.rank is not None,'Approved plan SHA and fixed rank required')
         if a.action=='stage':require(not a.gpu_authorized,'CPU stage is not GPU authorization');result=stage(a.plan,a.approved_plan_sha256,a.rank)

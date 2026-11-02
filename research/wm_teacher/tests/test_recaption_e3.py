@@ -130,6 +130,31 @@ class RecaptionTests(unittest.TestCase):
             self.assertIs(rc.validate_facts(facts), facts)
             self.assertEqual(facts, before)
 
+    def test_displayed_frame_indices_are_bounded_without_repair(self):
+        for text in ["0", "7", "0-7", "2-4"]:
+            facts = self.facts()
+            facts["actions_by_time"][0]["frames"] = text
+            before = copy.deepcopy(facts)
+            self.assertIs(rc.validate_facts(facts), facts)
+            self.assertEqual(facts, before)
+        for text in ["8", "8-9", "7-8", "8-8", "7-0", "-1", "0-121",
+                     "", "all", "0,7", "0-7,8", "1.5", "01", "0 - 7", "0-7\n"]:
+            facts = self.facts()
+            facts["actions_by_time"][0]["frames"] = text
+            before = copy.deepcopy(facts)
+            with self.subTest(text=text), self.assertRaises(ValueError):
+                rc.validate_facts(facts)
+            self.assertEqual(facts, before)
+
+    def test_out_of_range_facts_stop_before_caption_generation(self):
+        facts = self.facts()
+        facts["actions_by_time"].append({"frames": "8-9", "action": "invented ending"})
+        model, processor = self.model_processor([json.dumps(facts)])
+        with patch.object(rc, "sample_frames", return_value=[MagicMock() for _ in range(8)]):
+            with self.assertRaisesRegex(ValueError, "sampled-frame range"):
+                rc.recaption_one(model, processor, "toy-video", "cpu")
+        self.assertEqual(model.generate.call_count, 1)
+
     def test_valid_facts_and_held_claims_are_not_modified(self):
         facts = self.facts()
         facts["hands"]["held_object"] = "a mug"
@@ -160,11 +185,175 @@ class RecaptionTests(unittest.TestCase):
         self.assertEqual(removed, [])
         self.assertEqual(model.generate.call_count, 3)
 
+    def test_short_caption_after_writing_fails_without_static_fallback_or_retry(self):
+        facts = self.facts()
+        facts["hands"]["held_object"] = "a mug"
+        for caption in ["  A mug.  ", "assistant\nA mug.", "   "]:
+            model, processor = self.model_processor([json.dumps(facts), caption])
+            with self.subTest(caption=caption), patch.object(
+                rc, "sample_frames", return_value=[MagicMock() for _ in range(8)]
+            ), self.assertRaisesRegex(ValueError, "shorter than 40"):
+                rc.recaption_one(model, processor, "toy-video", "cpu")
+            self.assertEqual(model.generate.call_count, 2)
+            self.assertEqual(processor.batch_decode.call_count, 2)
+
+    def test_short_caption_after_null_hold_postfilter_fails(self):
+        caption = "A person holds a large object with both hands. A room."
+        model, processor = self.model_processor([json.dumps(self.facts()), caption])
+        with patch.object(rc, "sample_frames", return_value=[MagicMock() for _ in range(8)]):
+            with self.assertRaisesRegex(ValueError, "shorter than 40"):
+                rc.recaption_one(model, processor, "toy-video", "cpu")
+        self.assertEqual(model.generate.call_count, 2)
+
+    def test_short_caption_after_held_verification_fails_without_retry(self):
+        facts = self.facts()
+        facts["hands"]["held_object"] = "a mug"
+        caption = "A person holds a mug with both hands beside the table. Nearby chairs."
+        for verdict in ["no", "unclear"]:
+            model, processor = self.model_processor([json.dumps(facts), caption, verdict])
+            with self.subTest(verdict=verdict), patch.object(
+                rc, "sample_frames", return_value=[MagicMock() for _ in range(8)]
+            ), self.assertRaisesRegex(ValueError, "shorter than 40"):
+                rc.recaption_one(model, processor, "toy-video", "cpu")
+            self.assertEqual(model.generate.call_count, 3)
+            self.assertEqual(processor.batch_decode.call_count, 3)
+
+    def test_caption_frame_index_metadata_rejected_before_postfilter_or_verify(self):
+        facts = self.facts()
+        facts["hands"]["held_object"] = "a mug"
+        for suffix in ["In frame 8, the person turns right.",
+                       "The person turns in frames 0-7.",
+                       "The person turns between frames zero and seven.",
+                       "The person turns in the eighth frame.",
+                       "The person turns in the 8th frame.",
+                       "Frame index 0 shows a head turn.",
+                       "Frame #7 shows a head turn.",
+                       "Frames [0-7] show a head turn.",
+                       "Frames: 0-7 show a head turn.",
+                       "Frame index: 0 shows a head turn.",
+                       "Frame=7 shows a head turn.",
+                       "Across eight frames, the person turns.",
+                       "Across 8 frames, the person turns.",
+                       "He holds a cup in the eleventh frame.",
+                       "In frame -1 the person turns.",
+                       "The video-model training caption shows a turn in frame nine."]:
+            caption = "A person holds a mug and gestures with the free hand. " + suffix
+            model, processor = self.model_processor([json.dumps(facts), caption])
+            with self.subTest(suffix=suffix), patch.object(
+                rc, "sample_frames", return_value=[MagicMock() for _ in range(8)]
+            ), self.assertRaisesRegex(ValueError, "displayed-frame index metadata"):
+                rc.recaption_one(model, processor, "toy-video", "cpu")
+            self.assertEqual(model.generate.call_count, 2)
+
+    def test_frame_metadata_rejected_before_null_hold_sentence_removal(self):
+        facts = self.facts()
+        for suffix in ["He holds a cup in the eleventh frame.",
+                       "He holds a cup in frame -1."]:
+            caption = "A person turns toward a wooden door and gestures with the free hand. " + suffix
+            model, processor = self.model_processor([json.dumps(facts), caption])
+            with self.subTest(suffix=suffix), patch.object(
+                rc, "sample_frames", return_value=[MagicMock() for _ in range(8)]
+            ), self.assertRaisesRegex(ValueError, "displayed-frame index metadata"):
+                rc.recaption_one(model, processor, "toy-video", "cpu")
+            self.assertEqual(model.generate.call_count, 2)
+
+    def test_picture_frame_object_not_rejected_as_metadata(self):
+        facts = self.facts()
+        facts["entities"].append({"desc": "picture frame", "attrs": ["wooden"]})
+        caption = "A person stands beside a wooden picture frame on the wall of the room."
+        model, processor = self.model_processor([json.dumps(facts), caption])
+        with patch.object(rc, "sample_frames", return_value=[MagicMock() for _ in range(8)]):
+            actual, written, removed = rc.recaption_one(model, processor, "toy-video", "cpu")
+        self.assertEqual(actual, facts)
+        self.assertEqual(written, caption)
+        self.assertEqual(removed, [])
+        self.assertEqual(model.generate.call_count, 2)
+
+    def test_frame_numbers_and_ordinals_rejected_in_both_orders(self):
+        facts = self.facts()
+        ordinal_words = ["eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth",
+                         "sixteenth", "seventeenth", "eighteenth", "nineteenth", "twentieth"]
+        number_tokens = ordinal_words + ["11th", "20th", "11", "20", "eleven", "twenty", "-1", "+8", "eight", "8"]
+        for token in number_tokens:
+            for reference in ["frame " + token, token + " frame"]:
+                caption = "A person turns toward the door in the " + reference + "."
+                model, processor = self.model_processor([json.dumps(facts), caption])
+                with self.subTest(reference=reference), patch.object(
+                    rc, "sample_frames", return_value=[MagicMock() for _ in range(8)]
+                ), self.assertRaisesRegex(ValueError, "displayed-frame index metadata"):
+                    rc.recaption_one(model, processor, "toy-video", "cpu")
+                self.assertEqual(model.generate.call_count, 2)
+
+    def test_explicit_picture_frame_dimensions_preserve_caption_bytes(self):
+        for desc, dimension in [("picture frame", "8 inches"), ("picture frame", "one meter"),
+                                ("photo frame", "12 cm"), ("photograph frame", "two feet"),
+                                ("picture frame", "8.5 centimeters"), ("photo frame", "20 mm")]:
+            facts = self.facts()
+            facts["entities"].append({"desc": desc, "attrs": [dimension + " wide"]})
+            caption = "A wooden " + desc + " " + dimension + " wide hangs on the wall."
+            model, processor = self.model_processor([json.dumps(facts), caption])
+            with self.subTest(desc=desc, dimension=dimension), patch.object(
+                rc, "sample_frames", return_value=[MagicMock() for _ in range(8)]
+            ):
+                actual, written, removed = rc.recaption_one(model, processor, "toy-video", "cpu")
+            self.assertEqual(actual, facts)
+            self.assertEqual(written.encode(), caption.encode())
+            self.assertEqual(removed, [])
+            self.assertEqual(model.generate.call_count, 2)
+
+    def test_picture_frame_prefix_does_not_exempt_index_metadata(self):
+        for suffix in ["A wooden picture frame 8 hangs on the wall.",
+                       "A wooden picture frame one hangs on the wall.",
+                       "A wooden picture frame 8 indexes the view.",
+                       "A wooden picture frame index 8 hangs on the wall.",
+                       "A wooden photo frame eleventh hangs on the wall.",
+                       "A wooden frame 8 inches wide hangs on the wall.",
+                       "A picture frame 8 inches wide is visible in frame eleventh.",
+                       "A picture frame one meter wide is visible in the eleventh frame.",
+                       "A picture frame 8 inches wide appears; frame 7 shows a turn.",
+                       "A picture frame 8 inches wide appears; a photo frame 9 appears."]:
+            facts = self.facts()
+            facts["entities"].append({"desc": "picture frame", "attrs": ["8 inches wide"]})
+            model, processor = self.model_processor([json.dumps(facts), suffix])
+            with self.subTest(caption=suffix), patch.object(
+                rc, "sample_frames", return_value=[MagicMock() for _ in range(8)]
+            ), self.assertRaisesRegex(ValueError, "displayed-frame index metadata"):
+                rc.recaption_one(model, processor, "toy-video", "cpu")
+            self.assertEqual(model.generate.call_count, 2)
+
+    def test_distinct_subject_actions_and_holders_preserved_by_mock_pipeline(self):
+        facts = self.facts()
+        facts["entities"] = [
+            {"desc": "person in a broad hat", "attrs": ["holding a glass"]},
+            {"desc": "person in a cap", "attrs": ["holding a bottle"]},
+        ]
+        facts["hands"]["held_object"] = "a glass and a bottle"
+        facts["actions_by_time"] = [
+            {"frames": "0-7", "action": "person in a broad hat raises a glass to chest level"},
+            {"frames": "4-7", "action": "person in a cap raises a bottle to the mouth"},
+        ]
+        facts["start_end_difference"] = "person in a cap has brought the bottle to the mouth"
+        before = copy.deepcopy(facts)
+        caption = ("A person in a broad hat raises a glass to chest level. "
+                   "A person in a cap raises a bottle to the mouth.")
+        model, processor = self.model_processor([json.dumps(facts), caption, "yes"])
+        with patch.object(rc, "sample_frames", return_value=[MagicMock() for _ in range(8)]):
+            actual, written, removed = rc.recaption_one(model, processor, "toy-video", "cpu")
+        self.assertEqual(actual, before)
+        self.assertEqual(facts, before)
+        self.assertEqual(written, caption)
+        self.assertEqual(removed, [])
+        write_text = processor.apply_chat_template.call_args_list[1].args[0][0]["content"][0]["text"]
+        self.assertIn(json.dumps(before, ensure_ascii=False), write_text)
+        self.assertEqual(model.generate.call_count, 3)
+
     def test_resume_rejects_legacy_invalid_or_malformed_without_rewriting(self):
         valid = {"sample_id": "toy", "prompt_version": rc.PROMPT_VERSION,
                  "facts_json": self.facts(), "caption": "A still scene."}
         variants = [
             {**valid, "prompt_version": "e3-grounded-recaption-v1"},
+            {**valid, "prompt_version": "e3-grounded-recaption-v2"},
+            {"sample_id": "toy", "prompt_version": "e3-grounded-recaption-v2", "error": "ValueError"},
             {**valid, "facts_json": {"desc": "a person", "attrs": {}}},
             {**valid, "caption": ""},
             {"sample_id": "toy", "error": "ValueError"},
@@ -223,10 +412,43 @@ class RecaptionTests(unittest.TestCase):
             self.assertNotIn("facts_json", record)
             self.assertEqual(manifest.read_bytes(), before)
 
+    def test_v3_new_output_does_not_modify_legacy_v2_output(self):
+        model = MagicMock()
+        model.to.return_value = model
+        model_class = MagicMock()
+        model_class.from_pretrained.return_value = model
+        modules = {
+            "torch": types.SimpleNamespace(bfloat16="mock-bf16"),
+            "transformers": types.SimpleNamespace(
+                AutoProcessor=MagicMock(), Qwen2_5_VLForConditionalGeneration=model_class),
+        }
+        caption = "A person stands indoors beside a wooden table in a room."
+        with tempfile.TemporaryDirectory() as td:
+            manifest, out, legacy = (Path(td) / name for name in (
+                "manifest.jsonl", "new-v3.jsonl", "legacy-v2.jsonl"))
+            manifest.write_text(json.dumps({"sample_id": "toy", "video": "toy-video",
+                                            "captions": {"orig": "unchanged"}}) + "\n")
+            legacy.write_text(json.dumps({"sample_id": "toy", "prompt_version": "e3-grounded-recaption-v2",
+                                          "facts_json": self.facts(), "caption": caption}) + "\n")
+            before = legacy.read_bytes()
+            with patch.dict(sys.modules, modules), patch.object(sys, "argv", [
+                "recaption_e3", "--manifest", str(manifest), "--out", str(out)
+            ]), patch.object(rc, "recaption_one", return_value=(self.facts(), caption, [])) as rewrite, \
+                    patch.object(rc, "sha256", return_value="mock-video-sha"):
+                rc.main()
+            record = json.loads(out.read_text())
+            self.assertEqual(record["prompt_version"], "e3-grounded-recaption-v3")
+            self.assertEqual(record["caption"], caption)
+            self.assertEqual(record["facts_json"], self.facts())
+            self.assertNotIn("error", record)
+            rewrite.assert_called_once()
+            self.assertEqual(legacy.read_bytes(), before)
+
     def test_cli_legacy_resume_fails_before_loading_model(self):
         with tempfile.TemporaryDirectory() as td:
             out = Path(td) / "legacy.jsonl"
-            out.write_text(json.dumps({"sample_id": "toy", "facts_json": {"attrs": {}}}) + "\n")
+            out.write_text(json.dumps({"sample_id": "toy", "prompt_version": "e3-grounded-recaption-v2",
+                                       "facts_json": self.facts(), "caption": "A person stands indoors beside a wooden table."}) + "\n")
             before = out.read_bytes()
             with patch.object(sys, "argv", ["recaption_e3", "--manifest", "unused",
                                             "--out", str(out)]):
@@ -265,14 +487,18 @@ class RecaptionTests(unittest.TestCase):
         self.assertIn("A person stands still", out)
 
     def test_future_version_preserves_display_index_semantics(self):
-        self.assertEqual(rc.PROMPT_VERSION, "e3-grounded-recaption-v2")
+        self.assertEqual(rc.PROMPT_VERSION, "e3-grounded-recaption-v3")
         self.assertEqual(rc.N_FRAMES, 8)
         self.assertIn("displayed sampled images, NOT original video frame numbers", rc.FACT_PROMPT)
         self.assertNotIn("0-40", rc.FACT_PROMPT)
 
     def test_prompt_rules_present(self):
-        for needle in ["at least 2", "do not guess", "do not invent an ending", "NOT describe camera movement"]:
-            self.assertIn(needle.lower().replace("at least 2", "at least 2"), (rc.FACT_PROMPT + rc.WRITE_PROMPT).lower())
+        for needle in ["at least 2", "do not guess", "do not invent an ending", "NOT describe camera movement",
+                       "only 0..7, never 8 or 9", "visible subject description", "entities.desc",
+                       "never transfer", "a static background does not mean a static subject",
+                       "static photograph", "pause/resumption", "brands, OCR text", "internal states",
+                       "Do not omit actions", "Do NOT mention frame/frames", "length target"]:
+            self.assertIn(needle.lower(), (rc.FACT_PROMPT + rc.WRITE_PROMPT).lower())
 
 if __name__ == "__main__":
     unittest.main()

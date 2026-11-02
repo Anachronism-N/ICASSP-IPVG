@@ -21,7 +21,7 @@ E3三臂（seed0独立完整验收已通过；seed1待评分；用户选择C的2
 |---|---|---|
 | E1采样消融（1128条12组） | 采样参数能否缩小dynamic差距 | 未稳定改善：seed0/1/2差+2.13/−2.13/+1.06pp，样本std **2.214538pp**（原3.29错误，已按原始JSON复算） |
 | E1b CFG-Zero*（188条） | 零成本画质提升 | **否**：z2画质+1.7pp但DreamSim护栏超限 |
-| E2完整基准（1011条） | 开发集结论是否迁移公开基准 | **否**：dynamic −0.81pp、subject_consistency显著退化、Physics −1.7pp |
+| E2完整基准（1011条） | 开发集结论是否迁移公开基准 | **不全面晋级**：dynamic −0.81pp、subject_consistency显著退化；2026-11-02更正Physics最终分为+1.395826pp，旧−1.7pp取错子项 |
 | 三seed复验（seed0已有，seed1/2新增376条） | E1结论的seed稳定性 | 四seed已完整评分：dynamic均值差−0.265957pp、样本std2.193141pp；seed2 DreamSim失败，不重新选参 |
 | E3三臂seed0（282条已评分） | 标签净化+保真anchor的训练收益 | A DreamSim FAIL；B/C PASS，选C，Total*比base−0.136pp且dynamic差0；非质量晋级 |
 | 调研（A/B1方向完成） | 还有哪些可攻击面 | DyMoS(文献DD+13pp)/ALG(+7)/DenseDPO为下一梯队候选 |
@@ -35,7 +35,7 @@ E3三臂（seed0独立完整验收已通过；seed1待评分；用户选择C的2
 | aesthetic | 61.97 | 63.70 | −1.7pp |
 | 其余6维 | 持平~略优 | — | 合计−0.2pp |
 
-其他基准：base Physics-IQ 30.13%、WMB 8.297/10。E2的s12_c5在WMB为8.397/10、略高于base，但Physics/VBench退化，未晋级；不能把base称作所有单项本地最优。
+其他基准：base Physics-IQ 30.13%、WMB 8.297/10。E2的s12_c5在WMB为8.397/10、略高于base，但VBench主体时序一致性退化、运动未迁移，未晋级；Physics最终分为31.526205%，此前负向理由已更正；不能把base称作所有单项本地最优。
 
 **关键事实**：差距几乎全部集中在dynamic单项。而本轮已用三seed+E2证明采样参数无法缩小它——剩余攻击面为：
 1. E3标签净化训练：按seed0冻结C，用户选择先276条子集诊断；完整1366/180 GPUh未授权；seed1只补稳健性

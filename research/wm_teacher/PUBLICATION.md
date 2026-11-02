@@ -1,35 +1,5 @@
-# C1 completed input-caption diagnostic (2026-10-20)
+# Selected Teacher experiment source snapshot
 
-12 new original-caption videos and 12 scored rows completed, paired with 12 existing corrected-caption controls. Independent full decode, source/output hashes, original metric formulas and pair reconstruction passed; actual additional allocated cost 1.894074 GPUh within 6. See docs/39_C1原与校订Caption完整结论.md and eval/diag/C1_caption_public_results_20261020.json. Mean matching/quality improves with corrected labels on these six training-visible cases, but manipulation failures and case tradeoffs remain. This is not a trained-model improvement, a holdout estimate, or Teacher approval.
+This directory deliberately excludes the original Git history, cookies, credentials, data, model weights, videos, environments and private logs. Internal node addresses are placeholders; configure your own deployment before running scripts.
 
-Only four GPUs on the main node computed C1; three other nodes were not used for this run. Resource reservation/history is not experimental throughput. Teacher automatic FAIL/user review pending remain unchanged. Historical stages below are retained with their own timestamps.
-
-# M1/L1 complete-execution and literature update (2026-10-20)
-
-M1 completed 18 shared GT-forward-process states and 72 native model predictions. Independent CPU reconstruction matched all 54,378 numeric outputs (maximum difference 0); conservative allocated cost 0.182380 GPUh within 2. See docs/37_Teacher机制诊断M1实测结论.md and eval/diag/teacher_M1_public_results_20261020.json. This is not rollout replay, a causal quality cure, or Teacher approval.
-
-L1 decoded all 340 frozen windows and verified original files/provenance/contact hashes. Semantic review remains pending, all canonical source identities UNKNOWN; no population label error rate is claimed. See docs/35 and the safe L1 summary. Five relevant methods and official-source/license boundaries are documented in docs/36.
-
-Native scheduler and pipeline source snapshots plus the upstream Apache-2.0 license are included for mathematical regression tests; pipeline local modifications are identified. No tensor, media, original caption manifest, model weights or credentials are published. Historical sections below describe their own earlier stage. Teacher automatic FAIL/user review pending remain unchanged.
-
-# M1/L1 completed diagnostic update (2026-10-20)
-
-M1:18 shared GT-forward states and72 single-branch predictions completed and independently tensor/hash/formula verified,0.182380 allocated GPUh within2. Positive MSE improves18/18 but both positive and NEG drift; optimized scale stays near1 on these states. Do not claim a NEG-only cause or automatic Zero cure.
-
-L1:340 randomly stratified windows fully decoded and provenance/hash verified,17 sources20 each,76.160217 seconds CPU. Semantic review remains pending, canonical sources UNKNOWN; full decode is not caption accuracy. See docs35–37 and the two public aggregate JSON summaries. Five original-paper/implementation audits are retained with license and model-transfer limits. Teacher automatic FAIL/user review pending remains unchanged.
-
-# P1 complete-result update (2026-10-19)
-
-P1 generation and original-algorithm scoring are complete: 24 verified videos, 24 scored rows, 2.912882 allocated GPUh within the 12 GPUh cap. Independent re-decode, source/output/metric hashes and formula/aggregate checks passed. See docs/34_Teacher_CFG开发消融结论.md and eval/diag/teacher_p1_results_20261019.json. Lower CFG is rejected as an A07 repair: imaging, last-frame/motion guards and manipulation fail. Base passes the preregistered machine screen but has imaging/semantic tradeoffs; no promotion or Teacher approval. Teacher automatic FAIL and user review pending remain unchanged.
-
-The dated plan/code-only section below describes that earlier publication stage, not the present completion status. Private cases, media, weights, original CSV and credentials remain excluded.
-
-# Verified Teacher experiment results
-
-All3033 original outputs and full frame decoding, per-model WM/public VBench8 dimensions, GTref108, Physics198/66, WMB350 and fixed120 validation losses passed strict coverage verification. See [final report](docs/32_插值Teacher完整评测结论.md) for measured scores, candidate trade-offs, automatic gate failures and human review pending. This appendix does not change the parent IPVG competition hypotheses/rules/results. No claim of SOTA or accepted streaming Teacher is made. The source snapshot excludes private media, weights, credentials, identifying logs and original source Git history.
-
-## 2026-10-19: bounded P1 plan and code increment
-
-The six-source, two-model, CFG5/CFG3 internal diagnostic is running. This increment publishes the frozen protocol, bounded generation/scoring implementations and regression tests only; complete generation, scoring, semantic-action review and final P1 conclusions remain pending. Original/source-corrected captions are distinct. Development sources are training-visible; public source mapping remains unknown. Runtime DiffSynth package and entrypoints are copied locally and hashed. Generation is capped at 4 allocated GPUh, scoring at 8 and their total at 12. Separate temporary idle resource reservation is not experiment throughput or evidence of quality.
-
-The prior complete interpolation evaluation remains valid: Teacher automatic conditions FAIL and user review pending. No Student, distillation, AR or new full-scale training is authorized by this increment. Private media, case manifests, original CSV, source identifiers, weights, operational state and credentials are excluded.
+Use PUBLICATION_MANIFEST.json for source/snapshot hashes and the measured snapshot time. Historical planning documents are not proof of current experiment completion. All benchmark coverage, fixed validation loss and Teacher review requirements still apply.

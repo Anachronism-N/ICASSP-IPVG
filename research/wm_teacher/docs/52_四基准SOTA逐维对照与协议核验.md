@@ -1,5 +1,7 @@
 # 52 四基准SOTA逐维对照与协议核验（2026-10-25）
 
+> 2026-11-02刷新及勘误：官方VBench原Total最高仍DreamX90.49；新增去dynamic同公式36行复算最高LTX-2无po92.425997，base91.135529。E2 Physics旧28.41是时空子项，实际最终Original31.526205%，与base30.130379相比+1.395826pp；不能再说Physics下降。当前完整实验/最佳版本/可比SOTA差距见docs59，本文原其余协议限制仍有效。
+
 ## 1. 版本与定义
 
 当前尚无新Teacher通过全面晋级。以固定base Wan2.2-TI2V-5B raw、shift5/CFG5、50steps、seed0为最可靠整体基线；不是所有单项最好。E3 C开发集87.295%低于base87.431%，dynamic差0，只是合格臂中最高；E2 shift12在WMB8.397高于base8.297但其他基准退化，未晋级。

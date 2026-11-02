@@ -25,6 +25,7 @@ import json
 import math
 import os
 from pathlib import Path
+import random
 import signal
 import sys
 import time
@@ -443,7 +444,7 @@ def validate_checkpoint(value, model, optimizer, steps):
     import torch
     keys = {'protocol', 'steps', 'targets', 'rank', 'alpha', 'adapters', 'adapter_names', 'optimizer', 'rng', 'config'}
     require(isinstance(value, dict) and set(value) == keys, 'Checkpoint key schema differs')
-    require(value['protocol'] == PROTOCOL and value['steps'] == steps and value['targets'] == TARGETS
+    require(value['protocol'] == PROTOCOL and type(value['steps']) is int and value['steps'] == steps and value['targets'] == TARGETS
             and value['rank'] == LORA_RANK and value['alpha'] == LORA_ALPHA, 'Checkpoint training schema differs')
     params = ts.trainable_adapters(model)
     require(value['adapter_names'] == list(params) and set(value['adapters']) == set(params), 'Adapter names/order differ')
@@ -477,12 +478,17 @@ def save_checkpoint(path, value):
             'bytes': Path(path).stat().st_size}
 
 
-def load_checkpoint(path, record, model, optimizer, steps, cuda=False):
+def load_checkpoint(path, record, model, optimizer, steps, cuda=False, expected_config=None):
     import torch
     require(m1.sha256(path) == record['file_sha256'], 'Checkpoint file hash differs')
     value = torch.load(path, map_location='cpu', weights_only=True)
     require(ts.state_hash(value) == record['state_sha256'], 'Checkpoint state hash differs')
     validate_checkpoint(value, model, optimizer, steps)
+    if expected_config is not None:
+        saved_config = dict(value['config'])
+        saved_steps = saved_config.pop('completed_steps', None)
+        require(type(saved_steps) is int and saved_steps == steps, 'Checkpoint config completed_steps differs')
+        require(canonical_json(saved_config) == canonical_json(expected_config), 'Checkpoint saved config differs')
     with torch.no_grad():
         for key, p in ts.trainable_adapters(model).items():
             p.copy_(value['adapters'][key].to(p.device))
@@ -670,6 +676,149 @@ def make_cfg(args, horizon):
             'targets': TARGETS, 'per_rank_batch': 1, 'grad_accum': 1}
 
 
+SMOKE_RESUME_SCHEMA = 'e3-single-gpu-smoke-resume-v1'
+SMOKE_PYTHON_RNG_RULE = 'random.seed(derive_seed(smoke_python,seed)) before restore; no reseed after restore'
+
+
+def canonical_json(value):
+    return json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()
+
+
+def training_source_records():
+    return {'trainer': m1.file_record(__file__), 'm1_helper': m1.file_record(m1.__file__),
+            'smoke_helper': m1.file_record(ts.__file__),
+            'admission_helper': m1.file_record(Path(__file__).with_name('prepare_teacher_training_admission.py'))}
+
+
+def synthetic_data_identity():
+    return {'sample_identity_sha256': 'synthetic', 'context_set_sha256': 'synthetic',
+            'index_sha256': None, 'version': 'synthetic'}
+
+
+def trainer_identity():
+    stat = Path('/proc/self/stat').read_text()
+    return {'pid': os.getpid(), 'start_ticks': int(stat.rsplit(')', 1)[1].split()[19])}
+
+
+def input_identity(args):
+    return {'models_dir': str(Path(args.models_dir).absolute()), 'framework': str(Path(args.framework).absolute()),
+            'cache_index': str(Path(args.cache_index).absolute()) if args.cache_index else None,
+            'synthetic_inputs': args.synthetic_inputs}
+
+
+def sha256_text(value):
+    return type(value) is str and len(value) == 64 and all(c in '0123456789abcdef' for c in value)
+
+
+def read_bound_json(record):
+    require(isinstance(record, dict) and set(record) == {'path', 'bytes', 'sha256'}, 'JSON record schema differs')
+    path = Path(record['path'])
+    require(path.is_absolute() and path.is_file() and type(record['bytes']) is int
+            and 0 < record['bytes'] <= 16 * 1024 * 1024 and sha256_text(record['sha256']), 'Invalid JSON file record')
+    raw = path.read_bytes()
+    require(len(raw) == record['bytes'] and hashlib.sha256(raw).hexdigest() == record['sha256'],
+            'Bound JSON bytes/hash differ: ' + str(path))
+    return json.loads(raw)
+
+
+def validate_smoke_resume(args):
+    """CPU/raw-byte admission only; never authorizes GPU allocation or formal training."""
+    path = getattr(args, 'smoke_resume_proof', None)
+    approved = getattr(args, 'approved_smoke_resume_sha256', None)
+    require((path is None) == (approved is None), 'Both smoke resume proof and approved SHA256 are required')
+    if path is None:
+        return None
+    require(args.smoke and args.synthetic_inputs and args.cache_index is None,
+            'Resume is synthetic smoke-only, without a cache')
+    topology = validate_topology()
+    require(topology['world_size'] == 1, 'Smoke resume requires WORLD_SIZE=1')
+    require(args.offload == 'on' and args.smoke_offload == ['on'], 'Smoke resume requires only offload on')
+    require(not args.skip_model_hash and not args.skip_frozen_hash, 'Resume cannot skip model/frozen hashes')
+    require(type(args.max_steps) is int and args.max_steps > args.warmup, 'Resume requires a fixed logical horizon')
+    require(0 < args.max_gpu_hours <= 2, 'Resume cannot borrow beyond the single GPU 2 GPUh phase')
+    require(sha256_text(approved), 'Explicit full lowercase approved SHA256 required')
+    path = Path(path).absolute()
+    require(path.is_file() and 0 < path.stat().st_size <= 16 * 1024 * 1024, 'Small immutable resume JSON required')
+    raw = path.read_bytes()
+    require(hashlib.sha256(raw).hexdigest() == approved, 'Approved resume proof SHA256 differs')
+    proof = json.loads(raw)
+    keys = {'schema', 'phase', 'authorization', 'source_run_manifest', 'source_summary', 'checkpoint',
+            'source_completed_steps', 'continuation_updates', 'logical_horizon', 'config', 'source',
+            'synthetic_inputs_allowed', 'formal_training_allowed'}
+    require(isinstance(proof, dict) and set(proof) == keys and proof['schema'] == SMOKE_RESUME_SCHEMA,
+            'Versioned source-bound smoke resume proof required')
+    require(proof['phase'] == 'single_gpu_training_resume' and proof['synthetic_inputs_allowed'] is True
+            and proof['formal_training_allowed'] is False, 'Smoke resume phase/technical-only scope differs')
+    import prepare_teacher_training_admission as admission
+    auth = read_bound_json(proof['authorization'])
+    require(canonical_json(auth) == canonical_json(admission.AUTH_EXPECTED), 'New 32 GPUh authorization differs')
+    manifest = read_bound_json(proof['source_run_manifest'])
+    summary = read_bound_json(proof['source_summary'])
+    source_dir = Path(proof['source_run_manifest']['path']).parent
+    require(Path(proof['source_run_manifest']['path']).name == 'run_manifest.json'
+            and Path(proof['source_summary']['path']) == source_dir / 'summary.json', 'Source run paths differ')
+    prefix, updates = proof['source_completed_steps'], proof['continuation_updates']
+    require(type(prefix) is int and prefix > 0 and type(updates) is int and updates == args.smoke_steps
+            and type(proof['logical_horizon']) is int and proof['logical_horizon'] == args.max_steps
+            and prefix + updates <= args.max_steps, 'Resume prefix/segment/logical horizon differs')
+    cfg = make_cfg(args, args.max_steps)
+    require(canonical_json(proof['config']) == canonical_json(cfg)
+            and canonical_json(manifest.get('config')) == canonical_json(cfg), 'Original manifest config differs')
+    current_source = training_source_records()
+    require(canonical_json(proof['source']) == canonical_json(current_source)
+            and canonical_json(manifest.get('source')) == canonical_json(current_source), 'Original/current source binding differs')
+    require(canonical_json(manifest.get('inputs')) == canonical_json(input_identity(args)),
+            'Original model/framework/input paths differ')
+    require(manifest.get('protocol') == PROTOCOL and type(manifest.get('world_size')) is int
+            and manifest['world_size'] == 1 and type(manifest.get('num_samples')) is int
+            and manifest['num_samples'] == 64
+            and canonical_json(manifest.get('data')) == canonical_json(synthetic_data_identity()),
+            'Original data/synthetic/world identity differs')
+    require(canonical_json(manifest.get('smoke')) == canonical_json(
+                {'on': True, 'synthetic_inputs': True, 'steps_per_mode': prefix, 'offload_modes': ['on'],
+                 'python_rng_rule': SMOKE_PYTHON_RNG_RULE, 'python_seed': derive_seed('smoke_python', args.seed)})
+            and not manifest.get('resume'), 'Only a source-bound completed smoke prefix can be resumed')
+    require(manifest.get('base_shards_hashed') is True
+            and canonical_json(manifest.get('base_shards')) == canonical_json({r: m1.CACHE_PINS[r] for r in SHARD_RELS})
+            and canonical_json(manifest.get('framework')) == canonical_json(framework_records(args.framework)),
+            'Original base/framework identity differs')
+    require(type(manifest.get('order_plan_steps')) is int and manifest['order_plan_steps'] == prefix
+            and manifest.get('order_plan_sha256') == plan_sha256(DataOrder(args.seed, 64).plan(prefix, 1)),
+            'Original prefix data order differs')
+    import torch
+    require(manifest.get('torch_version') == str(torch.__version__), 'Original torch version differs')
+    source_allocation = manifest.get('allocation', {})
+    require(type(source_allocation.get('world_size')) is int and source_allocation['world_size'] == 1
+            and type(source_allocation.get('max_gpu_hours')) in (int, float)
+            and 0 < source_allocation['max_gpu_hours'] <= 2
+            and canonical_json(summary.get('allocation')) == canonical_json(source_allocation),
+            'Source allocation is not the single GPU phase')
+    mode = summary.get('smoke', {}).get('on', {})
+    require(summary.get('protocol') == PROTOCOL and summary.get('status') == 'completed'
+            and summary.get('mode') == 'smoke' and type(summary.get('completed_steps')) is int
+            and summary['completed_steps'] == prefix and set(summary.get('smoke', {})) == {'on'}
+            and type(mode.get('completed_steps')) is int and mode['completed_steps'] == prefix
+            and 'stop' in mode and mode['stop'] is None and sha256_text(summary.get('frozen_base_sha256')),
+            'Source smoke prefix is incomplete/stopped or lacks frozen base SHA256')
+    checkpoint = proof['checkpoint']
+    require(isinstance(checkpoint, dict) and set(checkpoint) == {'path', 'bytes', 'file_sha256', 'state_sha256'}
+            and canonical_json(checkpoint) == canonical_json(summary.get('checkpoint'))
+            and Path(checkpoint['path']) == source_dir / 'private' / CKPT_NAME
+            and type(checkpoint['bytes']) is int and checkpoint['bytes'] > 0
+            and sha256_text(checkpoint['file_sha256']) and sha256_text(checkpoint['state_sha256']),
+            'Original checkpoint record/schema differs')
+    ck_path = Path(checkpoint['path'])
+    require(ck_path.is_file() and ck_path.stat().st_size == checkpoint['bytes']
+            and m1.sha256(ck_path) == checkpoint['file_sha256'], 'Original checkpoint bytes/hash differ')
+    verify_base_shards(args.models_dir, hash_content=True)
+    return {'proof': {'path': str(path), 'bytes': len(raw), 'sha256': approved},
+            'phase': proof['phase'], 'source_run_manifest': proof['source_run_manifest'],
+            'source_summary': proof['source_summary'], 'checkpoint': checkpoint,
+            'source_completed_steps': prefix, 'continuation_updates': updates,
+            'logical_horizon': proof['logical_horizon'], 'frozen_base_sha256': summary['frozen_base_sha256'],
+            'formal_training_allowed': False, 'allocation_authorized_by_this_proof': False}
+
+
 def device_type(comm):
     import torch
     return torch.device(comm.device).type
@@ -682,9 +831,10 @@ def reset_memory(comm):
         torch.cuda.reset_peak_memory_stats()
 
 
-def smoke_modes(args, pipe, optimizer, params, samples_fn, order, cfg, comm, allocation, clock, log, autocast):
+def smoke_modes(args, pipe, optimizer, params, samples_fn, order, cfg, comm, allocation, clock, log, autocast,
+                step_offset=0):
     import torch
-    modes, offset = {}, 0
+    modes, offset = {}, step_offset
     for mode in args.smoke_offload:
         reset_memory(comm)
         done, records, stop = run_loop(pipe, optimizer, params, samples_fn, order, dict(cfg, offload=(mode == 'on')),
@@ -694,20 +844,26 @@ def smoke_modes(args, pipe, optimizer, params, samples_fn, order, cfg, comm, all
         ok = [r for r in records if r['status'] == 'ok']
         secs = [max(r['iteration_seconds_rank0'], r['step_seconds_max']) for r in ok]
         steady = sorted(secs[1:] if len(secs) > 1 else secs)
-        modes[mode] = {'completed_steps': done, 'stop': stop, 'iteration_seconds': secs,
+        modes[mode] = {'completed_steps': done, 'stop': stop, 'step_offset': offset - done,
+                       'logical_completed_steps': offset, 'last_step': records[-1] if records else None,
+                       'iteration_seconds': secs,
                        't_step_median_excluding_first': steady[len(steady) // 2] if steady else None,
                        'peak_allocated_bytes_max': max([r['peak_allocated_bytes_max'] for r in ok] or [0]),
                        'peak_reserved_bytes_rank0': torch.cuda.max_memory_reserved() if device_type(comm) == 'cuda' else 0,
                        'losses_fm': [r['loss_fm_mean'] for r in ok]}
         if stop == 'budget_exhausted_before_max_steps':
             break
-    return offset, modes
+    return offset - step_offset, modes
 
 
 def execute(args):
-    import torch
     started = time.time()
     t_start = time.monotonic()
+    resume = validate_smoke_resume(args)  # All raw-byte/source/phase checks precede any CUDA setup.
+    import torch
+    if args.smoke and args.synthetic_inputs:
+        random.seed(derive_seed('smoke_python', args.seed))
+    identity = trainer_identity()
     comm = setup_distributed()
     allocation = budget(args.max_gpu_hours, comm.world, args.cleanup_grace_seconds, args.save_reserve_seconds,
                         args.first_step_estimate_seconds)
@@ -715,7 +871,7 @@ def execute(args):
     clock = lambda: local_duration(t_start, time.monotonic())  # noqa: E731
     out = Path(args.out_dir).absolute()
     summary = {'protocol': PROTOCOL, 'status': 'failed', 'mode': 'smoke' if args.smoke else 'train',
-               'allocation': allocation, 'started_unix': started}
+               'allocation': allocation, 'started_unix': started, 'trainer_identity': identity}
     log_file, pipe, created = None, None, False
 
     def on_signal(signum, frame):
@@ -733,8 +889,7 @@ def execute(args):
             (out / 'export').mkdir(mode=0o700)
         comm.barrier()
         if args.synthetic_inputs:
-            data = {'samples': list(range(64)), 'sample_identity_sha256': 'synthetic', 'context_set_sha256': 'synthetic',
-                    'index_sha256': None, 'version': 'synthetic'}
+            data = dict(synthetic_data_identity(), samples=list(range(64)))
             samples_fn = synthetic_sample
         else:
             data = load_cache_index(args.cache_index, args.caption_version)
@@ -742,16 +897,23 @@ def execute(args):
         order = DataOrder(args.seed, len(data['samples']))
         total_steps = args.smoke_steps * len(args.smoke_offload) if args.smoke else args.max_steps
         cfg = make_cfg(args, args.max_steps or 1000)
-        plan = order.plan(total_steps, comm.world)
-        shards = verify_base_shards(args.models_dir, hash_content=(comm.rank == 0 and not args.skip_model_hash))
+        step_offset = resume['source_completed_steps'] if resume else 0
+        plan = [[order.index(step_offset + s, r, comm.world) for r in range(comm.world)] for s in range(total_steps)]
+        shards = verify_base_shards(args.models_dir, hash_content=(comm.rank == 0 and not args.skip_model_hash and resume is None))
         comm.barrier()
         if comm.rank == 0:
             manifest = {'protocol': PROTOCOL, 'config': cfg, 'allocation': allocation, 'world_size': comm.world,
                         'data': {k: v for k, v in data.items() if k != 'samples'}, 'num_samples': len(data['samples']),
                         'order_plan_sha256': plan_sha256(plan), 'order_plan_steps': total_steps,
                         't_noise_rule': 'Generator(derive_seed(t_noise,seed,step,sample_index)): randint(0,1000) then randn fp32 -> x0 dtype',
-                        'source': {'trainer': m1.file_record(__file__), 'm1_helper': m1.file_record(m1.__file__),
-                                   'smoke_helper': m1.file_record(ts.__file__)},
+                        'source': training_source_records(), 'inputs': input_identity(args),
+                        'smoke': {'on': args.smoke, 'synthetic_inputs': args.synthetic_inputs,
+                                  'steps_per_mode': args.smoke_steps, 'offload_modes': args.smoke_offload,
+                                  'python_rng_rule': SMOKE_PYTHON_RNG_RULE if args.smoke and args.synthetic_inputs else None,
+                                  'python_seed': derive_seed('smoke_python', args.seed) if args.smoke and args.synthetic_inputs else None},
+                        'trainer_identity': identity,
+                        'resume': resume, 'segment_requested_updates': total_steps,
+                        'logical_start_step': step_offset, 'logical_end_step_requested': step_offset + total_steps,
                         'framework': framework_records(args.framework),
                         'base_shards': {r: m1.CACHE_PINS[r] for r in SHARD_RELS},
                         'base_shards_hashed': not args.skip_model_hash, 'torch_version': str(torch.__version__),
@@ -770,12 +932,28 @@ def execute(args):
         frozen_before = ts.frozen_state_hash(pipe.dit) if comm.rank == 0 and not args.skip_frozen_hash else None
         optimizer = torch.optim.AdamW(params, lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, 0.999), eps=1e-8)
         cuda = device_type(comm) == 'cuda'
+        if resume:
+            require(frozen_before == resume['frozen_base_sha256'], 'Restored run frozen base identity differs')
+            load_checkpoint(resume['checkpoint']['path'], resume['checkpoint'], pipe.dit, optimizer,
+                            step_offset, cuda=cuda, expected_config=cfg)
+            summary['resume'] = resume
+        if comm.rank == 0:
+            summary['adapter_initial_sha256'] = ts.state_hash(ts.trainable_adapters(pipe.dit))
         autocast = lambda: torch.autocast(device_type=device_type(comm), dtype=torch.bfloat16)  # noqa: E731
         reset_memory(comm)
         summary['setup_seconds'] = setup_seconds = clock()
         if args.smoke:
             completed_steps, summary['smoke'] = smoke_modes(args, pipe, optimizer, params, samples_fn, order, cfg, comm,
-                                                            allocation, clock, log, autocast)
+                                                            allocation, clock, log, autocast, step_offset=step_offset)
+            summary['segment_executed_updates'] = completed_steps
+            summary['completed_steps'] = step_offset + completed_steps
+            summary['logical_completed_steps'] = step_offset + completed_steps
+            if comm.rank == 0:
+                summary['adapter_final_sha256'] = ts.state_hash(ts.trainable_adapters(pipe.dit))
+            require(set(summary['smoke']) == set(args.smoke_offload)
+                    and all(v['completed_steps'] == args.smoke_steps and v['stop'] is None
+                            for v in summary['smoke'].values()), 'Smoke stopped before all requested mode updates')
+            completed_steps += step_offset
         else:
             completed_steps, records, stop = run_loop(pipe, optimizer, params, samples_fn, order, cfg, comm, allocation,
                                                       clock, log, autocast)
@@ -794,6 +972,7 @@ def execute(args):
             require(ts.state_hash(reread) == record['state_sha256'], 'Checkpoint reread hash differs')
             del reread
             summary['checkpoint'] = record
+            summary['adapter_final_sha256'] = ts.state_hash(state['adapters'])
             summary['export'] = export_lora(out / 'export' / EXPORT_NAME, state['adapters'])
             if frozen_before is not None:
                 frozen_after = ts.frozen_state_hash(pipe.dit)
@@ -868,6 +1047,8 @@ def parser():
     p.add_argument('--smoke-steps', type=int, default=4)
     p.add_argument('--smoke-offload', type=lambda s: s.split(','), default=['on', 'off'])
     p.add_argument('--synthetic-inputs', action='store_true', help='smoke only: random shape-exact inputs')
+    p.add_argument('--smoke-resume-proof', type=Path, help='immutable single-GPU synthetic smoke continuation JSON only')
+    p.add_argument('--approved-smoke-resume-sha256', help='explicitly approved full SHA256 of smoke resume proof')
     p.add_argument('--target-gpu-hours', type=float, default=24.0)
     p.add_argument('--target-world', type=int, default=8)
     p.add_argument('--teacher-four-node-admission', action='store_true',
@@ -882,10 +1063,10 @@ def main(argv=None):
         validate_args(args)
         budget(args.max_gpu_hours, int(os.environ.get('WORLD_SIZE', '1')), args.cleanup_grace_seconds,
                args.save_reserve_seconds, args.first_step_estimate_seconds)
+        return execute(args)
     except Exception as error:
         print(type(error).__name__ + ': ' + str(error), file=sys.stderr)
         return 1
-    return execute(args)
 
 
 if __name__ == '__main__':
