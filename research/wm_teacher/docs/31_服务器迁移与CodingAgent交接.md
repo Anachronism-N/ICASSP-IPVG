@@ -1,3 +1,13 @@
+# 标签pilot真实启动验证修复（2026-11-02，尚无新bench结果）
+
+4节点第一次pilot在模型加载/CUDA初始化前因“Wrong actual GPU exec lease/GPU/state”失败：gpu_hold父命令与--后的worker命令均带--state-dir，验证器错误计数全argv。已核4parent退出、释放及0label，真实费用分别18.143487762660/15.434166906867/19.951568322256/17.300606979057秒，共70.829829970840秒；原记录保留，不记为0GPUh。
+
+修复只验证--之前真实lease命令，仍绑定GPU0/state-dir/exactparent和freshchildsession；同16固定样本、原v2captionhelper与模型不变。独立新root attempt2不复用旧launch/output，4node新cap各860秒＋所有旧失败≤3600秒原1GPUhpilot，label/cache阶段24GPUh未扩额。15相关CPU tests通过（真实嵌套重复参数、wrongGPU拒、prior不清零）；完整公开回归、source/实际stage后才能再次运行。
+
+这不是训练收益，正式Teacher训练及独立语义审验未完成。最新完整bench仍C276否定总体晋级结果；不根据此工程修复宣称SOTA差距收窄。实际旧失败证据attempt1_rank{0..3}.json私有保存，无prompt/media公示。
+
+---
+
 # 当前32GPUh训练准入实证（2026-11-02，标签pilot执行前）
 
 用户批准新的独立32GPUh阶段：标签重建/缓存24、单GPU训练与恢复2、多节点技术验证6，不挪阶段；四节点专用当前Teacher，其他业务13个任务/看护已清理，无数据模型文件删除，不杀平台/SSH/挂载/当前控制。目标超过同协议SOTA尚无直接证据；不因Goal要求跳过训练数据语义门、预算或AR/Student/蒸馏门。

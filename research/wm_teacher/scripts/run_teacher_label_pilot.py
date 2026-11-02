@@ -17,11 +17,13 @@ import run_teacher_generation as process
 import recaption_e3 as caption
 
 ROOT=Path(__file__).resolve().parents[1]
-LOCAL=Path('/dockerdata/wm_tmp/teacher_label_pilot_20261102')
+LOCAL=Path('/dockerdata/wm_tmp/teacher_label_pilot_20261102_attempt2')
+ATTEMPT_ID='label_pilot_attempt2'
+PRIOR_COST_SECONDS={0:18.143487762659788,1:15.434166906867176,2:19.951568322256207,3:17.300606979057193}
 AUTH=ROOT/'eval/diag/teacher_training_admission_authorization_20261101.json'
 MANIFEST=ROOT/'training_metadata/e3_recaption_20261022/pool1856_dual_manifest.jsonl'
-SCHEMA='teacher_label_pilot_execution_v1'
-CAP=900
+SCHEMA='teacher_label_pilot_execution_v2'
+CAP=860
 TAIL=90
 MODEL_ROOT=Path('/dockerdata/models_qwen25_local_20261023')
 MODEL_FILES=tuple(f'model-{i:05d}-of-00005.safetensors' for i in range(1,6))+('model.safetensors.index.json','config.json','generation_config.json','preprocessor_config.json','tokenizer_config.json','tokenizer.json','vocab.json','merges.txt','chat_template.json')
@@ -119,6 +121,16 @@ def prepare(model_proofs,output):
     require(len(eligible)>=16,'Not enough metadata-prescreened videos')
     import random
     selected=random.Random(prep.SEED).sample(eligible,16)
+    prior_rows=[]
+    for rank in range(4):
+        bound=record(ROOT/f'eval/teacher_label_pilot_20261102/attempt1_rank{rank}.json')
+        prior=read(bound)
+        require(prior['cost']['release_verified'] is True, 'Previous allocation release missing')
+        require(prior['parent']['released'] is True and prior['parent']['success'] is False
+                and prior['cost']['charged_upper_seconds']==PRIOR_COST_SECONDS[rank]
+                and prior['CUDA_initialized'] is False and prior['labels_written']==0, 'Prior failed pilot cost cannot be reset')
+        prior_rows.append(bound)
+    require(sum(PRIOR_COST_SECONDS.values())+4*CAP<=3600,'Repeated pilot plus previous cost exceeds original1GPUh pilot reservation')
     jobs=[]
     for index,row in enumerate(selected):
         sid=row['sample_id'];require(sid not in ('.','..') and all(c.isalnum() or c in '_.+-' for c in sid),'Unsafe sample basename')
@@ -129,6 +141,7 @@ def prepare(model_proofs,output):
         source_files=[record(ROOT/n,nonempty=(ROOT/n).stat().st_size>0) for n in SOURCE_NAMES],runtime=runtime(),nodes=nodes,jobs=jobs,
         allocations=[dict(rank=r,gpu_index=0,allocated_gpus=1,cap_seconds=CAP,job_indices=list(range(r*4,r*4+4))) for r in range(4)],
         stage='label_rebuild_and_cache',stage_cap_seconds=86400,pilot_reserved_seconds=3600,
+        attempt_id=ATTEMPT_ID,prior_attempt_proofs=prior_rows,prior_attempt_charged_seconds=sum(PRIOR_COST_SECONDS.values()),new_reserved_seconds=4*CAP,
         schema_validation_is_semantic_review=False,independent_semantic_review_pass=False,formal_training_allowed=False,
         retry_allowed=False,GPU_execution_started=False,selection_seed=prep.SEED,safety_filter_before_selection=True)
     return write_new(output,value)
@@ -140,6 +153,14 @@ def verify(path,digest,rank,local_assets=True):
             and p['stage_cap_seconds']==86400 and p['pilot_reserved_seconds']==3600
             and p['retry_allowed'] is False and p['independent_semantic_review_pass'] is False
             and p['formal_training_allowed'] is False,'Pilot stage/schema drift')
+    require(p['attempt_id']==ATTEMPT_ID and len(p['prior_attempt_proofs'])==4
+            and p['prior_attempt_charged_seconds']==sum(PRIOR_COST_SECONDS.values()) and p['new_reserved_seconds']==4*CAP
+            and p['prior_attempt_charged_seconds']+p['new_reserved_seconds']<=3600, 'Prior failed pilot charges or remaining reservation drift')
+    for prior_rank,proof in enumerate(p['prior_attempt_proofs']):
+        prior=read(proof)
+        require(prior['cost']['charged_upper_seconds']==PRIOR_COST_SECONDS[prior_rank]
+                and prior['cost']['release_verified'] is True and prior['parent']['released'] is True
+                and prior['CUDA_initialized'] is False and prior['labels_written']==0, 'Prior allocation evidence unverified')
     require(type(rank) is int and rank in range(4) and len(p['jobs'])==16 and len(p['nodes'])==4,'Fixed pilot topology required')
     expected=[dict(rank=r,gpu_index=0,allocated_gpus=1,cap_seconds=CAP,job_indices=list(range(r*4,r*4+4))) for r in range(4)]
     require(len({j['sample_id'] for j in p['jobs']})==16
@@ -190,7 +211,12 @@ def verify_worker_ancestry(launch,p,rank,launch_path,state_dir,ancestors):
     parent=launch['parent']
     require(any(all(a[k]==parent[k] for k in ('pid','session','start_ticks','argv')) for a in ancestors),
             'Actual worker ancestry does not contain the approved parent')
-    leases=[a for a in ancestors if str(ROOT/'scripts/gpu_hold.py') in a['argv']]
+    leases=[]
+    for ancestor in ancestors:
+        args=ancestor['argv']
+        prefix=args[:args.index('--')] if '--' in args else args
+        if str(ROOT/'scripts/gpu_hold.py') in prefix:
+            leases.append(dict(ancestor,argv=prefix))
     require(leases,'Actual GPU exec ancestry missing')
     for flag,value in (('--gpus','0'),('--state-dir',str(Path(state_dir).absolute())),('--action','exec')):
         require(any(a['argv'].count(flag)==1 and a['argv'][a['argv'].index(flag)+1]==value for a in leases),
@@ -210,7 +236,7 @@ def worker(path,digest,rank,launch_path,state_dir):
     ancestors=[];pid=os.getppid()
     while pid>1:
         identity=process.identity(pid);ancestors.append(identity);pid=identity['ppid']
-    require(any(Path(a['argv'][0]).name=='timeout' and '--signal=TERM' in a['argv'] and '--kill-after=20s' in a['argv'] and '810s' in a['argv'] for a in ancestors)
+    require(any(Path(a['argv'][0]).name=='timeout' and '--signal=TERM' in a['argv'] and '--kill-after=20s' in a['argv'] and str(CAP-TAIL)+'s' in a['argv'] for a in ancestors)
             and any('gpu_hold.py' in {Path(x).name for x in a['argv']} and 'exec' in a['argv'] for a in ancestors), 'GNU timeout and GPU lease ancestry required')
     verify_worker_ancestry(launch,p,rank,launch_path,state_dir,ancestors)
     supervised_path=LOCAL/'supervised.json'
@@ -267,7 +293,7 @@ def run(path,digest,rank,state_dir,gpu_authorized=False):
     launch=dict(plan=record(path),rank=rank,parent=owner,gpu_uuid=boundary['gpu_uuid'],start_monotonic=start,start_epoch=epoch,cap_seconds=CAP,gpu_index=0,state_dir=str(Path(state_dir).absolute()))
     write_new(LOCAL/'launch.json',launch)
     command=[sys.executable,str(ROOT/'scripts/gpu_hold.py'),'--action','exec','--gpus','0','--state-dir',str(state_dir),'--',
-        p['runtime']['tools']['timeout'],'--signal=TERM','--kill-after=20s','810s',sys.executable,'-B',str(Path(__file__).resolve()),'worker',
+        p['runtime']['tools']['timeout'],'--signal=TERM','--kill-after=20s',str(CAP-TAIL)+'s',sys.executable,'-B',str(Path(__file__).resolve()),'worker',
         '--plan',str(path),'--approved-plan-sha256',digest,'--rank',str(rank),'--state-dir',str(state_dir),'--launch',str(LOCAL/'launch.json')]
     child=None;identity=None;tracked=[];error=None;released=False;queries=[];old={}
     interrupted=[]

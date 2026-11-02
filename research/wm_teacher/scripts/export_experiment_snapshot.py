@@ -62,6 +62,7 @@ FILES = [
     "scripts/run_teacher_label_pilot.py", "tests/test_teacher_label_pilot.py",
     "scripts/prepare_teacher_training_admission.py", "tests/test_teacher_training_admission.py",
     "eval/diag/teacher_training_admission_public_20261102.json",
+    "eval/diag/teacher_label_lease_fix_public_20261102.json",
     "DiffSynth-Studio/diffsynth/utils/lora/general.py",
     "DiffSynth-Studio/diffsynth/core/gradient/gradient_checkpoint.py",
     "scripts/prepare_teacher_recovery.py", "tests/test_teacher_recovery.py",

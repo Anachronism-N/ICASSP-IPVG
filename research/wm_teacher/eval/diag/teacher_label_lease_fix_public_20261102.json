@@ -1,0 +1,42 @@
+{
+  "schema": "teacher_label_pilot_lease_fix_public_v1",
+  "date": "2026-11-02",
+  "first_attempt": {
+    "completed_labels": 0,
+    "Qwen_model_loaded": false,
+    "CUDA_initialized": false,
+    "error": "Lease prefix validation counted command parameters after the -- separator; no actual model inference took place",
+    "actual_charged_seconds_per_rank": [
+      18.143487762659788,
+      15.434166906867176,
+      19.951568322256207,
+      17.300606979057193
+    ],
+    "all_owned_processes_released": true,
+    "old_records_preserved": true
+  },
+  "fix": {
+    "lease_arguments_verified_only_before_command_separator": true,
+    "wrong_GPU_and_wrong_manager_still_rejected": true,
+    "new_unique_attempt_directory": true,
+    "prior_failed_seconds_charged": 70.82982997084036,
+    "new_caps_per_rank_seconds": [
+      860,
+      860,
+      860,
+      860
+    ],
+    "total_pilot_reserved_seconds": 3510.8298299708404,
+    "original_pilot_cap_seconds": 3600,
+    "label_and_cache_phase_cap_seconds": 86400,
+    "previous_failed_costs_zeroed": false,
+    "new_parameter_or_score_selection": false,
+    "same_prescreened16_examples": true
+  },
+  "formal_training_started": false,
+  "new_attempt_started": false,
+  "semantic_review_pass": false,
+  "quality_pass": false,
+  "SOTA_proven": false,
+  "caveat": "These are execution-validation repair and charged failure evidence, not trained-model or benchmark quality improvements."
+}
