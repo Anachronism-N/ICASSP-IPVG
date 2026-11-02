@@ -1,6 +1,8 @@
 {
   "created_at": "2026-11-02 23:07:19 CST",
+  "generated_asset_source_note": "PUBLICATION.md is generated public metadata; its source/snapshot hashes both refer to those public bytes, not a private repository file.",
   "files": [
+    {"path":"PUBLICATION.md","source_sha256":"7bb687c2ede84c24edb8f70379137925a045bb930f2e50dce3081a78adab6f80","snapshot_sha256":"7bb687c2ede84c24edb8f70379137925a045bb930f2e50dce3081a78adab6f80"},
     {
       "path": "README.md",
       "source_sha256": "ceb68424bfc7bc407badcaa0f02db75c5825f4fe30245bbcb015bd52bdd1f691",
