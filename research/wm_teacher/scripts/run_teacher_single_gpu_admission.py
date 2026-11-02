@@ -22,7 +22,12 @@ LOCAL = Path('/dockerdata/wm_tmp')
 AUTH = ROOT / 'eval/diag/teacher_training_admission_authorization_20261101.json'
 MODELS = Path('/dockerdata/models')
 FRAMEWORK = ROOT / 'DiffSynth-Studio'
-SCHEMA, PHASE = 'teacher_single_gpu_admission_v1', 'single_gpu_training_resume'
+SCHEMA, PHASE = 'teacher_single_gpu_deterministic_recovery_v2', 'single_gpu_training_resume'
+OUTPUT_ROOT = LOCAL / 'teacher_single_gpu_deterministic_recovery_20261102'
+PRIOR_ROOT = LOCAL / 'teacher_single_gpu_admission_20261102_run01'
+PRIOR_AUDIT = ROOT / 'eval/diag/teacher_single_gpu_actual_failure_audit_20261102.json'
+PRIOR_AUDIT_SHA256 = 'f3f2951345f2df2c9cc00cfe941dfc6219564d25b41b6526bfd4f1c7a85e64d0'
+DET_AUTH = ROOT / 'eval/diag/teacher_deterministic_recovery_authorization_20261102.json'
 CAP, CLEANUP, TAIL, CHILD_CAP = 7200, 120, 120, 2000
 GIT_ROOT = Path('/dockerdata/icaspp_ipvg_publication_20261018')
 BRANCH = 'wm-teacher-experiments-20261018'
@@ -91,8 +96,84 @@ def helpers():
     return tr, admission, process
 
 
+def deterministic_authorization(end=None):
+    tr, _, _ = helpers()
+    row = record(DET_AUTH, end)
+    require(row == tr.deterministic_authorization(), 'Additional authorization raw SHA/path differs')
+    value = read(row, end)
+    expected_scope = dict(new_GPUh_cap=2, allocated_cards=1, wall_cap_seconds=CAP, one_attempt=True,
+        reference_updates=4, prefix_updates=2, fresh_process_resume_updates=2, physical_optimizer_updates=8,
+        selected_attention_backend='same native FA3; explicit deterministic backward',
+        backend_capability_probe='First reference update is the actual capability gate, counted within four reference updates; no extra uncharged probe',
+        no_silent_backend_fallback=True)
+    require(value.get('schema') == 'teacher_deterministic_recovery_authorization_v1'
+            and encoded(value.get('assistant_bounded_scope')) == encoded(expected_scope)
+            and type(value.get('prior_failed_technical_GPUh_upper')) is int
+            and value['prior_failed_technical_GPUh_upper'] == 2
+            and value.get('prior_costs_preserved') is True and value.get('new_scope_additional_not_borrowed') is True
+            and encoded(value.get('original_training_stage_caps_GPUh')) == encoded(dict(
+                label_rebuild_and_cache=24, single_gpu_training_resume=2, multi_node_technical_validation=6))
+            and value.get('requires_new_source_runtime_publication_and_exact_resume_gate') is True
+            and all(value.get(k) is False for k in ('labels_budget_borrowing_allowed','formal_training_allowed',
+                'AR_allowed','student_distillation_allowed','automatic_retry_allowed')),
+            'Additional deterministic authorization scope/schema/types differs')
+    return row
+
+
+def prior_failure(end=None):
+    audit_row = record(PRIOR_AUDIT, end)
+    require(audit_row['sha256'] == PRIOR_AUDIT_SHA256, 'Original failure audit raw SHA differs')
+    audit = read(audit_row, end)
+    require(audit.get('schema') == 'teacher_single_gpu_actual_failure_audit_v1'
+            and audit.get('stage') == PHASE and type(audit.get('charged_upper_GPUh')) is int
+            and audit['charged_upper_GPUh'] == 2 and type(audit.get('physical_updates')) is int
+            and audit['physical_updates'] == 8 and audit.get('closure_present') is False
+            and audit.get('terminal_success') is False and audit.get('release_verified_at_audit') is True,
+            'Original failed allocation audit/fee/updates differs')
+    for key, name in (('parent', 'parent.json'), ('failure', 'cost.failure.json'), ('provisional_cost', 'cost.json')):
+        require(audit[key]['path'] == str(PRIOR_ROOT / name)
+                and record(PRIOR_ROOT / name, end) == audit[key], 'Original failure evidence bytes differ')
+    parent, failure, provisional = (read(audit[k], end) for k in ('parent', 'failure', 'provisional_cost'))
+    require(parent.get('schema') == 'teacher_single_gpu_admission_v1' and parent.get('phase') == PHASE
+            and parent.get('execution_success') is False and parent.get('success') is False
+            and parent.get('released') is True and parent.get('comparison') is None
+            and parent.get('error') == 'ValueError: Exact resumed trajectory differs: adapters'
+            and parent.get('plan') == audit['plan'] and failure.get('plan') == audit['plan']
+            and failure.get('schema') == 'teacher_single_gpu_cost_failure_v1' and failure.get('phase') == PHASE
+            and failure.get('terminal') is True and failure.get('success') is False
+            and failure.get('released_observed') is True and failure.get('parent_receipt') == audit['parent']
+            and provisional.get('parent_receipt') == audit['parent'] and provisional.get('success') is False,
+            'Original failed parent/cost binding differs')
+    require(all(type(v.get('charged_upper_seconds')) is int and v['charged_upper_seconds'] == CAP
+                and type(v.get('allocated_GPUh')) in (int, float) and v['allocated_GPUh'] == 2
+                for v in (failure, provisional))
+            and type(failure.get('cap_seconds')) is int and failure['cap_seconds'] == CAP,
+            'Original conservative 2 GPUh charge cannot be reset')
+    segments = parent.get('segments')
+    require(type(segments) is list and len(segments) == 3
+            and [(r.get('steps'), r.get('segment_updates')) for r in segments] == [(4,4),(2,2),(4,2)]
+            and all(type(r.get(k)) is int for r in segments for k in ('steps','segment_updates'))
+            and not (PRIOR_ROOT / 'cost.closure.json').exists(), 'Original eight physical calls/no closure differs')
+    return dict(audit=audit_row, parent=audit['parent'], failure=audit['failure'],
+                provisional_cost=audit['provisional_cost'], charged_upper_GPUh=2,
+                released_observed=True, physical_optimizer_calls=8, closure_present=False)
+
+
 def runtime(end=None):
+    tr, _, _ = helpers()
+    import torch
+    require(not torch.cuda.is_initialized(), 'Runtime preparation/verifier must remain CPU-only')
+    _, _, _, backend = tr.deterministic_fa3_backend(FRAMEWORK)
+    require(not torch.cuda.is_initialized(), 'Actual FA3 CPU import must not initialize CUDA')
+    require(backend['backend'] == 'flash_attn_3', 'Actual selected FA3 backend required')
     packages, files = {}, {}
+    dist = importlib.metadata.distribution('flash_attn_3')
+    packages['flash_attn_3'] = dist.version
+    fa3_files = [Path(backend['interface']['path']), Path(backend['native']['path']),
+                 Path(backend['native']['path']).parent / '_C.py',
+                 Path(dist.locate_file('EGG-INFO/PKG-INFO')).resolve()]
+    for p in fa3_files:
+        files[str(p)] = asset_record(p, end)
     for name, module in (('torch', 'torch'), ('peft', 'peft'), ('numpy', 'numpy'),
                          ('safetensors', 'safetensors'), ('accelerate', 'accelerate'),
                          ('transformers', 'transformers')):
@@ -115,14 +196,17 @@ def runtime(end=None):
     python = str(Path(sys.executable).resolve())
     for p in [python, *tools.values()]:
         files[str(Path(p).resolve())] = asset_record(Path(p).resolve(), end)
+    require(not torch.cuda.is_initialized(), 'Runtime byte freeze must remain CPU-only')
     return dict(python=python, packages=packages, tools=tools, files=list(files.values()),
-                exhaustive_attestation=False, caveat='Selected package entrypoints/native torch/tools only')
+                actual_FA3=backend, required_flags=dict(tr.DET_FA3_FLAGS), required_environment=dict(tr.DET_FA3_ENV),
+                exhaustive_attestation=False, caveat='Selected package entrypoints/native torch/FA3/tools only')
 
 
 def trainer_args(out, updates, seconds, proof=None):
     require(type(updates) is int and updates in (2, 4) and seconds > 420, 'Insufficient child window')
     args = ['--out-dir', str(out), '--models-dir', str(MODELS), '--framework', str(FRAMEWORK),
-            '--smoke', '--synthetic-inputs', '--smoke-steps', str(updates), '--smoke-offload', 'on',
+            '--smoke', '--synthetic-inputs', '--smoke-deterministic-fa3',
+            '--smoke-steps', str(updates), '--smoke-offload', 'on',
             '--offload', 'on', '--max-steps', '4', '--warmup', '1', '--seed', '20261102',
             '--lr', '5e-5', '--weight-decay', '0.01', '--clip', '1', '--anchor-lambda', '0.5',
             '--anchor-weighting', 'training_weight', '--log-every', '1', '--component-grad-every', '10',
@@ -142,9 +226,12 @@ def fixed_config():
 
 def safe_root(out, fresh=True):
     p = Path(out).absolute()
-    require(p.parent == LOCAL and p.resolve() == p and (not fresh or not p.exists()) and not p.is_symlink(),
+    require(p == OUTPUT_ROOT and p.parent == LOCAL and p.resolve() == p
+            and (not fresh or not p.exists()) and not p.is_symlink(),
             'New node-local allocation root only; no retry/reuse')
     require(LOCAL.is_dir(), 'Node-local parent missing')
+    require(not fresh or not list(LOCAL.glob(p.name + '.allocation-failure.*.json')),
+            'Allocation already attempted; original startup failure cannot be retried')
     return p
 
 
@@ -164,11 +251,17 @@ def prepare(out, state_dir):
     require(all(models[n]['sha256'] == tr.m1.CACHE_PINS[n] for n in models), 'Actual base content pin differs')
     return dict(schema=SCHEMA, phase=PHASE, private=True, execution_allowed=False,
                 formal_training_allowed=False, synthetic_inputs_allowed=True, gold_labels=False,
-                retry_allowed=False, borrowing_allowed=False, prior_charged_seconds=0,
+                retry_allowed=False, borrowing_allowed=False, prior_charged_seconds=CAP,
+                new_GPUh_cap=2, old_prior_upper_GPUh=2, cumulative_upper_GPUh=4,
+                one_attempt=1, reference_updates=4, prefix_updates=2, restore_updates=2,
+                deterministic_FA3_required=True, GPU_capability_unverified=True,
+                first_reference_update_is_capability_probe=True, extra_GPU_probe_allowed=False,
+                prior_failed_allocation=prior_failure(),
                 cap_seconds=CAP, cleanup_seconds=CLEANUP, tail_seconds=TAIL, child_cap_seconds=CHILD_CAP,
                 allocated_cards=1, rank=0, gpu_index=0, hostname=os.uname().nodename,
                 gpu_uuid=boundary['gpu_uuid'], state_dir=str(Path(state_dir).absolute()),
-                output_root=str(Path(out).absolute()), authorization=auth, config=fixed_config(),
+                output_root=str(Path(out).absolute()), authorization=auth,
+                additional_deterministic_authorization=deterministic_authorization(), config=fixed_config(),
                 synthetic_samples=64, logical_updates=4, physical_optimizer_calls=8,
                 inputs=dict(models_dir=str(MODELS), framework=str(FRAMEWORK), cache_index=None, synthetic_inputs=True),
                 trainer_source=tr.training_source_records(),
@@ -188,10 +281,16 @@ def verify_plan(path, digest, end=None, fresh=True):
             and p.get('execution_allowed') is False and p.get('formal_training_allowed') is False
             and p.get('synthetic_inputs_allowed') is True and p.get('gold_labels') is False
             and p.get('retry_allowed') is False and p.get('borrowing_allowed') is False, 'Technical phase drift')
-    expected = dict(prior_charged_seconds=0, cap_seconds=CAP, cleanup_seconds=CLEANUP, tail_seconds=TAIL,
+    expected = dict(prior_charged_seconds=CAP, new_GPUh_cap=2, old_prior_upper_GPUh=2, cumulative_upper_GPUh=4,
+                    one_attempt=1, reference_updates=4, prefix_updates=2, restore_updates=2,
+                    cap_seconds=CAP, cleanup_seconds=CLEANUP, tail_seconds=TAIL,
                     child_cap_seconds=CHILD_CAP, allocated_cards=1, rank=0, gpu_index=0,
                     synthetic_samples=64, logical_updates=4, physical_optimizer_calls=8)
     require(all(type(p.get(k)) is int and p[k] == v for k, v in expected.items()), 'Fixed budget/count/topology drift')
+    require(p.get('deterministic_FA3_required') is True and p.get('GPU_capability_unverified') is True
+            and p.get('first_reference_update_is_capability_probe') is True
+            and p.get('extra_GPU_probe_allowed') is False
+            and encoded(p.get('prior_failed_allocation')) == encoded(prior_failure(end)), 'New deterministic scope/prior failure drift')
     topology = tr.validate_topology()
     require(p['hostname'] == os.uname().nodename and topology['world_size'] == 1
             and topology['node_rank'] == topology['rank'] == topology['local_rank'] == 0
@@ -210,6 +309,8 @@ def verify_plan(path, digest, end=None, fresh=True):
     require(p['authorization'] == record(AUTH, end)
             and encoded(read(p['authorization'], end)) == encoded(admission.AUTH_EXPECTED), 'Original authorization drift')
     admission.validate_authorization(AUTH)
+    require(encoded(p.get('additional_deterministic_authorization')) == encoded(deterministic_authorization(end)),
+            'Additional deterministic authorization drift')
     for field, root, names in (('source', ROOT, SOURCE_NAMES), ('framework', FRAMEWORK, tr.FRAMEWORK_FILES),
                                ('models', MODELS, tr.SHARD_RELS)):
         require(set(p[field]) == set(names), 'Frozen asset coverage differs')
@@ -222,12 +323,12 @@ def verify_plan(path, digest, end=None, fresh=True):
             'Actual Python identity differs')
     require(set(rt['tools']) == {'timeout', 'nvidia-smi', 'git'} and
             all(shutil.which(n) == f for n, f in rt['tools'].items()), 'Actual tool path drift')
-    require(set(rt['packages']) == {'torch', 'peft', 'numpy', 'safetensors', 'accelerate', 'transformers'}
+    require(set(rt['packages']) == {'torch', 'peft', 'numpy', 'safetensors', 'accelerate', 'transformers', 'flash_attn_3'}
             and all(importlib.metadata.version(n) == v for n, v in rt['packages'].items()), 'Actual package version drift')
     require(len(rt['files']) >= 12 and len({r['path'] for r in rt['files']}) == len(rt['files']), 'Runtime byte coverage missing')
     for row in rt['files']:
         require(asset_record(row['path'], end) == row, 'Runtime byte drift')
-    require(rt == runtime(end), 'Selected runtime file coverage/path/content drift')
+    require(encoded(rt) == encoded(runtime(end)), 'Selected runtime file coverage/path/content/type drift')
     process.manager_boundary(p['state_dir'], 0, p['gpu_uuid'])
     deadline(end)
     return p, bound
@@ -284,6 +385,8 @@ def verify_approval(path, approved_sha, plan_record, plan, end):
     require(type(receipt.get('changed_files_remote_bytes_verified')) is int
             and receipt['changed_files_remote_bytes_verified'] == len(changed) > 0,
             'Actual commit changed-file verified count differs')
+    require(SNAPSHOT_PREFIX + '/scripts/run_teacher_single_gpu_admission.py' in changed,
+            'New deterministic recovery runner must change in the approved source commit')
     require(all(name == SNAPSHOT_PREFIX + '/PUBLICATION_MANIFEST.json'
                 or name.startswith(SNAPSHOT_PREFIX + '/') and name[len(SNAPSHOT_PREFIX)+1:] in published
                 for name in changed), 'Changed publication file omitted from manifest')
@@ -337,7 +440,8 @@ def run_child(plan, name, updates, start, root, interrupted, proof=None):
                str(ROOT / 'scripts/train_e3_lora.py'), *trainer_args(root / name, updates, seconds, proof)]
     launch = dict(name=name, command=command, parent=process.identity(os.getpid()),
                   started_monotonic=time.monotonic(), started_epoch=time.time(), cap_seconds=seconds,
-                  gpu_uuid=boundary['gpu_uuid'], boundary=boundary, state_dir=plan['state_dir'], hostname=os.uname().nodename)
+                  gpu_uuid=boundary['gpu_uuid'], boundary=boundary, state_dir=plan['state_dir'], hostname=os.uname().nodename,
+                  deterministic_environment=dict(CUBLAS_WORKSPACE_CONFIG=':4096:8'))
     write_new(root / (name + '.launch.json'), launch)
     child, owner, tracked, queries, error = None, None, [], [], None
     released, final, cleanup_signals = False, None, []
@@ -348,7 +452,7 @@ def run_child(plan, name, updates, start, root, interrupted, proof=None):
         env.update(CUDA_VISIBLE_DEVICES=plan['gpu_uuid'], PYTHONDONTWRITEBYTECODE='1',
                    WORLD_SIZE='1', RANK='0', LOCAL_RANK='0', LOCAL_WORLD_SIZE='1',
                    HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1', DIFFSYNTH_SKIP_DOWNLOAD='True', OMP_NUM_THREADS='1',
-                   PYTHONPATH=str(FRAMEWORK))
+                   PYTHONPATH=str(FRAMEWORK), CUBLAS_WORKSPACE_CONFIG=':4096:8')
         with (root / (name + '.log')).open('xb') as log:
             child = subprocess.Popen(command, env=env, stdout=log, stderr=subprocess.STDOUT,
                                      stdin=subprocess.DEVNULL, start_new_session=True)
@@ -405,11 +509,26 @@ def segment_state(plan, name, updates, cumulative, root, end):
     import merge_e3_lora as merge
     from safetensors.torch import load_file
     require(not torch.cuda.is_initialized(), 'Parent CPU verifier must not initialize CUDA')
+    require(encoded(runtime(end)) == encoded(plan['runtime']), 'Actual runtime full bytes changed across trainer segments')
     out = root / name
     summary_row, manifest_row = record(out / 'summary.json', end), record(out / 'run_manifest.json', end)
     summary, manifest = read(summary_row, end), read(manifest_row, end)
+    backend_row = record(out / 'deterministic_backend.json', end)
+    require(summary.get('deterministic_backend') == backend_row and manifest.get('deterministic_backend') == backend_row,
+            'Original trainer-written deterministic backend record required')
+    backend = read(backend_row, end)
+    current = tr.deterministic_fa3_runtime(tr.parser().parse_args(trainer_args(out, updates, CHILD_CAP)))
+    require(not torch.cuda.is_initialized(), 'Actual backend verifier must remain CPU-only')
+    require(encoded(backend) == encoded(current)
+            and encoded({k: backend[k] for k in ('backend','interface','native','torch_version')})
+                == encoded(plan['runtime']['actual_FA3'])
+            and encoded(backend['flags']) == encoded(plan['runtime']['required_flags'])
+            and encoded(backend['environment']) == encoded(plan['runtime']['required_environment'])
+            and backend['additional_deterministic_authorization'] == plan['additional_deterministic_authorization'],
+            'Actual selected deterministic FA3/readback flags/current runtime full SHA differs')
     parent = read(record(root / (name + '.parent.json'), end), end)
     launch = read(record(root / (name + '.launch.json'), end), end)
+    require(launch.get('deterministic_environment') == tr.DET_FA3_ENV, 'Pre-CUDA child deterministic environment drift')
     require(parent['launch'] == launch and parent['success'] is True and parent['released'] is True
             and parent['exit_code'] == 0 and parent['error'] is None, 'Original successful owned parent proof required')
     release_queries_valid(parent['release_queries'], plan['gpu_uuid'], launch['started_monotonic'])
@@ -512,7 +631,10 @@ def segment_state(plan, name, updates, cumulative, root, end):
                 and str(ROOT / 'scripts/train_e3_lora.py') in r['argv']
                 for r in parent['owned_processes']), 'Trainer not actually observed in owned child tree')
     deadline(end)
+    trajectory = [{k: r[k] for k in ('step','status','loss_total_mean','loss_fm_mean','loss_anchor_mean',
+                    'grad_norm_total_before_clip','grad_norm_fm','grad_norm_anchor_weighted','lr','per_rank')} for r in rows]
     result = dict(summary=summary_row, manifest=manifest_row, progress=progress_row, checkpoint=ck,
+                  deterministic_backend=backend_row, backend_identity=backend, exact_trajectory=trajectory,
                   trainer_identity=identity, frozen_base_sha256=summary['frozen_base_sha256'],
                   adapter_sha256=adapter_hash, initial_adapter_sha256=summary['adapter_initial_sha256'],
                   optimizer_sha256=tr.ts.state_hash(state['optimizer']),
@@ -527,7 +649,9 @@ def make_resume_proof(plan, prefix, root):
     proof = dict(schema='e3-single-gpu-smoke-resume-v1', phase=PHASE, authorization=plan['authorization'],
                  source_run_manifest=prefix['manifest'], source_summary=prefix['summary'], checkpoint=prefix['checkpoint'],
                  source_completed_steps=2, continuation_updates=2, logical_horizon=4, config=original['config'],
-                 source=original['source'], synthetic_inputs_allowed=True, formal_training_allowed=False)
+                 source=original['source'], synthetic_inputs_allowed=True, formal_training_allowed=False,
+                 additional_deterministic_authorization=plan['additional_deterministic_authorization'],
+                 deterministic_backend=prefix['deterministic_backend'])
     return write_new(root / 'resume_proof.json', proof)
 
 
@@ -551,7 +675,9 @@ def cost(start, released, publication_allowance=0):
                 allocated_GPUh=charged / 3600, actual_allocated_GPUh=elapsed/3600 if released else None,
                 released=released, budget_exceeded=charged > CAP,
                 scope='pre_spawn_through_final_release_and_parent_save', clock_host=os.uname().nodename,
-                cap_seconds=CAP, prior_charged_seconds=0)
+                cap_seconds=CAP, prior_charged_seconds=CAP, old_prior_upper_GPUh=2, new_GPUh_cap=2,
+                cumulative_charged_upper_seconds=CAP+charged, cumulative_upper_GPUh=(CAP+charged)/3600,
+                budgets_independent=True, borrowing_allowed=False, one_attempt=1)
 
 
 class Interruptions(list):
@@ -591,7 +717,15 @@ def verify_cost_closure(path, digest):
             and parent['released'] is True and parent['error'] is None
             and provisional['provisional'] is True and provisional['success'] is False
             and provisional['parent_receipt'] == value['parent']
-            and provisional['charged_upper_seconds'] >= CAP, 'Original parent/provisional cost binding differs')
+            and provisional['charged_upper_seconds'] >= CAP
+            and type(provisional.get('prior_charged_seconds')) is int and provisional['prior_charged_seconds'] == CAP
+            and provisional.get('budgets_independent') is True and provisional.get('borrowing_allowed') is False
+            and type(value.get('prior_charged_seconds')) is int and value['prior_charged_seconds'] == CAP
+            and type(value.get('old_prior_upper_GPUh')) is int and value['old_prior_upper_GPUh'] == 2
+            and type(value.get('new_GPUh_cap')) is int and value['new_GPUh_cap'] == 2
+            and type(value.get('cumulative_upper_GPUh')) is int and value['cumulative_upper_GPUh'] == 4
+            and value.get('budgets_independent') is True and value.get('borrowing_allowed') is False,
+            'Original parent/provisional cost/independent prior budget binding differs')
     require(not (root / 'cost.failure.json').exists(), 'Terminal publication failed during closure verification')
     return value
 
@@ -643,6 +777,9 @@ def run(path, digest, approval_path, approved_approval_sha, gpu_authorized=False
                     'Approved plan/authorization changed before child spawn')
             tr, admission, _ = helpers()
             admission.validate_authorization(plan['authorization']['path'])
+            require(plan['additional_deterministic_authorization'] == deterministic_authorization(start + CAP - TAIL)
+                    and plan['prior_failed_allocation'] == prior_failure(start + CAP - TAIL),
+                    'Original failure/new independent authorization changed before spawn')
             for row in plan['source'].values():
                 require(asset_record(row['path'], start + CAP - TAIL) == row, 'Current source changed before spawn')
             for row in [*plan['framework'].values(), *plan['models'].values(), *plan['runtime']['files']]:
@@ -664,6 +801,11 @@ def run(path, digest, approval_path, approved_approval_sha, gpu_authorized=False
         require(len({(r['trainer_identity']['pid'], r['trainer_identity']['start_ticks']) for r in results}) == 3,
                 'Three actual distinct CUDA trainer processes required')
         require(len({r['frozen_base_sha256'] for r in results}) == 1, 'Common base changed')
+        require(all(encoded(r['backend_identity']) == encoded(results[0]['backend_identity']) for r in results),
+                'Three actual child deterministic backends must be exactly identical')
+        require(encoded(results[0]['exact_trajectory'][:2]) == encoded(results[1]['exact_trajectory'])
+                and encoded(results[0]['exact_trajectory'][2:]) == encoded(results[2]['exact_trajectory']),
+                'Exact reference/prefix/resume gradients/loss/sample trajectory differs')
         require(results[-1]['steps'] == 4 and prefix['steps'] == 2
                 and results[0]['initial_adapter_sha256'] == results[1]['initial_adapter_sha256']
                 and prefix['adapter_sha256'] == results[-1]['initial_adapter_sha256'], 'Exact initial/prefix-to-restored identity differs')
@@ -729,7 +871,9 @@ def run(path, digest, approval_path, approved_approval_sha, gpu_authorized=False
                                    started_monotonic=start, observed_monotonic=observed,
                                    actual_elapsed_seconds=observed-start, charged_upper_seconds=CAP,
                                    allocated_GPUh=CAP/3600, publication_exit_allowance_seconds=1,
-                                   cap_seconds=CAP, budget_exceeded=False)
+                                   cap_seconds=CAP, budget_exceeded=False, prior_charged_seconds=CAP,
+                                   old_prior_upper_GPUh=2, new_GPUh_cap=2, cumulative_upper_GPUh=4,
+                                   budgets_independent=True, borrowing_allowed=False, one_attempt=1)
                     closure_record = write_new(root / 'cost.closure.json', closure)
                     verify_cost_closure(closure_record['path'], closure_record['sha256'])
                     final_result = record(root / 'cost.closure.json')

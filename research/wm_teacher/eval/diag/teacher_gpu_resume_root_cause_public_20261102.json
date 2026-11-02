@@ -1,0 +1,56 @@
+{
+  "schema": "teacher_gpu_resume_root_cause_public_v1",
+  "date": "2026-11-02",
+  "original_attempt_status": "failed",
+  "reference_updates": 4,
+  "prefix_updates": 2,
+  "resume_updates": 2,
+  "physical_updates": 8,
+  "initial_adapters_exact": true,
+  "prefix_checkpoint_restore_exact": true,
+  "final_adapters_exact": false,
+  "all_frozen_base_exact": true,
+  "final_RNG_exact": true,
+  "first_step": {
+    "sample_index": 3,
+    "timestep": 322,
+    "lr": 0.00005,
+    "reference_loss": 1.0140422582626343,
+    "prefix_loss": 1.0140422582626343,
+    "reference_FM_gradient_norm": 1.8463349342346191,
+    "prefix_FM_gradient_norm": 1.8504194021224976,
+    "earliest_observed_difference": "backward/gradient-diagnostic before clipping/AdamW or any resume"
+  },
+  "attention": {
+    "most_specific_supported_hypothesis": "FA3 native backward lacks explicit deterministic=True contract",
+    "source_selects_FA3_first": true,
+    "call_passes_deterministic": false,
+    "installed_function_default": false,
+    "forward_documented_deterministic": true,
+    "backward_determinism_flag_explicit": true,
+    "unique_atomic_kernel_causation_proven": false,
+    "deterministic_true_A100_runtime_proven": false
+  },
+  "final_difference": {
+    "adapter_tensors_different": 600,
+    "adapter_total_tensors": 600,
+    "adapter_elements_different": 80595712,
+    "adapter_elements_total": 80609280,
+    "adapter_max_abs": 0.0001930487051140517,
+    "adapter_relative_L2": 0.0012097512631702898,
+    "lora_B_relative_L2": 0.08391774479866379,
+    "Adam_first_moment_relative_L2": 0.523175850975837,
+    "Adam_second_moment_relative_L2": 0.7421363934997736
+  },
+  "original_fee": {
+    "observed_elapsed_seconds": 611.4827146586031,
+    "charged_upper_GPUh": 2,
+    "terminal_success": false,
+    "closure_present": false,
+    "GPU_release_observed": true,
+    "costs_preserved": true
+  },
+  "prospective_fix": "Synthetic-smoke-only explicit FA3 deterministic backward plus global strict determinism and frozen actual FA interface/native files, same 4 versus2+2 exact gate; new bounded scope, never posthoc tolerance relaxation",
+  "quality_claim": false,
+  "sota_proven": false
+}

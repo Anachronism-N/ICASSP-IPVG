@@ -1140,6 +1140,381 @@ sys.exit(rc)
             self.assertFalse((root / 'partial/private' / tr.CKPT_NAME).exists())
 
 
+def fake_fa3_modules(root, signature='q, k, v, deterministic=False'):
+    import torch
+    from einops import rearrange
+    framework = root / 'framework'
+    wan_path = framework / 'diffsynth/models/wan_video_dit.py'
+    wan_path.parent.mkdir(parents=True)
+    wan_path.write_text('# CPU mock native Wan module\n')
+    interface_path = root / 'fa3/flash_attn_interface.py'
+    interface_path.parent.mkdir()
+    native_path = interface_path.parent / 'flash_attn_3/_C.abi3.so'
+    native_path.parent.mkdir()
+    native_path.write_bytes(b'CPU mock native identity; never a kernel')
+    text = ('calls = []\ndef flash_attn_func(' + signature + '):\n'
+            '    calls.append(locals().copy())\n    return q\n')
+    interface_path.write_text(text)
+    interface = types.ModuleType('flash_attn_interface')
+    interface.__file__ = str(interface_path)
+    interface.__spec__ = types.SimpleNamespace(origin=str(interface_path))
+    exec(compile(text, str(interface_path), 'exec'), interface.__dict__)
+    native = types.ModuleType('flash_attn_3._C')
+    native.__file__ = str(native_path)
+    native.__spec__ = types.SimpleNamespace(origin=str(native_path))
+    wan = types.ModuleType('diffsynth.models.wan_video_dit')
+    wan.__file__ = str(wan_path)
+    wan.FLASH_ATTN_3_AVAILABLE = True
+    wan.flash_attn_interface = interface
+    tree = ast.parse((FRAMEWORK / 'diffsynth/models/wan_video_dit.py').read_text())
+    fn = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == 'flash_attention')
+    wan.__dict__.update(torch=torch, rearrange=rearrange, F=torch.nn.functional)
+    exec(compile(ast.Module(body=[fn], type_ignores=[]), str(wan_path), 'exec'), wan.__dict__)
+    return framework, wan, interface, native
+
+
+class DeterministicFa3Tests(Base):
+    def setUp(self):
+        self.authorization_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.authorization_dir.cleanup)
+        self.authorization_path = Path(self.authorization_dir.name) / 'synthetic_authorization.json'
+        self.authorization = {
+            'schema': 'teacher_deterministic_recovery_authorization_v1',
+            'user_reply': 'Synthetic CPU test fixture; not a user GPU authorization',
+            'in_response_to': 'CPU-only verification of the deterministic smoke authorization contract',
+            'assistant_bounded_scope': {
+                'new_GPUh_cap': 2, 'allocated_cards': 1, 'wall_cap_seconds': 7200, 'one_attempt': True,
+                'reference_updates': 4, 'prefix_updates': 2, 'fresh_process_resume_updates': 2,
+                'physical_optimizer_updates': 8,
+                'selected_attention_backend': 'same native FA3; explicit deterministic backward',
+                'backend_capability_probe': 'First reference update is the capability gate; no extra probe',
+                'no_silent_backend_fallback': True,
+            },
+            'prior_failed_technical_GPUh_upper': 2, 'prior_costs_preserved': True,
+            'original_training_stage_caps_GPUh': {
+                'label_rebuild_and_cache': 24, 'single_gpu_training_resume': 2,
+                'multi_node_technical_validation': 6,
+            },
+            'new_scope_additional_not_borrowed': True, 'labels_budget_borrowing_allowed': False,
+            'formal_training_allowed': False, 'AR_allowed': False, 'student_distillation_allowed': False,
+            'requires_new_source_runtime_publication_and_exact_resume_gate': True,
+            'automatic_retry_allowed': False,
+        }
+        tr.m1.atomic_json(self.authorization_path, self.authorization)
+        self.authorization_record = bound_json_record(self.authorization_path)
+        self.enterContext(patch.multiple(tr, DET_FA3_AUTH=self.authorization_path,
+                                        DET_FA3_AUTH_SHA256=self.authorization_record['sha256']))
+
+    def args(self, root, framework):
+        return tr.parser().parse_args(resume_argv(root / 'run') +
+                                     ['--framework', str(framework), '--smoke-deterministic-fa3'])
+
+    def modules_patch(self, wan, interface, native):
+        import contextlib
+        replacements = {'diffsynth.models.wan_video_dit': wan,
+                        'flash_attn_interface': interface, 'flash_attn_3._C': native}
+        @contextlib.contextmanager
+        def scoped():
+            old = {k: sys.modules.get(k) for k in replacements}
+            try:
+                sys.modules.update(replacements)
+                yield
+            finally:
+                for k, v in old.items():
+                    if v is None:
+                        sys.modules.pop(k, None)
+                    else:
+                        sys.modules[k] = v
+        return scoped()
+
+    def test_scope_guard_and_sparse_old_config(self):
+        self.assertEqual(tr.deterministic_authorization(), self.authorization_record)
+        self.assertEqual(tr.read_bound_json(self.authorization_record), self.authorization)
+        original = self.authorization_path.read_bytes()
+        for key, value in (('prior_costs_preserved', 1), ('formal_training_allowed', 0),
+                           ('prior_failed_technical_GPUh_upper', True)):
+            changed = copy.deepcopy(self.authorization)
+            changed[key] = value
+            self.authorization_path.write_text(json.dumps(changed))
+            try:
+                with self.subTest(authorization_type_drift=key), self.assertRaisesRegex(ValueError, 'authorization'):
+                    tr.deterministic_authorization()
+            finally:
+                self.authorization_path.write_bytes(original)
+        args = tr.parser().parse_args(resume_argv(Path('/tmp/unused_det_scope')))
+        old = tr.make_cfg(args, 4)
+        self.assertNotIn('smoke_deterministic_fa3', old)
+        args.smoke_deterministic_fa3 = True
+        tr.validate_args(args)
+        self.assertEqual(tr.make_cfg(args, 4), dict(old, smoke_deterministic_fa3=True))
+        for kw in ({'smoke': False}, {'synthetic_inputs': False, 'cache_index': Path('/cached'),
+                                      'caption_version': 'orig'}, {'cache_index': Path('/cached')}):
+            with self.subTest(kw=kw), self.assertRaises(ValueError):
+                tr.validate_args(types.SimpleNamespace(**dict(vars(args), **kw)))
+        with patch.dict(os.environ, WORLD_SIZE='2', LOCAL_WORLD_SIZE='2', RANK='0', LOCAL_RANK='0'):
+            with self.assertRaises(ValueError):
+                tr.validate_args(args)
+        with patch.object(tr, 'deterministic_fa3_context') as context, patch.object(tr, '_execute', return_value=0):
+            args.smoke_deterministic_fa3 = False
+            self.assertEqual(tr.execute(args), 0)
+            context.assert_not_called()
+
+    def test_same_native_rearrange_self_cross_keyword_and_finally_restoration(self):
+        torch = self.torch
+        flags_before = tr.deterministic_flags()
+        try:
+            tr.set_deterministic_flags(dict(tr.DET_FA3_FLAGS, deterministic_algorithms=False,
+                                           deterministic_warn_only=True, cudnn_allow_tf32=True,
+                                           matmul_allow_tf32=True, cudnn_benchmark=True))
+            saved = tr.deterministic_flags()
+            for had_env in (False, True):
+                for failure in (False, True):
+                    with self.subTest(had_env=had_env, failure=failure), tempfile.TemporaryDirectory() as tmp:
+                        root = Path(tmp)
+                        framework, wan, interface, native = fake_fa3_modules(root)
+                        original = interface.flash_attn_func
+                        args = self.args(root, framework)
+                        with self.modules_patch(wan, interface, native), patch.dict(os.environ):
+                            os.environ.pop('CUBLAS_WORKSPACE_CONFIG', None)
+                            if had_env:
+                                os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':16:8'
+                            q, k, v = (torch.randn(1, 3, 8) for _ in range(3))
+                            expected = wan.flash_attention(q, k, v, 2)
+                            self.assertFalse(interface.calls[-1]['deterministic'])
+                            try:
+                                with tr.deterministic_fa3_context(args) as runtime:
+                                    self.assertEqual(runtime['flags'], tr.DET_FA3_FLAGS)
+                                    self.assertEqual(runtime['environment'], tr.DET_FA3_ENV)
+                                    self.assertEqual(runtime['interface'], bound_json_record(interface.__file__))
+                                    self.assertEqual(runtime['native'], bound_json_record(native.__file__))
+                                    for _ in ('self', 'cross'):
+                                        result = wan.flash_attention(q, k, v, 2)
+                                        self.assertTrue(torch.equal(result, expected))
+                                        self.assertIs(interface.calls[-1]['deterministic'], True)
+                                        self.assertEqual(set(interface.calls[-1]), {'q', 'k', 'v', 'deterministic'})
+                                    with self.assertRaises(ValueError):
+                                        interface.flash_attn_func(q, k, v, deterministic=False)
+                                    if failure:
+                                        raise RuntimeError('simulated unsupported deterministic backward')
+                            except RuntimeError:
+                                self.assertTrue(failure)
+                            self.assertIs(interface.flash_attn_func, original)
+                            self.assertEqual(tr.deterministic_flags(), saved)
+                            if had_env:
+                                self.assertEqual(os.environ['CUBLAS_WORKSPACE_CONFIG'], ':16:8')
+                            else:
+                                self.assertNotIn('CUBLAS_WORKSPACE_CONFIG', os.environ)
+                            self.assertFalse(torch.cuda.is_initialized())
+        finally:
+            tr.set_deterministic_flags(flags_before)
+
+    def test_unavailable_api_origin_and_flag_drift_fail_closed(self):
+        for signature in ('q, k, v', 'q, k, v, **kwargs', 'q, k, v, deterministic=False, /'):
+            with self.subTest(signature=signature), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                framework, wan, interface, native = fake_fa3_modules(root, signature)
+                args = self.args(root, framework)
+                before = tr.deterministic_flags()
+                with self.modules_patch(wan, interface, native), patch.dict(os.environ):
+                    os.environ.pop('CUBLAS_WORKSPACE_CONFIG', None)
+                    with self.assertRaisesRegex(ValueError, 'keyword support'):
+                        with tr.deterministic_fa3_context(args):
+                            self.fail('Unsupported API accepted')
+                    self.assertEqual(tr.deterministic_flags(), before)
+                    self.assertNotIn('CUBLAS_WORKSPACE_CONFIG', os.environ)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            framework, wan, interface, native = fake_fa3_modules(root)
+            args = self.args(root, framework)
+            original = interface.flash_attn_func
+            before = tr.deterministic_flags()
+            with self.modules_patch(wan, interface, native):
+                wan.FLASH_ATTN_3_AVAILABLE = False
+                with self.assertRaisesRegex(ValueError, 'fall back'):
+                    tr.deterministic_fa3_runtime(args)
+                wan.FLASH_ATTN_3_AVAILABLE = True
+                native.__spec__.origin += '.different'
+                with self.assertRaisesRegex(ValueError, 'origin'):
+                    tr.deterministic_fa3_runtime(args)
+                native.__spec__.origin = native.__file__
+                with self.assertRaisesRegex(ValueError, 'drifted'):
+                    with tr.deterministic_fa3_context(args):
+                        self.torch.backends.cudnn.benchmark = True
+                self.assertIs(interface.flash_attn_func, original)
+                self.assertEqual(tr.deterministic_flags(), before)
+                with patch.object(self.torch.cuda, 'is_initialized', return_value=True):
+                    with self.assertRaisesRegex(ValueError, 'precede CUDA'):
+                        with tr.deterministic_fa3_context(args):
+                            self.fail('Already initialized CUDA accepted')
+
+    def test_real_native_signature_import_cpu_only(self):
+        # This checks the installed interface signature, not GPU kernel capability.
+        code = '''import inspect,os,sys,torch
+from unittest.mock import patch
+sys.path.insert(0,sys.argv[1])
+import train_e3_lora as tr
+assert not torch.cuda.is_initialized()
+environment=dict(os.environ); paths=list(sys.path); flags=tr.deterministic_flags()
+assert 'diffsynth' not in sys.modules and 'deepspeed' not in sys.modules
+with patch.multiple(tr, DET_FA3_AUTH=tr.Path(sys.argv[3]), DET_FA3_AUTH_SHA256=sys.argv[4]), \
+     patch.object(torch.cuda,'is_available',return_value=True), \
+     patch.object(torch.cuda,'device_count',return_value=1), \
+     patch.object(torch.cuda,'_lazy_init',side_effect=AssertionError('CPU helper attempted CUDA init')), \
+     patch.object(torch._C,'_cuda_init',side_effect=AssertionError('CPU helper attempted native CUDA init')):
+    value=tr.deterministic_fa3_runtime(type('Args',(),{'framework':sys.argv[2]})())
+    assert value['backend']=='flash_attn_3' and value['deterministic'] is True
+    import flash_attn_interface as f
+    p=inspect.signature(f.flash_attn_func).parameters['deterministic']
+    assert p.kind in (inspect.Parameter.KEYWORD_ONLY,inspect.Parameter.POSITIONAL_OR_KEYWORD)
+assert 'diffsynth' not in sys.modules and 'deepspeed' not in sys.modules
+assert environment==dict(os.environ) and paths==sys.path and flags==tr.deterministic_flags()
+assert not torch.cuda.is_initialized()
+'''
+        p = subprocess.run([sys.executable, '-B', '-c', code, str(SCRIPTS), str(FRAMEWORK),
+                            str(self.authorization_path), self.authorization_record['sha256']],
+                           env=dict(os.environ, CUDA_VISIBLE_DEVICES='', PYTHONDONTWRITEBYTECODE='1'),
+                           capture_output=True, text=True, timeout=180)
+        self.assertEqual(p.returncode, 0, p.stderr)
+
+    def test_execute_scope_before_setup_and_backward_failure_receipt(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            framework, wan, interface, native = fake_fa3_modules(root)
+            args = self.args(root, framework)
+            runner = EndToEndTests()
+            original = interface.flash_attn_func
+            before = tr.deterministic_flags()
+            with self.modules_patch(wan, interface, native):
+                def setup():
+                    self.assertEqual(tr.deterministic_flags(), tr.DET_FA3_FLAGS)
+                    self.assertEqual(os.environ['CUBLAS_WORKSPACE_CONFIG'], ':4096:8')
+                    self.assertIsNot(interface.flash_attn_func, original)
+                    return tr.Comm(None, 0, 1, 'cpu')
+                with (patch.object(tr, 'train_step', side_effect=RuntimeError('deterministic backend unsupported')),
+                      patch.object(tr, 'setup_distributed', side_effect=setup)):
+                    import contextlib
+                    with contextlib.ExitStack() as stack:
+                        for p in runner.patches(root)[1:]:
+                            stack.enter_context(p)
+                        self.assertEqual(tr.execute(args), 1)
+                summary = tr.m1.read_json(args.out_dir / 'summary.json')
+                manifest = tr.m1.read_json(args.out_dir / 'run_manifest.json')
+                self.assertIn('deterministic backend unsupported', summary['error'])
+                self.assertFalse((args.out_dir / 'private' / tr.CKPT_NAME).exists())
+                self.assertEqual(summary['deterministic_backend'], manifest['deterministic_backend'])
+                self.assertEqual(tr.read_bound_json(manifest['deterministic_backend']), tr.deterministic_fa3_runtime(args))
+                self.assertIs(interface.flash_attn_func, original)
+                self.assertEqual(tr.deterministic_flags(), before)
+
+    def test_deterministic_resume_backend_auth_contract_and_old_schema_isolation(self):
+        import contextlib
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            framework, wan, interface, native = fake_fa3_modules(root)
+            runner = EndToEndTests()
+            source = root / 'prefix'
+            argv = resume_argv(source) + ['--framework', str(framework), '--smoke-deterministic-fa3']
+            with self.modules_patch(wan, interface, native):
+                full_out = root / 'full_deterministic'
+                self.assertEqual(runner.run_main(root, resume_argv(full_out, 4) +
+                    ['--framework', str(framework), '--smoke-deterministic-fa3']), 0)
+                self.assertEqual(runner.run_main(root, argv), 0)
+                proof = resume_proof(root, source)
+                manifest = tr.m1.read_json(source / 'run_manifest.json')
+                proof.update(deterministic_backend=manifest['deterministic_backend'],
+                             additional_deterministic_authorization=tr.deterministic_authorization())
+                args = SmokeResumeTests.approved_args(self, root, proof)
+                args.framework = framework
+                args.smoke_deterministic_fa3 = True
+                def validate(scoped):
+                    with contextlib.ExitStack() as stack:
+                        for p in runner.patches(root):
+                            stack.enter_context(p)
+                        return tr.validate_smoke_resume(scoped)
+                self.assertEqual(validate(args)['deterministic_backend'], proof['deterministic_backend'])
+                self.assertEqual(runner.run_main(root, resume_argv(args.out_dir) +
+                    ['--framework', str(framework), '--smoke-deterministic-fa3', '--smoke-resume-proof',
+                     str(args.smoke_resume_proof), '--approved-smoke-resume-sha256',
+                     args.approved_smoke_resume_sha256]), 0)
+                self.assertEqual(tr.m1.read_json(args.out_dir / 'summary.json')['completed_steps'], 4)
+                full = self.torch.load(full_out / 'private' / tr.CKPT_NAME, map_location='cpu', weights_only=True)
+                resumed = self.torch.load(args.out_dir / 'private' / tr.CKPT_NAME, map_location='cpu', weights_only=True)
+                self.assertEqual(tr.ts.state_hash(full), tr.ts.state_hash(resumed))
+                for key in ('additional_deterministic_authorization', 'deterministic_backend'):
+                    changed = copy.deepcopy(proof)
+                    changed.pop(key)
+                    bad = SmokeResumeTests.approved_args(self, root, changed, 20 + len(key))
+                    bad.framework, bad.smoke_deterministic_fa3 = framework, True
+                    with self.subTest(missing=key), self.assertRaises(ValueError):
+                        validate(bad)
+                with self.assertRaises(ValueError):
+                    validate(types.SimpleNamespace(**dict(vars(args), smoke_deterministic_fa3=False)))
+                for asset in (Path(interface.__file__), Path(native.__file__)):
+                    raw = asset.read_bytes()
+                    asset.write_bytes(raw + b' actual changed bytes')
+                    try:
+                        with self.subTest(actual_asset=asset.name), self.assertRaisesRegex(ValueError, 'contract differs'):
+                            validate(args)
+                    finally:
+                        asset.write_bytes(raw)
+                backend_path = Path(proof['deterministic_backend']['path'])
+                backend_original = backend_path.read_bytes()
+                backend = tr.read_bound_json(proof['deterministic_backend'])
+                manifest_original = (source / 'run_manifest.json').read_bytes()
+                summary_original = (source / 'summary.json').read_bytes()
+                changes = [('backend', 'flash_attn_2'), ('deterministic', False),
+                           ('flags', dict(tr.DET_FA3_FLAGS, cudnn_benchmark=True)),
+                           ('environment', {'CUBLAS_WORKSPACE_CONFIG': ':16:8'}),
+                           ('interface', dict(backend['interface'], sha256='f' * 64)),
+                           ('native', dict(backend['native'], sha256='f' * 64)),
+                           ('additional_deterministic_authorization', dict(proof['additional_deterministic_authorization'],
+                                                                          sha256='f' * 64))]
+                for i, (key, value) in enumerate(changes, 100):
+                    altered = copy.deepcopy(backend)
+                    altered[key] = value
+                    backend_path.write_text(json.dumps(altered))
+                    changed = copy.deepcopy(proof)
+                    changed['deterministic_backend'] = bound_json_record(backend_path)
+                    for path, raw in ((source / 'run_manifest.json', manifest_original),
+                                      (source / 'summary.json', summary_original)):
+                        doc = json.loads(raw)
+                        doc['deterministic_backend'] = changed['deterministic_backend']
+                        path.write_text(json.dumps(doc))
+                    changed['source_run_manifest'] = bound_json_record(source / 'run_manifest.json')
+                    changed['source_summary'] = bound_json_record(source / 'summary.json')
+                    bad = SmokeResumeTests.approved_args(self, root, changed, i)
+                    bad.framework, bad.smoke_deterministic_fa3 = framework, True
+                    with self.subTest(key=key), self.assertRaisesRegex(ValueError, 'contract differs'):
+                        validate(bad)
+                backend_path.write_bytes(backend_original)
+                (source / 'run_manifest.json').write_bytes(manifest_original)
+                (source / 'summary.json').write_bytes(summary_original)
+                changed = copy.deepcopy(proof)
+                changed['additional_deterministic_authorization']['sha256'] = 'f' * 64
+                bad = SmokeResumeTests.approved_args(self, root, changed, 200)
+                bad.framework, bad.smoke_deterministic_fa3 = framework, True
+                with self.assertRaisesRegex(ValueError, 'authorization'):
+                    validate(bad)
+                with patch.object(tr, 'setup_distributed') as setup:
+                    with self.assertRaises(ValueError):
+                        tr.execute(bad)
+                    setup.assert_not_called()
+            # An old 13-key nondeterministic proof remains old-only even with a new source snapshot.
+            old_source = root / 'old_prefix'
+            self.assertEqual(runner.run_main(root, resume_argv(old_source)), 0)
+            auth_root = root / 'old_auth'
+            auth_root.mkdir()
+            old_proof = resume_proof(auth_root, old_source)
+            self.assertEqual(len(old_proof), 13)
+            bad = SmokeResumeTests.approved_args(self, root, old_proof, 300)
+            bad.smoke_deterministic_fa3 = True
+            with self.assertRaises(ValueError):
+                with contextlib.ExitStack() as stack:
+                    for p in runner.patches(root):
+                        stack.enter_context(p)
+                    tr.validate_smoke_resume(bad)
+
+
 class CliTests(unittest.TestCase):
     def test_help_and_bad_args_do_not_import_torch(self):
         cases = [('train_e3_lora', ['--help'], 0), ('train_e3_lora', ['--out-dir', '/tmp/never_e3', '--max-gpu-hours', '1'], 1),

@@ -1,0 +1,39 @@
+{
+  "schema": "teacher_label_v3_semantic_admission_public_v1",
+  "date": "2026-11-02",
+  "actual_records": 16,
+  "structured_labels": 15,
+  "error_records": 1,
+  "visual_reviewed_labels": 15,
+  "case_counts": {
+    "adequate": 3,
+    "needs_edit": 11,
+    "uncertain": 1,
+    "unreviewable": 0
+  },
+  "fact_claims": {
+    "supported": 124,
+    "unsupported": 32,
+    "uncertain": 17
+  },
+  "review_scope": "AI_independent, eight sampled source frames per case; not full video/human gold",
+  "human_review_performed": false,
+  "semantic_training_approval": false,
+  "full_label_rebuild_allowed": false,
+  "formal_training_allowed": false,
+  "retry_allowed": false,
+  "actual_v3_GPU_seconds": 266.64210349787027,
+  "prior_seconds": 330.59145557461306,
+  "cumulative_label_GPUh": 0.1658982108534676,
+  "pilot_cap_GPUh": 1,
+  "remaining_label_cache_stage_GPUh": 23.834101789146533,
+  "decision": "Do not scale the current automatic captioner to full dataset. Preserve all successful/error records and review contradictions; no selection based on benchmark scores.",
+  "defect_categories": [
+    "holder/action attribution",
+    "specific object hallucination",
+    "incorrect static pose",
+    "visible motion or endpoint omission",
+    "unsupported intent or hidden hand claims"
+  ],
+  "sota_proven": false
+}

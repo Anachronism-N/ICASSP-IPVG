@@ -1,3 +1,26 @@
+# 实机技术验收失败已留证；更强标注与确定性修复继续（2026-11-02）
+
+原单卡真实4reference+2prefix+2freshresume共8updates全部completed/save，三个自有CUDA进程退出并GPU释放；prefixadapter加载恢复exact、base和RNGexact，但首个freshprefix backwardgradnorm已异、最终600adapter与AdamWstates不exact，因此整体FAIL，无cost.closure。原已观测611.482715秒、费用保守上界2GPUh保留，不退款/重试/放宽allclose。根因最强定位FA3native默认非确定backward：同forwardloss首step1.0140422583但grad1.846334934vs1.850419402，旧runtime未冻结实际FA3资产，不能冒称某个kernel唯一因果已实证。LoRA B最终relativeL2差8.3918%，Adam一/二阶moments差52.3/74.2%，不是只序列化字节差。
+
+用户对另一次独立2GPUh确定性恢复明确回复“所有gpu你都可以使用”，按提出的2GPUh/单GPU/一次cap保存原raw授权，原失败预算不挪借；新synthetic-smoke-only显式FA3detTrue/torchflags/env/真实nativeSHA补充，原精确状态门保持。CPU45初版通过但另fresh-helper命令最后观察CUDA已初始化（原继承visibility/初始值/费用未记录，不补猜）；后续CPU硬阻断复现定位DiffSynth→deepspeed能力探测的隐式initCUDA企图，当前暂停旧冻结并改freshhiddenCUDA子进程做CPU身份验证；主父不缓存CPUdeepspeed，实际GPUbuild前环境先固定，首call核actualWan后端。未新CUDA训练。
+
+新32B标注：实际rank1模型14权重66,714,912,872bytes+configs/tokenizer25资产已streamhash/原stat绑定，sourceproof原nativeJSON保存。独立新rank1四卡monitor-only14400s不占卡。新32病例16旧诊断+16盲抽，16首尾源帧，同图像两阶段entityID事实→caption，CAP1800/4卡=2GPUh计label24；源码/CPUtests正修EOS截断、合法静态No大小写误拒及往复动作首末net相同被错误拒的3根因，未GPU。原v3累计0.165898210853GPUh/15结构+1error/3adequate11needsedit1uncertain，不全量/不自动retry。
+
+公开最新c46875d已有247项remoteSHA通过(综述docs59/E2Physics勘误/去DD公式已公开)，以上新变化是其后的本地事实，不能假称已包含于该commit。仍未正式候选训练，benchmark无新训练收益/SOTA直接证据，AR/Student/蒸馏关闭。
+
+---
+
+# 新v3实际结束与单卡技术验收启动（2026-11-02）
+
+实验综述/新源码已正常发布00d2edb（26变更/246manifest全部远端SHA通过，1162公开CPUpass/1既有skip）。生成PUBLICATION.md漏入SHA清单导致单卡CPU审批拒绝，未GPU；已仅补manifest并再次完整公开1162/1通过、正常发布c46875d（247资产+manifest远端SHA通过），不放宽执行验证。令牌仅临时进程环境用于推送，未写repo/gitconfig。
+
+- 一次获批v3恢复已实际全部退出：15合格结构标签+1 ValueError记录，四node parent成功3/失败1但全部GPU/tree released；原16记录/44raw副本内容SHA独立通过。新实际266.642103498秒+全部历史330.591455575秒，累计0.165898210853GPUh≤原1GPUhpilot，不重试、不全量。两个AI盲审组正在实际看原8抽帧+新标签，未设独立语义approval、未真人/full视频审阅。
+- 私有新v3证据eval/teacher_label_pilot_20261102/v3_collected/completion.audit.json，原v2/失败logs/cost不改。index9仅记录ValueError，原worker没有保留详细消息，不能猜测具体失败原因或从输出补造标签。
+- 单卡2GPUh新source/model/runtime/原计划b988e88/独立执行approval与c46875d远端manifest的真实CPU核验已过；v3rank0先released后才启动一个GPU0监督，固定synthetic reference4+prefix2+freshresume2逻辑4/物理8AdamW，全生命周期总7200秒。当前技术任务OawTwI正在真实受控执行，complete需最终cost.closure严格核验；不能把加载/部分更新叫完成，更不是正式训练或SOTA效果。
+- 正式训练数据/缓存/语义门、32NCCL全rank恢复及正式候选训练预算仍未过；AR/Student/蒸馏不启动。文档与该状态变化分别属于不同发布时间，以下“发布前”保留为历史。
+
+---
+
 # 最新实验综述与E2 Physics勘误（2026-11-02，发布前）
 
 用户要求持续超过同协议SOTA，并详细描述全部历史实验、最佳版本及各bench距离，另给VBench去dynamic公式。已写docs/59_实验全景_最佳Teacher与SOTA差距.md及eval/diag/teacher_experiment_sota_review_20261102.json；直接刷新官方36行，原Total最高DreamX90.49、同八维90.787722，base89.860075；自定义去dynamic base91.135529/DreamX91.344148，36行最高LTX2无po92.425997。去dynamic会偏爱低运动，不能冒官方SOTA。

@@ -59,6 +59,9 @@ FILES = [
     "docs/58_C276四基准子集完整结论.md",
     "docs/59_实验全景_最佳Teacher与SOTA差距.md",
     "eval/diag/teacher_experiment_sota_review_20261102.json",
+    "eval/diag/teacher_label_v3_semantic_public_20261102.json",
+    "eval/diag/teacher_gpu_resume_root_cause_public_20261102.json",
+    "scripts/run_teacher_qwen3vl32b_pilot.py", "tests/test_teacher_qwen3vl32b_pilot.py",
     "scripts/prepare_teacher_label_admission.py", "tests/test_prepare_teacher_label_admission.py",
     "scripts/run_teacher_label_admission.py", "tests/test_run_teacher_label_admission.py",
     "scripts/run_teacher_label_pilot.py", "tests/test_teacher_label_pilot.py",
@@ -105,6 +108,9 @@ FILES = [
     "DiffSynth-Studio/diffsynth/diffusion/training_module.py",
     "DiffSynth-Studio/diffsynth/diffusion/base_pipeline.py",
     "DiffSynth-Studio/diffsynth/models/wan_video_dit.py",
+    "DiffSynth-Studio/diffsynth/models/wan_video_camera_controller.py",
+    "DiffSynth-Studio/diffsynth/models/wantodance.py",
+    "DiffSynth-Studio/diffsynth/core/gradient/__init__.py",
     "DiffSynth-Studio/diffsynth/configs/model_configs.py",
     "DiffSynth-Studio/diffsynth/diffusion/loss.py",
     "DiffSynth-Studio/diffsynth/pipelines/wan_video.py",
@@ -212,7 +218,6 @@ def export(root, destination):
     scope = {"created_at": time.strftime("%F %T %Z"), "files": records,
              "experiment_progress": progress,
              "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders."}
-    (destination / "PUBLICATION_MANIFEST.json").write_text(json.dumps(scope, indent=2, ensure_ascii=False) + "\n")
     (destination / ".gitignore").write_text("*.mp4\n*.safetensors\n*.pth\n*.tar\n*.log\n__pycache__/\ncookies*\n.git/config\n")
     (destination / "PUBLICATION.md").write_text(
         "# Selected Teacher experiment source snapshot\n\n"
@@ -222,6 +227,10 @@ def export(root, destination):
         "Use PUBLICATION_MANIFEST.json for source/snapshot hashes and the measured snapshot time. "
         "Historical planning documents are not proof of current experiment completion. "
         "All benchmark coverage, fixed validation loss and Teacher review requirements still apply.\n")
+    metadata_hash = hashlib.sha256((destination / "PUBLICATION.md").read_bytes()).hexdigest()
+    records.append({"path": "PUBLICATION.md", "source_sha256": metadata_hash, "snapshot_sha256": metadata_hash})
+    scope["generated_asset_source_note"] = "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes."
+    (destination / "PUBLICATION_MANIFEST.json").write_text(json.dumps(scope, indent=2, ensure_ascii=False) + "\n")
     return scope
 
 

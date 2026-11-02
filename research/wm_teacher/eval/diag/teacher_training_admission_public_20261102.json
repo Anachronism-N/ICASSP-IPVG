@@ -168,6 +168,16 @@
       "CPU_label_tests_passed": 123,
       "actual_labels": 0,
       "semantic_approval": false
+    },
+    "actual_v3_outcome": {
+      "structured": 15,
+      "error_records": 1,
+      "reviewed": 15,
+      "adequate": 3,
+      "needs_edit": 11,
+      "uncertain": 1,
+      "semantic_training_approval": false,
+      "cumulative_GPUh": 0.1658982108534676
     }
   },
   "single_gpu_technical_protocol": {
@@ -193,7 +203,7 @@
     "no_extra_budget_for_restart": true,
     "implementation_status": "Trainer CPU implementation39 passed; independent review and complete allocation supervisor pending",
     "CPU_tests_are_GPU_proof": false,
-    "actual_GPU_updates": 0,
+    "actual_GPU_updates": 8,
     "formal_training": false,
     "supervisor": {
       "source_sha256": "56ab14fa3911d43138847befa5b5ce38d59f0b85f85f9d93573881256e34cd14",
@@ -204,6 +214,38 @@
       "cost_protocol": "Immutable provisional full-cap reservation, separate verified cost.closure; failure marker overrides",
       "actual_GPU_run": false,
       "independent_new_revision_acceptance": "main verification pending"
+    },
+    "actual_outcome": "failed: exact resumed adapter trajectory differed",
+    "actual_checkpoint_restore_exact": true,
+    "final_reference_vs_resume_exact": false,
+    "frozen_base_unchanged": true,
+    "RNG_exact": true,
+    "cost_closure_present": false,
+    "observed_elapsed_seconds": 611.4827146586031,
+    "original_charged_upper_GPUh": 2,
+    "old_failure_costs_preserved": true,
+    "new_deterministic_bounded_scope": {
+      "user_reply": "所有gpu你都可以使用",
+      "new_GPUh_cap": 2,
+      "allocated_cards": 1,
+      "one_attempt": true,
+      "same_exact_gate": true,
+      "same_FA3_forward_backend": true,
+      "implementation_started": true,
+      "actual_GPU_run_started": false
     }
+  },
+  "new_stronger_label_pilot": {
+    "model": "Qwen3-VL-32B-Instruct",
+    "dtype": "BF16",
+    "four_GPU_single_node": true,
+    "node_rank": 1,
+    "frames": 16,
+    "diagnostic_cases": 16,
+    "blind_cases": 16,
+    "allocation_GPUh_cap": 2,
+    "actual_complete_model_file_SHA_verified": 25,
+    "implementation_in_progress": true,
+    "actual_GPU_started": false
   }
 }

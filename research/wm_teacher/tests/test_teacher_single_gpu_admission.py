@@ -45,9 +45,51 @@ def cpu_empty_query(uuid):
                 stderr=result.stderr, pids=[], start_monotonic=start, end_monotonic=time.monotonic())
 
 
+def deterministic_authorization_fixture(parent):
+    return ad.write_new(Path(parent)/'det_auth.json', dict(
+        schema='teacher_deterministic_recovery_authorization_v1', user_reply='CPU fixture only', in_response_to='CPU fixture only',
+        assistant_bounded_scope=dict(new_GPUh_cap=2, allocated_cards=1, wall_cap_seconds=7200, one_attempt=True,
+            reference_updates=4, prefix_updates=2, fresh_process_resume_updates=2, physical_optimizer_updates=8,
+            selected_attention_backend='same native FA3; explicit deterministic backward',
+            backend_capability_probe='First reference update is the actual capability gate, counted within four reference updates; no extra uncharged probe',
+            no_silent_backend_fallback=True), prior_failed_technical_GPUh_upper=2, prior_costs_preserved=True,
+        original_training_stage_caps_GPUh=dict(label_rebuild_and_cache=24,single_gpu_training_resume=2,multi_node_technical_validation=6),
+        new_scope_additional_not_borrowed=True, labels_budget_borrowing_allowed=False, formal_training_allowed=False,
+        AR_allowed=False, student_distillation_allowed=False, requires_new_source_runtime_publication_and_exact_resume_gate=True,
+        automatic_retry_allowed=False))
+
+
+def backend_fixture(parent):
+    interface=Path(parent)/'fa3_interface.py'; interface.write_text('def flash_attn_func(*args, deterministic=False): pass\n')
+    native=Path(parent)/'native_C.so'; native.write_bytes(b'CPU fixture native bytes, never GPU backend')
+    return dict(backend='flash_attn_3', interface=ad.record(interface), native=ad.record(native), torch_version='CPU fixture')
+
+
+def prior_fixture(parent, charged=7200, closure=False):
+    old = Path(parent) / 'old_failed_allocation'
+    old.mkdir()
+    plan = ad.write_new(Path(parent)/'old_plan.json', dict(cpu_fixture_only=True))
+    previous = ad.write_new(old/'parent.json', dict(schema='teacher_single_gpu_admission_v1', phase=ad.PHASE,
+        execution_success=False, success=False, released=True, comparison=None,
+        error='ValueError: Exact resumed trajectory differs: adapters', plan=plan,
+        segments=[dict(steps=s,segment_updates=u) for s,u in ((4,4),(2,2),(4,2))]))
+    failure = ad.write_new(old/'cost.failure.json', dict(schema='teacher_single_gpu_cost_failure_v1', phase=ad.PHASE,
+        terminal=True, success=False, released_observed=True, parent_receipt=previous, plan=plan,
+        charged_upper_seconds=charged, allocated_GPUh=charged/3600, cap_seconds=7200))
+    provisional = ad.write_new(old/'cost.json', dict(parent_receipt=previous, success=False,
+        charged_upper_seconds=charged, allocated_GPUh=charged/3600))
+    if closure: ad.write_new(old/'cost.closure.json', dict(success=True))
+    audit = ad.write_new(Path(parent)/'old_audit.json', dict(schema='teacher_single_gpu_actual_failure_audit_v1',
+        stage=ad.PHASE, charged_upper_GPUh=2, physical_updates=8, closure_present=False,
+        terminal_success=False, release_verified_at_audit=True, parent=previous, failure=failure,
+        provisional_cost=provisional, plan=plan))
+    return old, audit
+
+
 def fake_plan(root):
     return dict(schema=ad.SCHEMA, phase=ad.PHASE, hostname=os.uname().nodename, output_root=str(root),
                 gpu_uuid=UUID, state_dir=str(ad.STATE_DIR), config=ad.fixed_config(),
+                prior_failed_allocation=dict(cpu_fixture_only=True),
                 runtime=dict(python=sys.executable, tools=dict(timeout=shutil.which('timeout'))))
 
 
@@ -104,6 +146,7 @@ def cpu_harness(parent, mode):
     plan.update(source={},framework={},models={})
     plan['runtime']['files']=[]
     plan['authorization']=ad.write_new(parent/'auth.json',admission.AUTH_EXPECTED)
+    plan['additional_deterministic_authorization']=deterministic_authorization_fixture(parent)
     path = parent/'plan.json'
     row = ad.write_new(path,plan)
     approval_path = parent/'approval.json'
@@ -114,6 +157,9 @@ def cpu_harness(parent, mode):
                   + ("time.sleep(.2); sys.exit(3)" if mode in ('fail','third','savefail') else "time.sleep(90)"))
     def popen(command, **kwargs):
         if any(str(item).endswith('gpu_hold.py') for item in command):
+            assert '--smoke-deterministic-fa3' in command
+            assert kwargs['env']['CUBLAS_WORKSPACE_CONFIG']==':4096:8'
+            assert kwargs['env']['CUDA_VISIBLE_DEVICES']==UUID
             return REAL_POPEN([sys.executable,'-B','-c',child_code],**kwargs)
         return REAL_POPEN(command,**kwargs)
     real_write=ad.write_new
@@ -128,7 +174,9 @@ def cpu_harness(parent, mode):
             result['query']['pids']=[42]
         return result
     with (
-        patch.object(ad,'LOCAL',parent), patch.object(ad,'verify_plan',return_value=(plan,row)),
+        patch.object(ad,'LOCAL',parent), patch.object(ad,'OUTPUT_ROOT',parent/'allocation'), patch.object(ad,'verify_plan',return_value=(plan,row)),
+        patch.object(ad,'deterministic_authorization',return_value=plan['additional_deterministic_authorization']),
+        patch.object(ad,'prior_failure',return_value=plan['prior_failed_allocation']),
         patch.object(ad,'verify_approval',return_value=approval),
         patch.object(process,'manager_boundary',side_effect=boundary),
         patch.object(process,'query_release',side_effect=cpu_empty_query),
@@ -147,6 +195,7 @@ def closure_harness(parent, mode):
     plan.update(source={},framework={},models={})
     plan['runtime']['files']=[]
     plan['authorization']=ad.write_new(parent/'auth.json',admission.AUTH_EXPECTED)
+    plan['additional_deterministic_authorization']=deterministic_authorization_fixture(parent)
     row=ad.write_new(parent/'plan.json',plan)
     approval=ad.write_new(parent/'approval.json',dict(cpu_only=True))
     real_write, real_clock, real_identity = ad.write_new, time.monotonic, process.identity
@@ -174,11 +223,14 @@ def closure_harness(parent, mode):
     def segment(plan,name,updates,cumulative,root,end):
         result=dict(trainer_identity=dict(pid=dict(reference=101,prefix=102,resume=103)[name],start_ticks=1),
                     frozen_base_sha256='base',initial_adapter_sha256='prefix' if name=='resume' else 'initial',
-                    adapter_sha256='prefix' if name=='prefix' else 'final',steps=cumulative,segment_updates=updates)
+                    adapter_sha256='prefix' if name=='prefix' else 'final',steps=cumulative,segment_updates=updates,
+                    backend_identity=dict(cpu_fixture=True), exact_trajectory=list(range(cumulative-updates,cumulative)))
         return result,dict(steps=cumulative)
     result,error=None,None
     with (
-        patch.object(ad,'LOCAL',parent), patch.object(ad,'verify_plan',return_value=(plan,row)),
+        patch.object(ad,'LOCAL',parent), patch.object(ad,'OUTPUT_ROOT',parent/'allocation'), patch.object(ad,'verify_plan',return_value=(plan,row)),
+        patch.object(ad,'deterministic_authorization',return_value=plan['additional_deterministic_authorization']),
+        patch.object(ad,'prior_failure',return_value=plan['prior_failed_allocation']),
         patch.object(ad,'verify_approval',return_value=approval),
         patch.object(process,'manager_boundary',side_effect=gpu_boundary),
         patch.object(process,'query_release',side_effect=cpu_empty_query),
@@ -221,6 +273,8 @@ class AdmissionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             parent=Path(tmp); models=parent/'models'; models.mkdir(); framework=parent/'framework'; framework.mkdir()
             auth=parent/'auth.json'; ad.write_new(auth,admission.AUTH_EXPECTED)
+            extra=deterministic_authorization_fixture(parent); old,audit=prior_fixture(parent)
+            backend=backend_fixture(parent)
             rels=('base/shard1','base/shard2','base/shard3'); pins={}
             for i,rel in enumerate(rels):
                 file=models/rel; file.parent.mkdir(exist_ok=True); file.write_bytes(('tiny CPU weight fixture '+str(i)).encode())
@@ -231,11 +285,12 @@ class AdmissionTests(unittest.TestCase):
                           'scripts/train_e3_lora.py','scripts/run_teacher_training_smoke.py')
             files=[ad.asset_record(ROOT/name) for name in source_names]+[ad.asset_record(framework/name) for name in framework_names]
             files += [ad.asset_record(models/rel) for rel in rels]
-            versions={name:ad.importlib.metadata.version(name) for name in ('torch','peft','numpy','safetensors','accelerate','transformers')}
+            versions={name:ad.importlib.metadata.version(name) for name in ('torch','peft','numpy','safetensors','accelerate','transformers','flash_attn_3')}
             runtime=dict(python=str(Path(sys.executable).resolve()),packages=versions,
                          tools={name:sys.executable for name in ('timeout','nvidia-smi','git')},files=files,
+                         actual_FA3=backend,required_flags=dict(tr.DET_FA3_FLAGS),required_environment=dict(tr.DET_FA3_ENV),
                          exhaustive_attestation=False,caveat='CPU fixture mocks selected attestation; not GPU permission')
-            with patch.object(ad,'LOCAL',parent),patch.object(ad,'AUTH',auth),patch.object(ad,'MODELS',models),                  patch.object(ad,'FRAMEWORK',framework),patch.object(ad,'SOURCE_NAMES',source_names),                  patch.object(tr,'SHARD_RELS',rels),patch.object(tr,'FRAMEWORK_FILES',framework_names),                  patch.object(tr.m1,'CACHE_PINS',pins),patch.object(ad,'runtime',return_value=runtime),                  patch.object(ad.shutil,'which',return_value=sys.executable),                  patch.object(process,'manager_boundary',side_effect=gpu_boundary):
+            with patch.object(ad,'LOCAL',parent), patch.object(ad,'OUTPUT_ROOT',parent/'allocation'),patch.object(ad,'AUTH',auth), patch.object(ad,'DET_AUTH',Path(extra['path'])),                  patch.object(tr,'DET_FA3_AUTH',Path(extra['path'])),patch.object(tr,'DET_FA3_AUTH_SHA256',extra['sha256']),                  patch.object(ad,'PRIOR_ROOT',old),patch.object(ad,'PRIOR_AUDIT',Path(audit['path'])),                  patch.object(ad,'PRIOR_AUDIT_SHA256',audit['sha256']),patch.object(ad,'MODELS',models),                  patch.object(ad,'FRAMEWORK',framework),patch.object(ad,'SOURCE_NAMES',source_names),                  patch.object(tr,'SHARD_RELS',rels),patch.object(tr,'FRAMEWORK_FILES',framework_names),                  patch.object(tr.m1,'CACHE_PINS',pins),patch.object(ad,'runtime',return_value=runtime),                  patch.object(ad.shutil,'which',return_value=sys.executable),                  patch.object(process,'manager_boundary',side_effect=gpu_boundary):
                 plan=ad.prepare(parent/'allocation',ad.STATE_DIR)
                 row=ad.write_new(parent/'plan.json',plan)
                 verified,bound=ad.verify_plan(row['path'],row['sha256'])
@@ -244,9 +299,28 @@ class AdmissionTests(unittest.TestCase):
                 self.assertEqual(set(plan['trainer_source']),{'trainer','m1_helper','smoke_helper','admission_helper'})
                 self.assertTrue(all(set(r)=={'path','bytes','sha256','mtime_ns','inode'} for r in plan['source'].values()))
                 for field,value in [('phase','formal_training'),('cap_seconds',7201),('rank',1),('gpu_index',1),
-                                    ('synthetic_samples',63),('formal_training_allowed',True)]:
+                                    ('synthetic_samples',63),('formal_training_allowed',True),
+                                    ('schema','teacher_single_gpu_admission_v1'),('one_attempt',True),
+                                    ('prior_charged_seconds',0),('old_prior_upper_GPUh',0),('new_GPUh_cap',3),
+                                    ('cumulative_upper_GPUh',2),('extra_GPU_probe_allowed',True),
+                                    ('reference_updates',5),('prefix_updates',2.0),('restore_updates',3)]:
                     bad=dict(plan,**{field:value}); new=ad.write_new(parent/(field+'.json'),bad)
                     with self.assertRaises(ValueError): ad.verify_plan(new['path'],new['sha256'])
+                self.assertEqual((plan['new_GPUh_cap'],plan['old_prior_upper_GPUh'],plan['cumulative_upper_GPUh']),(2,2,4))
+                self.assertTrue(plan['GPU_capability_unverified'] and plan['first_reference_update_is_capability_probe'])
+                for field in ('interface','native'):
+                    bad=copy.deepcopy(plan);bad['runtime']['actual_FA3'][field]['sha256']='0'*64
+                    new=ad.write_new(parent/('wrong_backend_'+field+'.json'),bad)
+                    with self.assertRaises(ValueError):ad.verify_plan(new['path'],new['sha256'])
+                bad=copy.deepcopy(plan);bad['runtime']['required_flags']['deterministic_algorithms']=1
+                new=ad.write_new(parent/'wrongflagtype.json',bad)
+                with self.assertRaises(ValueError):ad.verify_plan(new['path'],new['sha256'])
+                bad=copy.deepcopy(plan);bad['prior_failed_allocation']['released_observed']=1
+                new=ad.write_new(parent/'wrongpriortype.json',bad)
+                with self.assertRaises(ValueError):ad.verify_plan(new['path'],new['sha256'])
+                bad=copy.deepcopy(plan);bad['additional_deterministic_authorization']['sha256']='0'*64
+                new=ad.write_new(parent/'wrongdet_auth.json',bad)
+                with self.assertRaises(ValueError):ad.verify_plan(new['path'],new['sha256'])
                 bad=copy.deepcopy(plan); bad['source'][source_names[0]]['sha256']='0'*64
                 new=ad.write_new(parent/'source.json',bad)
                 with self.assertRaises(ValueError): ad.verify_plan(new['path'],new['sha256'])
@@ -270,6 +344,9 @@ class AdmissionTests(unittest.TestCase):
         self.assertLess(args.max_gpu_hours*3600,1000)
         self.assertEqual(args.smoke_offload,['on'])
         self.assertFalse(args.skip_model_hash or args.skip_frozen_hash)
+        self.assertTrue(args.smoke_deterministic_fa3)
+        self.assertTrue(all('--smoke-deterministic-fa3' in ad.trainer_args(Path('/unused'),u,1000)
+                            for _,u,_ in ad.SEGMENTS))
 
     def test_evidence_writer_never_overwrites_existing_plan_or_receipt(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -281,6 +358,9 @@ class AdmissionTests(unittest.TestCase):
     def test_unknown_and_known_overrun_fees_never_clip(self):
         with patch.object(ad.time,'monotonic',return_value=100):
             self.assertEqual(ad.cost(0,False)['charged_upper_seconds'],7200)
+            self.assertEqual(ad.cost(0,False)['prior_charged_seconds'],7200)
+            self.assertEqual(ad.cost(0,False)['cumulative_upper_GPUh'],4)
+            self.assertTrue(ad.cost(0,False)['budgets_independent'])
             self.assertEqual(ad.cost(0,True)['charged_upper_seconds'],100)
             known=ad.cost(0,True,publication_allowance=1)
             self.assertEqual(known['actual_elapsed_seconds'],100)
@@ -303,8 +383,10 @@ class AdmissionTests(unittest.TestCase):
             row=ad.write_new(parent/'wrong.json',plan)
             with self.assertRaises(ValueError): ad.verify_plan(row['path'],row['sha256'])
             with self.assertRaises(ValueError): ad.verify_plan(row['path'],'0'*64)
-            with patch.object(ad,'LOCAL',parent):
-                ad.safe_root(parent/'fresh')
+            with patch.object(ad,'LOCAL',parent),patch.object(ad,'OUTPUT_ROOT',parent/'allocation'):
+                ad.safe_root(parent/'allocation')
+                with self.assertRaises(ValueError): ad.safe_root(parent/'fresh')
+                with self.assertRaises(ValueError): ad.safe_root(parent/'teacher_single_gpu_admission_20261102_run01')
                 (parent/'old').mkdir()
                 for root in (parent,parent/'old',parent.parent/'foreign'):
                     with self.assertRaises(ValueError): ad.safe_root(root)
@@ -441,6 +523,8 @@ class AdmissionTests(unittest.TestCase):
             self.assertFalse(failure['success'])
             self.assertGreater(failure['actual_elapsed_seconds'],0)
             self.assertGreaterEqual(failure['charged_upper_seconds'],ad.CAP)
+            with patch.object(ad,'LOCAL',Path(tmp)),patch.object(ad,'OUTPUT_ROOT',root),self.assertRaises(ValueError):
+                ad.safe_root(root)
 
     def test_terminal_cost_save_stall_and_alarm_cannot_return_or_validate_success(self):
         for mode in ('slowcost','slowclosure','alarm'):
@@ -502,6 +586,89 @@ class AdmissionTests(unittest.TestCase):
             self.assertIsNotNone(receipt['exit_code'])
             self.assertGreaterEqual(ad.cost(time.monotonic(),receipt['released'])['allocated_GPUh'],2)
 
+    def test_additional_authorization_raw_sha_and_exact_scope_types(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp); good=deterministic_authorization_fixture(root)
+            document=ad.read(good)
+            def validate(row):
+                with (patch.object(ad,'DET_AUTH',Path(row['path'])),
+                      patch.object(tr,'DET_FA3_AUTH',Path(row['path'])),
+                      patch.object(tr,'DET_FA3_AUTH_SHA256',row['sha256'])):
+                    return ad.deterministic_authorization()
+            self.assertEqual(validate(good),good)
+            changes=[('new_GPUh_cap',True),('allocated_cards',2),('wall_cap_seconds',7200.0),
+                     ('one_attempt',1),('reference_updates',5),('prefix_updates',True),
+                     ('fresh_process_resume_updates',3),('physical_optimizer_updates',9),
+                     ('no_silent_backend_fallback',1)]
+            for i,(key,value) in enumerate(changes):
+                bad=copy.deepcopy(document); bad['assistant_bounded_scope'][key]=value
+                row=ad.write_new(root/('wrongscope'+str(i)+'.json'),bad)
+                with self.subTest(key=key),self.assertRaises(ValueError): validate(row)
+            for key,value in [('prior_failed_technical_GPUh_upper',0),('automatic_retry_allowed',True),
+                              ('new_scope_additional_not_borrowed',False),('labels_budget_borrowing_allowed',True),
+                              ('formal_training_allowed',True),('AR_allowed',True)]:
+                row=ad.write_new(root/(key+'.json'),dict(document,**{key:value}))
+                with self.subTest(key=key),self.assertRaises(ValueError): validate(row)
+            with (patch.object(ad,'DET_AUTH',Path(good['path'])),patch.object(tr,'DET_FA3_AUTH',Path(good['path'])),
+                  patch.object(tr,'DET_FA3_AUTH_SHA256','0'*64),self.assertRaises(ValueError)):
+                ad.deterministic_authorization()
+
+    def test_original_failed_allocation_raw_sha_fee_eight_calls_and_no_closure(self):
+        for charged,closure in ((7200,False),(0,False),(7200.0,False),(7200,True)):
+            with self.subTest(charged=charged,closure=closure),tempfile.TemporaryDirectory() as tmp:
+                old,audit=prior_fixture(Path(tmp),charged,closure)
+                with (patch.object(ad,'PRIOR_ROOT',old),patch.object(ad,'PRIOR_AUDIT',Path(audit['path'])),
+                      patch.object(ad,'PRIOR_AUDIT_SHA256',audit['sha256'])):
+                    if type(charged) is int and charged==7200 and not closure:
+                        value=ad.prior_failure()
+                        self.assertEqual((value['charged_upper_GPUh'],value['physical_optimizer_calls']),(2,8))
+                        self.assertTrue(value['released_observed']);self.assertFalse(value['closure_present'])
+                        with patch.object(ad,'PRIOR_AUDIT_SHA256','0'*64),self.assertRaises(ValueError): ad.prior_failure()
+                        (old/'parent.json').write_bytes(b'changed actual original bytes')
+                        with self.assertRaises(ValueError): ad.prior_failure()
+                    else:
+                        with self.assertRaises(ValueError): ad.prior_failure()
+
+    def test_driver_fifteen_key_proof_is_accepted_by_real_cpu_trainer_and_exact_resume(self):
+        import contextlib
+        import torch
+        spec=importlib.util.spec_from_file_location('_admission_det_fixture',ROOT/'tests/test_e3_train.py')
+        fixture=importlib.util.module_from_spec(spec);spec.loader.exec_module(fixture)
+        fixture.Base.setUpClass()
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);extra=deterministic_authorization_fixture(root)
+            auth=ad.write_new(root/'original_auth.json',admission.AUTH_EXPECTED)
+            framework,wan,interface,native=fixture.fake_fa3_modules(root)
+            runner=fixture.EndToEndTests()
+            with (fixture.DeterministicFa3Tests().modules_patch(wan,interface,native),
+                  patch.object(ad,'DET_AUTH',Path(extra['path'])),patch.object(tr,'DET_FA3_AUTH',Path(extra['path'])),
+                  patch.object(tr,'DET_FA3_AUTH_SHA256',extra['sha256'])):
+                for name,updates in (('reference',4),('prefix',2)):
+                    argv=ad.trainer_args(root/name,updates,2000)+['--framework',str(framework)]
+                    self.assertEqual(runner.run_main(root,argv),0)
+                original=ad.read(ad.record(root/'prefix/run_manifest.json'))
+                summary=ad.read(ad.record(root/'prefix/summary.json'))
+                prefix=dict(steps=2,segment_updates=2,manifest=ad.record(root/'prefix/run_manifest.json'),
+                    summary=ad.record(root/'prefix/summary.json'),checkpoint=summary['checkpoint'],
+                    deterministic_backend=original['deterministic_backend'])
+                proof=ad.make_resume_proof(dict(authorization=auth,additional_deterministic_authorization=extra),prefix,root)
+                body=ad.read(proof)
+                self.assertEqual(len(body),15)
+                self.assertEqual(body['additional_deterministic_authorization'],extra)
+                self.assertEqual(body['deterministic_backend'],ad.record(root/'prefix/deterministic_backend.json'))
+                argv=ad.trainer_args(root/'resume',2,2000,proof)+['--framework',str(framework)]
+                args=tr.parser().parse_args(argv)
+                with contextlib.ExitStack() as stack:
+                    for p in runner.patches(root):stack.enter_context(p)
+                    self.assertEqual(tr.validate_smoke_resume(args)['proof'],proof)
+                self.assertEqual(runner.run_main(root,argv),0)
+                states={name:torch.load(root/name/'private'/tr.CKPT_NAME,map_location='cpu',weights_only=True)
+                        for name in ('reference','resume')}
+                self.assertTrue(ad.compare_states(states['reference'],states['resume'])['adapter_optimizer_rng_exact'])
+                for key in ('adapters','optimizer','rng'):
+                    self.assertEqual(tr.ts.state_hash(states['reference'][key]),tr.ts.state_hash(states['resume'][key]))
+                self.assertFalse(torch.cuda.is_initialized())
+
     def test_actual_fresh_tiny_reference4_equals_prefix2_restore2(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)
@@ -549,7 +716,7 @@ class PublicationTests(unittest.TestCase):
                 return REAL_RUN(['git','-C',str(repo),*args],capture_output=True,check=True).stdout
             git('init','-b',ad.BRANCH); git('config','user.email','cpu-test@example.invalid'); git('config','user.name','CPU test')
             snapshot=repo/ad.SNAPSHOT_PREFIX; (snapshot/'scripts').mkdir(parents=True)
-            published=snapshot/'scripts/example.py'; published.write_text('sanitized host value\n')
+            published=snapshot/'scripts/run_teacher_single_gpu_admission.py'; published.write_text('sanitized host value\n')
             source=ad.asset_record(private)
             manifest=snapshot/'PUBLICATION_MANIFEST.json'
             framework_source=ad.asset_record(ROOT/'DiffSynth-Studio/diffsynth/utils/lora/general.py')
@@ -558,7 +725,7 @@ class PublicationTests(unittest.TestCase):
             framework_snapshot.write_text('sanitized framework fixture\n')
             extra=snapshot/'README.md'; extra.write_text('uncovered fixture snapshot\n')
             manifest_row=ad.write_new(manifest,dict(files=[
-                dict(path='scripts/example.py',source_sha256=source['sha256'],snapshot_sha256=ad.record(published)['sha256']),
+                dict(path='scripts/run_teacher_single_gpu_admission.py',source_sha256=source['sha256'],snapshot_sha256=ad.record(published)['sha256']),
                 dict(path=framework_path,source_sha256=framework_source['sha256'],snapshot_sha256=ad.record(framework_snapshot)['sha256']),
                 dict(path='README.md',source_sha256=ad.record(extra)['sha256'],snapshot_sha256=ad.record(extra)['sha256'])]))
             git('add','.'); git('commit','-m','CPU fixture publication')
@@ -568,7 +735,7 @@ class PublicationTests(unittest.TestCase):
             receipt_content=dict(commit=commit,remote_equal=True,manifest_sha256=manifest_row['sha256'],
                                  changed_files_remote_bytes_verified=4,manifest_files_verified=3,quality_claim=False,sota_proven=False)
             receipt=ad.write_new(root/'remote_receipt.json',receipt_content)
-            plan=dict(source={'scripts/example.py':source},framework={'diffsynth/utils/lora/general.py':framework_source},
+            plan=dict(source={'scripts/run_teacher_single_gpu_admission.py':source},framework={'diffsynth/utils/lora/general.py':framework_source},
                       runtime=dict(tools=dict(git=shutil.which('git'))))
             plan_row=ad.write_new(root/'plan.json',plan)
             approval=dict(schema='teacher_single_gpu_execution_approval_v1',private=True,GPU_authorized=True,

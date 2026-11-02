@@ -663,17 +663,24 @@ def validate_args(args):
     else:
         require(args.max_steps is not None and args.max_steps > args.warmup, '--max-steps (> warmup) required')
         require(not args.synthetic_inputs, 'Synthetic inputs are smoke-only')
+    if getattr(args, 'smoke_deterministic_fa3', False):
+        require(args.smoke and args.synthetic_inputs and args.cache_index is None
+                and validate_topology()['world_size'] == 1,
+                'Deterministic FA3 is single-GPU synthetic smoke-only, without a cache')
     require(args.synthetic_inputs or args.cache_index, '--cache-index required (or --smoke --synthetic-inputs)')
     require(args.synthetic_inputs or args.caption_version, '--caption-version required with a cache')
 
 
 def make_cfg(args, horizon):
-    return {'seed': args.seed, 'lr': args.lr, 'weight_decay': args.weight_decay, 'warmup': args.warmup,
+    cfg = {'seed': args.seed, 'lr': args.lr, 'weight_decay': args.weight_decay, 'warmup': args.warmup,
             'horizon': horizon, 'clip': args.clip, 'anchor_lambda': float(args.anchor_lambda),
             'anchor_weighting': args.anchor_weighting, 'component_grad_every': args.component_grad_every,
             'log_every': args.log_every, 'offload': args.offload == 'on', 'max_steps': args.max_steps,
             'caption_version': args.caption_version, 'lora_rank': LORA_RANK, 'lora_alpha': LORA_ALPHA,
             'targets': TARGETS, 'per_rank_batch': 1, 'grad_accum': 1}
+    if getattr(args, 'smoke_deterministic_fa3', False):
+        cfg['smoke_deterministic_fa3'] = True
+    return cfg
 
 
 SMOKE_RESUME_SCHEMA = 'e3-single-gpu-smoke-resume-v1'
@@ -721,6 +728,168 @@ def read_bound_json(record):
     return json.loads(raw)
 
 
+DET_FA3_SCHEMA = 'e3-smoke-deterministic-fa3-v1'
+DET_FA3_AUTH = ROOT / 'eval/diag/teacher_deterministic_recovery_authorization_20261102.json'
+DET_FA3_AUTH_SHA256 = 'ea4397d4f9221b86403c0a4c7fad712962f0d24cf6837cce068555c4697b220a'
+DET_FA3_ENV = {'CUBLAS_WORKSPACE_CONFIG': ':4096:8'}
+DET_FA3_FLAGS = {'deterministic_algorithms': True, 'deterministic_warn_only': False,
+                 'cudnn_deterministic': True, 'cudnn_benchmark': False,
+                 'cudnn_allow_tf32': False, 'matmul_allow_tf32': False}
+
+
+def deterministic_asset_record(path):
+    p = Path(path).absolute()
+    require(p.resolve() == p, 'Deterministic backend asset must be a nonsymlink file')
+    before = p.stat()
+    row = m1.file_record(p)
+    after = p.stat()
+    require((before.st_size, before.st_mtime_ns, before.st_ino) ==
+            (after.st_size, after.st_mtime_ns, after.st_ino), 'Deterministic backend asset changed while hashing')
+    return {k: row[k] for k in ('path', 'bytes', 'sha256')}
+
+
+def deterministic_authorization(record=None):
+    actual = deterministic_asset_record(DET_FA3_AUTH)
+    require(actual['sha256'] == DET_FA3_AUTH_SHA256 and
+            (record is None or canonical_json(record) == canonical_json(actual)),
+            'Additional deterministic recovery authorization bytes/hash differ')
+    read_bound_json(actual)
+    return actual
+
+
+def deterministic_fa3_backend(framework):
+    import importlib
+    import inspect
+    import torch
+    root = Path(framework).resolve()
+    require(not torch.cuda.is_initialized(), 'CPU backend identity requires uninitialized CUDA')
+    wan = sys.modules.get('diffsynth.models.wan_video_dit')
+    interface = importlib.import_module('flash_attn_interface')
+    native = importlib.import_module('flash_attn_3._C')
+    require(Path(interface.__file__).resolve() == Path(interface.__spec__.origin).resolve() and
+            Path(native.__file__).resolve() == Path(native.__spec__.origin).resolve() and
+            Path(native.__file__).resolve().parent == Path(interface.__file__).resolve().parent / 'flash_attn_3',
+            'Actual loaded FA3 interface/native origin differs')
+    original = interface.flash_attn_func
+    require(original.__module__ == interface.__name__ and
+            Path(inspect.getsourcefile(original)).resolve() == Path(interface.__file__).resolve(),
+            'FA3 callable is not the actual native interface')
+    param = inspect.signature(original).parameters.get('deterministic')
+    require(param is not None and param.kind in (inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                                                inspect.Parameter.KEYWORD_ONLY),
+            'Actual FA3 API lacks explicit deterministic keyword support')
+    identity = {'backend': 'flash_attn_3', 'interface': deterministic_asset_record(interface.__file__),
+                'native': deterministic_asset_record(native.__file__), 'torch_version': str(torch.__version__)}
+    require(not torch.cuda.is_initialized(), 'FA3 metadata import initialized CUDA')
+    if wan is not None:
+        require(Path(wan.__file__).resolve() == root / 'diffsynth/models/wan_video_dit.py',
+                'Imported wrong native Wan attention module')
+        require(wan.FLASH_ATTN_3_AVAILABLE is True and wan.flash_attn_interface is interface,
+                'Deterministic FA3 cannot fall back to FA2/SAGE/SDPA')
+    else:
+        import subprocess
+        code = '''import contextlib,io,json,sys,torch
+assert not torch.cuda.is_initialized()
+with contextlib.redirect_stdout(io.StringIO()):
+    sys.path.insert(0,sys.argv[1]); sys.path.insert(0,sys.argv[2])
+    import train_e3_lora as tr
+    import diffsynth.models.wan_video_dit as wan
+    identity=tr.deterministic_fa3_backend(sys.argv[2])[3]
+    source=tr.deterministic_asset_record(wan.__file__)
+assert not torch.cuda.is_initialized()
+print(json.dumps(dict(identity=identity,wan_source=source,cuda_initialized=False),sort_keys=True))
+'''
+        env = dict(os.environ, CUDA_VISIBLE_DEVICES='', PYTHONDONTWRITEBYTECODE='1')
+        result = subprocess.run([sys.executable, '-B', '-c', code, str(Path(__file__).parent), str(root)],
+                                env=env, capture_output=True, text=True, timeout=120)
+        require(result.returncode == 0, 'Isolated CPU Wan import failed: ' + result.stderr[-2000:])
+        observed = json.loads(result.stdout)
+        require(set(observed) == {'identity', 'wan_source', 'cuda_initialized'}
+                and observed['cuda_initialized'] is False
+                and canonical_json(observed['identity']) == canonical_json(identity)
+                and canonical_json(observed['wan_source']) == canonical_json(
+                    deterministic_asset_record(root / 'diffsynth/models/wan_video_dit.py')),
+                'Isolated actual Wan/FA3 identity differs')
+    require(not torch.cuda.is_initialized(), 'CPU backend identity initialized parent CUDA')
+    return wan, interface, original, identity
+
+
+def deterministic_flags():
+    import torch
+    return {'deterministic_algorithms': torch.are_deterministic_algorithms_enabled(),
+            'deterministic_warn_only': torch.is_deterministic_algorithms_warn_only_enabled(),
+            'cudnn_deterministic': torch.backends.cudnn.deterministic,
+            'cudnn_benchmark': torch.backends.cudnn.benchmark,
+            'cudnn_allow_tf32': torch.backends.cudnn.allow_tf32,
+            'matmul_allow_tf32': torch.backends.cuda.matmul.allow_tf32}
+
+
+def set_deterministic_flags(flags):
+    import torch
+    torch.use_deterministic_algorithms(flags['deterministic_algorithms'],
+                                       warn_only=flags['deterministic_warn_only'])
+    torch.backends.cudnn.deterministic = flags['cudnn_deterministic']
+    torch.backends.cudnn.benchmark = flags['cudnn_benchmark']
+    torch.backends.cudnn.allow_tf32 = flags['cudnn_allow_tf32']
+    torch.backends.cuda.matmul.allow_tf32 = flags['matmul_allow_tf32']
+
+
+def deterministic_fa3_runtime(args):
+    _, _, _, identity = deterministic_fa3_backend(args.framework)
+    return dict(identity, schema=DET_FA3_SCHEMA, deterministic=True,
+                flags=dict(DET_FA3_FLAGS), environment=dict(DET_FA3_ENV),
+                additional_deterministic_authorization=deterministic_authorization())
+
+
+@contextlib.contextmanager
+def deterministic_fa3_context(args):
+    import torch
+    validate_args(args)
+    require(getattr(args, 'smoke_deterministic_fa3', False), 'Explicit deterministic smoke flag required')
+    require(not torch.cuda.is_initialized(), 'Deterministic environment must precede CUDA setup')
+    env_before = {k: os.environ.get(k) for k in DET_FA3_ENV}
+    flags_before = deterministic_flags()
+    interface = original = wrapper = None
+    try:
+        os.environ.update(DET_FA3_ENV)
+        set_deterministic_flags(DET_FA3_FLAGS)
+        wan, interface, original, identity = deterministic_fa3_backend(args.framework)
+        runtime = dict(identity, schema=DET_FA3_SCHEMA, deterministic=True,
+                       flags=deterministic_flags(), environment={k: os.environ.get(k) for k in DET_FA3_ENV},
+                       additional_deterministic_authorization=deterministic_authorization())
+        require(runtime['flags'] == DET_FA3_FLAGS and runtime['environment'] == DET_FA3_ENV,
+                'Deterministic flags/environment readback differs')
+        def wrapper(*a, **kw):
+            active_wan = sys.modules.get('diffsynth.models.wan_video_dit')
+            require(active_wan is not None
+                    and Path(active_wan.__file__).resolve() == Path(args.framework).resolve() / 'diffsynth/models/wan_video_dit.py'
+                    and active_wan.FLASH_ATTN_3_AVAILABLE is True and active_wan.flash_attn_interface is interface
+                    and interface.flash_attn_func is wrapper and deterministic_flags() == DET_FA3_FLAGS
+                    and {k: os.environ.get(k) for k in DET_FA3_ENV} == DET_FA3_ENV,
+                    'Active deterministic backend/flags/environment drifted')
+            require('deterministic' not in kw or kw['deterministic'] is True,
+                    'Cannot disable deterministic FA3 inside technical context')
+            return original(*a, **dict(kw, deterministic=True))
+        interface.flash_attn_func = wrapper
+        yield runtime
+        active_wan = sys.modules.get('diffsynth.models.wan_video_dit')
+        require((active_wan is None or
+                 (Path(active_wan.__file__).resolve() == Path(args.framework).resolve() / 'diffsynth/models/wan_video_dit.py'
+                  and active_wan.FLASH_ATTN_3_AVAILABLE is True and active_wan.flash_attn_interface is interface))
+                and interface.flash_attn_func is wrapper and deterministic_flags() == DET_FA3_FLAGS
+                and {k: os.environ.get(k) for k in DET_FA3_ENV} == DET_FA3_ENV,
+                'Active deterministic backend/flags/environment drifted')
+    finally:
+        if interface is not None and original is not None:
+            interface.flash_attn_func = original
+        set_deterministic_flags(flags_before)
+        for key, value in env_before.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+
+
 def validate_smoke_resume(args):
     """CPU/raw-byte admission only; never authorizes GPU allocation or formal training."""
     path = getattr(args, 'smoke_resume_proof', None)
@@ -745,6 +914,9 @@ def validate_smoke_resume(args):
     keys = {'schema', 'phase', 'authorization', 'source_run_manifest', 'source_summary', 'checkpoint',
             'source_completed_steps', 'continuation_updates', 'logical_horizon', 'config', 'source',
             'synthetic_inputs_allowed', 'formal_training_allowed'}
+    deterministic = getattr(args, 'smoke_deterministic_fa3', False)
+    if deterministic:
+        keys |= {'additional_deterministic_authorization', 'deterministic_backend'}
     require(isinstance(proof, dict) and set(proof) == keys and proof['schema'] == SMOKE_RESUME_SCHEMA,
             'Versioned source-bound smoke resume proof required')
     require(proof['phase'] == 'single_gpu_training_resume' and proof['synthetic_inputs_allowed'] is True
@@ -755,6 +927,15 @@ def validate_smoke_resume(args):
     manifest = read_bound_json(proof['source_run_manifest'])
     summary = read_bound_json(proof['source_summary'])
     source_dir = Path(proof['source_run_manifest']['path']).parent
+    if deterministic:
+        deterministic_authorization(proof['additional_deterministic_authorization'])
+        backend_row = proof['deterministic_backend']
+        require(canonical_json(backend_row) == canonical_json(manifest.get('deterministic_backend'))
+                and canonical_json(backend_row) == canonical_json(summary.get('deterministic_backend'))
+                and Path(backend_row['path']) == source_dir / 'deterministic_backend.json',
+                'Source deterministic backend record differs')
+        require(canonical_json(read_bound_json(backend_row)) == canonical_json(deterministic_fa3_runtime(args)),
+                'Original/current deterministic backend contract differs')
     require(Path(proof['source_run_manifest']['path']).name == 'run_manifest.json'
             and Path(proof['source_summary']['path']) == source_dir / 'summary.json', 'Source run paths differ')
     prefix, updates = proof['source_completed_steps'], proof['continuation_updates']
@@ -811,12 +992,16 @@ def validate_smoke_resume(args):
     require(ck_path.is_file() and ck_path.stat().st_size == checkpoint['bytes']
             and m1.sha256(ck_path) == checkpoint['file_sha256'], 'Original checkpoint bytes/hash differ')
     verify_base_shards(args.models_dir, hash_content=True)
-    return {'proof': {'path': str(path), 'bytes': len(raw), 'sha256': approved},
+    result = {'proof': {'path': str(path), 'bytes': len(raw), 'sha256': approved},
             'phase': proof['phase'], 'source_run_manifest': proof['source_run_manifest'],
             'source_summary': proof['source_summary'], 'checkpoint': checkpoint,
             'source_completed_steps': prefix, 'continuation_updates': updates,
             'logical_horizon': proof['logical_horizon'], 'frozen_base_sha256': summary['frozen_base_sha256'],
             'formal_training_allowed': False, 'allocation_authorized_by_this_proof': False}
+    if deterministic:
+        result.update(deterministic_backend=proof['deterministic_backend'],
+                      additional_deterministic_authorization=proof['additional_deterministic_authorization'])
+    return result
 
 
 def device_type(comm):
@@ -857,9 +1042,22 @@ def smoke_modes(args, pipe, optimizer, params, samples_fn, order, cfg, comm, all
 
 
 def execute(args):
+    if not getattr(args, 'smoke_deterministic_fa3', False):
+        return _execute(args)
+    validate_args(args)
+    resume = validate_smoke_resume(args)
+    with deterministic_fa3_context(args) as runtime:
+        if resume:
+            require(canonical_json(runtime) == canonical_json(read_bound_json(resume['deterministic_backend'])),
+                    'Active restored deterministic backend differs')
+        return _execute(args, runtime, resume)
+
+
+def _execute(args, deterministic_runtime=None, approved_resume=None):
     started = time.time()
     t_start = time.monotonic()
-    resume = validate_smoke_resume(args)  # All raw-byte/source/phase checks precede any CUDA setup.
+    resume = approved_resume if deterministic_runtime is not None else validate_smoke_resume(args)
+    # All raw-byte/source/phase checks precede any CUDA setup.
     import torch
     if args.smoke and args.synthetic_inputs:
         random.seed(derive_seed('smoke_python', args.seed))
@@ -887,6 +1085,10 @@ def execute(args):
             created = True
             (out / 'private').mkdir(mode=0o700)
             (out / 'export').mkdir(mode=0o700)
+            if deterministic_runtime is not None:
+                backend_path = out / 'deterministic_backend.json'
+                m1.atomic_json(backend_path, deterministic_runtime)
+                summary['deterministic_backend'] = deterministic_asset_record(backend_path)
         comm.barrier()
         if args.synthetic_inputs:
             data = dict(synthetic_data_identity(), samples=list(range(64)))
@@ -918,6 +1120,8 @@ def execute(args):
                         'base_shards': {r: m1.CACHE_PINS[r] for r in SHARD_RELS},
                         'base_shards_hashed': not args.skip_model_hash, 'torch_version': str(torch.__version__),
                         'argv': sys.argv[1:]}
+            if deterministic_runtime is not None:
+                manifest['deterministic_backend'] = summary['deterministic_backend']
             m1.atomic_json(out / 'run_manifest.json', json_safe(manifest))
             log, log_file = progress_writer(out / 'progress.jsonl')
         else:
@@ -1047,6 +1251,8 @@ def parser():
     p.add_argument('--smoke-steps', type=int, default=4)
     p.add_argument('--smoke-offload', type=lambda s: s.split(','), default=['on', 'off'])
     p.add_argument('--synthetic-inputs', action='store_true', help='smoke only: random shape-exact inputs')
+    p.add_argument('--smoke-deterministic-fa3', action='store_true',
+                   help='opt-in single-GPU synthetic smoke: same native FA3, explicit deterministic backward')
     p.add_argument('--smoke-resume-proof', type=Path, help='immutable single-GPU synthetic smoke continuation JSON only')
     p.add_argument('--approved-smoke-resume-sha256', help='explicitly approved full SHA256 of smoke resume proof')
     p.add_argument('--target-gpu-hours', type=float, default=24.0)

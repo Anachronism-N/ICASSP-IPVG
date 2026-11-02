@@ -129,7 +129,7 @@ class ExportSnapshotTests(unittest.TestCase):
         self.assertEqual(actual, set(self.files) | {
             "PUBLICATION_MANIFEST.json", "PUBLICATION.md", ".gitignore"})
         self.assertFalse((self.destination / ".git").exists())
-        self.assertEqual({record["path"] for record in scope["files"]}, set(self.files))
+        self.assertEqual({record["path"] for record in scope["files"]}, set(self.files) | {"PUBLICATION.md"})
         for relative in excluded:
             self.assertFalse((self.destination / relative).exists())
         self.assertEqual(scope["experiment_progress"], {
@@ -144,8 +144,9 @@ class ExportSnapshotTests(unittest.TestCase):
         for record in scope["files"]:
             relative = record["path"]
             exported = (self.destination / relative).read_bytes()
-            self.assertEqual(exported, originals[relative])
-            self.assertEqual(record["source_sha256"], hashlib.sha256(originals[relative]).hexdigest())
+            original = exported if relative == "PUBLICATION.md" else originals[relative]
+            self.assertEqual(exported, original)
+            self.assertEqual(record["source_sha256"], hashlib.sha256(original).hexdigest())
             self.assertEqual(record["snapshot_sha256"], hashlib.sha256(exported).hexdigest())
         self.assertEqual(json.loads((self.destination / "PUBLICATION_MANIFEST.json").read_text()), scope)
 

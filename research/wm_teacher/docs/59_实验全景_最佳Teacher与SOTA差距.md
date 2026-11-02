@@ -1,3 +1,4 @@
+
 # 59 实验全景、最佳 Teacher 与 SOTA 差距
 
 > 更新：2026-11-02。依据原始评分、当前源码和本次重新读取的官方公开表。
@@ -181,7 +182,11 @@ WM22四容忍护栏通过不表示全部质量提升。实际29.583832085GPUh≤
 
 v3修复了索引、无依据mostly-still短句兜底、主体动作归属提示和帧元数据拒绝；112CPU+独立76mock/3CLI通过，不证明新标签视觉已好。用户已批一次同16例恢复各node810秒，所有原费用+新3240秒≤原1GPUhpilot，仍须新freeze/发布/实际生成/独立语义审阅。
 
-单卡恢复CLI的CPU4reference对prefix2+freshprocess2全adapter/AdamW/RNG/顺序精确相同，共8次tiny CPU更新。未来实机协议仍未运行，成功费用闭合保守记满7200秒=2GPUh上界，不是CPU实测GPU费用；没有native80.6M CUDA/full尺寸/NCCL证据。完整费用监督旧版被独立反例阻止准入，已修pretry失败/成本尾部并做22+6CPU回归，仍须新source/发布/真实执行门。
+单卡恢复CLI的CPU4reference对prefix2+freshprocess2全adapter/AdamW/RNG/顺序精确相同，共8次tiny CPU更新。后续2026-11-02已实际执行全尺寸80.6M LoRA：reference4、prefix2、freshresume2全部更新并保存，三个CUDA进程、基座不变、prefix checkpoint加载状态精确恢复；但reference/prefix首步backward梯度诊断已不同，最终adapter/AdamW轨迹不精确一致，**技术验收FAIL**，没有成功cost.closure。实际已观测611.482715秒，费用仍保守上界7200秒=2GPUh，不自动退款/重试/放宽容差。原完整费用监督两漏洞已修，不以22+6CPU通过冒实机成功。
+
+只读根因定位：原生FA3优先路径没有显式deterministic backward，接口默认False，符合forward loss相同但backward梯度不同的观测；不是独立GPU A/B证明某个atomic kernel唯一致因。三checkpoint RNG精确一致，LoRA B最终相对L2差8.3918%、Adam一/二阶moment相对差52.3%/74.2%，不能以全adapter总体0.12%的差掩盖B或optimizer变化。新技术专用确定性修复和一次额外有界2GPUh正在准备，旧失败和费用保留，不借标签/多节点预算。
+
+一次v3已实际结束：15结构标签+1错误；独立AI8抽帧审阅3 adequate/11 needs_edit/1 uncertain，训练语义仍未批准。用户选择换更强标注器新pilot；实际Qwen3-VL-32B-Instruct BF16 14分片62.133GiB，rank1当前完整24加载资产流式SHA已核，补README后25资产proof绑定。下一固定rank1四卡/16帧/32病例（16诊断+16盲抽）标签pilot预算2GPUh计原24GPUh，图像再次参与caption生成，实体ID分别绑定持物和事件。仅更大模型、CPU处理或资产存在不证明语义质量提升，仍须一次实际生成及独立盲审。
 
 **没有新Teacher训练后bench结果；工程测试、标签结果不代替SOTA证据。**
 
