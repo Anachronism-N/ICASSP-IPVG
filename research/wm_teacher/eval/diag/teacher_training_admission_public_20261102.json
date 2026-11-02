@@ -1,0 +1,86 @@
+{
+  "schema": "teacher_training_admission_progress_public_v1",
+  "date": "2026-11-02",
+  "goal": "Improve one bidirectional Wan2.2-TI2V5B Teacher; comparable SOTA evidence still required",
+  "resources": {
+    "nodes_dedicated": 4,
+    "GPUs_available": 32,
+    "other_business_jobs_cleaned": 13,
+    "only_verified_business_roots_stopped": true,
+    "system_control_mounts_preserved": true
+  },
+  "authorized_phase_caps_GPUh": {
+    "label_rebuild_and_cache": 24,
+    "single_gpu_training_resume": 2,
+    "multi_node_technical_validation": 6
+  },
+  "total_cap_GPUh": 32,
+  "phase_borrowing_allowed": false,
+  "formal_candidate_training_budget_approved": false,
+  "old_training_records": {
+    "records": 1856,
+    "v1_records": 1856,
+    "current_v2_records_proven": 0,
+    "schema_valid": 1249,
+    "schema_invalid": 607,
+    "duplicate_ids": 0,
+    "independent_semantic_review_proven": false
+  },
+  "actual_Qwen_model_content": {
+    "nodes_verified": 4,
+    "files_each": 14,
+    "bytes_each": 16595961188,
+    "weight_shards_each": 5,
+    "common_content_sha256": "b400159941dc7fcc823a66641f0e6fcc7c928fa9831cea540ad942d09fa8d617",
+    "new_remote_directories_staged_from_verified_local_source": true,
+    "CUDA_initialized": false
+  },
+  "label_pilot": {
+    "selected": 16,
+    "selection_seed": 20261101,
+    "scores_used_for_selection": false,
+    "metadata_eligible": 1815,
+    "metadata_excluded": 41,
+    "metadata_safety_is_visual_truth": false,
+    "GPUs_per_node": 1,
+    "jobs_per_node": 4,
+    "hard_cap_seconds_per_node": 900,
+    "total_pilot_cap_GPUh": 1,
+    "charged_to_phase": "label_rebuild_and_cache",
+    "labels_completed": 0,
+    "semantic_review_pass": false,
+    "formal_training_allowed": false
+  },
+  "CPU_training_components": {
+    "topology_four_nodes_eight_GPUs_each": 32,
+    "host_local_elapsed_MAX_sync": true,
+    "absolute_cross_host_monotonic_broadcast_removed": true,
+    "four_node_CUDA_runtime_allowed": false,
+    "missing_gates": [
+      "Actual NCCL four-node technical validation",
+      "Independent all-rank resume state and next-step trajectory evidence",
+      "Bounded pre-spawn through final-release allocation ledger",
+      "Validated v2 training labels/cache and independent semantic review",
+      "Frozen formal candidate training budget"
+    ]
+  },
+  "CPU_pilot_safety_repairs": [
+    "Exact five model shards plus nine config/tokenizer files bound to the actual loading root",
+    "Actual worker ancestry includes approved parent PID/start/session and fixed GPU0 lease/state path",
+    "Repeated TERM/INT latched through owned cleanup and cost receipt saving",
+    "Separate final cost record includes parent-save overhead"
+  ],
+  "real_GPU_pilot_started": false,
+  "real_training_started": false,
+  "quality_pass": false,
+  "SOTA_proven": false,
+  "AR_allowed": false,
+  "student_distillation_allowed": false,
+  "caveat": "Metadata, model bytes and CPU tests are not caption visual correctness, validated training labels, successful CUDA training or SOTA. All real pilot/technical work is bounded within the explicitly approved separate stages.",
+  "related_CPU_tests": {
+    "passed": 151,
+    "failed": 0,
+    "exit_code": 0,
+    "scope": "Label CPU metadata/reservation,13 real-pilot CPU gates,33 trainer CPU/Gloo tests, recaption parser and export contracts"
+  }
+}

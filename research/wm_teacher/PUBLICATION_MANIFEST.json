@@ -48,8 +48,8 @@
     },
     {
       "path": "docs/31_服务器迁移与CodingAgent交接.md",
-      "source_sha256": "e803ebfd18dcabde1bf5201d157d4928187728b795a4251beaec4f9ba7492591",
-      "snapshot_sha256": "c5aec0e64d5dd518d38e7e0bfc97e7760b1b544f8f4a1518503f49a5867da024"
+      "source_sha256": "32fc3a1e7f1d0ec5b7eac25fedb4aa461d599c0f8562f6417958d0c732b83ae9",
+      "snapshot_sha256": "3ea0f54554a8f90987fcf1468cecfe1506f872974089afa4421c6c1f5fa4a230"
     },
     {
       "path": "patches/diffsynth_studio_fb337fb.patch",
@@ -108,8 +108,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "77b63769a54568985d6018f60a8fd1af174fb5d5e933a5d83d092736f34821e9",
-      "snapshot_sha256": "77b63769a54568985d6018f60a8fd1af174fb5d5e933a5d83d092736f34821e9"
+      "source_sha256": "9cf098938f46e231970b39d0f4457864d86a4c6f102bce0825bfc30e3381a950",
+      "snapshot_sha256": "9cf098938f46e231970b39d0f4457864d86a4c6f102bce0825bfc30e3381a950"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -674,8 +674,8 @@
     },
     {
       "path": "scripts/train_e3_lora.py",
-      "source_sha256": "257c87f8fe72c0a47ad394b95ee7ec6e02b800d1f363ac2878178087bcda0e70",
-      "snapshot_sha256": "257c87f8fe72c0a47ad394b95ee7ec6e02b800d1f363ac2878178087bcda0e70"
+      "source_sha256": "f6dcfd71c281ad4ead4feae3f3b0a4963c2cece784f1d8f1110ad55f63ddfcfb",
+      "snapshot_sha256": "f6dcfd71c281ad4ead4feae3f3b0a4963c2cece784f1d8f1110ad55f63ddfcfb"
     },
     {
       "path": "scripts/recaption_e3.py",
@@ -689,8 +689,8 @@
     },
     {
       "path": "tests/test_e3_train.py",
-      "source_sha256": "d456cd0648cd2c225d44ccba33fcc9e8b0534be937540cbd4ff8d099b4a98332",
-      "snapshot_sha256": "d456cd0648cd2c225d44ccba33fcc9e8b0534be937540cbd4ff8d099b4a98332"
+      "source_sha256": "1445ad9ad32d9fcd7d29ca40da52793e868c9a1f85be86ad028964c90e294648",
+      "snapshot_sha256": "1445ad9ad32d9fcd7d29ca40da52793e868c9a1f85be86ad028964c90e294648"
     },
     {
       "path": "tests/test_recaption_e3.py",
@@ -1116,6 +1116,71 @@
       "path": "eval/diag/teacher_once_failure_public_20261029.json",
       "source_sha256": "af2f3bcd9012dfef1cdc8c8359b459736ad0f7897d67d17ecfe665878a261558",
       "snapshot_sha256": "af2f3bcd9012dfef1cdc8c8359b459736ad0f7897d67d17ecfe665878a261558"
+    },
+    {
+      "path": "eval/diag/teacher_training_admission_public_20261102.json",
+      "source_sha256": "26c4b48b0b79d1daf88fc0a3371e8e7f47e296c77b6f5eadf5d5f852758019aa",
+      "snapshot_sha256": "26c4b48b0b79d1daf88fc0a3371e8e7f47e296c77b6f5eadf5d5f852758019aa"
+    },
+    {
+      "path": "scripts/prepare_teacher_label_admission.py",
+      "source_sha256": "1721dbf43b68d289a15145f86bd16a5815ce729eaf282072c536f7b00a91f350",
+      "snapshot_sha256": "1721dbf43b68d289a15145f86bd16a5815ce729eaf282072c536f7b00a91f350"
+    },
+    {
+      "path": "tests/test_prepare_teacher_label_admission.py",
+      "source_sha256": "743cad8032707896e40fa29f3324bdeefaa6a00348a8c1bc7de0e686f2ad9629",
+      "snapshot_sha256": "743cad8032707896e40fa29f3324bdeefaa6a00348a8c1bc7de0e686f2ad9629"
+    },
+    {
+      "path": "scripts/run_teacher_label_admission.py",
+      "source_sha256": "a1540d6461787b85f69ee822aab856e301002553edeb036594be517f3a9829a8",
+      "snapshot_sha256": "a1540d6461787b85f69ee822aab856e301002553edeb036594be517f3a9829a8"
+    },
+    {
+      "path": "tests/test_run_teacher_label_admission.py",
+      "source_sha256": "dbdf29bb7d0371e8d22e360a8c73713c32f4405191d8757e4268209d733273f5",
+      "snapshot_sha256": "dbdf29bb7d0371e8d22e360a8c73713c32f4405191d8757e4268209d733273f5"
+    },
+    {
+      "path": "scripts/run_teacher_label_pilot.py",
+      "source_sha256": "a0b918cbd87ab8ae0a05613b75e59b4b33137b11b1d546c89fc6b0512e77e35d",
+      "snapshot_sha256": "a0b918cbd87ab8ae0a05613b75e59b4b33137b11b1d546c89fc6b0512e77e35d"
+    },
+    {
+      "path": "tests/test_teacher_label_pilot.py",
+      "source_sha256": "d7443d386992eb333f17f0077dfbeae35c6f77afd495a0a7b60c954d8f4e76ff",
+      "snapshot_sha256": "d7443d386992eb333f17f0077dfbeae35c6f77afd495a0a7b60c954d8f4e76ff"
+    },
+    {
+      "path": "scripts/prepare_teacher_training_admission.py",
+      "source_sha256": "71fa4b0f816e443c4435204858a5791c340b9f608416d5058dd4ee58ffb29c3d",
+      "snapshot_sha256": "71fa4b0f816e443c4435204858a5791c340b9f608416d5058dd4ee58ffb29c3d"
+    },
+    {
+      "path": "tests/test_teacher_training_admission.py",
+      "source_sha256": "1e21b40e21bb2b4a03a3aa30a14d73b9707477a87a3317feb215111a60851d90",
+      "snapshot_sha256": "1e21b40e21bb2b4a03a3aa30a14d73b9707477a87a3317feb215111a60851d90"
+    },
+    {
+      "path": "scripts/cache_e3_inputs.py",
+      "source_sha256": "2a78e5644be71d7019080c7259daff0ab71a065e6d1bb04427ca5a2d6942e074",
+      "snapshot_sha256": "2a78e5644be71d7019080c7259daff0ab71a065e6d1bb04427ca5a2d6942e074"
+    },
+    {
+      "path": "scripts/merge_e3_lora.py",
+      "source_sha256": "eaec3561484d51627a51a5aaa0cd1a6060348641c2ce478ba633ba61b399a4a0",
+      "snapshot_sha256": "eaec3561484d51627a51a5aaa0cd1a6060348641c2ce478ba633ba61b399a4a0"
+    },
+    {
+      "path": "DiffSynth-Studio/diffsynth/utils/lora/general.py",
+      "source_sha256": "b061015a749616e52113e77df2d397e2990b052c65f421f8c9d607cf94529b67",
+      "snapshot_sha256": "b061015a749616e52113e77df2d397e2990b052c65f421f8c9d607cf94529b67"
+    },
+    {
+      "path": "DiffSynth-Studio/diffsynth/core/gradient/gradient_checkpoint.py",
+      "source_sha256": "00f33981e4ac155d1ae757de2765703cd4881775b9cf8360627c709d631c2b21",
+      "snapshot_sha256": "00f33981e4ac155d1ae757de2765703cd4881775b9cf8360627c709d631c2b21"
     }
   ],
   "experiment_progress": {
@@ -1246,5 +1311,5 @@
     "parent_source_disjointness_confirmed": false,
     "training_started": false
   },
-  "latest_increment_scope": "Actual one-recovery canary failures and charged costs; no further retry or full quality acceptance"
+  "latest_increment_scope": "New separately authorized24+2+6 GPUh training admission; real four-node label pilot, CPU topology/clock repairs; no completed training or semantic/SOTA claim"
 }

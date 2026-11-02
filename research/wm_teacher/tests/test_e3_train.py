@@ -159,6 +159,46 @@ class Base(unittest.TestCase):
         cls.torch = torch
 
 
+class TopologyTests(unittest.TestCase):
+    def test_legacy_and_explicit_four_node_topology(self):
+        for world in range(1, 9):
+            for rank in range(world):
+                env = {'WORLD_SIZE': str(world), 'LOCAL_WORLD_SIZE': str(world),
+                       'RANK': str(rank), 'LOCAL_RANK': str(rank)}
+                self.assertEqual(tr.validate_topology(env, visible_devices=world)['nnodes'], 1)
+        for rank in range(32):
+            env = {'WORLD_SIZE': '32', 'LOCAL_WORLD_SIZE': '8', 'RANK': str(rank),
+                   'LOCAL_RANK': str(rank % 8), 'GROUP_RANK': str(rank // 8), 'NNODES': '4'}
+            with self.assertRaises(ValueError):
+                tr.validate_topology(env)
+            topo = tr.validate_topology(env, teacher_four_node_admission=True, visible_devices=8)
+            self.assertEqual((topo['node_rank'], topo['world_size']), (rank // 8, 32))
+        self.assertEqual(tr.budget(6, 32, 60, 240, 120, teacher_four_node_admission=True)['wall_seconds'], 675)
+        with self.assertRaises(ValueError):
+            tr.budget(6, 32, 60, 240, 120)
+
+    def test_rank_node_mapping_world_and_local_visibility_are_strict(self):
+        good = {'WORLD_SIZE': '32', 'LOCAL_WORLD_SIZE': '8', 'RANK': '17',
+                'LOCAL_RANK': '1', 'GROUP_RANK': '2', 'NNODES': '4'}
+        for key, value in [('RANK', '-1'), ('RANK', '32'), ('RANK', '9'), ('LOCAL_RANK', '8'),
+                           ('GROUP_RANK', '1'), ('NODE_RANK', '1'), ('NNODES', '2'),
+                           ('LOCAL_WORLD_SIZE', '4'), ('WORLD_SIZE', '16')]:
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                tr.validate_topology(dict(good, **{key: value}), teacher_four_node_admission=True, visible_devices=8)
+        with self.assertRaises(ValueError):
+            tr.validate_topology(good, teacher_four_node_admission=True, visible_devices=7)
+        del good['GROUP_RANK']
+        with self.assertRaises(ValueError):
+            tr.validate_topology(good, teacher_four_node_admission=True)
+
+    def test_clock_offsets_cancel_only_with_own_host_start(self):
+        self.assertEqual(tr.local_duration(100, 115), tr.local_duration(900000100, 900000115))
+        self.assertEqual(tr.Comm().max_duration(15), 15)
+        for started, now in [(5, 4), (float('nan'), 5)]:
+            with self.assertRaises(ValueError):
+                tr.local_duration(started, now)
+
+
 class DeterminismTests(Base):
     def test_t_noise_deterministic_and_independent_of_global_rng(self):
         torch = self.torch
@@ -423,8 +463,12 @@ class LoopTests(Base):
                 "pipe = T.build_tiny_pipe(dtype=torch.float32); T.perturb_lora_b(pipe.dit, seed=int(sys.argv[2]) + 50)\n"
                 "params = tr.adapter_list(pipe.dit); comm = tr.Comm(dist, int(sys.argv[2]), 2, 'cpu'); comm.broadcast_(params)\n"
                 "opt = torch.optim.AdamW(params, lr=5e-3, weight_decay=0.01)\n"
-                "s = time.monotonic()\n"
-                "done, recs, stop = tr.run_loop(pipe, opt, params, T.tiny_sample_fp32, tr.DataOrder(11, 5), T.cfg(max_steps=3, anchor_lambda=0.2), comm, tr.budget(1, 2, 1, 1, 0.01), lambda: time.monotonic() - s, None)\n"
+                "offset = int(sys.argv[2]) * 100000000; s = time.monotonic() + offset\n"
+                "assert comm.max_duration(20 + int(sys.argv[2])) == 21\n"
+                "done, recs, stop = tr.run_loop(pipe, opt, params, T.tiny_sample_fp32, tr.DataOrder(11, 5), T.cfg(max_steps=3, anchor_lambda=0.2), comm, tr.budget(1, 2, 1, 1, 0.01), lambda: tr.local_duration(s, time.monotonic() + offset), None)\n"
+                "assert all(0 <= r['elapsed_seconds'] < 300 for r in recs)\n"
+                "blocked, empty, reason = tr.run_loop(pipe, opt, params, T.tiny_sample_fp32, tr.DataOrder(11,5), T.cfg(max_steps=1), comm, tr.budget(1,2,1,1,0.01), lambda: 4000 * int(sys.argv[2]), None)\n"
+                "assert (blocked, empty, reason) == (0, [], 'budget_exhausted_before_max_steps')\n"
                 "torch.save({k: v.detach() for k, v in tr.ts.trainable_adapters(pipe.dit).items()}, sys.argv[3])\n"
                 "json.dump([r['per_rank'] for r in recs], open(sys.argv[3] + '.json', 'w'))\n"
                 "dist.destroy_process_group()\n") % (str(SCRIPTS), str(Path(__file__).resolve().parent))
@@ -758,6 +802,8 @@ class CliTests(unittest.TestCase):
                                     '--max-gpu-hours', 'nan'], 1),
                  ('train_e3_lora', ['--out-dir', '/tmp/never_e3', '--max-steps', '50', '--cache-index', '/x', '--caption-version', 'a',
                                     '--max-gpu-hours', '999'], 1),
+                 ('train_e3_lora', ['--out-dir', '/tmp/never_e3', '--max-gpu-hours', '6',
+                                    '--smoke', '--synthetic-inputs', '--teacher-four-node-admission'], 1),
                  ('cache_e3_inputs', ['--help'], 0), ('merge_e3_lora', ['--help'], 0)]
         for mod, argv, expected in cases:
             code = ("import %s as r, sys\ntry: rc=r.main(sys.argv[1:])\nexcept SystemExit as e: rc=e.code\n"

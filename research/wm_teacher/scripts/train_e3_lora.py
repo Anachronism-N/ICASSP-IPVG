@@ -110,10 +110,11 @@ def lr_factor(update, warmup, horizon):
 
 # ----------------------------------------------------------------------------- budget
 
-def budget(max_gpu_hours, world, grace, save_reserve, first_step_estimate):
+def budget(max_gpu_hours, world, grace, save_reserve, first_step_estimate, *, teacher_four_node_admission=False):
     vals = (max_gpu_hours, grace, save_reserve, first_step_estimate)
     require(all(type(v) in (int, float) and math.isfinite(v) and v > 0 for v in vals), 'Finite positive budget values required')
-    require(type(world) is int and 1 <= world <= 8, 'Single node: world size 1..8')
+    allowed = type(world) is int and (1 <= world <= 8 or (teacher_four_node_admission and world == 32))
+    require(allowed, 'Single node: world size 1..8; explicit Teacher admission permits 4x8 only')
     require(max_gpu_hours <= MAX_GPU_HOURS_CAP, 'max-gpu-hours exceeds hard cap')
     wall = max_gpu_hours * 3600.0 / world
     require(grace < wall / 4 and save_reserve < wall / 2, 'Grace/save reserve too large for the wall budget')
@@ -309,6 +310,15 @@ class Comm:
         import torch
         t = torch.tensor([float(value)], dtype=torch.float64, device=self.device)
         self.dist.broadcast(t, src)
+        return float(t.item())
+
+    def max_duration(self, value):
+        require(type(value) in (int, float) and math.isfinite(value) and value >= 0, 'Invalid local duration')
+        if self.world == 1:
+            return float(value)
+        import torch
+        t = torch.tensor([float(value)], dtype=torch.float64, device=self.device)
+        self.dist.all_reduce(t, op=self.dist.ReduceOp.MAX)
         return float(t.item())
 
     def barrier(self):
@@ -560,20 +570,22 @@ def run_loop(pipe, optimizer, params, samples_fn, order, cfg, comm, allocation, 
     records, estimate, stop, window = [], allocation['first_step_estimate_seconds'], None, []
     for k in range(steps):
         step = step_offset + k
-        decision = comm.rank == 0 and should_stop(clock(), estimate, allocation)
+        elapsed = comm.max_duration(clock())
+        decision = should_stop(elapsed, estimate, allocation)
         if comm.any_flag(decision):
             stop = 'budget_exhausted_before_max_steps'
             break
         t_iter = time.perf_counter()
         index = order.index(step, comm.rank, comm.world)
         stats = train_step(pipe, params, optimizer, samples_fn(index), step, index, cfg, comm, autocast, tolerate_oom)
-        stats['elapsed_seconds'] = clock()
+        stats['elapsed_seconds'] = comm.max_duration(clock())
         if stats['status'] == 'oom':
             stop = 'oom'
             records.append(stats)
             break
         stats['iteration_seconds_rank0'] = time.perf_counter() - t_iter
-        observed = max(stats['iteration_seconds_rank0'], stats['step_seconds_max'])
+        stats['iteration_seconds_max'] = comm.max_duration(stats['iteration_seconds_rank0'])
+        observed = max(stats['iteration_seconds_max'], stats['step_seconds_max'])
         estimate = observed if k == 0 else max(estimate, observed)
         window.append(stats['loss_total_mean'])
         records.append(stats)
@@ -583,13 +595,45 @@ def run_loop(pipe, optimizer, params, samples_fn, order, cfg, comm, allocation, 
     return len([r for r in records if r['status'] == 'ok']), records, stop
 
 
-def setup_distributed():
+def validate_topology(env=None, *, teacher_four_node_admission=False, visible_devices=None):
+    env = os.environ if env is None else env
+    world = int(env.get('WORLD_SIZE', '1'))
+    rank = int(env.get('RANK', '0'))
+    local = int(env.get('LOCAL_RANK', '0'))
+    local_world = int(env.get('LOCAL_WORLD_SIZE', str(world)))
+    require(1 <= local_world <= 8 and world > 0 and world % local_world == 0, 'Invalid local/global world size')
+    nnodes = world // local_world
+    require((nnodes == 1 and 1 <= world <= 8) or
+            (teacher_four_node_admission and nnodes == 4 and local_world == 8 and world == 32),
+            'Allowed topology: one node 1..8 ranks, or explicit Teacher admission four nodes x eight ranks')
+    require(int(env.get('NNODES', str(nnodes))) == nnodes, 'NNODES differs from world/local world')
+    require(0 <= rank < world and 0 <= local < local_world, 'Rank out of range')
+    if nnodes > 1:
+        require('GROUP_RANK' in env or 'NODE_RANK' in env, 'Explicit torchrun node rank required')
+    node_rank = int(env.get('GROUP_RANK', env.get('NODE_RANK', '0')))
+    require(int(env.get('NODE_RANK', str(node_rank))) == node_rank, 'Node rank declarations differ')
+    require(0 <= node_rank < nnodes and rank == node_rank * local_world + local, 'Foreign rank/node/local mapping')
+    if visible_devices is not None:
+        require(type(visible_devices) is int and visible_devices >= local_world, 'Need one visible GPU per local rank')
+    return {'nnodes': nnodes, 'local_world_size': local_world, 'world_size': world,
+            'rank': rank, 'local_rank': local, 'node_rank': node_rank}
+
+
+def local_duration(started_monotonic, now_monotonic):
+    require(all(type(v) in (int, float) and math.isfinite(v) for v in (started_monotonic, now_monotonic)),
+            'Finite same-host monotonic timestamps required')
+    elapsed = now_monotonic - started_monotonic
+    require(elapsed >= 0, 'Monotonic timestamps must belong to the same host/clock')
+    return elapsed
+
+
+def setup_distributed(*, teacher_four_node_admission=False):
+    topology = validate_topology(teacher_four_node_admission=teacher_four_node_admission)
+    require(topology['nnodes'] == 1, 'BLOCKED: four-node runtime needs real NCCL/all-rank resume/allocation proofs')
     import torch
-    world = int(os.environ.get('WORLD_SIZE', '1'))
-    rank = int(os.environ.get('RANK', '0'))
-    local = int(os.environ.get('LOCAL_RANK', '0'))
-    require(world == int(os.environ.get('LOCAL_WORLD_SIZE', str(world))), 'Single node only')
-    require(torch.cuda.is_available() and torch.cuda.device_count() >= world, 'Need one visible GPU per rank')
+    world, rank, local = topology['world_size'], topology['rank'], topology['local_rank']
+    require(torch.cuda.is_available(), 'CUDA required')
+    validate_topology(teacher_four_node_admission=teacher_four_node_admission, visible_devices=torch.cuda.device_count())
     torch.cuda.set_device(local)
     device = torch.device('cuda', local)
     if world == 1:
@@ -601,6 +645,8 @@ def setup_distributed():
 
 
 def validate_args(args):
+    require(not getattr(args, 'teacher_four_node_admission', False),
+            'BLOCKED: four-node admission is CPU planning only; real NCCL/all-rank resume/data/budget review required')
     require(math.isfinite(args.anchor_lambda) and args.anchor_lambda >= 0, 'anchor-lambda must be finite >=0')
     require(args.lr > 0 and args.weight_decay >= 0 and args.clip > 0 and args.warmup >= 0, 'Bad optimizer settings')
     require(args.log_every >= 1 and args.component_grad_every >= 1 and args.load_concurrency >= 1, 'Bad cadence settings')
@@ -665,8 +711,8 @@ def execute(args):
     comm = setup_distributed()
     allocation = budget(args.max_gpu_hours, comm.world, args.cleanup_grace_seconds, args.save_reserve_seconds,
                         args.first_step_estimate_seconds)
-    t0 = comm.broadcast_float(t_start)  # CLOCK_MONOTONIC is host-wide; all ranks charge from rank0 start
-    clock = lambda: time.monotonic() - t0  # noqa: E731
+    # Absolute monotonic timestamps are never comparable across hosts.
+    clock = lambda: local_duration(t_start, time.monotonic())  # noqa: E731
     out = Path(args.out_dir).absolute()
     summary = {'protocol': PROTOCOL, 'status': 'failed', 'mode': 'smoke' if args.smoke else 'train',
                'allocation': allocation, 'started_unix': started}
@@ -778,7 +824,9 @@ def execute(args):
         wall = clock() + 1.0  # publication allowance
         summary['ledger'] = {'cards': comm.world, 'wall_seconds': wall, 'gpu_hours': wall * comm.world / 3600.0,
                              'budget_gpu_hours': allocation['max_gpu_hours'], 'within_budget': wall <= allocation['wall_seconds'],
-                             'accounting': 'world x wall from rank0 trainer start (hash/load/train/save/verify) + 1s; torchrun spawn excluded'}
+                             'complete_allocation_accounting_proven': False,
+                             'accounting': 'trainer-process bound only (setup/rendezvous/hash/load/train/save/verify) + 1s; '
+                                           'external allocation supervisor must additionally charge spawn and final cleanup'}
         if not summary['ledger']['within_budget']:
             summary['status'] = 'failed'
         if comm.rank == 0 and created:
@@ -822,12 +870,15 @@ def parser():
     p.add_argument('--synthetic-inputs', action='store_true', help='smoke only: random shape-exact inputs')
     p.add_argument('--target-gpu-hours', type=float, default=24.0)
     p.add_argument('--target-world', type=int, default=8)
+    p.add_argument('--teacher-four-node-admission', action='store_true',
+                   help='reserved explicit 4x8 topology; CPU prepare only, CUDA execution remains BLOCKED')
     return p
 
 
 def main(argv=None):
     args = parser().parse_args(argv)
     try:
+        validate_topology(teacher_four_node_admission=args.teacher_four_node_admission)
         validate_args(args)
         budget(args.max_gpu_hours, int(os.environ.get('WORLD_SIZE', '1')), args.cleanup_grace_seconds,
                args.save_reserve_seconds, args.first_step_estimate_seconds)

@@ -1,3 +1,33 @@
+# 当前32GPUh训练准入实证（2026-11-02，标签pilot执行前）
+
+用户批准新的独立32GPUh阶段：标签重建/缓存24、单GPU训练与恢复2、多节点技术验证6，不挪阶段；四节点专用当前Teacher，其他业务13个任务/看护已清理，无数据模型文件删除，不杀平台/SSH/挂载/当前控制。目标超过同协议SOTA尚无直接证据；不因Goal要求跳过训练数据语义门、预算或AR/Student/蒸馏门。
+
+- 真实Qwen模型已在四节点各14文件（5权重分片＋9配置/tokenizer）当前流式SHA核验，统一内容digest b400159941dc7fcc823a66641f0e6fcc7c928fa9831cea540ad942d09fa8d617，各16595961188字节。三远端初查无模型目录，新部署自rank0已核本地副本后再次SHA全部通过，不靠共享盘直接载权重。
+- 原1856标签全部v1，607结构拒绝/1249结构通过，独立语义review未证明。新CPUdraft16pilot metadata安全预筛1815合格/41排除，seed20261101在未看模型分数前固定；不把metadata筛查当视觉gold。
+- 实际新run_teacher_label_pilot.py独占pilot16（四节点各1GPU4例，cap900秒总1GPUh计入label24），原recaption v2/helper完整8帧与typed facts；原视频SHA和本地媒体copy、精确Qwen root/14asset集合、模型proof/当前runtime/source、live原父祖先与固定GPU0 lease、freshchildsession/dispatch、重复TERM只latched不打断清理、最终cost含保存均强制。任何缺schema/unsafe输出失败留记录，不创造semanticreview。
+- 独立窄Read指出三实际风险（核A载B、缺exact祖先、重复TERM打断清理），均已最小修复；新增真实harmlessCPU child清理中向本parent发送二次TERM仍reap且cost/receipt持久，modelroot缺/替换/partial和分离祖先均拒。最终相关151CPU测试通过，包含草稿60、trainer33、pilot13/原解析器与导出契约；不是CUDA已成功或正式训练开始。
+- train_e3_lora纯拓扑已支持验证显式4×8=32，host-local MAX elapsed替代跨host绝对mono广播，各rank一致预算停步；真实四节点CUDA入口仍blocked（缺NCCL/全rank恢复/allallocatedclosure证据）。single-node技术smoke入口保持，4update必须smoke-offload on，2GPUh独立预算；不能用默认on,off跑8update冒4。
+- 真实新pilot plan.final.json已CPU构造SHAce3bc77a5bb6f8c9c38c4545e63acc144321aff1d8e564743b02fc2e9d192fa5，16 selected源视频内容已核。四节点CPUstage正在独立本地copy＋actualQwen/runtime/source检查，不初始GPU。旧plan.json冻结只历史预版本，不复用其旧sourceSHA。
+- 正式GPU标签pilot必须完整公开source/test/脱敏/远端字节门通过，再明确approvedplan运行；pilot之后真实cost/全部records/full schema覆盖/失败/释放核后决定24阶段剩余能否全标签/缓存，独立semanticreview未通过仍不正式训练。任何参数或sample数不因结果而改，不能把16条表现当1856泛化。
+
+本段只是当前本地交接；发布后以新commit/manifest及远端回执为准，不把写出当发布。权重、原提示词/病例ID、媒体、rawlog不公开。
+
+---
+
+# 当前四节点专用训练准备（2026-11-01）
+
+用户明确要求清理其他进程、四节点全部用于当前World Model实验，并先报告训练前进度/规划；持续目标为超过SOTA，但不绕过数据/预算/质量门。已在实际四节点停止13个已确认的其他业务及专属看护：四stage2 supervisord、两个relay、review服务及其shell；复查发现另一个旧CodeBuddy会话自动重启review，核实不是当前控制祖先后连同其两子任务停止。仅SIGTERM，无SIGKILL，不杀SSH、平台进程、dop-fuse挂载、IDE基础服务和当前控制会话；不删除任何数据、模型或日志。
+
+最终复查四节点无其他计算业务、无GPU compute，32×A100-40GB全部0%利用率，驱动少量1–4MiB残留，不是占卡作业。四节点现在均为当前实验可调度资源，不宣称已开始训练或32卡训练已可运行。CPU相关原服务已经清理，旧进程不可自动重启。
+
+- 清理证据eval/diag/other_business_cleanup_rank{0..3}_1793527097048.json及old_review_agent_cleanup_20261101.json，包含PID/starttime/argvSHA；不公开原命令或后台配置。
+- 本轮对已知八个训练标签记录文件和pool1856_dual_manifest只读核验：1856条全部v1，1249结构合格、607结构不合格、0重复；两caption列orig/fixed各1856。结构通过不等于独立语义review，更不代表旧fixedcaption/cache可作为新v2训练真值。读前后文件SHA未变，报告eval/diag/teacher_training_data_readonly_20261101_1793527220570350364.json；只针对该指定历史集，不断言别处不存在新数据。
+- 当前train_e3_lora仅world1–8且单node，跨nodeabsoluteMONOTONIC广播、每rank恢复/globalbatch与原费用监督均需独立修正和技术验证；不能直接torchrun32宣称可用。历史单GPU4update峰21.594GiB只旧smoke，不证明当前anchor或4node质量。
+- 当前推进方向锁定单一双向Wan2.2-TI2V5B Teacher有限监督LoRA，不继续失败的ALG/DyMoS恢复队列，不启AR/Student/蒸馏。先修复/重新构建合规标签、独立语义与父源隔离审阅、新缓存绑定，再单卡更新/保存/新进程恢复技术smoke、单node和跨nodeDDP验收、固定一个候选训练与94×双seed/多基准质量验收。公共基准不参与选参。
+- 新训练数据准备/缓存/技术验收与正式训练需独立硬上限；资源四节点授权不等于无限GPUh，不能借之前base/ALG/Dy generation剩额。尚未开始新训练/GPU标注，不能根据SOTA目标跳过必要标签/预算门或假称质量已达标。
+
+---
+
 # 一次恢复已结束：首分片再次失败，禁止再自动重试（2026-10-29）
 
 用户只批准“一次恢复、预算不变”；recovery_a2该权限现已使用。base与ALG均未完成固定12条canary，HSKGvY与6XkiW6按预注册规则退出，未派发任何余15或DyMoS。已核实四节点无GPU计算进程，四个自有monitor-only管理器均正常停止，未启动占卡、删视频或改历史账本。不得因原goal/四节点可用而再次恢复或请求更多seed救结果。
