@@ -1,0 +1,506 @@
+{
+  "AR_allowed": false,
+  "GPUs_released": true,
+  "actual_allocated_GPUh": 1.753457672673588,
+  "actual_elapsed_seconds": 1578.1119054062292,
+  "allocated_cards": 4,
+  "automatic_retry_allowed": false,
+  "case_records": [
+    {
+      "deny_token": "likely",
+      "duration_seconds": 29.71312779188156,
+      "failure_reason": "Ungrounded identity/intent/object claim withheld",
+      "failure_stage": "facts_parse",
+      "group": "diagnostic",
+      "index": 0,
+      "new_tokens": {
+        "facts": 384
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 38.977748612873256,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 1,
+      "new_tokens": {
+        "caption": 132,
+        "facts": 380
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 58.5886926651001,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 2,
+      "new_tokens": {
+        "caption": 141,
+        "facts": 655
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": "likely",
+      "duration_seconds": 40.004189676605165,
+      "failure_reason": "Ungrounded identity/intent/object claim withheld",
+      "failure_stage": "facts_parse",
+      "group": "diagnostic",
+      "index": 3,
+      "new_tokens": {
+        "facts": 542
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 46.29186166450381,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 4,
+      "new_tokens": {
+        "caption": 126,
+        "facts": 477
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 32.16782604996115,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 5,
+      "new_tokens": {
+        "caption": 106,
+        "facts": 303
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 42.73298153746873,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 6,
+      "new_tokens": {
+        "caption": 122,
+        "facts": 436
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 44.54065509606153,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 7,
+      "new_tokens": {
+        "caption": 123,
+        "facts": 461
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": "logo",
+      "duration_seconds": 43.00939691904932,
+      "failure_reason": "Ungrounded identity/intent/object claim withheld",
+      "failure_stage": "facts_parse",
+      "group": "diagnostic",
+      "index": 8,
+      "new_tokens": {
+        "facts": 592
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": "frame",
+      "duration_seconds": 67.46099119726568,
+      "failure_reason": "Single grounded paragraph without frame/sample metadata required",
+      "failure_stage": "caption_validate",
+      "group": "diagnostic",
+      "index": 9,
+      "new_tokens": {
+        "caption": 115,
+        "facts": 799
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 47.656454754062,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 10,
+      "new_tokens": {
+        "caption": 124,
+        "facts": 501
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 31.80137556232512,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 11,
+      "new_tokens": {
+        "caption": 89,
+        "facts": 312
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": "name",
+      "duration_seconds": 30.1616964712739,
+      "failure_reason": "Ungrounded identity/intent/object claim withheld",
+      "failure_stage": "facts_parse",
+      "group": "diagnostic",
+      "index": 12,
+      "new_tokens": {
+        "facts": 401
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 46.42782719992101,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 13,
+      "new_tokens": {
+        "caption": 130,
+        "facts": 476
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 34.321746855042875,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 14,
+      "new_tokens": {
+        "caption": 110,
+        "facts": 313
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 34.32969078235328,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 15,
+      "new_tokens": {
+        "caption": 108,
+        "facts": 332
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 52.890307450667024,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 16,
+      "new_tokens": {
+        "caption": 106,
+        "facts": 578
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 41.97442719899118,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 17,
+      "new_tokens": {
+        "caption": 111,
+        "facts": 443
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 37.20953855011612,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 18,
+      "new_tokens": {
+        "caption": 110,
+        "facts": 374
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 63.95445842947811,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 19,
+      "new_tokens": {
+        "caption": 113,
+        "facts": 756
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": "logo",
+      "duration_seconds": 41.092544462531805,
+      "failure_reason": "Ungrounded identity/intent/object claim withheld",
+      "failure_stage": "facts_parse",
+      "group": "blind",
+      "index": 20,
+      "new_tokens": {
+        "facts": 566
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 54.9136380199343,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 21,
+      "new_tokens": {
+        "caption": 116,
+        "facts": 627
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": "name",
+      "duration_seconds": 47.02102894894779,
+      "failure_reason": "Ungrounded identity/intent/object claim withheld",
+      "failure_stage": "facts_parse",
+      "group": "blind",
+      "index": 22,
+      "new_tokens": {
+        "facts": 657
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 34.107348886318505,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 23,
+      "new_tokens": {
+        "caption": 103,
+        "facts": 334
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 66.7985028186813,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 24,
+      "new_tokens": {
+        "caption": 139,
+        "facts": 765
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 39.74418652430177,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 25,
+      "new_tokens": {
+        "caption": 94,
+        "facts": 420
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 39.68084298167378,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 26,
+      "new_tokens": {
+        "caption": 106,
+        "facts": 409
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 30.822365682572126,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 27,
+      "new_tokens": {
+        "caption": 98,
+        "facts": 279
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 43.00422584731132,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 28,
+      "new_tokens": {
+        "caption": 130,
+        "facts": 435
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 39.35145229008049,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 29,
+      "new_tokens": {
+        "caption": 94,
+        "facts": 425
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 49.03328340407461,
+      "failure_reason": "Caption must contain 40..120 words",
+      "failure_stage": "caption_validate",
+      "group": "blind",
+      "index": 30,
+      "new_tokens": {
+        "caption": 152,
+        "facts": 499
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": "frame",
+      "duration_seconds": 50.70186934247613,
+      "failure_reason": "Single grounded paragraph without frame/sample metadata required",
+      "failure_stage": "caption_validate",
+      "group": "blind",
+      "index": 31,
+      "new_tokens": {
+        "caption": 92,
+        "facts": 585
+      },
+      "not_attempted": false,
+      "success": false
+    }
+  ],
+  "cases_attempted": 32,
+  "charged_upper_GPUh": 6,
+  "cumulative_label_upper_GPUh": 20.165898210853467,
+  "date": "2026-11-03",
+  "diagnosis": null,
+  "dtype": "bfloat16",
+  "experiment_complete": false,
+  "failure_stage_counts": {
+    "caption_validate": 3,
+    "facts_parse": 6
+  },
+  "fixed_cases": 32,
+  "fixed_groups": [
+    16,
+    16
+  ],
+  "formal_training_allowed": false,
+  "groups": {
+    "blind": {
+      "captions": 12,
+      "cases": 16,
+      "errors": 4,
+      "not_attempted": 0
+    },
+    "diagnostic": {
+      "captions": 11,
+      "cases": 16,
+      "errors": 5,
+      "not_attempted": 0
+    }
+  },
+  "label_stage_cap_GPUh": 24,
+  "load_seconds": 22.992885565385222,
+  "model": "Qwen3-VL-32B-Instruct",
+  "old_failure_upper_GPUh_preserved": 2,
+  "previous_failed_recovery_upper_GPUh": 6,
+  "prior_charged_upper_GPUh": 14.165898210853467,
+  "protocol_allocation_ordinal": 3,
+  "quality_claim": false,
+  "recovery_attempt_consumed": true,
+  "safe_failure_reason_counts": {
+    "Caption must contain 40..120 words": 1,
+    "Single grounded paragraph without frame/sample metadata required": 2,
+    "Ungrounded identity/intent/object claim withheld": 6
+  },
+  "schema": "teacher_qwen32b_prompt_v2_public_v1",
+  "semantic_review_pass": false,
+  "sota_proven": false,
+  "source_frames_per_case": 16,
+  "stop_reason": "completed",
+  "structural_32_caption_gate_pass": false,
+  "student_distillation_allowed": false,
+  "wall_cap_seconds": 5400,
+  "worker_receipt_present": true
+}

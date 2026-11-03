@@ -66,6 +66,8 @@ FILES = [
     "docs/60_Qwen32B标签一次恢复.md",
     "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
     "eval/diag/teacher_qwen32b_supplemental_public_20261103.json",
+    "eval/diag/teacher_qwen32b_prompt_v2_public_20261103.json",
+    "scripts/run_teacher_label_semantic_review.py", "tests/test_teacher_label_semantic_review.py",
     "scripts/prepare_teacher_label_admission.py", "tests/test_prepare_teacher_label_admission.py",
     "scripts/run_teacher_label_admission.py", "tests/test_run_teacher_label_admission.py",
     "scripts/run_teacher_label_pilot.py", "tests/test_teacher_label_pilot.py",

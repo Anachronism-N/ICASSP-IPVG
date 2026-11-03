@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-03 21:14:15 CST",
+  "created_at": "2026-11-03 21:48:16 CST",
   "files": [
     {
       "path": "README.md",
@@ -303,8 +303,8 @@
     },
     {
       "path": "docs/60_Qwen32B标签一次恢复.md",
-      "source_sha256": "64a044085359262e30cfdfff831ebf31c931f5b565ba76b389550a6d01d9122a",
-      "snapshot_sha256": "64a044085359262e30cfdfff831ebf31c931f5b565ba76b389550a6d01d9122a"
+      "source_sha256": "f327de32bab238d711635d8bc3469abe1d8d862e542539a5df4f622e43c3348e",
+      "snapshot_sha256": "f327de32bab238d711635d8bc3469abe1d8d862e542539a5df4f622e43c3348e"
     },
     {
       "path": "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
@@ -315,6 +315,21 @@
       "path": "eval/diag/teacher_qwen32b_supplemental_public_20261103.json",
       "source_sha256": "6080f2ee4de1c2e130f26002593c7aea9238edf979aaf7b2d7dbfb7e0c10ace9",
       "snapshot_sha256": "6080f2ee4de1c2e130f26002593c7aea9238edf979aaf7b2d7dbfb7e0c10ace9"
+    },
+    {
+      "path": "eval/diag/teacher_qwen32b_prompt_v2_public_20261103.json",
+      "source_sha256": "c0f4e6afe6a490b61573b9ea9412b0ca3a775baf8caf4dc60798377df2c89165",
+      "snapshot_sha256": "c0f4e6afe6a490b61573b9ea9412b0ca3a775baf8caf4dc60798377df2c89165"
+    },
+    {
+      "path": "scripts/run_teacher_label_semantic_review.py",
+      "source_sha256": "591d746130a68d979250e45171b0f4976bd18d824efdf0d8c9776ff2c53e0370",
+      "snapshot_sha256": "591d746130a68d979250e45171b0f4976bd18d824efdf0d8c9776ff2c53e0370"
+    },
+    {
+      "path": "tests/test_teacher_label_semantic_review.py",
+      "source_sha256": "18f2adefd59a71e73c63eb8ddb856dcea23d9344bce2204d466c93f1ce1d71ea",
+      "snapshot_sha256": "18f2adefd59a71e73c63eb8ddb856dcea23d9344bce2204d466c93f1ce1d71ea"
     },
     {
       "path": "scripts/prepare_teacher_label_admission.py",
@@ -748,8 +763,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "c7bd27baffd7354889008f17b5940a13ba129b8eb97bb554243ac66ec53ee734",
-      "snapshot_sha256": "c7bd27baffd7354889008f17b5940a13ba129b8eb97bb554243ac66ec53ee734"
+      "source_sha256": "2243bfd0cd56acc701cba953b95e87ac616946543cd59f53c529fdc0760fc20a",
+      "snapshot_sha256": "2243bfd0cd56acc701cba953b95e87ac616946543cd59f53c529fdc0760fc20a"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -1310,11 +1325,12 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "b5cde70f5994c0958b5e56d963b43ba30ed64c37",
+  "preserved_public_base_commit": "72074891708ca9b00ad29e73aca970e6a11063ac",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
     "docs/60_Qwen32B标签一次恢复.md",
     "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
+    "eval/diag/teacher_qwen32b_prompt_v2_public_20261103.json",
     "eval/diag/teacher_qwen32b_supplemental_public_20261103.json",
     "scripts/export_experiment_snapshot.py",
     "scripts/gpu_hold.py",
@@ -1329,6 +1345,7 @@
     "scripts/run_teacher_generation.py",
     "scripts/run_teacher_inference_smoke.py",
     "scripts/run_teacher_label_pilot.py",
+    "scripts/run_teacher_label_semantic_review.py",
     "scripts/run_teacher_mechanism_probe.py",
     "scripts/run_teacher_qwen3vl32b_pilot.py",
     "scripts/run_teacher_qwen3vl32b_recovery.py",
@@ -1337,6 +1354,7 @@
     "scripts/train_e3_lora.py",
     "scripts/verify_teacher_history.py",
     "tests/test_e3_train.py",
+    "tests/test_teacher_label_semantic_review.py",
     "tests/test_teacher_qwen3vl32b_pilot.py",
     "tests/test_teacher_qwen3vl32b_recovery.py",
     "tests/test_teacher_single_gpu_admission.py"
