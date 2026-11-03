@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-03 22:06:09 CST",
+  "created_at": "2026-11-03 23:05:00 CST",
   "files": [
     {
       "path": "README.md",
@@ -48,8 +48,8 @@
     },
     {
       "path": "docs/31_服务器迁移与CodingAgent交接.md",
-      "source_sha256": "1002f7cc0e48a5f06c8a40fc1e4f5ae910054594bb0de5c97b8a3b8db259b621",
-      "snapshot_sha256": "c14679f8b3b2c06e008c9b7b8d34958bc1dac7578b341f92e7f32bb75d0f6d0b"
+      "source_sha256": "c9a044dd1d85faeeacb9627fc2656e9cdcd98f3de033a0345f3f6d47feedc497",
+      "snapshot_sha256": "7cb1e0087fbf2b5612e3ce928e9dc406796fbae16e264288471e211c05890e3c"
     },
     {
       "path": "patches/diffsynth_studio_fb337fb.patch",
@@ -293,18 +293,18 @@
     },
     {
       "path": "scripts/run_teacher_qwen3vl32b_recovery.py",
-      "source_sha256": "8e2df3edccc69c4116594cb19ee7ab2ca668e1ba902262b745788c85d962dc4f",
-      "snapshot_sha256": "8e2df3edccc69c4116594cb19ee7ab2ca668e1ba902262b745788c85d962dc4f"
+      "source_sha256": "e14fe0acc11765f84edcb2c83ae9dd72d666690c4c9f3603bc954c51293a0eab",
+      "snapshot_sha256": "e14fe0acc11765f84edcb2c83ae9dd72d666690c4c9f3603bc954c51293a0eab"
     },
     {
       "path": "tests/test_teacher_qwen3vl32b_recovery.py",
-      "source_sha256": "c1524d6afb2126c5ff5498287d34297e0ce8207049cd45efcc6900bb387adb61",
-      "snapshot_sha256": "c1524d6afb2126c5ff5498287d34297e0ce8207049cd45efcc6900bb387adb61"
+      "source_sha256": "814ae7a0828dbf12a8cf8f38c4fd4ca4757554de5d556ececcbbcff87b23fc47",
+      "snapshot_sha256": "814ae7a0828dbf12a8cf8f38c4fd4ca4757554de5d556ececcbbcff87b23fc47"
     },
     {
       "path": "docs/60_Qwen32B标签一次恢复.md",
-      "source_sha256": "fbdab2efedade7194fe22085f549ea1a86f55c9bcfca7ef96201255aed5ae8e9",
-      "snapshot_sha256": "fbdab2efedade7194fe22085f549ea1a86f55c9bcfca7ef96201255aed5ae8e9"
+      "source_sha256": "cb6348318b434f8a85f90ef30eb3247194f7caa5c5a5409bdfbe48b0bf520bcb",
+      "snapshot_sha256": "cb6348318b434f8a85f90ef30eb3247194f7caa5c5a5409bdfbe48b0bf520bcb"
     },
     {
       "path": "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
@@ -325,6 +325,11 @@
       "path": "eval/diag/teacher_independent_label_review_public_20261103.json",
       "source_sha256": "52308d8fa4e20bedfef34bac4df009bab363221b3f58153ce67cc5ac15e258c6",
       "snapshot_sha256": "52308d8fa4e20bedfef34bac4df009bab363221b3f58153ce67cc5ac15e258c6"
+    },
+    {
+      "path": "eval/diag/teacher_qwen32b_constrained_public_20261103.json",
+      "source_sha256": "c454a28c1dbec0b58e6a43952168319864120a5d8a2fa3b735e324722a3b3780",
+      "snapshot_sha256": "c454a28c1dbec0b58e6a43952168319864120a5d8a2fa3b735e324722a3b3780"
     },
     {
       "path": "scripts/run_teacher_label_semantic_review.py",
@@ -768,8 +773,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "61f32b0d610554986775f168ec441fff1e411db5792481b6c7e31e173245e702",
-      "snapshot_sha256": "61f32b0d610554986775f168ec441fff1e411db5792481b6c7e31e173245e702"
+      "source_sha256": "b4b506189306f3d332e272f8f3103e1446e0945af7711f48e0a2607911aff550",
+      "snapshot_sha256": "b4b506189306f3d332e272f8f3103e1446e0945af7711f48e0a2607911aff550"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -1330,11 +1335,12 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "809bda0e5c05757662e895784c4334fd9beeca5b",
+  "preserved_public_base_commit": "ed5d64d7f9ea26fa5b443306f31268146e4c9c73",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
     "docs/60_Qwen32B标签一次恢复.md",
     "eval/diag/teacher_independent_label_review_public_20261103.json",
+    "eval/diag/teacher_qwen32b_constrained_public_20261103.json",
     "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
     "eval/diag/teacher_qwen32b_prompt_v2_public_20261103.json",
     "eval/diag/teacher_qwen32b_supplemental_public_20261103.json",

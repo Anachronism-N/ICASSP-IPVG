@@ -1280,12 +1280,25 @@ def verify_cost_closure(path, digest):
     return c
 
 
+def foreign_gpu_observations(p, owner, parent, tracked):
+    _, process, _, _ = helpers()
+    members = process.owned_members(owner, tracked)
+    allowed = {owner['pid'], parent['pid'], *(m['pid'] for m in members)}
+    observations = []
+    for uuid in p['gpu_uuids']:
+        query = process.query_release(uuid)
+        if set(query['pids']) - allowed:
+            observations.append(query)
+    return observations
+
+
 def run(path, digest, approval_path, approval_digest, gpu_authorized=False):
     require(gpu_authorized is True and threading.current_thread() is threading.main_thread(),
             'Only explicit authorized main-thread parent may allocate GPUs')
     start, epoch = time.monotonic(), time.time()
     p, bound, approval, process, parent, child, owner = None, None, None, None, None, None, None
     initial, final, queries, tracked, cleanup_signals = [], [], [], [], []
+    foreign_observations = []
     interrupted, old_handlers, error = [], {}, None
     released, tree_released, attempt_owned, verified, terminal_success = False, False, False, False, False
     worker_row, final_row, lock = None, None, None
@@ -1348,8 +1361,14 @@ def run(path, digest, approval_path, approval_digest, gpu_authorized=False):
             require(owner['pid'] == owner['session'] == child.pid and owner['ppid'] == parent['pid'], 'Actual fresh owned child session required')
             write_new(LOCAL / 'supervised.json', dict(launch=launch_row, parent=parent, child=owner,
                 observed_monotonic=time.monotonic(), command=command))
+            next_owner_check = time.monotonic() + 5
             while child.poll() is None and not interrupted and time.monotonic() < start+CAP-TAIL:
                 process.owned_members(owner, tracked)
+                if time.monotonic() >= next_owner_check:
+                    observed = foreign_gpu_observations(p, owner, parent, tracked)
+                    foreign_observations.extend(observed)
+                    require(not observed, 'External GPU owner appeared during allocation; stop owned work without foreign signals')
+                    next_owner_check = time.monotonic() + 5
                 time.sleep(.05)
         require(not interrupted and child.poll() == 0, 'Worker failed or timed out; one attempt only')
         worker_row = record(LOCAL / 'worker.json', start+CAP-TAIL)
@@ -1400,6 +1419,7 @@ def run(path, digest, approval_path, approval_digest, gpu_authorized=False):
                 receipt = dict(schema='teacher_qwen3vl32b_recovery_parent_v1', phase=PHASE, plan=bound, approval=approval,
                     parent=parent, child=owner, worker=worker_row, initial_boundary=initial, final_boundary=final,
                     release_queries=queries, cleanup_signals=cleanup_signals, tree_released=tree_released,
+                    foreign_gpu_observations=foreign_observations,
                     released=released, error=error, interrupted_signals=interrupted, no_child_spawned=child is None,
                     started_monotonic=start, started_epoch=epoch, observed_monotonic=time.monotonic(),
                     execution_success=error is None and released and worker_row is not None and not interrupted,

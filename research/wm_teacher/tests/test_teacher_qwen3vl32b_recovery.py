@@ -1178,3 +1178,16 @@ def test_constrained_decode_passes_native_tokenizer_ids_and_stage_specific_eos(m
             return torch.tensor([[10,11,100,151645]])
     out=pilot.generate_text(Model(),Processor(),[Image.new('RGB',(640,352)) for _ in range(16)],'cpu',max_tokens,facts)
     assert out==(json.dumps(FACTS) if facts is None else CAPTION)
+
+
+
+def test_runtime_owner_check_records_intrusion_without_foreign_signals(monkeypatch):
+    from types import SimpleNamespace
+    process=SimpleNamespace(owned_members=lambda owner,tracked:[{'pid':3}],
+        query_release=lambda uuid:dict(gpu_uuid=uuid,pids=[3]))
+    monkeypatch.setattr(pilot,'helpers',lambda:(None,process,None,None))
+    p=dict(gpu_uuids=['GPU-0','GPU-1'])
+    assert pilot.foreign_gpu_observations(p,{'pid':1},{'pid':2},[])==[]
+    process.query_release=lambda uuid:dict(gpu_uuid=uuid,pids=[3,77] if uuid=='GPU-1' else [3])
+    assert pilot.foreign_gpu_observations(p,{'pid':1},{'pid':2},[])==[{'gpu_uuid':'GPU-1','pids':[3,77]}]
+    assert not hasattr(process,'kill') and not hasattr(process,'cleanup_owned')
