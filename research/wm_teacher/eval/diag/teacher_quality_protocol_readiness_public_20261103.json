@@ -210,5 +210,74 @@
       "physical_laws": 1750
     }
   },
-  "audit_script_sha256": "65202d46963352db8abf5eb7e0797ae28e2462d91732a4703dd39210f1364962"
+  "audit_script_sha256": "65202d46963352db8abf5eb7e0797ae28e2462d91732a4703dd39210f1364962",
+  "A800_CPU_runtime_preparation": {
+    "packages": {
+      "accelerate": "1.10.1",
+      "einops": "0.8.1",
+      "flash-attn": "2.8.3",
+      "ftfy": "6.3.1",
+      "modelscope": "1.30.0",
+      "numpy": "1.26.4",
+      "peft": "0.17.1",
+      "protobuf": "5.29.5",
+      "safetensors": "0.6.2",
+      "sentencepiece": "0.2.1",
+      "torch": "2.7.1+cu126",
+      "torchvision": "0.22.1+cu126",
+      "transformers": "4.57.1",
+      "wcwidth": "0.2.14"
+    },
+    "official_wheel_sha256": "cafd4f708725e1be95495a86cbf418cfada08e707c8a797def61488a2a3c4f72",
+    "native_bytes": 1000919832,
+    "native_sha256": "4fc741413e0ddcd19a95ecf3dbca058ceb36912fcceb96647236a9dd0d5620e3",
+    "native_import_and_link_verified": true,
+    "actual_Wan_import_verified": true,
+    "pipeline_import_verified": true,
+    "training_module_import_verified": true,
+    "selected_assets_sha_verified": 79,
+    "CUDA_initialized": false,
+    "attention_kernel_executed": false,
+    "model_exact_resume_verified": false,
+    "native_deterministic_default": false,
+    "explicit_deterministic_true_still_required": true,
+    "checkpoint_uses_deepspeed": false,
+    "old_FA3_approval_not_reused": true,
+    "base_copy_status": "running; not a complete model deployment proof"
+  },
+  "native_Teacher_base_headers": {
+    "shards": [
+      {
+        "bytes": 9825014472,
+        "header_bytes": 41664,
+        "header_sha256": "99fd56044679f8b2d5650d086d7efe769feceae6c8dd8f2d19801ac6f8020960",
+        "relative": "diffusion_pytorch_model-00001-of-00003.safetensors",
+        "tensor_count": 413
+      },
+      {
+        "bytes": 9995661736,
+        "header_bytes": 41376,
+        "header_sha256": "cb940f3e56aa8688ae901e5890595a03b2c5a2d1e57baae2d80a148d891f8830",
+        "relative": "diffusion_pytorch_model-00002-of-00003.safetensors",
+        "tensor_count": 407
+      },
+      {
+        "bytes": 178558176,
+        "header_bytes": 472,
+        "header_sha256": "35265405793b02264d347ee5e49186fe4e9b427ae535a55c4e9e6f8bd0a1db82",
+        "relative": "diffusion_pytorch_model-00003-of-00003.safetensors",
+        "tensor_count": 5
+      }
+    ],
+    "tensor_keys": 825,
+    "header_parameter_elements": 4999787712,
+    "header_dtype_counts": {
+      "F32": 825
+    },
+    "original_attention_projection_keys_present": true,
+    "head_dimension": 128,
+    "model_loaded": false,
+    "full_content_hash_claim": false
+  },
+  "authorization_and_quality_caveat": "CPU-only native runtime preparation, no additional GPU allocation, no model update, no semantic or exact-resume admission, no new SOTA evidence; original stage cap and pending budget request unchanged"
 }

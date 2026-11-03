@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-03 23:19:04 CST",
+  "created_at": "2026-11-03 23:54:00 CST",
   "files": [
     {
       "path": "README.md",
@@ -303,8 +303,8 @@
     },
     {
       "path": "docs/60_Qwen32B标签一次恢复.md",
-      "source_sha256": "c5dce72c1ca8068a6aeb0bb512a638ee2db1847cddfd68807835f2c58a78d662",
-      "snapshot_sha256": "c5dce72c1ca8068a6aeb0bb512a638ee2db1847cddfd68807835f2c58a78d662"
+      "source_sha256": "37577b7c6d8c719f721773cc9b90aee3566bf1509d5697da8247cf08a9a4ec73",
+      "snapshot_sha256": "37577b7c6d8c719f721773cc9b90aee3566bf1509d5697da8247cf08a9a4ec73"
     },
     {
       "path": "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
@@ -333,8 +333,8 @@
     },
     {
       "path": "eval/diag/teacher_quality_protocol_readiness_public_20261103.json",
-      "source_sha256": "84ae423217bf5f3adbf4bc227e31362c41ef01123b9c87e9e77a0601b4498662",
-      "snapshot_sha256": "84ae423217bf5f3adbf4bc227e31362c41ef01123b9c87e9e77a0601b4498662"
+      "source_sha256": "0c91aa49aba87af4ec61efcea709597810990ca0fb0e16786ffe1f445e51ab26",
+      "snapshot_sha256": "0c91aa49aba87af4ec61efcea709597810990ca0fb0e16786ffe1f445e51ab26"
     },
     {
       "path": "scripts/run_teacher_label_semantic_review.py",
@@ -1340,7 +1340,7 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "9f9bc0a4ec72166e0d35723043539689a72a3081",
+  "preserved_public_base_commit": "7bcb94453c3dc3accf7ed9ea005bdeaf1e432d49",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
     "docs/60_Qwen32B标签一次恢复.md",

@@ -156,3 +156,15 @@ C276原子集真实生成28.483680GPUh、评分1.100152GPUh；历史两seedALG/D
 复用已有serve_label_review.py的白名单输入契约，新准备两轮全部36段保留标签（原策略13、v2策略23）；固定seed20261103打乱顺序、隐藏方法名与AI结论。26个去重源视频均CPU完整解码121帧，共3146帧，分别生成0–60、61–120两页contact sheet，同时保留原视频观看入口。标签/video/pages原SHA核验及现有load_cases验证通过，原64条来源记录分母与28个缺标签记录边界另记。
 
 私有目录eval/teacher_label_semantic_review_20261103/human_review_pack，包含index/audit/隐藏mapping及preparation.receipt；权限700/600。没有启动网络listener、没有上传媒体、没有写任何human verdict；人工审阅完成和训练语义批准仍false。此准备解除的是素材/接口缺口，不是语义真值或正式训练门。后续可经现有本地只读check-only入口复核后供真人审阅；不把同族8B的adequate标记自动改写成人类判断。
+
+## 13. 新集群FA2运行时CPU准备（未GPU恢复或训练）
+
+为解决下一轮A800真实技术准入的环境缺口，已从官方v2.8.3 release选择Python3.12/torch2.7/CXX11ABI true/CUDA12 wheel。256,028,810bytes下载SHA256与GitHub release digest严格相同；解压后实际FA2 native库与wheel相应成员字节SHA一致。隔离安装在新本地site目录，不覆盖已有32B标注venv、不修改原FA3协议授权。
+
+硬阻断CUDA初始化和CPU导入阶段网络后，实际Wan模块、WanVideoPipeline及DiffusionTrainingModule导入通过；实际wan.FLASH_ATTN_3_AVAILABLE=false、FLASH_ATTN_2_AVAILABLE=true，链接到核实的flash_attn_2_cuda原生库。forward支持deterministic关键字，torch注册backward schema具有bool deterministic，dropout_p默认0.0。**默认deterministic仍false**，所以原生导入成功不能当精确恢复已完成；新GPU协议还须显式deterministic=True、固定flags/env、4-reference vs 2-prefix+2-freshresume、原adapter/AdamW/RNG精确门，且独立预算/source/model/runtime/host审批。不能把FA2替代偷偷说成旧FA3相同轨迹或旧恢复权限未用。
+
+79项实际加载源码与selected runtime资产SHA已冻结，CUDA_initialized=false、model_loaded=false、attention_kernel_executed=false、GPU授权false。本环境未装deepspeed，checkpoint分支与旧runtime不同，后续须明示冻结且验证，不能冒充旧runtime完整复现。FA2及最小Wan导入依赖只装新隔离目录；训练源、原失败与标注环境不改。
+
+另有CPU复制三片原Teacher DiT到新本地目录的受管任务，复制途中逐hash绑定原CACHE_PINS、输出独立SHA和safetensors头核查；目前尚在执行，不当完整模型部署证明。完成事实必须以独立base_content.proof.json和三个pin相符为准。全程未加载权重到GPU、未执行LoRA update，没有新Teacher质量或SOTA结果。当前仍等待此前已明确提出的新增预算和跨项目占卡入口协调授权。
+
+实际基座头另外CPU核验：三片原safetensors含825个F32 tensor、4,999,787,712参数元素，30个block与全部self/cross q/k/v/o投影存在，配置head_dim128。源文件F32不等于运行时F32：现有build_pipe明确torch_dtype=bfloat16加载且LoRA可训练tensor转float32；后续须按实际加载检查。头读取不等于全内容SHA或GPU模型加载，当前CPU复制未完成状态不改为true。
