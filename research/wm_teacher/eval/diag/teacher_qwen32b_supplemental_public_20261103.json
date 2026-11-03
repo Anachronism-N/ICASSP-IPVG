@@ -1,0 +1,511 @@
+{
+  "AR_allowed": false,
+  "GPUs_released": true,
+  "actual_allocated_GPUh": 1.669926838695796,
+  "actual_elapsed_seconds": 1502.9341548262164,
+  "allocated_cards": 4,
+  "automatic_retry_allowed": false,
+  "case_records": [
+    {
+      "deny_token": null,
+      "duration_seconds": 36.78262776695192,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 0,
+      "new_tokens": {
+        "caption": 113,
+        "facts": 345
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 36.7381861358881,
+      "failure_reason": "Caption must contain 40..120 words",
+      "failure_stage": "caption_validate",
+      "group": "diagnostic",
+      "index": 1,
+      "new_tokens": {
+        "caption": 155,
+        "facts": 311
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": "frame",
+      "duration_seconds": 42.98798681702465,
+      "failure_reason": "Single grounded paragraph without frame/sample metadata required",
+      "failure_stage": "caption_validate",
+      "group": "diagnostic",
+      "index": 2,
+      "new_tokens": {
+        "caption": 155,
+        "facts": 416
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 40.82011784426868,
+      "failure_reason": "Caption must contain 40..120 words",
+      "failure_stage": "caption_validate",
+      "group": "diagnostic",
+      "index": 3,
+      "new_tokens": {
+        "caption": 152,
+        "facts": 386
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": "frame",
+      "duration_seconds": 47.499324817210436,
+      "failure_reason": "Single grounded paragraph without frame/sample metadata required",
+      "failure_stage": "caption_validate",
+      "group": "diagnostic",
+      "index": 4,
+      "new_tokens": {
+        "caption": 213,
+        "facts": 423
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 21.99867473077029,
+      "failure_reason": "Cross-entity global hand/object transfer withheld",
+      "failure_stage": "facts_parse",
+      "group": "diagnostic",
+      "index": 5,
+      "new_tokens": {
+        "facts": 288
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 36.88580603618175,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 6,
+      "new_tokens": {
+        "caption": 134,
+        "facts": 334
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 47.38312069885433,
+      "failure_reason": "Caption must contain 40..120 words",
+      "failure_stage": "caption_validate",
+      "group": "diagnostic",
+      "index": 7,
+      "new_tokens": {
+        "caption": 173,
+        "facts": 436
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 44.07356661465019,
+      "failure_reason": "Caption must contain 40..120 words",
+      "failure_stage": "caption_validate",
+      "group": "diagnostic",
+      "index": 8,
+      "new_tokens": {
+        "caption": 184,
+        "facts": 405
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": "frame",
+      "duration_seconds": 67.96809736546129,
+      "failure_reason": "Single grounded paragraph without frame/sample metadata required",
+      "failure_stage": "caption_validate",
+      "group": "diagnostic",
+      "index": 9,
+      "new_tokens": {
+        "caption": 178,
+        "facts": 741
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 43.34541382547468,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 10,
+      "new_tokens": {
+        "caption": 133,
+        "facts": 433
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 31.683065723627806,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 11,
+      "new_tokens": {
+        "caption": 130,
+        "facts": 276
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": "name",
+      "duration_seconds": 30.964907304383814,
+      "failure_reason": "Ungrounded identity/intent/object claim withheld",
+      "failure_stage": "facts_parse",
+      "group": "diagnostic",
+      "index": 12,
+      "new_tokens": {
+        "facts": 416
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 40.83297300897539,
+      "failure_reason": "Caption must contain 40..120 words",
+      "failure_stage": "caption_validate",
+      "group": "diagnostic",
+      "index": 13,
+      "new_tokens": {
+        "caption": 140,
+        "facts": 369
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 36.25190141517669,
+      "failure_reason": "Caption must contain 40..120 words",
+      "failure_stage": "caption_validate",
+      "group": "diagnostic",
+      "index": 14,
+      "new_tokens": {
+        "caption": 161,
+        "facts": 302
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 30.499394988641143,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "diagnostic",
+      "index": 15,
+      "new_tokens": {
+        "caption": 111,
+        "facts": 275
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 46.7563511794433,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 16,
+      "new_tokens": {
+        "caption": 124,
+        "facts": 499
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 39.751349123194814,
+      "failure_reason": "Caption must contain 40..120 words",
+      "failure_stage": "caption_validate",
+      "group": "blind",
+      "index": 17,
+      "new_tokens": {
+        "caption": 161,
+        "facts": 364
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 32.9226626958698,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 18,
+      "new_tokens": {
+        "caption": 128,
+        "facts": 294
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 42.45180878881365,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 19,
+      "new_tokens": {
+        "caption": 115,
+        "facts": 444
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 36.49851937871426,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 20,
+      "new_tokens": {
+        "caption": 114,
+        "facts": 361
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 61.45970932766795,
+      "failure_reason": "Caption must contain 40..120 words",
+      "failure_stage": "caption_validate",
+      "group": "blind",
+      "index": 21,
+      "new_tokens": {
+        "caption": 178,
+        "facts": 662
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 40.98767627775669,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 22,
+      "new_tokens": {
+        "caption": 137,
+        "facts": 395
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 30.36412673909217,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 23,
+      "new_tokens": {
+        "caption": 132,
+        "facts": 239
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 60.14727022871375,
+      "failure_reason": "Caption must contain 40..120 words",
+      "failure_stage": "caption_validate",
+      "group": "blind",
+      "index": 24,
+      "new_tokens": {
+        "caption": 214,
+        "facts": 575
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 33.436823673546314,
+      "failure_reason": "Caption must contain 40..120 words",
+      "failure_stage": "caption_validate",
+      "group": "blind",
+      "index": 25,
+      "new_tokens": {
+        "caption": 143,
+        "facts": 269
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 41.6249252166599,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 26,
+      "new_tokens": {
+        "caption": 142,
+        "facts": 388
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 29.21543190162629,
+      "failure_reason": null,
+      "failure_stage": null,
+      "group": "blind",
+      "index": 27,
+      "new_tokens": {
+        "caption": 127,
+        "facts": 228
+      },
+      "not_attempted": false,
+      "success": true
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 46.04593767039478,
+      "failure_reason": "Caption must contain 40..120 words",
+      "failure_stage": "caption_validate",
+      "group": "blind",
+      "index": 28,
+      "new_tokens": {
+        "caption": 160,
+        "facts": 439
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": "frame",
+      "duration_seconds": 46.64909580629319,
+      "failure_reason": "Single grounded paragraph without frame/sample metadata required",
+      "failure_stage": "caption_validate",
+      "group": "blind",
+      "index": 29,
+      "new_tokens": {
+        "caption": 144,
+        "facts": 484
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 45.021798277273774,
+      "failure_reason": "Caption must contain 40..120 words",
+      "failure_stage": "caption_validate",
+      "group": "blind",
+      "index": 30,
+      "new_tokens": {
+        "caption": 180,
+        "facts": 423
+      },
+      "not_attempted": false,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": 54.556483309715986,
+      "failure_reason": "Caption must contain 40..120 words",
+      "failure_stage": "caption_validate",
+      "group": "blind",
+      "index": 31,
+      "new_tokens": {
+        "caption": 176,
+        "facts": 562
+      },
+      "not_attempted": false,
+      "success": false
+    }
+  ],
+  "cases_attempted": 32,
+  "charged_upper_GPUh": 6,
+  "cumulative_label_upper_GPUh": 14.165898210853467,
+  "date": "2026-11-03",
+  "diagnosis": null,
+  "dtype": "bfloat16",
+  "experiment_complete": false,
+  "failure_stage_counts": {
+    "caption_validate": 17,
+    "facts_parse": 2
+  },
+  "fixed_cases": 32,
+  "fixed_groups": [
+    16,
+    16
+  ],
+  "formal_training_allowed": false,
+  "groups": {
+    "blind": {
+      "captions": 8,
+      "cases": 16,
+      "errors": 8,
+      "not_attempted": 0
+    },
+    "diagnostic": {
+      "captions": 5,
+      "cases": 16,
+      "errors": 11,
+      "not_attempted": 0
+    }
+  },
+  "label_stage_cap_GPUh": 24,
+  "load_seconds": 22.6748184626922,
+  "model": "Qwen3-VL-32B-Instruct",
+  "old_failure_upper_GPUh_preserved": 2,
+  "previous_failed_recovery_upper_GPUh": 6,
+  "prior_charged_upper_GPUh": 8.165898210853467,
+  "quality_claim": false,
+  "recovery_attempt_consumed": true,
+  "safe_failure_reason_counts": {
+    "Caption must contain 40..120 words": 13,
+    "Cross-entity global hand/object transfer withheld": 1,
+    "Single grounded paragraph without frame/sample metadata required": 4,
+    "Ungrounded identity/intent/object claim withheld": 1
+  },
+  "schema": "teacher_qwen32b_supplemental_public_v1",
+  "semantic_review_pass": false,
+  "sota_proven": false,
+  "source_frames_per_case": 16,
+  "stop_reason": "completed",
+  "structural_32_caption_gate_pass": false,
+  "student_distillation_allowed": false,
+  "supplemental_allocation_ordinal": 2,
+  "wall_cap_seconds": 5400,
+  "worker_receipt_present": true
+}
