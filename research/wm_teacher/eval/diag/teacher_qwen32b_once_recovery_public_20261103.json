@@ -1,0 +1,411 @@
+{
+  "AR_allowed": false,
+  "GPUs_released": true,
+  "actual_allocated_GPUh": 0.3401837133957694,
+  "actual_elapsed_seconds": 306.16534205619246,
+  "allocated_cards": 4,
+  "automatic_retry_allowed": false,
+  "case_records": [
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 0,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 1,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 2,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 3,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 4,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 5,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 6,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 7,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 8,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 9,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 10,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 11,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 12,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 13,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 14,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "diagnostic",
+      "index": 15,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 16,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 17,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 18,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 19,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 20,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 21,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 22,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 23,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 24,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 25,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 26,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 27,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 28,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 29,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 30,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    },
+    {
+      "deny_token": null,
+      "duration_seconds": null,
+      "failure_reason": "worker_exception",
+      "failure_stage": "not_attempted",
+      "group": "blind",
+      "index": 31,
+      "new_tokens": {},
+      "not_attempted": true,
+      "success": false
+    }
+  ],
+  "cases_attempted": 0,
+  "charged_upper_GPUh": 6,
+  "cumulative_label_upper_GPUh": 8.165898210853467,
+  "date": "2026-11-03",
+  "diagnosis": "relative_parent_runner_path_rejected_by_absolute_path_ancestry_gate",
+  "dtype": "bfloat16",
+  "experiment_complete": false,
+  "failure_stage_counts": {
+    "not_attempted": 32
+  },
+  "fixed_cases": 32,
+  "fixed_groups": [
+    16,
+    16
+  ],
+  "formal_training_allowed": false,
+  "groups": {
+    "blind": {
+      "captions": 0,
+      "cases": 16,
+      "errors": 16,
+      "not_attempted": 16
+    },
+    "diagnostic": {
+      "captions": 0,
+      "cases": 16,
+      "errors": 16,
+      "not_attempted": 16
+    }
+  },
+  "label_stage_cap_GPUh": 24,
+  "load_seconds": null,
+  "model": "Qwen3-VL-32B-Instruct",
+  "old_failure_upper_GPUh_preserved": 2,
+  "prior_charged_upper_GPUh": 2.1658982108534675,
+  "quality_claim": false,
+  "recovery_attempt_consumed": true,
+  "safe_failure_reason_counts": {
+    "worker_exception": 32
+  },
+  "schema": "teacher_qwen32b_once_recovery_public_v1",
+  "semantic_review_pass": false,
+  "sota_proven": false,
+  "source_frames_per_case": 16,
+  "stop_reason": "pre_model_parent_command_gate_rejection",
+  "structural_32_caption_gate_pass": false,
+  "student_distillation_allowed": false,
+  "wall_cap_seconds": 5400,
+  "worker_receipt_present": false
+}

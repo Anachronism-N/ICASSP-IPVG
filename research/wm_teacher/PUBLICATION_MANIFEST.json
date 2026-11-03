@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-03 17:35:12 CST",
+  "created_at": "2026-11-03 18:01:54 CST",
   "files": [
     {
       "path": "README.md",
@@ -48,8 +48,8 @@
     },
     {
       "path": "docs/31_服务器迁移与CodingAgent交接.md",
-      "source_sha256": "42c6110dde09c568d8717e6a6f6e6ad782bb9d8cae48747e9272963adb8510df",
-      "snapshot_sha256": "04f16ec209e42576b5c2fa0d465ee7cd63447cbba50944587dbf2d2878255530"
+      "source_sha256": "d5da3067d8f1a7f9e87c3e0e6c3c719d75b5c39c7e9450fe8c9839ae4110d175",
+      "snapshot_sha256": "927a51f3a06a86ab394d27dc4cda6f2da1c8e44987137b6ca51b1c0c0334fa9b"
     },
     {
       "path": "patches/diffsynth_studio_fb337fb.patch",
@@ -303,8 +303,13 @@
     },
     {
       "path": "docs/60_Qwen32B标签一次恢复.md",
-      "source_sha256": "1ce7f08e494c2fed99b4d12efb76d74f2d19338a9579b994e4630bdbf7b038fb",
-      "snapshot_sha256": "1ce7f08e494c2fed99b4d12efb76d74f2d19338a9579b994e4630bdbf7b038fb"
+      "source_sha256": "d69ea215b0ef81520f2da86ca512ca59167a3a30b06ee390da28eb08ae2dcd48",
+      "snapshot_sha256": "d69ea215b0ef81520f2da86ca512ca59167a3a30b06ee390da28eb08ae2dcd48"
+    },
+    {
+      "path": "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
+      "source_sha256": "45b91ab7ade11bb64c74bde6555ca3f1cd7ad8e9cc601d944e811e14d74dd823",
+      "snapshot_sha256": "45b91ab7ade11bb64c74bde6555ca3f1cd7ad8e9cc601d944e811e14d74dd823"
     },
     {
       "path": "scripts/prepare_teacher_label_admission.py",
@@ -738,8 +743,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "4bc3698ad3530fdf3810114e01b61493b943d3725b10526ba01ef6042a4fafcd",
-      "snapshot_sha256": "4bc3698ad3530fdf3810114e01b61493b943d3725b10526ba01ef6042a4fafcd"
+      "source_sha256": "1b2b5928dc23bdd021a70a207eaf3f25eac9f5e6e9c08f269aaa2789dd490f0d",
+      "snapshot_sha256": "1b2b5928dc23bdd021a70a207eaf3f25eac9f5e6e9c08f269aaa2789dd490f0d"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -1300,10 +1305,11 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "e5404ca4ec90ce2b12de7313d7b13bdee1db5a03",
+  "preserved_public_base_commit": "174b692c68b7b22c51f65fed319be82b97de1c94",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
     "docs/60_Qwen32B标签一次恢复.md",
+    "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
     "scripts/export_experiment_snapshot.py",
     "scripts/gpu_hold.py",
     "scripts/measure_teacher_throughput.py",
