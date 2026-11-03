@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-04 01:50:05 CST",
+  "created_at": "2026-11-04 03:24:10 CST",
   "files": [
     {
       "path": "README.md",
@@ -323,18 +323,18 @@
     },
     {
       "path": "scripts/run_teacher_a800_exact_resume.py",
-      "source_sha256": "15973ed4385535a042a9049a06ee786229a092936119a28c76c3f01e1ddebd2f",
-      "snapshot_sha256": "15973ed4385535a042a9049a06ee786229a092936119a28c76c3f01e1ddebd2f"
+      "source_sha256": "5b6b1147e41c83fad5efef86296a00d141e8f5344947d254bac2c82c662bb930",
+      "snapshot_sha256": "5b6b1147e41c83fad5efef86296a00d141e8f5344947d254bac2c82c662bb930"
     },
     {
       "path": "tests/test_teacher_a800_exact_resume.py",
-      "source_sha256": "f6125ffac043653cbc8a395bafec4276511065f51dc5e99ea6a0fddb47b449bb",
-      "snapshot_sha256": "f6125ffac043653cbc8a395bafec4276511065f51dc5e99ea6a0fddb47b449bb"
+      "source_sha256": "d6e701399346da0578134bbe32f1678326b1d4c3ea8c7bb4007d38ae1262156a",
+      "snapshot_sha256": "d6e701399346da0578134bbe32f1678326b1d4c3ea8c7bb4007d38ae1262156a"
     },
     {
       "path": "docs/60_Qwen32B标签一次恢复.md",
-      "source_sha256": "765aedee9f17b34a34914bf1d5a8cce4900fac90d19879e819b435f752256277",
-      "snapshot_sha256": "765aedee9f17b34a34914bf1d5a8cce4900fac90d19879e819b435f752256277"
+      "source_sha256": "2ba84328161ce82981c4a120abb888b7711cd9883c4cfffe805ba429c1760eb1",
+      "snapshot_sha256": "2ba84328161ce82981c4a120abb888b7711cd9883c4cfffe805ba429c1760eb1"
     },
     {
       "path": "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
@@ -358,8 +358,8 @@
     },
     {
       "path": "eval/diag/teacher_qwen32b_constrained_public_20261103.json",
-      "source_sha256": "c454a28c1dbec0b58e6a43952168319864120a5d8a2fa3b735e324722a3b3780",
-      "snapshot_sha256": "c454a28c1dbec0b58e6a43952168319864120a5d8a2fa3b735e324722a3b3780"
+      "source_sha256": "788c366cdca1c99607994d9fbd10338eed9c640395d2f4b66f456c3df642a0f9",
+      "snapshot_sha256": "788c366cdca1c99607994d9fbd10338eed9c640395d2f4b66f456c3df642a0f9"
     },
     {
       "path": "eval/diag/teacher_quality_protocol_readiness_public_20261103.json",
@@ -368,13 +368,13 @@
     },
     {
       "path": "scripts/run_teacher_label_semantic_review.py",
-      "source_sha256": "5e91de7b791a02f16abb29a65bbf469176334dabcef67429e59b058bbd39928f",
-      "snapshot_sha256": "5e91de7b791a02f16abb29a65bbf469176334dabcef67429e59b058bbd39928f"
+      "source_sha256": "2e42328c677d8f0cca159c2dac9c4b12c3fea11e8cb0844bc395cce90bed16df",
+      "snapshot_sha256": "2e42328c677d8f0cca159c2dac9c4b12c3fea11e8cb0844bc395cce90bed16df"
     },
     {
       "path": "tests/test_teacher_label_semantic_review.py",
-      "source_sha256": "7a9acaa151bc8968077db5b6f18d1cc10268120c34abffcdfa7ddafb8d98b8a5",
-      "snapshot_sha256": "7a9acaa151bc8968077db5b6f18d1cc10268120c34abffcdfa7ddafb8d98b8a5"
+      "source_sha256": "8de896289cace2f8dce2348ba72a1e582695f4c8a8681076b34cc903250db9c2",
+      "snapshot_sha256": "8de896289cace2f8dce2348ba72a1e582695f4c8a8681076b34cc903250db9c2"
     },
     {
       "path": "scripts/prepare_teacher_label_admission.py",
@@ -1370,7 +1370,7 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "b2b253392d32a1d01cc29d12ccf42e4a785c29e9",
+  "preserved_public_base_commit": "c76b752874861500f1bf234d5d3b51b795da1075",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
     "docs/60_Qwen32B标签一次恢复.md",

@@ -206,3 +206,18 @@ allocation003尚无GPU claim，原32视频CPU准备已保存旧freeze副本，�
 native3实机GPU4在lease下成功：CUDA掩码3个长度与原生NoBadWords精确等价，CPU输入token与GPU输出scores对齐通过；BF16/24heads/head_dim128/seq128与1024各重复两次，4forward/4backward exact全部通过。实际9.979866s、按0.2GPUh计费，含两次旧失败技术累计0.6/8，GPU4与原mode释放恢复。这不是完整Wan模型精确resume，不能自动改正式训练门。大模型003已以同已核int32实现和同32源病例启动，保持原精确门，结果另审计。
 
 新增full-DiT FA2技术准入范围：5040s单卡=1.4GPUh，技术累计上界2.0/8，留6给后续multinode技术。使用三片原20GB本地base SHA、原train_step/checkpoint/load/FixedOrder/synthetic_sample；FA2 explicit deterministic=True/dropout0、torch确定性flags与CUBLAS工作空间、600adapter/AdamW/Python+CPU+CUDA RNG精确门。物理4reference+2prefix+2freshresume，逻辑horizon4，seed20261104，offload on、lambda.5。每segment真实fresh子进程，旧FA3失败不重跑、lambda/样本/状态门不临时放宽。模型forward不是标签语义验收，full-MoDel probe不消费真实标签，不是候选训练或SOTA质量成绩。源码/模型/runtime/授权/公开字节验收后才启动。
+
+
+## 15. allocation003完整结案与真实训练API修订（2026-11-04）
+
+固定32病例均实际执行，30条结构合格caption、2条caption_validate词数失败：诊断16/16，沿用原blind来源组14/16。原40..120词、16帧、EOS、实体关联门均未放宽；失败模型原文未保存，不能凭token数猜测词数方向或事后补写。所有32例、两条失败、claim和原执行源码/媒体字节已私有保留并独立核验。32/32精确结构门仍FAIL，30/32不是全量或独立泛化收益。
+
+父生命周期1661.801988秒、实际1.846446654GPUh；完整独占资源窗口5104.808620秒、实际5.672009577GPUh，不能只按短父进程计费。保守计6GPUh，新标签阶段18/96，历史标签累计41.832564878GPUh。原compute模式已恢复，没有原始外部侵入记录；旧失败的false/null与费用不回填或退款。
+
+完整Wan5B FA2精确恢复001在模型加载后、任何训练update前失败：引用不存在的train_e3_lora.FixedOrder，真实训练器类名为DataOrder。不是已证实的数值不确定性；原AssertionError终态与reference.log保留，计1.4GPUh，技术累计2.0/8GPUh。模型加载不等于精确恢复。
+
+独立修订002改用真实DataOrder与Comm，在模型加载前核对真实train_step/checkpoint/load接口。新增真实API的CPU微模型4reference vs 2prefix+重新构造模型resume2回归，adapter/AdamW/Python和CPU RNG及后两次更新记录精确相等；该CPU检查不替代A800/CUDA完整模型门。新002单独冻结1卡5040秒/1.4GPUh，预留后技术累计3.4/8，前次失败SHA、原源码和费用绑定，不复用claim、不自动循环重试，完整精确门不变。
+
+allocation003首次独立8B诊断评审另冻结1卡3600秒/1GPUh：只评审30条原保留caption，完整32病例分母与2条接口失败保留；诊断组和原blind组分开报告。沿用同七字段/四程序化正负控制/16首尾均匀帧，AI判断仍非人工gold且不自行批准语义门。启动前GPU5的不同占卡入口未符合当前精确识别/lease门，未发信号或消耗分配；改为新集群GPU0使用节点本地限时lease与精确已确认holder释放，终态须恢复原模式。标签阶段预留后19/96，旧41.832564878费用不重置；不重新生成或修改任何旧caption。
+
+针对恢复与评审的20项CPU测试通过。完整公开测试和独立远端字节核验后才允许两项新GPU入口。正式Teacher训练、AR、Student/蒸馏依然关闭，没有新Teacher全集质量评测或同协议SOTA结论。

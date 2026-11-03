@@ -18,6 +18,20 @@ CAMPAIGN_SHA='ffa19129fb3256e482553bb1b90a7f09edd95eed4391687e6b45426d0706b8fe'
 PYTHON='/dockerdata/venv_qwen32b_20261103/bin/python3.12'
 SITE='/dockerdata/wm_a800_fa2_runtime_20261103/site'
 CAP=5040
+REVISION002=False
+PRIOR_TECHNICAL_GPUH=.6
+
+def configure_revision002():
+    global E,AUTH_SHA,REVISION002,PRIOR_TECHNICAL_GPUH
+    E=ROOT/'eval/teacher_progress_campaign_20261104/a800_exact_resume002'
+    AUTH_SHA='bfe1a2cabb914250c50599a5050a40b157fcce3ae18dc4a210027fdb103da6c9'
+    REVISION002=True;PRIOR_TECHNICAL_GPUH=2.0
+
+def training_interfaces(tr,device):
+    for name in ('DataOrder','Comm','synthetic_sample','train_step','checkpoint_state',
+                 'validate_checkpoint','save_checkpoint','load_checkpoint'):
+        assert callable(getattr(tr,name)), 'Real trainer API missing: '+name
+    return tr.DataOrder(20261104,4),tr.Comm(None,0,1,device)
 
 def record(p):
     p=Path(p).resolve();before=p.stat();h=hashlib.sha256()
@@ -39,6 +53,12 @@ def authorize():
     a=read(row);assert record(E.parent/'campaign.authorization.json')['sha256']==CAMPAIGN_SHA
     assert a['wall_cap_seconds']==CAP and a['upper_GPUh']==1.4 and a['phase']=='technical_admission'
     assert a['formal_training_allowed'] is False and a['automatic_retry_allowed'] is False
+    assert a['prior_new_technical_GPUh']==PRIOR_TECHNICAL_GPUH and PRIOR_TECHNICAL_GPUH+1.4<=8
+    if REVISION002:
+        assert a['revision']==2 and a['real_training_API_CPU_test_required']
+        previous=E.parent/'a800_exact_resume001/terminal.json'
+        assert record(previous)['sha256']==a['previous_failed_terminal_sha256']
+        assert not json.loads(previous.read_bytes())['success']
     return a,row
 
 def prepare():
@@ -77,6 +97,9 @@ def worker(a):
     assert os.environ['CUDA_VISIBLE_DEVICES']==launch['gpu_uuid'] and os.environ['PYTHONPATH']==SITE
     assert os.environ['CUBLAS_WORKSPACE_CONFIG']==':4096:8'
     p,row=verify_plan(a.plan,a.sha)
+    sys.path.insert(0,str(ROOT/'scripts'))
+    import train_e3_lora as tr
+    order,comm=training_interfaces(tr,'cuda:0')
     import torch
     import flash_attn
     import flash_attn.flash_attn_interface as interface
@@ -108,7 +131,7 @@ def worker(a):
         offset=2
     elif a.segment not in ('reference','prefix'):raise AssertionError('Unknown segment')
     initial=tr.ts.state_hash(tr.ts.trainable_adapters(pipe.dit))
-    order=tr.FixedOrder(20261104,4);comm=tr.Comm(None,0,1,'cuda:0');records=[]
+    records=[]
     for step in range(offset,offset+(4 if a.segment=='reference' else 2)):
         sample_index=order.index(step,0,1);sample=tr.synthetic_sample(sample_index)
         row=tr.train_step(pipe,params,optimizer,sample,step,sample_index,config,comm,
@@ -165,8 +188,9 @@ def run(a):
         for segment in ('reference','prefix','resume'):
             assert time.monotonic()-start<CAP-120
             with (E/(segment+'.log')).open('xb') as log:
-                child=subprocess.Popen([PYTHON,str(Path(__file__).resolve()),'worker','--segment',segment,'--plan',a.plan,'--sha',a.sha],
-                    env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+                command=[PYTHON,str(Path(__file__).resolve()),'worker','--segment',segment,'--plan',a.plan,'--sha',a.sha]
+                if REVISION002:command.insert(2,'--revision002')
+                child=subprocess.Popen(command,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
                 child.wait(timeout=max(1,CAP-120-(time.monotonic()-start)))
             assert child.returncode==0, 'A segment failed; no automatic retries'
             assert not owners(uuid)
@@ -194,14 +218,16 @@ def run(a):
         elapsed=time.monotonic()-start
         save(E/'terminal.json',dict(success=error is None and released and restored and elapsed<=CAP,terminal=True,
             error_type=error,elapsed_seconds=elapsed,allocated_cards=1,charged_upper_GPUh=max(1.4,elapsed/3600),
-            cumulative_new_technical_upper_GPUh=.6+max(1.4,elapsed/3600),released=released,modes_restored=restored,
+            cumulative_new_technical_upper_GPUh=PRIOR_TECHNICAL_GPUH+max(1.4,elapsed/3600),released=released,modes_restored=restored,
             formal_training_allowed=False,goal_complete=False))
         for s,h in old.items():signal.signal(s,h)
     assert error is None and released and restored
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('command',choices=['prepare','run','worker'])
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--revision002',action='store_true')
+    p.add_argument('command',choices=['prepare','run','worker'])
     p.add_argument('--plan');p.add_argument('--sha');p.add_argument('--segment');a=p.parse_args()
+    if a.revision002:configure_revision002()
     if a.command=='prepare':print(json.dumps(prepare(),sort_keys=True))
     elif a.command=='worker':worker(a)
     else:run(a)

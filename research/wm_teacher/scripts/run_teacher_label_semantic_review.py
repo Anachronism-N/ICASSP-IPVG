@@ -17,6 +17,7 @@ MODEL = Path('/dockerdata/wm_models_qwen8b_review_20261103')
 CAP, TAIL = 3600, 120
 ALLOCATION_GPUH = 1
 FOLLOWUP = False
+CAMPAIGN003 = False
 PRIOR_GPUH = 20.165898210853467
 AUTH = ROOT / 'eval/teacher_label_semantic_review_20261103/review.authorization.json'
 AUTH_SHA = '8eac69afd4a42f3966bae70bad1d0947a9e44c41fe0eabb673e28cb5dbbc3154'
@@ -44,6 +45,14 @@ def configure_followup():
     AUTH = ROOT / 'eval/teacher_label_review_followup_20261103/review.authorization.json'
     AUTH_SHA = '142e74234d32884bcc5fdbafd2ff6278a7ac75a4b14a91e9c16219e115dde590'
 
+
+def configure_campaign003():
+    global CAP,TAIL,ALLOCATION_GPUH,PRIOR_GPUH,AUTH,AUTH_SHA,CAMPAIGN003
+    CAMPAIGN003=True
+    CAP,TAIL,ALLOCATION_GPUH=3600,120,1
+    PRIOR_GPUH=41.832564877520134
+    AUTH=ROOT/'eval/teacher_progress_campaign_20261104/semantic_review003/review.authorization.json'
+    AUTH_SHA='94d2945be0e6724bc25302c27b0bd2ede5581dec5d03cf9127a31f03fee00309'
 
 def helpers():
     import run_teacher_qwen3vl32b_recovery as r
@@ -130,39 +139,51 @@ def prepare(evidence_roots, model_proof, output):
     for group, root in enumerate(evidence_roots):
         root = Path(root)
         require(root.is_absolute() and root.resolve() == root, 'Canonical private evidence required')
-        audit_row = record(root / 'completion.independent_audit.json')
+        audit_row = record(root / ('completion.audit.json' if CAMPAIGN003 else 'completion.independent_audit.json'))
         audit = read(audit_row)
-        require(audit['summary']['cases_attempted'] == 32 and audit['summary']['GPUs_released'] is True,
+        if CAMPAIGN003:
+            require(audit_row['sha256']==scope['source_audit_sha256'], 'Exact original allocation audit required')
+            require(audit['labels']==30 and audit['errors']==2 and audit['charged_upper_GPUh']==6, 'Unchanged original result denominator required')
+            summary=dict(cases_attempted=audit['cases_attempted'],GPUs_released=audit['resource_modes_restored'],
+                         cumulative_label_upper_GPUh=audit['historical_plus_new_label_upper_GPUh'])
+        else:summary=audit['summary']
+        require(summary['cases_attempted'] == 32 and summary['GPUs_released'] is True,
                 'Only completely executed/released evidence is reviewable')
         inputs.append(audit_row)
-        cost_path = root / 'run01_raw_snapshot/cost.failure.json'
+        raw_root=root/('raw_snapshot' if CAMPAIGN003 else 'run01_raw_snapshot')
+        cost_path = raw_root / 'cost.failure.json'
         if not cost_path.exists():
-            cost_path = root / 'run01_raw_snapshot/cost.closure.json'
+            cost_path = raw_root / 'cost.closure.json'
         cost_row = record(cost_path)
         cost = read(cost_row)
         require(cost['terminal'] is True and cost.get('released_observed', cost.get('released')) is True,
                 'Original complete allocation must remain charged')
         prior.append(cost_row)
         for i in range(32):
-            label_row = record(root / 'run01_raw_snapshot' / f'label{i}.json')
+            label_row = record(raw_root / f'label{i}.json')
             label = read(label_row)
             if 'error_type' in label:
                 continue  # Denominator retained below; never infer a missing caption.
             r.validate_facts(label['facts_json'])
             r.validate_caption(label['caption'])
-            video_row = record(root / 'run01_raw_snapshot' / f'video{i}.mp4')
+            video_row = record(raw_root / f'video{i}.mp4')
             require(video_row['sha256'] == label['video_sha256'], 'Exact reviewed source bytes required')
-            jobs.append(dict(index=len(jobs), evidence_group=group, source_index=i, label=label_row, video=video_row))
-    require(len(evidence_roots) == 2 and len(jobs) <= 64 and jobs, 'Fixed two-run review scope required')
-    require(read(inputs[-1])['summary']['cumulative_label_upper_GPUh'] == PRIOR_GPUH, 'Cumulative label budget drift')
+            jobs.append(dict(index=len(jobs), evidence_group=(int(i>=16) if CAMPAIGN003 else group), source_index=i, label=label_row, video=video_row))
+    require(len(evidence_roots)==(1 if CAMPAIGN003 else 2) and jobs and len(jobs)<=64, 'Fixed review scope required')
+    if CAMPAIGN003:
+        require(len(jobs)==scope['expected_valid_labels']==30 and scope['all_cases_denominator']==32, 'Exact first-review scope required')
+        require(scope['prior_new_label_GPUh']==18 and scope['new_label_cap_GPUh']==96, 'Frozen campaign phase budget required')
+        require(record(AUTH.parent.parent/'campaign.authorization.json')['sha256']==scope['parent_campaign_sha256'], 'Exact campaign authorization required')
+    require(summary['cumulative_label_upper_GPUh'] == PRIOR_GPUH, 'Cumulative label budget drift')
     import gpu_hold
     uuid = gpu_hold.query_gpus()[0]['uuid']
     plan = dict(schema='teacher_label_independent_review_plan_v1', private=True,
         hostname=os.uname().nodename, node_ip=os.environ.get('NODE_IP'), gpu_uuid=uuid, allocated_cards=1,
         cap_seconds=CAP, tail_seconds=TAIL, prior_charged_label_GPUh=PRIOR_GPUH, upper_GPUh=ALLOCATION_GPUH,
-        cumulative_label_upper_GPUh=PRIOR_GPUH+ALLOCATION_GPUH, stage_cap_GPUh=24,
+        cumulative_label_upper_GPUh=PRIOR_GPUH+ALLOCATION_GPUH, stage_cap_GPUh=(96 if CAMPAIGN003 else 24),
+        new_label_stage_prior_GPUh=(18 if CAMPAIGN003 else None),
         output_root=str(Path(output).parent / 'review_run01'), inputs=inputs, previous_costs=prior,
-        jobs=jobs, all_cases_denominator=64, model=model, runtime=r.runtime(),
+        jobs=jobs, all_cases_denominator=(32 if CAMPAIGN003 else 64), model=model, runtime=r.runtime(),
         source={n: record(ROOT/n) for n in ('scripts/run_teacher_label_semantic_review.py',
             'tests/test_teacher_label_semantic_review.py', *r.SOURCE_NAMES)},
         authorization=authorization, prompt_sha256=hashlib.sha256(PROMPT.encode()).hexdigest(), controls=controls(),
@@ -184,6 +205,11 @@ def verify(plan_path, digest, end=None):
             'formal_training_allowed','AR_allowed','student_distillation_allowed')),
         'Exact finite independent-review scope required')
     require(p['authorization']==r.pinned(AUTH,AUTH_SHA,end), 'Exact independent review authorization SHA required')
+    if CAMPAIGN003:
+        scope=read(p['authorization'],end)
+        require(p['all_cases_denominator']==32 and len(p['jobs'])==30 and p['new_label_stage_prior_GPUh']==18
+                and p['stage_cap_GPUh']==96 and 18+ALLOCATION_GPUH<=96, 'Exact separate campaign budget required')
+        require(record(AUTH.parent.parent/'campaign.authorization.json',end)['sha256']==scope['parent_campaign_sha256'], 'Campaign authorization drift')
     for row in [p['authorization'],*p['inputs'], *p['previous_costs'], *p['source'].values()]: r.check(row, end)
     for row in p['model']['files']: r.check({k: row[k] for k in ('path','bytes','sha256')}, end)
     require(r.runtime(end) == p['runtime'], 'Current selected review runtime differs')
@@ -280,6 +306,7 @@ def run(args):
     r,process=helpers()
     require(args.gpu_authorized and Path(sys.argv[0]).is_absolute(), 'Explicit new canonical reviewer allocation required')
     start=time.monotonic(); end=start+CAP-TAIL;child=owner=None;tracked=[];released=False;error=None
+    lease=None;resource_mode=None;resource_restored=not CAMPAIGN003;holder_signals=[]
     bound=r.pinned(args.plan,args.sha,end);p=read(bound,end)
     output=Path(p['output_root'])
     require(output.is_absolute() and output.resolve()==output and output.parent.resolve()==Path(args.plan).parent.resolve(),
@@ -292,6 +319,19 @@ def run(args):
     try:
         p,bound=verify(args.plan,args.sha,end)
         publication(p,args.commit,args.receipt,end)
+        if CAMPAIGN003:
+            import teacher_gpu_exclusive as guard
+            resource_mode=guard.query_modes()[p['gpu_uuid']]
+            require(resource_mode['index']==0 and resource_mode['mode'] in ('Default','Exclusive_Process'), 'Assigned new-cluster GPU0 only')
+            lease_dir=Path('/dockerdata/wm_gpu_exclusivity');lease_dir.mkdir(mode=0o700,exist_ok=True)
+            candidate=lease_dir/(p['gpu_uuid']+'.json')
+            with candidate.open('x') as f:f.write(json.dumps(dict(gpu_uuid=p['gpu_uuid'],expires_epoch=time.time()+CAP,owner_pid=os.getpid())))
+            candidate.chmod(0o600);lease=candidate
+            subprocess.run(['nvidia-smi','-i',p['gpu_uuid'],'-c','3'],check=True,capture_output=True,timeout=10)
+            for pid in process.query_release(p['gpu_uuid'])['pids']:
+                identity=guard.signal_holder(pid,0)
+                require(identity is not None, 'Unknown review GPU owner blocks execution')
+                holder_signals.append(identity)
         require(process.query_release(p['gpu_uuid'])['pids']==[], 'Review GPU not idle; no foreign signals allowed')
         parent=process.identity(os.getpid())
         launch=write(output/'launch.json',dict(parent=parent,plan=bound,start_monotonic=start))
@@ -299,6 +339,7 @@ def run(args):
         command=['timeout','--signal=TERM','--kill-after=20s',f'{seconds}s',PYTHON,str(Path(__file__).resolve()),
                  'worker','--plan',bound['path'],'--sha',bound['sha256'],'--launch',launch['path']]
         if FOLLOWUP:command.insert(command.index('worker'),'--followup')
+        if CAMPAIGN003:command.insert(command.index('worker'),'--campaign003')
         env=dict(os.environ,CUDA_VISIBLE_DEVICES=p['gpu_uuid'],HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',OMP_NUM_THREADS='1')
         with (output/'worker.log').open('xb') as log:
             child=subprocess.Popen(command,stdout=log,stderr=subprocess.STDOUT,env=env,start_new_session=True)
@@ -322,9 +363,19 @@ def run(args):
         except BaseException as exc:
             error=type(exc).__name__
             released=False
+        if lease is not None:
+            try:
+                subprocess.run(['nvidia-smi','-i',p['gpu_uuid'],'-c','0' if resource_mode['mode']=='Default' else '3'],
+                               check=True,capture_output=True,timeout=10)
+                resource_restored=guard.query_modes()[p['gpu_uuid']]['mode']==resource_mode['mode']
+                require(json.loads(lease.read_text())['owner_pid']==os.getpid(), 'Lease ownership drift')
+                lease.unlink()
+            except BaseException as exc:error=type(exc).__name__;resource_restored=False
+        elif CAMPAIGN003:resource_restored=True
         elapsed=time.monotonic()-start
         result=dict(schema='teacher_label_review_terminal_v1',terminal=True,plan=bound,
-            success=error is None and released and elapsed<CAP,review_semantic_pass=False,error_type=error,
+            success=error is None and released and resource_restored and elapsed<CAP,review_semantic_pass=False,error_type=error,
+            resource_modes_restored=resource_restored,holder_signals=holder_signals,old_cluster_touched=False,
             start_monotonic=start,elapsed_seconds=elapsed,allocated_cards=1,cap_seconds=CAP,
             actual_allocated_GPUh=elapsed/3600,charged_upper_GPUh=max(ALLOCATION_GPUH,elapsed/3600),
             cumulative_label_upper_GPUh=PRIOR_GPUH+max(ALLOCATION_GPUH,elapsed/3600),GPUs_released=released,release_queries=queries,
@@ -336,13 +387,15 @@ def run(args):
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--followup',action='store_true')
+    parser=argparse.ArgumentParser(description=__doc__)
+    modes=parser.add_mutually_exclusive_group();modes.add_argument('--followup',action='store_true');modes.add_argument('--campaign003',action='store_true')
     parser.add_argument('command',choices=['prepare','run','worker'])
     parser.add_argument('--plan');parser.add_argument('--sha');parser.add_argument('--launch')
-    parser.add_argument('--evidence',nargs=2);parser.add_argument('--model-proof');parser.add_argument('--output')
+    parser.add_argument('--evidence',nargs='+');parser.add_argument('--model-proof');parser.add_argument('--output')
     parser.add_argument('--commit');parser.add_argument('--receipt');parser.add_argument('--gpu-authorized',action='store_true')
     a=parser.parse_args()
     if a.followup:configure_followup()
+    if a.campaign003:configure_campaign003()
     if a.command=='prepare': result=prepare(a.evidence,a.model_proof,a.output)
     elif a.command=='worker': result=worker(a.plan,a.sha,a.launch)
     else: result=run(a)

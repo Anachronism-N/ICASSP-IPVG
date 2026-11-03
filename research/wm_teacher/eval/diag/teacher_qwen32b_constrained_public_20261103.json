@@ -414,5 +414,43 @@
   "structural_32_caption_gate_pass": false,
   "student_distillation_allowed": false,
   "wall_cap_seconds": 2400,
-  "worker_receipt_present": true
+  "worker_receipt_present": true,
+  "new_campaign_allocation003": {
+    "date": "2026-11-04",
+    "fixed_cases": 32,
+    "cases_attempted": 32,
+    "labels": 30,
+    "errors": 2,
+    "diagnostic": {
+      "labels": 16,
+      "cases": 16
+    },
+    "blind_source_group": {
+      "labels": 14,
+      "cases": 16
+    },
+    "structural_32_caption_gate_pass": false,
+    "failure_counts": {
+      "Caption must contain 40..120 words": 2
+    },
+    "actual_parent_GPUh": 1.846446653527932,
+    "actual_full_resource_GPUh": 5.672009577362074,
+    "charged_upper_GPUh": 6,
+    "new_label_used_upper_GPUh": 18,
+    "historical_label_upper_GPUh": 41.832564877520134,
+    "resource_modes_restored": true,
+    "semantic_review_pass": false,
+    "formal_training_allowed": false,
+    "sota_proven": false
+  },
+  "new_campaign_exact_resume001": {
+    "success": false,
+    "failure_stage": "trainer_API_before_first_update",
+    "failure_reason": "FixedOrder does not exist; real trainer uses DataOrder",
+    "charged_upper_GPUh": 1.4,
+    "cumulative_new_technical_upper_GPUh": 2,
+    "released": true,
+    "modes_restored": true,
+    "formal_training_allowed": false
+  }
 }
