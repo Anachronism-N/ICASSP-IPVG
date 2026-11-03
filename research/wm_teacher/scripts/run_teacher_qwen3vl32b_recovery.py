@@ -56,6 +56,9 @@ CUMULATIVE_CAP_GPUH = 8.165898210853468
 ORIGINAL_PRIOR_GPUH = PRIOR_GPUH
 ORIGINAL_CUMULATIVE_CAP_GPUH = CUMULATIVE_CAP_GPUH
 SUPPLEMENTAL = False
+PROMPT_V2 = False
+PROMPT_V2_AUTH = ROOT / 'eval/teacher_label_prompt_v2_20261103/prompt_v2.authorization.json'
+PROMPT_V2_AUTH_SHA = '5a70b129fb053dce7c3dde62542adcc064e47543b84ef844de88079c13d4111c'
 SUPPLEMENTAL_AUTH = ROOT / 'eval/teacher_label_supplemental_20261103/supplemental.authorization.json'
 SUPPLEMENTAL_AUTH_SHA = 'd3c7e6ddc2dfffd0f63f2bb8cfd9f614412b8b764dd56a4a144c81dfacc41fe5'
 WEIGHT_BYTES = 66714912872
@@ -143,6 +146,72 @@ unsupported dynamics, or frame/sample indices, sampling/clip metadata. Do not pa
 invented events or automatically insert a motionless/no-change sentence. Return paragraph only.
 Facts:
 """
+
+
+ORIGINAL_FACTS_PROMPT_SHA = hashlib.sha256(FACTS_PROMPT.encode()).hexdigest()
+ORIGINAL_CAPTION_PROMPT_SHA = hashlib.sha256(CAPTION_PROMPT.encode()).hexdigest()
+FACTS_PROMPT_V2 = FACTS_PROMPT + """
+Positive output specification: describe the depicted scene and generic visible entities directly.
+Write descriptions as ordinary appearance, location, pose and visible motion; never narrate how
+images were sampled or how text/identity could be read. Keep each entity description concise.
+For an event, describe only the action of its entity_id; split simultaneous actions into separate
+entity-specific events, with no speculation about anyone else. For a still scene, events=[] and
+state only the visible arrangement in start_end_difference. Report what is supported, not a
+list of unavailable information. The JSON's numeric frame_start/frame_end fields are sufficient
+for chronology; prose descriptions use ordinary scene language without sampling terminology.
+"""
+CAPTION_PROMPT_V2 = """Write exactly ONE English paragraph describing the depicted scene using the SAME sixteen
+images and the grounded facts below. Use four sentences, each with 12 to 22 words, for a total
+of 48 to 88 words. Plain text only, no title, list, newline, JSON, quotation marks or word counts.
+Sentence 1: generic visible subject and appearance in its setting.
+Sentence 2: supported pose or action, attributed to the correct subject and visible object.
+Sentence 3: another supported scene detail or visible progression without inventing an event.
+Sentence 4: the visible end relationship; preserve an outward-and-return trajectory if supported.
+For a still scene, describe appearance, spatial arrangement and supported unchanged state;
+never invent movement merely to reach the length. Choose a few relevant details rather than
+listing every object. Stay concise, and describe the scene directly instead of the input images.
+Use normal chronology words such as initially, then and finally when useful. Never use frame,
+frames, sampled, sampling, timestamps, fps, resolution, names, brands, OCR, identity, inferred
+intent, unseen objects or a claim about an unavailable view. State only supported visible facts,
+not what could not be read or inferred. Plain paragraph only. Facts:
+"""
+
+
+def configure_prompt_v2():
+    global PROMPT_V2, LOCAL, STATE_DIR, RECOVERY_EVIDENCE, PRIOR_GPUH, CUMULATIVE_CAP_GPUH
+    global FACTS_PROMPT, CAPTION_PROMPT, PROMPT_VERSION
+    PROMPT_V2 = True
+    LOCAL = Path('/dockerdata/wm_tmp/teacher_qwen32b_prompt_v2_20261103_run01')
+    STATE_DIR = Path('/dockerdata/wm_logs/teacher_qwen32b_prompt_v2_20261103')
+    RECOVERY_EVIDENCE = PROMPT_V2_AUTH.parent
+    PRIOR_GPUH = 14.165898210853467
+    CUMULATIVE_CAP_GPUH = 20.165898210853467
+    FACTS_PROMPT, CAPTION_PROMPT = FACTS_PROMPT_V2, CAPTION_PROMPT_V2
+    PROMPT_VERSION = 'qwen3vl32b-positive-output-policy-v2'
+
+
+def prompt_v2_authorization(end=None):
+    row = pinned(PROMPT_V2_AUTH, PROMPT_V2_AUTH_SHA, end)
+    a = read(row, end)
+    expected = dict(allocation_ordinal=3, new_allocation_GPUh_cap=6, wall_cap_seconds=5400,
+        allocated_cards=4, dtype='bfloat16', cases=32, fixed_groups=[16, 16], frames_per_case=16,
+        prior_charged_upper_GPUh=PRIOR_GPUH, cumulative_label_upper_GPUh_cap=CUMULATIVE_CAP_GPUH,
+        label_stage_cap_GPUh=24, automatic_retry_allowed=False, original_validation_gates_preserved=True,
+        original_cases_preserved=True, original_raw_failures_and_costs_preserved=True,
+        full_rebuild_allowed=False, formal_training_allowed=False, AR_allowed=False, student_distillation_allowed=False)
+    require(a.get('schema') == 'teacher_qwen32b_prompt_policy_v2_authorization_v1'
+        and a.get('user_directive') == '请持续推进实验,直到模型能接近或者超越sota'
+        and all(type(a.get(k)) is type(v) and a[k] == v for k, v in expected.items()),
+        'Exact new prompt-policy allocation required; no previous allocation reset')
+    prior = ROOT / 'eval/teacher_label_supplemental_20261103'
+    require(a['previous_experiment']['path'] == str(prior / 'run01_raw_snapshot/cost.failure.json')
+        and a['previous_claim']['path'] == str(prior / 'attempt.claim'), 'Previous charged allocation records required')
+    failure, claim = read(a['previous_experiment'], end), read(a['previous_claim'], end)
+    require(failure['terminal'] is True and failure['success'] is False
+        and failure['released_observed'] is True and failure['allocated_GPUh'] == 6.0
+        and failure['cumulative_label_upper_GPUh'] == PRIOR_GPUH and type(claim.get('pid')) is int,
+        'Previous failure and claim must remain consumed and fully charged')
+    return row
 
 
 def require(ok, message):
@@ -238,7 +307,8 @@ def configure_supplemental():
 def canonical_launch(argv):
     require(type(argv) is list and len(argv) >= 2 and argv[1] == str(Path(__file__).resolve()),
             'Launch the parent with the absolute canonical runner path before any allocation')
-    require(argv.count('--supplemental') == int(SUPPLEMENTAL), 'Exact supplemental launch scope required')
+    require(argv.count('--supplemental') == int(SUPPLEMENTAL)
+        and argv.count('--prompt-v2') == int(PROMPT_V2), 'Exact experimental launch scope required')
     return True
 
 
@@ -341,7 +411,7 @@ def authorization_rows(end=None):
     require(CAP == 5400 and TAIL == 120 and CARDS == 4 and ALLOCATION_GPUH == CARDS * CAP / 3600
             and abs(PRIOR_GPUH + ALLOCATION_GPUH - CUMULATIVE_CAP_GPUH) < 1e-12
             and CUMULATIVE_CAP_GPUH <= 24, 'No phase borrowing')
-    return rows + [recovery_row, cluster_row] + ([supplemental_authorization(end)] if SUPPLEMENTAL else [])
+    return rows + [recovery_row, cluster_row] + ([supplemental_authorization(end)] if SUPPLEMENTAL else []) + ([prompt_v2_authorization(end)] if PROMPT_V2 else [])
 
 
 def runtime(end=None):
@@ -464,8 +534,8 @@ def first_pilot_identity(jobs, end=None):
     keys = ('index', 'group', 'sample_id', 'video', 'original_prompt_sha256')
     require(first.get('schema') == 'teacher_qwen3vl32b_pilot_plan_v1' and len(first['jobs']) == 32
         and [{k: j[k] for k in keys} for j in jobs] == [{k: j[k] for k in keys} for j in first['jobs']]
-        and first['config']['facts_prompt_sha256'] == fixed_config()['facts_prompt_sha256']
-        and first['config']['caption_prompt_sha256'] == fixed_config()['caption_prompt_sha256'],
+        and first['config']['facts_prompt_sha256'] == (ORIGINAL_FACTS_PROMPT_SHA if PROMPT_V2 else fixed_config()['facts_prompt_sha256'])
+        and first['config']['caption_prompt_sha256'] == (ORIGINAL_CAPTION_PROMPT_SHA if PROMPT_V2 else fixed_config()['caption_prompt_sha256']),
         'Recovery must use the same 32 cases, bytes and prompts as the first pilot')
     return True
 
@@ -901,7 +971,8 @@ def verify_worker_ancestry(launch, p, bound, ancestors, supervised):
     parent = launch['parent']
     require(any(same_identity(a, parent) for a in ancestors), 'Actual approved parent ancestor required')
     args = parent['argv']
-    require(args.count('--supplemental') == int(SUPPLEMENTAL), 'Actual supplemental parent command binding differs')
+    require(args.count('--supplemental') == int(SUPPLEMENTAL) and args.count('--prompt-v2') == int(PROMPT_V2),
+        'Actual experimental parent command binding differs')
     require(str(Path(__file__).resolve()) in args and 'run' in args and args.count('--gpu-authorized') == 1
         and exact_flags(args, (('--plan', bound['path']), ('--approved-plan-sha256', bound['sha256']),
             ('--approval', launch['approval']['path']), ('--approved-approval-sha256', launch['approval']['sha256']))),
@@ -1193,6 +1264,8 @@ def run(path, digest, approval_path, approval_digest, gpu_authorized=False):
             'worker', '--plan', bound['path'], '--approved-plan-sha256', digest, '--launch', launch_row['path']]
         if SUPPLEMENTAL:
             command.insert(command.index('worker'), '--supplemental')
+        if PROMPT_V2:
+            command.insert(command.index('worker'), '--prompt-v2')
         env = dict(os.environ, CUDA_VISIBLE_DEVICES=','.join(p['gpu_uuids']), HF_HUB_OFFLINE='1',
                    TRANSFORMERS_OFFLINE='1', OMP_NUM_THREADS='1')
         with (LOCAL / 'worker.log').open('xb') as log:
@@ -1315,7 +1388,9 @@ def run(path, digest, approval_path, approval_digest, gpu_authorized=False):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--supplemental', action='store_true', help='Only the separately authorized second allocation; original claim and costs preserved')
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument('--supplemental', action='store_true', help='Separately authorized second allocation; original claim and costs preserved')
+    modes.add_argument('--prompt-v2', action='store_true', help='New positive-output prompt experiment; original validation gates unchanged')
     commands = parser.add_subparsers(dest='command', required=True)
     prep = commands.add_parser('prepare')
     prep.add_argument('--model-proof', required=True)
@@ -1339,6 +1414,8 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.supplemental:
         configure_supplemental()
+    if args.prompt_v2:
+        configure_prompt_v2()
     if args.command == 'run':
         canonical_launch([sys.executable, sys.argv[0], *(sys.argv[1:] if argv is None else argv)])
     if args.command == 'model-proof':

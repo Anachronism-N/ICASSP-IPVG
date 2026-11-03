@@ -1081,3 +1081,45 @@ def test_supplemental_auth_real_file_bindings_retain_failure(tmp_path, monkeypat
     else:
         with pytest.raises(ValueError): pilot.supplemental_authorization()
     assert pilot.record(claim['path']) == claim and pilot.record(failure['path']) == failure
+
+
+
+def test_prompt_v2_only_changes_policy_not_precise_validators(monkeypatch):
+    keys = ('PROMPT_V2', 'LOCAL', 'STATE_DIR', 'RECOVERY_EVIDENCE', 'PRIOR_GPUH',
+            'CUMULATIVE_CAP_GPUH', 'FACTS_PROMPT', 'CAPTION_PROMPT', 'PROMPT_VERSION')
+    for k in keys: monkeypatch.setattr(pilot, k, getattr(pilot, k))
+    before = pilot.fixed_config()
+    facts_validator, caption_validator = pilot.validate_facts, pilot.validate_caption
+    pilot.configure_prompt_v2()
+    after = pilot.fixed_config()
+    changed = {k for k in before if before[k] != after[k]}
+    assert changed == {'facts_prompt_sha256', 'caption_prompt_sha256', 'prompt_version'}
+    assert pilot.validate_facts is facts_validator and pilot.validate_caption is caption_validator
+    assert pilot.PRIOR_GPUH == 14.165898210853467 and pilot.CUMULATIVE_CAP_GPUH == 20.165898210853467
+    assert after['frames'] == 16 and after['caption_words'] == [40, 120] and after['do_sample'] is False
+    assert '12 to 22 words' in pilot.CAPTION_PROMPT and '48 to 88 words' in pilot.CAPTION_PROMPT
+    assert pilot.canonical_launch([sys.executable, str(Path(pilot.__file__).resolve()), '--prompt-v2', 'run'])
+    with pytest.raises(ValueError):
+        pilot.canonical_launch([sys.executable, str(Path(pilot.__file__).resolve()), '--supplemental', 'run'])
+    for bad in (' '.join(['visible']*121), CAPTION + ' The frame shows a table.'):
+        with pytest.raises(ValueError): pilot.validate_caption(bad)
+
+
+def test_prompt_v2_same_cases_still_rejects_swapping(monkeypatch):
+    for k in ('PROMPT_V2', 'LOCAL', 'STATE_DIR', 'RECOVERY_EVIDENCE', 'PRIOR_GPUH',
+              'CUMULATIVE_CAP_GPUH', 'FACTS_PROMPT', 'CAPTION_PROMPT', 'PROMPT_VERSION'):
+        monkeypatch.setattr(pilot, k, getattr(pilot, k))
+    prep, _, _, _ = pilot.helpers()
+    _, rows = prep.manifest_rows(pilot.MANIFEST)
+    old = pilot.read(pilot.pinned(pilot.OLD_PLAN, pilot.OLD_PLAN_SHA))
+    pilot.configure_prompt_v2()
+    jobs = pilot.jobs_for(rows, old)
+    assert pilot.first_pilot_identity(jobs)
+    jobs[0], jobs[1] = jobs[1], jobs[0]
+    with pytest.raises(ValueError): pilot.first_pilot_identity(jobs)
+
+
+def test_protocol_modes_are_mutually_exclusive():
+    with pytest.raises(SystemExit):
+        pilot.main(['--supplemental', '--prompt-v2', 'verify', '--plan', 'missing',
+                    '--approved-plan-sha256', 'a'*64])
