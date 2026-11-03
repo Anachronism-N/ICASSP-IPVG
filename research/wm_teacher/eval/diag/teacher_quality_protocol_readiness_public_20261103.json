@@ -1,0 +1,214 @@
+{
+  "base_vbench": {
+    "camera_motion_present": false,
+    "core_cases": 355,
+    "coverage": {
+      "aesthetic_quality": {
+        "all_scores_finite": true,
+        "expected": 355,
+        "observed": 355,
+        "set_exact": true
+      },
+      "background_consistency": {
+        "all_scores_finite": true,
+        "expected": 109,
+        "observed": 109,
+        "set_exact": true
+      },
+      "dynamic_degree": {
+        "all_scores_finite": true,
+        "expected": 246,
+        "observed": 246,
+        "set_exact": true
+      },
+      "i2v_background": {
+        "all_scores_finite": true,
+        "expected": 109,
+        "observed": 109,
+        "set_exact": true
+      },
+      "i2v_subject": {
+        "all_scores_finite": true,
+        "expected": 246,
+        "observed": 246,
+        "set_exact": true
+      },
+      "imaging_quality": {
+        "all_scores_finite": true,
+        "expected": 355,
+        "observed": 355,
+        "set_exact": true
+      },
+      "motion_smoothness": {
+        "all_scores_finite": true,
+        "expected": 246,
+        "observed": 246,
+        "set_exact": true
+      },
+      "subject_consistency": {
+        "all_scores_finite": true,
+        "expected": 246,
+        "observed": 246,
+        "set_exact": true
+      }
+    },
+    "local_core_samples_per_pair": 1,
+    "official_camera_unique_videos": 3815,
+    "official_camera_weight": 0.1,
+    "official_core_samples_per_pair": 5,
+    "official_core_unique_videos": 1775,
+    "official_i2v_weight_sum": 2.1,
+    "official_original_total": null,
+    "status": "8-dimensional core only; not official 9-dimensional Total",
+    "total_star_pct": 89.86007506693805,
+    "total_without_dynamic_pct": 91.13552887260545
+  },
+  "date": "2026-11-03",
+  "domain_holdout": {
+    "GTref_entries_finite": true,
+    "base_dreamsim_mean": 0.17463796300652587,
+    "cases": 108
+  },
+  "full_one_candidate_manifest_counts": {
+    "Physics_views": 198,
+    "VBench_core": 355,
+    "WorldModelBench": 350,
+    "domain_holdout": 108
+  },
+  "goal_complete": false,
+  "measured_old_C276_cost": {
+    "generation": 28.483680308025797,
+    "score": 1.1001517768838032,
+    "total": 29.5838320849096
+  },
+  "new_GPU_scoring_performed": false,
+  "new_generation_performed": false,
+  "official_reference": {
+    "comparison_status": "Exact checkpoint, sampling, prompt and camera/seed protocols not matched; no definitive gap",
+    "matched_sota_verified": false,
+    "model_rows": 36,
+    "snapshot_accessed_at": "2026-11-02T14:47:59.061912+00:00"
+  },
+  "physics": {
+    "E2_original_final_pct": 31.52620480645157,
+    "IQTable_recompute_this_audit": false,
+    "base_original_final_pct": 30.13037868892134,
+    "final_not_spatiotemporal_field": true,
+    "original_csv_rows_exact": true,
+    "protocol": "Original I2V single candidate",
+    "scenarios": 66
+  },
+  "quality_claim": false,
+  "requirements": [
+    "New candidate must pass semantic input and exact technical-resume gates before training",
+    "Evaluate a single frozen candidate on complete applicable sets; subset improvement is not final acceptance",
+    "Separate raw/po and single-candidate/BoN; original Total remains missing until camera protocol and five samples are fulfilled",
+    "Match exact external comparator checkpoints or mark leaderboard comparisons as reference only",
+    "Fresh A800 measurement required before freezing complete-generation and scoring caps; 64 GPUh is not guaranteed sufficient"
+  ],
+  "schema": "teacher_quality_protocol_readiness_audit_v1",
+  "sota_proven": false,
+  "source_files": [
+    {
+      "bytes": 80622,
+      "relative": "eval/vbench_i2v/scores/base__i2v_subject_eval_results.json",
+      "sha256": "cf0220b40d7a281a47cbecc5c2270bab55d4414a3c6956b156fd8d4318dfe171"
+    },
+    {
+      "bytes": 35991,
+      "relative": "eval/vbench_i2v/scores/base__i2v_background_eval_results.json",
+      "sha256": "fd1a3aceff820ad910e4f9b1f355224cd0d9f71c5e65c617450ca4bd09db21ef"
+    },
+    {
+      "bytes": 52032,
+      "relative": "eval/vbench_i2v/scores/base__subject_consistency_eval_results.json",
+      "sha256": "08d8cd04798dd87484e8aed52116bfc712d6aadafb61fce915892c854b76cb34"
+    },
+    {
+      "bytes": 32262,
+      "relative": "eval/vbench_i2v/scores/base__background_consistency_eval_results.json",
+      "sha256": "4aff7d560f31296c832cb1206cadb841762b4ba7a5934e968be0bdc76bdc6c00"
+    },
+    {
+      "bytes": 52023,
+      "relative": "eval/vbench_i2v/scores/base__motion_smoothness_eval_results.json",
+      "sha256": "d839cf8915192713ca23eb764d4c18e6abfb0b5f24467d088e9d3443ee151db0"
+    },
+    {
+      "bytes": 48719,
+      "relative": "eval/vbench_i2v/scores/base__dynamic_degree_eval_results.json",
+      "sha256": "33a7d4b57a8cb73eff019fb192a4a1c4bb255f56a2a962e23a6266643ebf3c2a"
+    },
+    {
+      "bytes": 75161,
+      "relative": "eval/vbench_i2v/scores/base__aesthetic_quality_eval_results.json",
+      "sha256": "36333e6b60d41cdddc891d87556707cc5423fde639d0349448ac15d5a980a110"
+    },
+    {
+      "bytes": 74800,
+      "relative": "eval/vbench_i2v/scores/base__imaging_quality_eval_results.json",
+      "sha256": "bb0cb29b5d6bd039bbf175c76f4ace2df90022ea2d045586c2b4c4a20819cdaf"
+    },
+    {
+      "bytes": 175479,
+      "relative": "eval/vbench_i2v/cases.jsonl",
+      "sha256": "af64dd751d0d4400fef61b714983d86b4b4ce2613b2a6a64257091ddf9b89128"
+    },
+    {
+      "bytes": 787,
+      "relative": "eval/physiq/results/physics-IQ-benchmark/results/base-op-run_01_metrics.json",
+      "sha256": "9ee444561e04dd3fede81cee516a78f04263064e47b2152e10cacfe730ed126b"
+    },
+    {
+      "bytes": 784,
+      "relative": "eval/physiq/results/physics-IQ-benchmark/results/base_s12c5-op-run_01_metrics.json",
+      "sha256": "078f2716b49593966950f00258af3bbc5fa306105d56b12f944e0aee147c2bd2"
+    },
+    {
+      "bytes": 2345425,
+      "relative": "eval/physiq/results/physics-IQ-benchmark/results/base-op-run_01.csv",
+      "sha256": "a4de9545792faa3d39e98905887cb2921a5d48fb73defee13d06f5bea479e606"
+    },
+    {
+      "bytes": 177429,
+      "relative": "eval/wmb/results/base.json",
+      "sha256": "5305c557de9d1616ec47214f31a3c0ee597c959558df0764e6d93649ffeb6109"
+    },
+    {
+      "bytes": 22187,
+      "relative": "eval/wm_bench/gtref_base.json",
+      "sha256": "a0172348ef35560618992f64e9c9353932c7646521e2c19ebf24f2450a394cbb"
+    },
+    {
+      "bytes": 40481,
+      "relative": "eval/diag/teacher_experiment_sota_review_20261102.json",
+      "sha256": "ae037b3b4b5ca1f8b256202058adea3ba12bfb20752757a1be8c031d338b6d41"
+    },
+    {
+      "bytes": 20598,
+      "relative": "eval/diag/teacher_C276_public_results_20261026.json",
+      "sha256": "6ce6993b8866fe7310378d29241637bd398a390a8d9c1b7a38f94ee4b41d3e58"
+    },
+    {
+      "bytes": 4177,
+      "relative": "migrated_official_reference/constant.py",
+      "sha256": "c265be4cb51f95257e0b9dfbcb95453d39edca47ee14cb3f7b11e6f20f165e17"
+    },
+    {
+      "bytes": 3542,
+      "relative": "migrated_official_reference/cal_i2v_final_score.py",
+      "sha256": "fd9e92b5d1bb3eb3413516e26c48f3e923516a70c2c9ecf1b17598fc94f7770e"
+    }
+  ],
+  "wmb": {
+    "base_total": 8.297142857142857,
+    "cases": 350,
+    "protocol": "local original eight-question judge",
+    "question_counts": {
+      "common_sense": 700,
+      "instruction": 350,
+      "physical_laws": 1750
+    }
+  },
+  "audit_script_sha256": "65202d46963352db8abf5eb7e0797ae28e2462d91732a4703dd39210f1364962"
+}

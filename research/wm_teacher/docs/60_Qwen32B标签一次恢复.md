@@ -134,3 +134,25 @@ CPU 协议测试：`tests/test_teacher_qwen3vl32b_recovery.py`。CPU 测试通�
 ### 无新增GPU分配的最小安全修复
 
 已在原监督父进程补每5s的4UUID原始PID检查；允许当前受监督树内的CUDA进程，发现外部重入即保存原查询、正常清理自有进程并保留失败/全额费用，不向外部PID发信号。这不是独占资源协调的替代品，也不是实机复跑或成功声明。新增CPU单测验证仅记录侵入PID且无外部kill接口；原执行源码21文件已经私有逐SHA保留，不事后把新防护说成原实验已具备。
+
+## 12. 持续目标被拒后追加只读核查（2026-11-03）
+
+目标未完成，原24GPUh标签预算剩余约0.167435122。现已向用户一次明确提出新增168GPUh上限和暂停其他新集群会话自动占卡/提供可安全暂停控制入口的请求；待答复，不将“继续目标”自动变成超原阶段帽或正式训练许可。168的96标签/cache、8技术、64门后训练/评测只是有限下一阶段推进范围，不保证64覆盖新Teacher+base+外部SOTA的官方全集；必须先用新增授权下的有限实机测量冻结后续可行分配，预算不足时不做半批验收或放宽规则。
+
+### 占卡重入实际控制原因
+
+现场launcher GPU0..3空闲。原pair-manager的resources_safe原证据显示训练结束/锁释放，现进程阻塞在wait旧holder，并没有循环重启逻辑；它不是新orphan holder的可证明调度来源。新占卡程序不读od_reserve标记、不取得ms12k flock、不检查已有CUDA任务。既有GPU0..3四个ms12k锁可以只读打开后临时取得/释放，文件均0bytes，未修改；所以仅创建新lease/锁并不能阻止该脚本占卡。未改共享外部项目源码、未向管理器发信号，尚未获得外部会话控制入口。需要会话层停止重复启动或经明确资源协调让所有占卡入口遵守同一lease；不能“删旧锁/杀全机python”假装解决。
+
+### 真实质量协议与预算复核
+
+独立读取官方cal_i2v_final_score与constant，camera位于I2V组、权重0.1/I2V总权2.1，Quality仍含dynamic0.5。base的355原病例适用八维分数集合全部精确、有限（dynamic是246个原bool判定，不当类型损坏）：Total*=89.860075、同公式去dynamic=91.135529。缺camera的原官方9维Total必须保持null；不调用官方缺维补零分支。完整官方core每pair5视频为1775，加camera109×7×5=3815，合5590视频，不等于目前本地core355。
+
+同时核对Physics原66scene CSV行及原final_score_orig字段，base30.130379%、E2 31.526205%；本轮没有重跑IQTable或重评分。WMB350/原2800判定（instruction350、物理1750、常识700）集合/类型通过、独立原公式8.297143；WM108原GTref全字段有限、DreamSim均值0.174638。官方外部精确checkpoint/输入模式/原caption或po/候选数和采样规格尚未对齐；同协议SOTA gap未确定。本次是原始结果复核，不是新模型或新GPU评分。
+
+C276原子集真实生成28.483680GPUh、评分1.100152GPUh；历史两seedALG/Dy每视频约360–389s仅作为旧机证据，不能承诺A800速度，不能据此声称64GPUh必定覆盖新模型完整四基准。已保存私有quality_protocol_readiness.audit.json，所有引用源码/输入SHA可复核，不改变原评分与训练门。
+
+### 已准备的私有人工盲审材料（未伪造审阅完成）
+
+复用已有serve_label_review.py的白名单输入契约，新准备两轮全部36段保留标签（原策略13、v2策略23）；固定seed20261103打乱顺序、隐藏方法名与AI结论。26个去重源视频均CPU完整解码121帧，共3146帧，分别生成0–60、61–120两页contact sheet，同时保留原视频观看入口。标签/video/pages原SHA核验及现有load_cases验证通过，原64条来源记录分母与28个缺标签记录边界另记。
+
+私有目录eval/teacher_label_semantic_review_20261103/human_review_pack，包含index/audit/隐藏mapping及preparation.receipt；权限700/600。没有启动网络listener、没有上传媒体、没有写任何human verdict；人工审阅完成和训练语义批准仍false。此准备解除的是素材/接口缺口，不是语义真值或正式训练门。后续可经现有本地只读check-only入口复核后供真人审阅；不把同族8B的adequate标记自动改写成人类判断。

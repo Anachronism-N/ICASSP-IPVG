@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-03 23:05:00 CST",
+  "created_at": "2026-11-03 23:19:04 CST",
   "files": [
     {
       "path": "README.md",
@@ -303,8 +303,8 @@
     },
     {
       "path": "docs/60_Qwen32B标签一次恢复.md",
-      "source_sha256": "cb6348318b434f8a85f90ef30eb3247194f7caa5c5a5409bdfbe48b0bf520bcb",
-      "snapshot_sha256": "cb6348318b434f8a85f90ef30eb3247194f7caa5c5a5409bdfbe48b0bf520bcb"
+      "source_sha256": "c5dce72c1ca8068a6aeb0bb512a638ee2db1847cddfd68807835f2c58a78d662",
+      "snapshot_sha256": "c5dce72c1ca8068a6aeb0bb512a638ee2db1847cddfd68807835f2c58a78d662"
     },
     {
       "path": "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
@@ -330,6 +330,11 @@
       "path": "eval/diag/teacher_qwen32b_constrained_public_20261103.json",
       "source_sha256": "c454a28c1dbec0b58e6a43952168319864120a5d8a2fa3b735e324722a3b3780",
       "snapshot_sha256": "c454a28c1dbec0b58e6a43952168319864120a5d8a2fa3b735e324722a3b3780"
+    },
+    {
+      "path": "eval/diag/teacher_quality_protocol_readiness_public_20261103.json",
+      "source_sha256": "84ae423217bf5f3adbf4bc227e31362c41ef01123b9c87e9e77a0601b4498662",
+      "snapshot_sha256": "84ae423217bf5f3adbf4bc227e31362c41ef01123b9c87e9e77a0601b4498662"
     },
     {
       "path": "scripts/run_teacher_label_semantic_review.py",
@@ -773,8 +778,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "b4b506189306f3d332e272f8f3103e1446e0945af7711f48e0a2607911aff550",
-      "snapshot_sha256": "b4b506189306f3d332e272f8f3103e1446e0945af7711f48e0a2607911aff550"
+      "source_sha256": "44cacededba57c005d1347e40b08d096c8c7785af5d7fadde8b575d73a088199",
+      "snapshot_sha256": "44cacededba57c005d1347e40b08d096c8c7785af5d7fadde8b575d73a088199"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -1335,11 +1340,12 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "ed5d64d7f9ea26fa5b443306f31268146e4c9c73",
+  "preserved_public_base_commit": "9f9bc0a4ec72166e0d35723043539689a72a3081",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
     "docs/60_Qwen32B标签一次恢复.md",
     "eval/diag/teacher_independent_label_review_public_20261103.json",
+    "eval/diag/teacher_quality_protocol_readiness_public_20261103.json",
     "eval/diag/teacher_qwen32b_constrained_public_20261103.json",
     "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
     "eval/diag/teacher_qwen32b_prompt_v2_public_20261103.json",
