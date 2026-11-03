@@ -1221,3 +1221,26 @@ def test_expanded_vectorized_scope_preserves_old_caps_and_validators(monkeypatch
     assert (pilot.validate_facts,pilot.validate_caption)==v
     assert pilot.fixed_config()['decoder_implementation']=='exact_vectorized_bad_words_v1'
     assert pilot.canonical_launch([sys.executable,str(Path(pilot.__file__).resolve()),'--vectorized','run'])
+
+
+
+def test_vectorized_mask_explicitly_moves_prefix_to_logits_device():
+    import torch
+    ids=torch.tensor([[3,4]]);scores=torch.randn(1,12)
+    moved=[];original=torch.Tensor.to
+    def observed(t,*args,**kwargs):
+        if t is ids:moved.append(args[0])
+        return original(t,*args,**kwargs)
+    with patch.object(torch.Tensor,'to',observed):
+        pilot.vectorized_bad_words([[4,5]],[11])(ids,scores)
+    assert moved==[scores.device]
+
+
+def test_vectorized_device_alignment_meta_logits():
+    import torch
+    ids=torch.tensor([[3,4]])
+    scores=torch.empty((1,12),device='meta')
+    mask=pilot.vectorized_bad_words([[4,5]],[11])
+    result=mask(ids,scores)
+    assert result.device==scores.device and ('meta',None) in mask.cache
+    assert mask.cache[('meta',None)][1][0].device==scores.device

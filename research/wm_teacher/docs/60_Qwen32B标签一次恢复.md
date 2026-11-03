@@ -178,3 +178,11 @@ C276原子集真实生成28.483680GPUh、评分1.100152GPUh；历史两seedALG/D
 新集群四卡临时使用EXCLUSIVE_PROCESS，已确认hold_gpu脚本按精确PIDFD/argv/设备归属暂停；守护只对这些已授权holder发SIGTERM，不杀业务任务、不改跨集群共享外部脚本。进入实验后CUDA上下文占有四卡会拒绝新增holder；既有每5秒外部PID检查保留。结束恢复原compute-mode并写独立账本；复原失败不算完成。原集群不动，非分配GPU不改。
 
 先完成此新协议的32/32结构与独立语义审核；FAIL不自动重试/放宽。正式训练仍须数据/cache语义门及独立FA2精确恢复验证后，按已批准的条件64GPUh范围冻结单候选。全基准和外部同协议对手不足时如实报告，不把工程通过当SOTA。
+
+### 新阶段allocation001终态与独立allocation002
+
+首轮db5f9cd在4卡EXCLUSIVE_PROCESS下完整尝试32病例，32例facts_generate均为统一RuntimeError、0标签；没有外部GPU侵入记录。资源守护323.902487s/约0.359891652实际allocatedGPUh、父266.194952s；按总上限保守计6GPUh，新阶段标签用6/96、总阶段6/168，旧23.832564878不退款。原错误没有保留详细traceback，不能凭泛化RuntimeError断言某个CUDA kernel唯一因果。
+
+CPU代码复核发现HF分片模型input_ids位于embedding卡，而输出scores位于lm_head卡；首次向量化掩码沿input_ids.device建prefix却向scores设备scatter，构成明确跨设备代码错误。新实现将prefix token与cache显式对齐scores.device；补单设备to调用及meta异设备回归，原掩码与原生CPU等价验证仍通过。此修复为新独立allocation002的实现版本，原failure/claim/实际源码快照保持不变，不删除claim自动重跑。新002单独从已批96内预留6GPUh，旧失败全额保留，53xx内层工作/5400s总资源窗、同32病例和16帧、原精确门不放宽；先实机证实代码路径，再谈结构/语义。
+
+四卡原compute_mode已正常恢复Default，已知holder仅精确PIDFD TERM，无共享外部源码改写/旧集群信号。资源独占这次实际生效，不把实现错误归因于卡不足。
