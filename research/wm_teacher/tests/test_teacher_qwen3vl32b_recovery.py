@@ -389,7 +389,8 @@ def harmless_tree(tmp_path, ignore_term=False):
     script = ('import subprocess,sys,time,os,json,signal;'
         + ('signal.signal(signal.SIGTERM,signal.SIG_IGN);' if ignore_term else '')
         + 'p=subprocess.Popen([sys.executable,"-c","import time;time.sleep(60)"]);'
-        + 'open(' + repr(str(marker)) + ',"w").write(json.dumps({"pid":p.pid}));time.sleep(60)')
+        + '\nwith open(' + repr(str(marker) + '.tmp') + ',"w") as f: f.write(json.dumps({"pid":p.pid}))\n'
+        + 'os.replace(' + repr(str(marker) + '.tmp') + ',' + repr(str(marker)) + ');time.sleep(60)')
     child = subprocess.Popen([sys.executable, '-c', script], start_new_session=True)
     _, process, _, _ = pilot.helpers()
     owner = process.identity(child.pid)
@@ -1009,3 +1010,74 @@ def test_second_recovery_claim_refused_without_dispatch(cpu_supervisor):
         call_cpu_supervisor(cpu_supervisor)
     assert not calls and not (local / 'attempt.lock').exists()
     assert list(evidence.glob('qwen3vl32b.allocation-failure.*.json'))
+
+
+@pytest.mark.parametrize('path', ['scripts/run_teacher_qwen3vl32b_recovery.py', './scripts/run_teacher_qwen3vl32b_recovery.py'])
+def test_relative_launch_rejected_before_claim_or_dispatch(path, monkeypatch):
+    calls = []
+    monkeypatch.setattr(pilot, 'run', lambda *args: calls.append(args))
+    monkeypatch.setattr(sys, 'argv', [path])
+    with pytest.raises(ValueError, match='absolute canonical runner path'):
+        pilot.main(['run', '--plan', 'missing', '--approved-plan-sha256', 'a'*64,
+            '--approval', 'missing', '--approved-approval-sha256', 'b'*64, '--gpu-authorized'])
+    assert calls == []
+
+
+def test_canonical_launch_preserves_exact_scope():
+    argv = [sys.executable, str(Path(pilot.__file__).resolve()), 'run']
+    assert pilot.canonical_launch(argv)
+    with pytest.raises(ValueError):
+        pilot.canonical_launch(argv + ['--supplemental'])
+    with patch.object(pilot, 'SUPPLEMENTAL', True):
+        assert pilot.canonical_launch(argv + ['--supplemental'])
+        with pytest.raises(ValueError):
+            pilot.canonical_launch(argv)
+
+
+def test_supplemental_configuration_keeps_original_budget_and_changes_claim_root(monkeypatch):
+    keys = ('SUPPLEMENTAL', 'LOCAL', 'STATE_DIR', 'RECOVERY_EVIDENCE', 'PRIOR_GPUH', 'CUMULATIVE_CAP_GPUH')
+    before = {k: getattr(pilot, k) for k in keys}
+    for k, v in before.items():
+        monkeypatch.setattr(pilot, k, v)
+    pilot.configure_supplemental()
+    assert pilot.PRIOR_GPUH == 8.165898210853467
+    assert pilot.CUMULATIVE_CAP_GPUH == 14.165898210853467
+    assert pilot.ORIGINAL_PRIOR_GPUH == 2.1658982108534675
+    assert pilot.ORIGINAL_CUMULATIVE_CAP_GPUH == 8.165898210853468
+    assert pilot.LOCAL != before['LOCAL'] and pilot.RECOVERY_EVIDENCE != before['RECOVERY_EVIDENCE']
+    assert pilot.RECOVERY_EVIDENCE == pilot.SUPPLEMENTAL_AUTH.parent
+
+
+@pytest.mark.parametrize('mutation', [None, 'budget', 'refund', 'claim', 'retry'])
+def test_supplemental_auth_real_file_bindings_retain_failure(tmp_path, monkeypatch, mutation):
+    monkeypatch.setattr(pilot, 'ROOT', tmp_path)
+    monkeypatch.setattr(pilot, 'PRIOR_GPUH', 8.165898210853467)
+    monkeypatch.setattr(pilot, 'CUMULATIVE_CAP_GPUH', 14.165898210853467)
+    old = tmp_path / 'eval/teacher_label_recovery_20261103'
+    (old / 'run01_raw_snapshot').mkdir(parents=True)
+    failure = pilot.write_new(old / 'run01_raw_snapshot/cost.failure.json', dict(terminal=True,
+        success=False, released_observed=True, allocated_GPUh=6.0,
+        prior_charged_label_GPUh=2.1658982108534675, cumulative_label_upper_GPUh=8.165898210853467))
+    claim = pilot.write_new(old / 'attempt.claim', dict(pid=123))
+    a = dict(schema='teacher_qwen32b_supplemental_allocation_authorization_v1',
+        user_reply='我给你所有权限,请继续进行推进',
+        new_allocation_GPUh_cap=6, wall_cap_seconds=5400, allocated_cards=4, fixed_cases=32,
+        fixed_groups=[16, 16], frames_per_case=16, dtype='bfloat16',
+        prior_charged_upper_GPUh=8.165898210853467, cumulative_label_upper_GPUh_cap=14.165898210853467,
+        label_stage_cap_GPUh=24, previous_consumed_recovery_attempts=1, allocation_ordinal=2,
+        original_recovery_claim_preserved=True, previous_failure_costs_preserved=True,
+        automatic_retry_allowed=False, sample_substitution_allowed=False, frame_reduction_allowed=False,
+        precision_gate_relaxation_allowed=False, formal_training_allowed=False, AR_allowed=False,
+        student_distillation_allowed=False, prior_failure=failure, prior_claim=claim)
+    if mutation == 'budget': a['new_allocation_GPUh_cap'] = 12
+    if mutation == 'refund': a['prior_charged_upper_GPUh'] = 2.1658982108534675
+    if mutation == 'claim': a['prior_claim'] = dict(claim, path=str(tmp_path / 'different.claim'))
+    if mutation == 'retry': a['automatic_retry_allowed'] = True
+    row = pilot.write_new(tmp_path / 'supplemental.json', a)
+    monkeypatch.setattr(pilot, 'SUPPLEMENTAL_AUTH', Path(row['path']))
+    monkeypatch.setattr(pilot, 'SUPPLEMENTAL_AUTH_SHA', row['sha256'])
+    if mutation is None:
+        assert pilot.supplemental_authorization() == row
+    else:
+        with pytest.raises(ValueError): pilot.supplemental_authorization()
+    assert pilot.record(claim['path']) == claim and pilot.record(failure['path']) == failure

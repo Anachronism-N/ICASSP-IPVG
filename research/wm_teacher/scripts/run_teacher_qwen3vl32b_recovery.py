@@ -53,6 +53,11 @@ FIRST_PILOT_PRIOR_GPUH = 0.1658982108534676
 # Earlier label GPUh plus the first 32B pilot's retained 2 GPUh upper bound; never refunded.
 PRIOR_GPUH = 2.1658982108534675
 CUMULATIVE_CAP_GPUH = 8.165898210853468
+ORIGINAL_PRIOR_GPUH = PRIOR_GPUH
+ORIGINAL_CUMULATIVE_CAP_GPUH = CUMULATIVE_CAP_GPUH
+SUPPLEMENTAL = False
+SUPPLEMENTAL_AUTH = ROOT / 'eval/teacher_label_supplemental_20261103/supplemental.authorization.json'
+SUPPLEMENTAL_AUTH_SHA = 'd3c7e6ddc2dfffd0f63f2bb8cfd9f614412b8b764dd56a4a144c81dfacc41fe5'
 WEIGHT_BYTES = 66714912872
 WEIGHTS = tuple(f'model-{i:05d}-of-00014.safetensors' for i in range(1, 15))
 # The actual index/config/processor/tokenizer set is checked against the local directory.
@@ -220,6 +225,50 @@ def fixed_config():
         stage2_same_images=True, automatic_retry_allowed=False)
 
 
+def configure_supplemental():
+    global SUPPLEMENTAL, LOCAL, STATE_DIR, RECOVERY_EVIDENCE, PRIOR_GPUH, CUMULATIVE_CAP_GPUH
+    SUPPLEMENTAL = True
+    LOCAL = Path('/dockerdata/wm_tmp/teacher_qwen32b_supplemental_20261103_execution01')
+    STATE_DIR = Path('/dockerdata/wm_logs/teacher_qwen32b_supplemental_20261103')
+    RECOVERY_EVIDENCE = SUPPLEMENTAL_AUTH.parent
+    PRIOR_GPUH = 8.165898210853467
+    CUMULATIVE_CAP_GPUH = 14.165898210853467
+
+
+def canonical_launch(argv):
+    require(type(argv) is list and len(argv) >= 2 and argv[1] == str(Path(__file__).resolve()),
+            'Launch the parent with the absolute canonical runner path before any allocation')
+    require(argv.count('--supplemental') == int(SUPPLEMENTAL), 'Exact supplemental launch scope required')
+    return True
+
+
+def supplemental_authorization(end=None):
+    row = pinned(SUPPLEMENTAL_AUTH, SUPPLEMENTAL_AUTH_SHA, end)
+    a = read(row, end)
+    expected = dict(new_allocation_GPUh_cap=6, wall_cap_seconds=5400, allocated_cards=4,
+        fixed_cases=32, fixed_groups=[16, 16], frames_per_case=16, dtype='bfloat16',
+        prior_charged_upper_GPUh=PRIOR_GPUH, cumulative_label_upper_GPUh_cap=CUMULATIVE_CAP_GPUH,
+        label_stage_cap_GPUh=24, previous_consumed_recovery_attempts=1, allocation_ordinal=2,
+        original_recovery_claim_preserved=True, previous_failure_costs_preserved=True,
+        automatic_retry_allowed=False, sample_substitution_allowed=False, frame_reduction_allowed=False,
+        precision_gate_relaxation_allowed=False, formal_training_allowed=False, AR_allowed=False,
+        student_distillation_allowed=False)
+    require(a.get('schema') == 'teacher_qwen32b_supplemental_allocation_authorization_v1'
+        and a.get('user_reply') == '我给你所有权限,请继续进行推进'
+        and all(type(a.get(k)) is type(v) and a[k] == v for k, v in expected.items()),
+        'New explicit supplemental allocation authorization required; original attempt stays consumed')
+    old_root = ROOT / 'eval/teacher_label_recovery_20261103'
+    require(a['prior_failure']['path'] == str(old_root / 'run01_raw_snapshot/cost.failure.json')
+        and a['prior_claim']['path'] == str(old_root / 'attempt.claim'), 'Original consumed allocation bindings required')
+    failure, claim = read(a['prior_failure'], end), read(a['prior_claim'], end)
+    require(failure['terminal'] is True and failure['success'] is False
+        and failure['released_observed'] is True and failure['allocated_GPUh'] == 6.0
+        and failure['prior_charged_label_GPUh'] == ORIGINAL_PRIOR_GPUH
+        and failure['cumulative_label_upper_GPUh'] == PRIOR_GPUH
+        and type(claim.get('pid')) is int and claim['pid'] > 0, 'Prior failure must remain fully charged and consumed')
+    return row
+
+
 def authorization_rows(end=None):
     rows = [pinned(p, d, end) for p, d in ((AUTH, AUTH_SHA), (NEW_AUTH, NEW_AUTH_SHA),
                                          (SCOPE_AUTH, SCOPE_AUTH_SHA))]
@@ -264,8 +313,8 @@ def authorization_rows(end=None):
         original_scope_authorization=str(SCOPE_AUTH), stage=PHASE, stage_cap_GPUh=24,
         new_allocation_GPUh_cap=6, allocated_cards=4, wall_cap_seconds=5400, node_rank=1,
         gpu_indices=[0, 1, 2, 3], frames_per_case=16, cases=32, original_fixed_cases_preserved=True,
-        old_pilot_charged_upper_GPUh=2, all_previous_label_charged_upper_GPUh=PRIOR_GPUH,
-        cumulative_label_upper_GPUh_cap=CUMULATIVE_CAP_GPUH, one_recovery_attempt=True,
+        old_pilot_charged_upper_GPUh=2, all_previous_label_charged_upper_GPUh=ORIGINAL_PRIOR_GPUH,
+        cumulative_label_upper_GPUh_cap=ORIGINAL_CUMULATIVE_CAP_GPUH, one_recovery_attempt=True,
         automatic_retry_allowed=False, new_output_root_required=True,
         old_raw_logs_labels_and_costs_preserved=True, safe_failure_stage_and_case_duration_required=True,
         new_source_runtime_publication_gate_required=True, full_rebuild_allowed=False,
@@ -278,8 +327,8 @@ def authorization_rows(end=None):
         and all(type(cluster.get(k)) is int and cluster[k] == v for k, v in (('nodes', 1), ('allocated_cards', CARDS),
             ('cases', 32), ('frames_per_case', 16), ('wall_cap_seconds', CAP), ('new_allocation_GPUh_cap', ALLOCATION_GPUH),
             ('stage_cap_GPUh', 24), ('recovery_attempts_before_migration', 0)))
-        and cluster.get('all_previous_label_charged_upper_GPUh') == PRIOR_GPUH
-        and cluster.get('cumulative_label_upper_GPUh_cap') == CUMULATIVE_CAP_GPUH
+        and cluster.get('all_previous_label_charged_upper_GPUh') == ORIGINAL_PRIOR_GPUH
+        and cluster.get('cumulative_label_upper_GPUh_cap') == ORIGINAL_CUMULATIVE_CAP_GPUH
         and cluster.get('dtype') == 'bfloat16' and cluster.get('fixed_groups') == [16, 16]
         and all(cluster.get(k) is True for k in ('one_recovery_attempt', 'new_output_root_required',
             'safe_failure_stage_case_duration_and_stop_reason_required', 'new_host_runtime_model_source_freeze_required',
@@ -292,7 +341,7 @@ def authorization_rows(end=None):
     require(CAP == 5400 and TAIL == 120 and CARDS == 4 and ALLOCATION_GPUH == CARDS * CAP / 3600
             and abs(PRIOR_GPUH + ALLOCATION_GPUH - CUMULATIVE_CAP_GPUH) < 1e-12
             and CUMULATIVE_CAP_GPUH <= 24, 'No phase borrowing')
-    return rows + [recovery_row, cluster_row]
+    return rows + [recovery_row, cluster_row] + ([supplemental_authorization(end)] if SUPPLEMENTAL else [])
 
 
 def runtime(end=None):
@@ -852,6 +901,7 @@ def verify_worker_ancestry(launch, p, bound, ancestors, supervised):
     parent = launch['parent']
     require(any(same_identity(a, parent) for a in ancestors), 'Actual approved parent ancestor required')
     args = parent['argv']
+    require(args.count('--supplemental') == int(SUPPLEMENTAL), 'Actual supplemental parent command binding differs')
     require(str(Path(__file__).resolve()) in args and 'run' in args and args.count('--gpu-authorized') == 1
         and exact_flags(args, (('--plan', bound['path']), ('--approved-plan-sha256', bound['sha256']),
             ('--approval', launch['approval']['path']), ('--approved-approval-sha256', launch['approval']['sha256']))),
@@ -1141,6 +1191,8 @@ def run(path, digest, approval_path, approval_digest, gpu_authorized=False):
             '--gpus', '0,1,2,3', '--state-dir', p['state_dir'], '--', p['runtime']['tools']['timeout'],
             '--signal=TERM', '--kill-after=20s', f'{seconds}s', p['runtime']['python'], str(Path(__file__).resolve()),
             'worker', '--plan', bound['path'], '--approved-plan-sha256', digest, '--launch', launch_row['path']]
+        if SUPPLEMENTAL:
+            command.insert(command.index('worker'), '--supplemental')
         env = dict(os.environ, CUDA_VISIBLE_DEVICES=','.join(p['gpu_uuids']), HF_HUB_OFFLINE='1',
                    TRANSFORMERS_OFFLINE='1', OMP_NUM_THREADS='1')
         with (LOCAL / 'worker.log').open('xb') as log:
@@ -1263,6 +1315,7 @@ def run(path, digest, approval_path, approval_digest, gpu_authorized=False):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--supplemental', action='store_true', help='Only the separately authorized second allocation; original claim and costs preserved')
     commands = parser.add_subparsers(dest='command', required=True)
     prep = commands.add_parser('prepare')
     prep.add_argument('--model-proof', required=True)
@@ -1284,6 +1337,10 @@ def main(argv=None):
     closure.add_argument('--closure', required=True)
     closure.add_argument('--approved-closure-sha256', required=True)
     args = parser.parse_args(argv)
+    if args.supplemental:
+        configure_supplemental()
+    if args.command == 'run':
+        canonical_launch([sys.executable, sys.argv[0], *(sys.argv[1:] if argv is None else argv)])
     if args.command == 'model-proof':
         result = model_proof(args.output)
     elif args.command == 'prepare':

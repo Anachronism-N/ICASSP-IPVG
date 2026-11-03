@@ -341,7 +341,8 @@ def harmless_tree(tmp_path, ignore_term=False):
     script = ('import subprocess,sys,time,os,json,signal;'
         + ('signal.signal(signal.SIGTERM,signal.SIG_IGN);' if ignore_term else '')
         + 'p=subprocess.Popen([sys.executable,"-c","import time;time.sleep(60)"]);'
-        + 'open(' + repr(str(marker)) + ',"w").write(json.dumps({"pid":p.pid}));time.sleep(60)')
+        + '\nwith open(' + repr(str(marker) + '.tmp') + ',"w") as f: f.write(json.dumps({"pid":p.pid}))\n'
+        + 'os.replace(' + repr(str(marker) + '.tmp') + ',' + repr(str(marker)) + ');time.sleep(60)')
     child = subprocess.Popen([sys.executable, '-c', script], start_new_session=True)
     _, process, _, _ = pilot.helpers()
     owner = process.identity(child.pid)

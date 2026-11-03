@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-03 18:01:54 CST",
+  "created_at": "2026-11-03 18:46:09 CST",
   "files": [
     {
       "path": "README.md",
@@ -288,23 +288,23 @@
     },
     {
       "path": "tests/test_teacher_qwen3vl32b_pilot.py",
-      "source_sha256": "db6d14016b4c144912a01054260764dfadbbf30a697879c6c04fe73e94690468",
-      "snapshot_sha256": "db6d14016b4c144912a01054260764dfadbbf30a697879c6c04fe73e94690468"
+      "source_sha256": "53e0c6b93e7ba273d7d12e8782fcb945fae714d014576c48fc7878fbe2fb4679",
+      "snapshot_sha256": "53e0c6b93e7ba273d7d12e8782fcb945fae714d014576c48fc7878fbe2fb4679"
     },
     {
       "path": "scripts/run_teacher_qwen3vl32b_recovery.py",
-      "source_sha256": "6fda015008d19a89bc694282e89e16667672a3b1d81c047199ea47506241bac6",
-      "snapshot_sha256": "6fda015008d19a89bc694282e89e16667672a3b1d81c047199ea47506241bac6"
+      "source_sha256": "3fdc99844af2cd4c60820c4291765aab4f2ae853cd0da8fa91bab05d4aef649d",
+      "snapshot_sha256": "3fdc99844af2cd4c60820c4291765aab4f2ae853cd0da8fa91bab05d4aef649d"
     },
     {
       "path": "tests/test_teacher_qwen3vl32b_recovery.py",
-      "source_sha256": "47c1b0e72ccd4c064390a15a0edfe361d89f14054c1db986796f2ffee314cea7",
-      "snapshot_sha256": "47c1b0e72ccd4c064390a15a0edfe361d89f14054c1db986796f2ffee314cea7"
+      "source_sha256": "9281abbad242cb73138e35cde9ce42e5fb1dfe037b411549b990aff6fbc84de4",
+      "snapshot_sha256": "9281abbad242cb73138e35cde9ce42e5fb1dfe037b411549b990aff6fbc84de4"
     },
     {
       "path": "docs/60_Qwen32B标签一次恢复.md",
-      "source_sha256": "d69ea215b0ef81520f2da86ca512ca59167a3a30b06ee390da28eb08ae2dcd48",
-      "snapshot_sha256": "d69ea215b0ef81520f2da86ca512ca59167a3a30b06ee390da28eb08ae2dcd48"
+      "source_sha256": "02765484aae71d88e9e06280f8f5248527acdf1fbbb0920d57bfbdefb33b8e12",
+      "snapshot_sha256": "02765484aae71d88e9e06280f8f5248527acdf1fbbb0920d57bfbdefb33b8e12"
     },
     {
       "path": "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
@@ -1305,7 +1305,7 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "174b692c68b7b22c51f65fed319be82b97de1c94",
+  "preserved_public_base_commit": "6edfa9de245bd822f23d417292b7893752d48752",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
     "docs/60_Qwen32B标签一次恢复.md",
