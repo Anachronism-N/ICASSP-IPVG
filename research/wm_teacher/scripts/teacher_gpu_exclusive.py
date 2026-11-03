@@ -13,6 +13,17 @@ import time
 
 HOLDER='/srv/PRIVATE_STORAGE'
 HOLDER_PYTHON='/srv/PRIVATE_STORAGE'
+CONTROL_PYTHON='/usr/bin/python3'
+
+def control_runtime():
+    import hashlib
+    code="import os,sys,signal,select,json,subprocess; assert hasattr(os,'pidfd_open') and hasattr(signal,'pidfd_send_signal'); fd=os.pidfd_open(os.getpid()); signal.pidfd_send_signal(fd,0); assert not select.select([fd],[],[],0)[0]; os.close(fd); print(json.dumps(dict(python=sys.executable,version=sys.version.split()[0],files=[sys.executable,signal.__file__,select.__file__,json.__file__,subprocess.__file__],pidfd_self_signal_zero_pass=True)))"
+    value=json.loads(subprocess.check_output([CONTROL_PYTHON,'-I','-c',code],text=True,timeout=10))
+    files=[]
+    for name in sorted({str(Path(n).resolve()) for n in value['files']}):
+        data=Path(name).read_bytes();files.append(dict(path=name,bytes=len(data),sha256=hashlib.sha256(data).hexdigest()))
+    return dict(python=str(Path(value['python']).resolve()),version=value['version'],files=files,
+                pidfd_self_signal_zero_pass=value['pidfd_self_signal_zero_pass'])
 
 def query_modes():
     r=subprocess.run(['nvidia-smi','--query-gpu=uuid,index,compute_mode','--format=csv,noheader,nounits'],
@@ -37,6 +48,10 @@ def holder_identity(pid,gpu):
     return dict(pid=pid,start_ticks=int(stat[19]),argv=args,gpu=gpu)
 
 def signal_holder(pid,gpu):
+    assert type(pid) is int and pid>1 and type(gpu) is int and 0<=gpu<8
+    if not (hasattr(os,'pidfd_open') and hasattr(signal,'pidfd_send_signal')):
+        code="import sys,json; sys.path.insert(0,sys.argv[1]); import teacher_gpu_exclusive as g; assert hasattr(g.os,'pidfd_open') and hasattr(g.signal,'pidfd_send_signal'); print(json.dumps(g.signal_holder(int(sys.argv[2]),int(sys.argv[3]))))"
+        return json.loads(subprocess.check_output([CONTROL_PYTHON,'-I','-c',code,str(Path(__file__).resolve().parent),str(pid),str(gpu)],text=True,timeout=30))
     fd=os.pidfd_open(pid)
     try:
         identity=holder_identity(pid,gpu)

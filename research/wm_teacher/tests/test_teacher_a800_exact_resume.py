@@ -86,3 +86,24 @@ def test_real_API_CPU_reference_prefix_fresh_resume_exact(tmp_path):
             for key in ('step','lr','grad_norm_total_before_clip','loss_fm_mean',
                         'loss_anchor_mean','loss_total_mean','per_rank'):
                 assert x[key]==y[key]
+
+
+def test_revision003_preserves_both_failed_full_resume_allocations(monkeypatch):
+    for k in ('E','AUTH_SHA','REVISION002','REVISION003','PRIOR_TECHNICAL_GPUH'):
+        monkeypatch.setattr(a,k,getattr(a,k))
+    a.configure_revision003()
+    assert a.E.name=='a800_exact_resume003' and a.PRIOR_TECHNICAL_GPUH==3.4
+    assert a.CAP==5040 and a.REVISION003 and a.PRIOR_TECHNICAL_GPUH+1.4<=8
+
+
+def test_revision003_controller_drift_is_rejected_before_claim(tmp_path,monkeypatch):
+    import types
+    import teacher_gpu_exclusive as guard
+    monkeypatch.setattr(a,'E',tmp_path);monkeypatch.setattr(a,'REVISION003',True)
+    monkeypatch.setattr(a,'authorize',lambda:None)
+    monkeypatch.setattr(sys,'argv',[str(S)])
+    row=a.save(tmp_path/'plan.json',{'resource_control_runtime':{'pinned':True}})
+    args=types.SimpleNamespace(plan=row['path'],sha=row['sha256'])
+    monkeypatch.setattr(guard,'control_runtime',lambda:{'pinned':False})
+    with patch.object(a.subprocess,'Popen') as spawn,pytest.raises(AssertionError):a.run(args)
+    spawn.assert_not_called();assert not (tmp_path/'attempt.claim').exists()

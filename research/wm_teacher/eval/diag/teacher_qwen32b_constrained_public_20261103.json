@@ -452,5 +452,32 @@
     "released": true,
     "modes_restored": true,
     "formal_training_allowed": false
+  },
+  "new_campaign_exact_resume002": {
+    "success": false,
+    "worker_started": false,
+    "model_updates": 0,
+    "error_type": "AttributeError",
+    "diagnosis": "Model Python lacks os.pidfd_open; original guarded call reproduced safely on non-holder self",
+    "charged_upper_GPUh": 1.4,
+    "cumulative_new_technical_upper_GPUh": 3.4,
+    "original_released": false,
+    "modes_restored": true,
+    "formal_training_allowed": false
+  },
+  "new_campaign_semantic_review003": {
+    "success": false,
+    "worker_started": false,
+    "reviewed_labels": 0,
+    "source_valid_labels": 30,
+    "all_cases_denominator": 32,
+    "error_type": "AttributeError",
+    "diagnosis": "Model Python lacks os.pidfd_open before any holder signal or review worker",
+    "charged_upper_GPUh": 1,
+    "new_label_used_upper_GPUh": 19,
+    "historical_label_upper_GPUh": 42.832564877520134,
+    "modes_restored": true,
+    "semantic_review_pass": false,
+    "formal_training_allowed": false
   }
 }

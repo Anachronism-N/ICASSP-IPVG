@@ -19,6 +19,7 @@ PYTHON='/dockerdata/venv_qwen32b_20261103/bin/python3.12'
 SITE='/dockerdata/wm_a800_fa2_runtime_20261103/site'
 CAP=5040
 REVISION002=False
+REVISION003=False
 PRIOR_TECHNICAL_GPUH=.6
 
 def configure_revision002():
@@ -26,6 +27,12 @@ def configure_revision002():
     E=ROOT/'eval/teacher_progress_campaign_20261104/a800_exact_resume002'
     AUTH_SHA='bfe1a2cabb914250c50599a5050a40b157fcce3ae18dc4a210027fdb103da6c9'
     REVISION002=True;PRIOR_TECHNICAL_GPUH=2.0
+
+def configure_revision003():
+    global E,AUTH_SHA,REVISION002,REVISION003,PRIOR_TECHNICAL_GPUH
+    E=ROOT/'eval/teacher_progress_campaign_20261104/a800_exact_resume003'
+    AUTH_SHA='29db4b47a2d0a1afe6c0dfa52f4538f4ca2d75c5b95f90e835cc57981eaf9744'
+    REVISION002=True;REVISION003=True;PRIOR_TECHNICAL_GPUH=3.4
 
 def training_interfaces(tr,device):
     for name in ('DataOrder','Comm','synthetic_sample','train_step','checkpoint_state',
@@ -55,8 +62,8 @@ def authorize():
     assert a['formal_training_allowed'] is False and a['automatic_retry_allowed'] is False
     assert a['prior_new_technical_GPUh']==PRIOR_TECHNICAL_GPUH and PRIOR_TECHNICAL_GPUH+1.4<=8
     if REVISION002:
-        assert a['revision']==2 and a['real_training_API_CPU_test_required']
-        previous=E.parent/'a800_exact_resume001/terminal.json'
+        assert a['revision']==(3 if REVISION003 else 2) and a['real_training_API_CPU_test_required']
+        previous=E.parent/('a800_exact_resume002/terminal.json' if REVISION003 else 'a800_exact_resume001/terminal.json')
         assert record(previous)['sha256']==a['previous_failed_terminal_sha256']
         assert not json.loads(previous.read_bytes())['success']
     return a,row
@@ -75,11 +82,17 @@ def prepare():
         runtime_files=runtime['files'],models=models,framework=str(ROOT/'DiffSynth-Studio'),
         backend='native_FA2_explicit_deterministic_true',model_updates=8,logical_updates=4,
         allocated_cards=1,cap_seconds=CAP,upper_GPUh=1.4,automatic_retry_allowed=False,formal_training_allowed=False)
+    if REVISION003:
+        import teacher_gpu_exclusive as guard
+        result['resource_control_runtime']=guard.control_runtime()
     return save(E/'plan.json',result)
 
 def verify_plan(path,digest):
     row=record(path);assert row['sha256']==digest;p=read(row)
     assert p['cap_seconds']==CAP and p['allocated_cards']==1 and p['formal_training_allowed'] is False
+    if REVISION003:
+        import teacher_gpu_exclusive as guard
+        assert p['resource_control_runtime']==guard.control_runtime(), 'PIDFD controller bytes or capabilities differ'
     for r in [*p['source'].values(),*p['runtime_files'],*p['models']]:assert record(r['path'])==r
     return p,row
 
@@ -159,6 +172,10 @@ def owners(uuid):
 def run(a):
     authorize();start=time.monotonic()
     assert Path(sys.argv[0]).is_absolute()
+    if REVISION003:
+        import teacher_gpu_exclusive as guard
+        bound=record(a.plan);assert bound['sha256']==a.sha
+        assert read(bound)['resource_control_runtime']==guard.control_runtime(), 'PIDFD control preclaim gate failed'
     save(E/'attempt.claim',dict(start_monotonic=start,pid=os.getpid()))
     info=subprocess.check_output(['nvidia-smi','-i','4','--query-gpu=uuid,compute_mode','--format=csv,noheader'],text=True).strip().split(',')
     uuid,mode=info[0].strip(),info[1].strip();child=None;error=None;released=False;restored=False
@@ -189,7 +206,7 @@ def run(a):
             assert time.monotonic()-start<CAP-120
             with (E/(segment+'.log')).open('xb') as log:
                 command=[PYTHON,str(Path(__file__).resolve()),'worker','--segment',segment,'--plan',a.plan,'--sha',a.sha]
-                if REVISION002:command.insert(2,'--revision002')
+                if REVISION002:command.insert(2,'--revision003' if REVISION003 else '--revision002')
                 child=subprocess.Popen(command,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
                 child.wait(timeout=max(1,CAP-120-(time.monotonic()-start)))
             assert child.returncode==0, 'A segment failed; no automatic retries'
@@ -224,10 +241,12 @@ def run(a):
     assert error is None and released and restored
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--revision002',action='store_true')
+    p=argparse.ArgumentParser(description=__doc__)
+    modes=p.add_mutually_exclusive_group();modes.add_argument('--revision002',action='store_true');modes.add_argument('--revision003',action='store_true')
     p.add_argument('command',choices=['prepare','run','worker'])
     p.add_argument('--plan');p.add_argument('--sha');p.add_argument('--segment');a=p.parse_args()
     if a.revision002:configure_revision002()
+    if a.revision003:configure_revision003()
     if a.command=='prepare':print(json.dumps(prepare(),sort_keys=True))
     elif a.command=='worker':worker(a)
     else:run(a)

@@ -132,3 +132,24 @@ def test_campaign003_verify_retains_all_32_cases_and_phase_budget(monkeypatch,ch
     if change:
         with pytest.raises(ValueError):review.verify('synthetic_plan','digest')
     else:assert review.verify('synthetic_plan','digest')[0] is p
+
+
+def test_campaign004_keeps_failed_review_charge_and_unchanged_AI_rules(monkeypatch):
+    for k in ('CAP','TAIL','ALLOCATION_GPUH','PRIOR_GPUH','AUTH','AUTH_SHA','CAMPAIGN003','CAMPAIGN004'):
+        monkeypatch.setattr(review,k,getattr(review,k))
+    prompt=review.PROMPT;fields=review.FIELDS
+    review.configure_campaign004()
+    assert review.PRIOR_GPUH==42.832564877520134 and review.AUTH.parent.name=='semantic_review004'
+    assert review.ALLOCATION_GPUH==1 and review.CAP==3600
+    assert review.PROMPT==prompt and review.FIELDS==fields and review.CAMPAIGN004
+
+
+def test_campaign004_controller_drift_never_creates_allocation(tmp_path,monkeypatch):
+    import teacher_gpu_exclusive as guard
+    monkeypatch.setattr(review,'CAMPAIGN004',True)
+    monkeypatch.setattr(sys,'argv',[str(Path(review.__file__).resolve())])
+    output=tmp_path/'run';row=review.write(tmp_path/'plan.json',dict(output_root=str(output),resource_control_runtime={'pinned':True}))
+    args=SimpleNamespace(gpu_authorized=True,plan=row['path'],sha=row['sha256'])
+    monkeypatch.setattr(guard,'control_runtime',lambda:{'pinned':False})
+    with patch.object(review.subprocess,'Popen') as spawn,pytest.raises(ValueError):review.run(args)
+    spawn.assert_not_called();assert not output.exists()

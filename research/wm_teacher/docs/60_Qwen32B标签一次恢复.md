@@ -221,3 +221,16 @@ native3实机GPU4在lease下成功：CUDA掩码3个长度与原生NoBadWords精�
 allocation003首次独立8B诊断评审另冻结1卡3600秒/1GPUh：只评审30条原保留caption，完整32病例分母与2条接口失败保留；诊断组和原blind组分开报告。沿用同七字段/四程序化正负控制/16首尾均匀帧，AI判断仍非人工gold且不自行批准语义门。启动前GPU5的不同占卡入口未符合当前精确识别/lease门，未发信号或消耗分配；改为新集群GPU0使用节点本地限时lease与精确已确认holder释放，终态须恢复原模式。标签阶段预留后19/96，旧41.832564878费用不重置；不重新生成或修改任何旧caption。
 
 针对恢复与评审的20项CPU测试通过。完整公开测试和独立远端字节核验后才允许两项新GPU入口。正式Teacher训练、AR、Student/蒸馏依然关闭，没有新Teacher全集质量评测或同协议SOTA结论。
+
+
+## 16. 模型Python缺PIDFD的真实失败与控制解释器修订（2026-11-04）
+
+提交d34d683ccf86680e59409ec672dfabeb3e54ad7a完整公开1484 passed/3 skipped，271白名单文件及7变更经独立远端克隆逐字节核验。第一次测试命令漏带已部署媒体工具PATH导致5失败，原失败日志保留；补PATH后完整重跑通过。测试产生的pytest缓存没有发布，原测试目录保留，仅复制已测试白名单的相同字节，未放宽发布精确门。
+
+完整恢复002与独立评审003都在资源控制阶段、任何模型/评审worker启动前以AttributeError失败。所选模型Python3.12.13没有os.pidfd_open或signal.pidfd_send_signal；从两项原执行源码对非holder自身PID安全CPU重放，均在pidfd_open处复现。没有模型update、没有新8B判断，不能将模型API的CPU通过当完整恢复成功。恢复002原released=false保留；两项原compute_mode均恢复，旧holder未被误称自有模型进程。恢复002计1.4GPUh、技术累计3.4/8；评审003计1GPUh、新标签累计19/96、历史标签累计42.832564878。各原claim、终态和执行源码私有保留，不退款、不删除锁或自动重跑。
+
+控制修订只将PIDFD操作委托给已核验的隔离系统Python3.11.6（-I），不替换模型/训练Python，不用普通PID kill降级。实际系统解释器对存活自身PID执行pidfd_open+signal0探针通过；原精确argv、GPU placement、UID、PIDFD TERM和退出等待仍在控制进程内执行，未知任务仍拒绝。新增真实控制probe、非holder自身拒绝、参数约束与桥接契约测试；控制器7项CPU测试通过，恢复/评审控制漂移在创建GPU claim前拒绝。
+
+独立恢复003另冻结1卡5040秒/1.4GPUh，新技术预留累计4.8/8；独立评审004另冻结1卡3600秒/1GPUh，新标签预留累计20/96。前项失败SHA和已消耗费用继续绑定。两项冻结系统解释器、signal/select/json/subprocess等关键文件的原始字节与真实PIDFD能力，CPU准入在新claim前复验。仍为同完整4reference+2prefix+2freshresume和同30段首次实际8B评审/完整32病例分母，不重生成caption、不改原精确门、七字段或四控制。完整当前公开测试和远端字节核验后才允许新GPU分配。
+
+以上不是Teacher质量或SOTA收益；结构32/32、人工语义准入和完整模型精确恢复均未通过，正式训练、AR、Student/蒸馏保持关闭。

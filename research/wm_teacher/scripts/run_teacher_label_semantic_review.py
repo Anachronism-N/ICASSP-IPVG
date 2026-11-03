@@ -18,6 +18,7 @@ CAP, TAIL = 3600, 120
 ALLOCATION_GPUH = 1
 FOLLOWUP = False
 CAMPAIGN003 = False
+CAMPAIGN004 = False
 PRIOR_GPUH = 20.165898210853467
 AUTH = ROOT / 'eval/teacher_label_semantic_review_20261103/review.authorization.json'
 AUTH_SHA = '8eac69afd4a42f3966bae70bad1d0947a9e44c41fe0eabb673e28cb5dbbc3154'
@@ -53,6 +54,14 @@ def configure_campaign003():
     PRIOR_GPUH=41.832564877520134
     AUTH=ROOT/'eval/teacher_progress_campaign_20261104/semantic_review003/review.authorization.json'
     AUTH_SHA='94d2945be0e6724bc25302c27b0bd2ede5581dec5d03cf9127a31f03fee00309'
+
+def configure_campaign004():
+    global CAP,TAIL,ALLOCATION_GPUH,PRIOR_GPUH,AUTH,AUTH_SHA,CAMPAIGN003,CAMPAIGN004
+    CAMPAIGN003=True;CAMPAIGN004=True
+    CAP,TAIL,ALLOCATION_GPUH=3600,120,1
+    PRIOR_GPUH=42.832564877520134
+    AUTH=ROOT/'eval/teacher_progress_campaign_20261104/semantic_review004/review.authorization.json'
+    AUTH_SHA='89ec7101b0938105bc826fd2567a8740e1fb6c19bf577afff89c479f60186c2b'
 
 def helpers():
     import run_teacher_qwen3vl32b_recovery as r
@@ -172,16 +181,19 @@ def prepare(evidence_roots, model_proof, output):
     require(len(evidence_roots)==(1 if CAMPAIGN003 else 2) and jobs and len(jobs)<=64, 'Fixed review scope required')
     if CAMPAIGN003:
         require(len(jobs)==scope['expected_valid_labels']==30 and scope['all_cases_denominator']==32, 'Exact first-review scope required')
-        require(scope['prior_new_label_GPUh']==18 and scope['new_label_cap_GPUh']==96, 'Frozen campaign phase budget required')
+        require(scope['prior_new_label_GPUh']==(19 if CAMPAIGN004 else 18) and scope['new_label_cap_GPUh']==96, 'Frozen campaign phase budget required')
         require(record(AUTH.parent.parent/'campaign.authorization.json')['sha256']==scope['parent_campaign_sha256'], 'Exact campaign authorization required')
-    require(summary['cumulative_label_upper_GPUh'] == PRIOR_GPUH, 'Cumulative label budget drift')
+    if CAMPAIGN004:
+        previous=record(AUTH.parent.parent/'semantic_review003/review_run01/terminal.json')
+        require(previous['sha256']==scope['previous_review_terminal_sha256'] and not read(previous)['success'], 'Failed review must remain charged and immutable')
+    require(summary['cumulative_label_upper_GPUh'] == (scope['source_allocation_historical_GPUh'] if CAMPAIGN004 else PRIOR_GPUH), 'Original label allocation budget drift')
     import gpu_hold
     uuid = gpu_hold.query_gpus()[0]['uuid']
     plan = dict(schema='teacher_label_independent_review_plan_v1', private=True,
         hostname=os.uname().nodename, node_ip=os.environ.get('NODE_IP'), gpu_uuid=uuid, allocated_cards=1,
         cap_seconds=CAP, tail_seconds=TAIL, prior_charged_label_GPUh=PRIOR_GPUH, upper_GPUh=ALLOCATION_GPUH,
         cumulative_label_upper_GPUh=PRIOR_GPUH+ALLOCATION_GPUH, stage_cap_GPUh=(96 if CAMPAIGN003 else 24),
-        new_label_stage_prior_GPUh=(18 if CAMPAIGN003 else None),
+        new_label_stage_prior_GPUh=((19 if CAMPAIGN004 else 18) if CAMPAIGN003 else None),
         output_root=str(Path(output).parent / 'review_run01'), inputs=inputs, previous_costs=prior,
         jobs=jobs, all_cases_denominator=(32 if CAMPAIGN003 else 64), model=model, runtime=r.runtime(),
         source={n: record(ROOT/n) for n in ('scripts/run_teacher_label_semantic_review.py',
@@ -189,6 +201,9 @@ def prepare(evidence_roots, model_proof, output):
         authorization=authorization, prompt_sha256=hashlib.sha256(PROMPT.encode()).hexdigest(), controls=controls(),
         automatic_retry_allowed=False, semantic_review_pass=False, formal_training_allowed=False,
         AR_allowed=False, student_distillation_allowed=False)
+    if CAMPAIGN004:
+        import teacher_gpu_exclusive as guard
+        plan['resource_control_runtime']=guard.control_runtime()
     return write(output, plan)
 
 
@@ -207,9 +222,12 @@ def verify(plan_path, digest, end=None):
     require(p['authorization']==r.pinned(AUTH,AUTH_SHA,end), 'Exact independent review authorization SHA required')
     if CAMPAIGN003:
         scope=read(p['authorization'],end)
-        require(p['all_cases_denominator']==32 and len(p['jobs'])==30 and p['new_label_stage_prior_GPUh']==18
-                and p['stage_cap_GPUh']==96 and 18+ALLOCATION_GPUH<=96, 'Exact separate campaign budget required')
+        require(p['all_cases_denominator']==32 and len(p['jobs'])==30 and p['new_label_stage_prior_GPUh']==(19 if CAMPAIGN004 else 18)
+                and p['stage_cap_GPUh']==96 and p['new_label_stage_prior_GPUh']+ALLOCATION_GPUH<=96, 'Exact separate campaign budget required')
         require(record(AUTH.parent.parent/'campaign.authorization.json',end)['sha256']==scope['parent_campaign_sha256'], 'Campaign authorization drift')
+    if CAMPAIGN004:
+        import teacher_gpu_exclusive as guard
+        require(p['resource_control_runtime']==guard.control_runtime(), 'PIDFD controller bytes or capabilities drift')
     for row in [p['authorization'],*p['inputs'], *p['previous_costs'], *p['source'].values()]: r.check(row, end)
     for row in p['model']['files']: r.check({k: row[k] for k in ('path','bytes','sha256')}, end)
     require(r.runtime(end) == p['runtime'], 'Current selected review runtime differs')
@@ -308,6 +326,9 @@ def run(args):
     start=time.monotonic(); end=start+CAP-TAIL;child=owner=None;tracked=[];released=False;error=None
     lease=None;resource_mode=None;resource_restored=not CAMPAIGN003;holder_signals=[]
     bound=r.pinned(args.plan,args.sha,end);p=read(bound,end)
+    if CAMPAIGN004:
+        import teacher_gpu_exclusive as guard
+        require(p['resource_control_runtime']==guard.control_runtime(), 'PIDFD control preclaim gate failed')
     output=Path(p['output_root'])
     require(output.is_absolute() and output.resolve()==output and output.parent.resolve()==Path(args.plan).parent.resolve(),
             'New canonical same-plan-parent review output required')
@@ -339,7 +360,7 @@ def run(args):
         command=['timeout','--signal=TERM','--kill-after=20s',f'{seconds}s',PYTHON,str(Path(__file__).resolve()),
                  'worker','--plan',bound['path'],'--sha',bound['sha256'],'--launch',launch['path']]
         if FOLLOWUP:command.insert(command.index('worker'),'--followup')
-        if CAMPAIGN003:command.insert(command.index('worker'),'--campaign003')
+        if CAMPAIGN003:command.insert(command.index('worker'),'--campaign004' if CAMPAIGN004 else '--campaign003')
         env=dict(os.environ,CUDA_VISIBLE_DEVICES=p['gpu_uuid'],HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',OMP_NUM_THREADS='1')
         with (output/'worker.log').open('xb') as log:
             child=subprocess.Popen(command,stdout=log,stderr=subprocess.STDOUT,env=env,start_new_session=True)
@@ -388,7 +409,7 @@ def run(args):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    modes=parser.add_mutually_exclusive_group();modes.add_argument('--followup',action='store_true');modes.add_argument('--campaign003',action='store_true')
+    modes=parser.add_mutually_exclusive_group();modes.add_argument('--followup',action='store_true');modes.add_argument('--campaign003',action='store_true');modes.add_argument('--campaign004',action='store_true')
     parser.add_argument('command',choices=['prepare','run','worker'])
     parser.add_argument('--plan');parser.add_argument('--sha');parser.add_argument('--launch')
     parser.add_argument('--evidence',nargs='+');parser.add_argument('--model-proof');parser.add_argument('--output')
@@ -396,6 +417,7 @@ def main():
     a=parser.parse_args()
     if a.followup:configure_followup()
     if a.campaign003:configure_campaign003()
+    if a.campaign004:configure_campaign004()
     if a.command=='prepare': result=prepare(a.evidence,a.model_proof,a.output)
     elif a.command=='worker': result=worker(a.plan,a.sha,a.launch)
     else: result=run(a)
