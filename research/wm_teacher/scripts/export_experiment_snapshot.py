@@ -63,6 +63,7 @@ FILES = [
     "eval/diag/teacher_gpu_resume_root_cause_public_20261102.json",
     "scripts/run_teacher_qwen3vl32b_pilot.py", "tests/test_teacher_qwen3vl32b_pilot.py",
     "scripts/run_teacher_qwen3vl32b_recovery.py", "tests/test_teacher_qwen3vl32b_recovery.py",
+    "scripts/teacher_gpu_exclusive.py", "tests/test_teacher_gpu_exclusive.py",
     "docs/60_Qwen32B标签一次恢复.md",
     "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
     "eval/diag/teacher_qwen32b_supplemental_public_20261103.json",

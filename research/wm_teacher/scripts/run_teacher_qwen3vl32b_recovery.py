@@ -58,6 +58,10 @@ ORIGINAL_CUMULATIVE_CAP_GPUH = CUMULATIVE_CAP_GPUH
 SUPPLEMENTAL = False
 PROMPT_V2 = False
 CONSTRAINED = False
+VECTORIZED = False
+STAGE_LABEL_CAP = 24
+CAMPAIGN_AUTH = ROOT / 'eval/teacher_progress_campaign_20261104/campaign.authorization.json'
+CAMPAIGN_AUTH_SHA = 'ffa19129fb3256e482553bb1b90a7f09edd95eed4391687e6b45426d0706b8fe'
 CONSTRAINED_AUTH = ROOT / 'eval/teacher_label_constrained_decode_20261103/constrained.authorization.json'
 CONSTRAINED_AUTH_SHA = 'a1f093dd1e9b3dbf65be26b300dca4788f5a7c39b24f175b6a29690ddc71198c'
 PROMPT_V2_AUTH = ROOT / 'eval/teacher_label_prompt_v2_20261103/prompt_v2.authorization.json'
@@ -70,7 +74,7 @@ WEIGHTS = tuple(f'model-{i:05d}-of-00014.safetensors' for i in range(1, 15))
 REQUIRED_CONFIGS = {'README.md', 'chat_template.json', 'config.json', 'generation_config.json',
     'merges.txt', 'model.safetensors.index.json', 'preprocessor_config.json', 'tokenizer.json',
     'tokenizer_config.json', 'video_preprocessor_config.json', 'vocab.json'}
-SOURCE_NAMES = ('scripts/run_teacher_qwen3vl32b_recovery.py', 'tests/test_teacher_qwen3vl32b_recovery.py',
+SOURCE_NAMES = ('scripts/teacher_gpu_exclusive.py','tests/test_teacher_gpu_exclusive.py', 'scripts/run_teacher_qwen3vl32b_recovery.py', 'tests/test_teacher_qwen3vl32b_recovery.py',
  'scripts/run_teacher_qwen3vl32b_pilot.py', 'tests/test_teacher_qwen3vl32b_pilot.py',
  'scripts/run_teacher_label_pilot.py', 'scripts/run_teacher_single_gpu_admission.py',
  'scripts/recaption_e3.py', 'scripts/prepare_teacher_label_admission.py',
@@ -295,8 +299,9 @@ def fixed_config():
         facts_prompt_sha256=hashlib.sha256(FACTS_PROMPT.encode()).hexdigest(),
         caption_prompt_sha256=hashlib.sha256(CAPTION_PROMPT.encode()).hexdigest(),
         stage2_same_images=True, automatic_retry_allowed=False)
-    if CONSTRAINED:
+    if CONSTRAINED or VECTORIZED:
         config['decoder_constraints'] = dict(deny_words=list(DENY_DECODE_WORDS),caption_deny_words=list(CAPTION_DECODE_WORDS),caption_eos_min_words=40)
+    if VECTORIZED:config['decoder_implementation']='exact_vectorized_bad_words_v1'
     return config
 
 
@@ -341,6 +346,71 @@ def constrained_authorization(end=None):
     return row
 
 
+def configure_vectorized():
+    global VECTORIZED, CONSTRAINED, LOCAL, STATE_DIR, RECOVERY_EVIDENCE, CAP, ALLOCATION_GPUH
+    global PRIOR_GPUH, CUMULATIVE_CAP_GPUH, PROMPT_VERSION, STAGE_LABEL_CAP
+    configure_constrained()
+    CONSTRAINED, VECTORIZED = False, True
+    LOCAL = Path('/dockerdata/wm_tmp/teacher_vectorized_32b_20261104_run01')
+    STATE_DIR = Path('/dockerdata/wm_logs/teacher_vectorized_32b_20261104')
+    RECOVERY_EVIDENCE = CAMPAIGN_AUTH.parent
+    CAP, ALLOCATION_GPUH = 5300, 4*5300/3600
+    PRIOR_GPUH = 23.832564877520134
+    CUMULATIVE_CAP_GPUH = PRIOR_GPUH + ALLOCATION_GPUH
+    STAGE_LABEL_CAP = 120
+    PROMPT_VERSION = 'qwen3vl32b-vectorized-constrained-v4'
+
+
+def vectorized_authorization(end=None):
+    row = pinned(CAMPAIGN_AUTH, CAMPAIGN_AUTH_SHA, end)
+    a = read(row,end)
+    expected = dict(new_campaign_GPUh_cap=168,stage_caps_GPUh={'label_and_cache':96,
+        'technical_admission':8,'gate_conditioned_teacher_training_and_evaluation':64},
+        legacy_label_charged_upper_GPUh=PRIOR_GPUH,legacy_failure_costs_preserved=True,
+        phase_borrowing_allowed=False,legacy_claims_and_errors_immutable=True,
+        formal_training_allowed_without_semantic_and_technical_gates=False,AR_allowed=False,
+        student_distillation_allowed=False,automatic_retry_allowed=False)
+    require(a['schema']=='teacher_extended_stage_authorization_v1'
+        and a['user_reply']=='可以扩大预算.当前一共8节点可用,资源肯定是充足的'
+        and all(type(a[k]) is type(v) and a[k]==v for k,v in expected.items()), 'Explicit expanded-stage authorization required')
+    require(a['allocation_001']==dict(scope='new prospective vectorized forbidden-token decoding, fixed32x16 BF16',
+        cards=4,wall_cap_seconds=5400,upper_GPUh=6,output_root=str(LOCAL),prior_new_stage_upper_GPUh=0),
+        'Exact first expanded-stage allocation required')
+    old = ROOT/'eval/teacher_label_constrained_decode_20261103'
+    require((old/'attempt.claim').is_file(), 'Previous claim must remain consumed')
+    cost=read(record(old/'run01_raw_snapshot/cost.failure.json',end),end)
+    require(cost['success'] is False and cost['cumulative_label_upper_GPUh']==PRIOR_GPUH,
+        'Previous failed allocation remains charged')
+    return row
+
+
+def vectorized_bad_words(words, eos):
+    import torch
+    from transformers import LogitsProcessor
+    class WordMask(LogitsProcessor):
+        def __init__(self):
+            sequences={tuple(w) for w in words if w and not (len(w)==1 and w[0] in eos)}
+            self.singles=sorted({w[0] for w in sequences if len(w)==1})
+            groups={}
+            for w in sorted(sequences):
+                if len(w)>1:groups.setdefault(len(w)-1,[]).append(w)
+            self.groups=groups;self.cache={}
+        def __call__(self, input_ids, scores):
+            key=(input_ids.device.type,input_ids.device.index)
+            if key not in self.cache:
+                self.cache[key]={length:(torch.tensor([w[:-1] for w in rows],device=input_ids.device),
+                    torch.tensor([w[-1] for w in rows],device=input_ids.device)) for length,rows in self.groups.items()}
+            blocked=torch.zeros_like(scores,dtype=torch.bool)
+            if self.singles:blocked[:,self.singles]=True
+            for length,(prefix,targets) in self.cache[key].items():
+                if length>=input_ids.shape[1]:continue
+                matches=input_ids[:,-length:].unsqueeze(1).eq(prefix.unsqueeze(0)).all(dim=-1)
+                blocked.scatter_reduce_(1,targets.unsqueeze(0).expand(input_ids.shape[0],-1),matches,
+                    reduce='amax',include_self=True)
+            return scores.masked_fill(blocked,float('-inf'))
+    return WordMask()
+
+
 def minimum_caption_words(prompt_length, processor, eos):
     from transformers import LogitsProcessor
     class MinimumWords(LogitsProcessor):
@@ -367,7 +437,7 @@ def canonical_launch(argv):
     require(type(argv) is list and len(argv) >= 2 and argv[1] == str(Path(__file__).resolve()),
             'Launch the parent with the absolute canonical runner path before any allocation')
     require(argv.count('--supplemental') == int(SUPPLEMENTAL)
-        and argv.count('--prompt-v2') == int(PROMPT_V2) and argv.count('--constrained') == int(CONSTRAINED),
+        and argv.count('--prompt-v2') == int(PROMPT_V2) and argv.count('--constrained') == int(CONSTRAINED) and argv.count('--vectorized') == int(VECTORIZED),
         'Exact experimental launch scope required')
     return True
 
@@ -468,10 +538,10 @@ def authorization_rows(end=None):
             'frame_reduction_allowed', 'foreign_gpu_workloads_may_be_killed', 'full_rebuild_allowed',
             'formal_training_allowed', 'AR_allowed', 'student_distillation_allowed')),
         'New-cluster recovery freeze drift')
-    require(CAP == (2400 if CONSTRAINED else 5400) and TAIL == 120 and CARDS == 4 and ALLOCATION_GPUH == CARDS * CAP / 3600
+    require(CAP == (5300 if VECTORIZED else 2400 if CONSTRAINED else 5400) and TAIL == 120 and CARDS == 4 and ALLOCATION_GPUH == CARDS * CAP / 3600
             and abs(PRIOR_GPUH + ALLOCATION_GPUH - CUMULATIVE_CAP_GPUH) < 1e-12
-            and CUMULATIVE_CAP_GPUH <= 24, 'No phase borrowing')
-    return rows + [recovery_row, cluster_row] + ([supplemental_authorization(end)] if SUPPLEMENTAL else []) + ([prompt_v2_authorization(end)] if PROMPT_V2 else []) + ([constrained_authorization(end)] if CONSTRAINED else [])
+            and CUMULATIVE_CAP_GPUH <= STAGE_LABEL_CAP, 'No phase borrowing')
+    return rows + [recovery_row, cluster_row] + ([supplemental_authorization(end)] if SUPPLEMENTAL else []) + ([prompt_v2_authorization(end)] if PROMPT_V2 else []) + ([constrained_authorization(end)] if CONSTRAINED else []) + ([vectorized_authorization(end)] if VECTORIZED else [])
 
 
 def runtime(end=None):
@@ -594,8 +664,8 @@ def first_pilot_identity(jobs, end=None):
     keys = ('index', 'group', 'sample_id', 'video', 'original_prompt_sha256')
     require(first.get('schema') == 'teacher_qwen3vl32b_pilot_plan_v1' and len(first['jobs']) == 32
         and [{k: j[k] for k in keys} for j in jobs] == [{k: j[k] for k in keys} for j in first['jobs']]
-        and first['config']['facts_prompt_sha256'] == (ORIGINAL_FACTS_PROMPT_SHA if (PROMPT_V2 or CONSTRAINED) else fixed_config()['facts_prompt_sha256'])
-        and first['config']['caption_prompt_sha256'] == (ORIGINAL_CAPTION_PROMPT_SHA if (PROMPT_V2 or CONSTRAINED) else fixed_config()['caption_prompt_sha256']),
+        and first['config']['facts_prompt_sha256'] == (ORIGINAL_FACTS_PROMPT_SHA if (PROMPT_V2 or CONSTRAINED or VECTORIZED) else fixed_config()['facts_prompt_sha256'])
+        and first['config']['caption_prompt_sha256'] == (ORIGINAL_CAPTION_PROMPT_SHA if (PROMPT_V2 or CONSTRAINED or VECTORIZED) else fixed_config()['caption_prompt_sha256']),
         'Recovery must use the same 32 cases, bytes and prompts as the first pilot')
     return True
 
@@ -641,7 +711,7 @@ def prepare(model_proof_path, output, gpu_uuids):
         selection_seed=SEED, selection_uses_benchmark_scores=False, fixed_groups=[16, 16],
         metadata_eligible_rows=1815, metadata_rejected_rows=41,
         cap_seconds=CAP, tail_seconds=TAIL, allocated_cards=CARDS, allocation_GPUh_cap=ALLOCATION_GPUH,
-        prior_charged_label_GPUh=PRIOR_GPUH, stage_cap_GPUh=24, single_attempt=True,
+        prior_charged_label_GPUh=PRIOR_GPUH, stage_cap_GPUh=STAGE_LABEL_CAP, single_attempt=True,
         automatic_retry_allowed=False, full_rebuild_allowed=False, formal_training_allowed=False,
         AR_allowed=False, student_distillation_allowed=False, GPU_execution_started=False,
         semantic_review_pass=False, structural_validation_is_semantic_approval=False)
@@ -660,7 +730,7 @@ def verify(path, digest, end=None, local_assets=True):
         and type(p.get('node_ip')) is str and p['node_ip'] == os.environ.get('NODE_IP')
         and p.get('output_root') == str(LOCAL) and p.get('state_dir') == str(STATE_DIR), 'New fixed rank1 scope/root/config required')
     fixed = dict(cap_seconds=CAP, tail_seconds=TAIL, allocated_cards=CARDS, allocation_GPUh_cap=ALLOCATION_GPUH,
-        prior_charged_label_GPUh=PRIOR_GPUH, stage_cap_GPUh=24, selection_seed=SEED,
+        prior_charged_label_GPUh=PRIOR_GPUH, stage_cap_GPUh=STAGE_LABEL_CAP, selection_seed=SEED,
         metadata_eligible_rows=1815, metadata_rejected_rows=41, fixed_groups=[16, 16],
         single_attempt=True, automatic_retry_allowed=False, full_rebuild_allowed=False,
         formal_training_allowed=False, AR_allowed=False, student_distillation_allowed=False,
@@ -849,17 +919,23 @@ def generate_text(model, processor, images, device, max_tokens, facts=None, trac
     inputs = processor.apply_chat_template(messages, tokenize=True, add_generation_prompt=True,
         return_dict=True, return_tensors='pt').to(device)
     constraints = {}
-    if CONSTRAINED:
+    if CONSTRAINED or VECTORIZED:
         words = DENY_DECODE_WORDS + (CAPTION_DECODE_WORDS if facts is not None else ())
         forms = {prefix+form for word in words for form in (word,word.title(),word.upper()) for prefix in ('',' ')}
         ids = [processor.tokenizer.encode(form,add_special_tokens=False) for form in sorted(forms)]
-        constraints['bad_words_ids'] = [tokens for tokens in ids if tokens]
+        from transformers import LogitsProcessorList
+        eos_ids=model.generation_config.eos_token_id
+        eos_ids=[eos_ids] if type(eos_ids) is int else eos_ids
+        if VECTORIZED:
+            constraints['logits_processor']=LogitsProcessorList([vectorized_bad_words(ids,eos_ids)])
+        else:
+            constraints['bad_words_ids'] = [tokens for tokens in ids if tokens]
         if facts is not None:
             from transformers import LogitsProcessorList
             eos_ids = model.generation_config.eos_token_id
             eos_ids = [eos_ids] if type(eos_ids) is int else eos_ids
             require(type(eos_ids) is list and eos_ids and all(type(t) is int for t in eos_ids), 'Strict configured decoder EOS required')
-            constraints['logits_processor'] = LogitsProcessorList([minimum_caption_words(inputs['input_ids'].shape[1],processor,eos_ids)])
+            constraints.setdefault('logits_processor',LogitsProcessorList()).append(minimum_caption_words(inputs['input_ids'].shape[1],processor,eos_ids))
     with torch.inference_mode():
         output = model.generate(**inputs, max_new_tokens=max_tokens, do_sample=False, **constraints)
     new_tokens = output[:, inputs['input_ids'].shape[1]:]
@@ -1043,7 +1119,7 @@ def verify_worker_ancestry(launch, p, bound, ancestors, supervised):
     parent = launch['parent']
     require(any(same_identity(a, parent) for a in ancestors), 'Actual approved parent ancestor required')
     args = parent['argv']
-    require(args.count('--supplemental') == int(SUPPLEMENTAL) and args.count('--prompt-v2') == int(PROMPT_V2) and args.count('--constrained') == int(CONSTRAINED),
+    require(args.count('--supplemental') == int(SUPPLEMENTAL) and args.count('--prompt-v2') == int(PROMPT_V2) and args.count('--constrained') == int(CONSTRAINED) and args.count('--vectorized') == int(VECTORIZED),
         'Actual experimental parent command binding differs')
     require(str(Path(__file__).resolve()) in args and 'run' in args and args.count('--gpu-authorized') == 1
         and exact_flags(args, (('--plan', bound['path']), ('--approved-plan-sha256', bound['sha256']),
@@ -1353,6 +1429,8 @@ def run(path, digest, approval_path, approval_digest, gpu_authorized=False):
             command.insert(command.index('worker'), '--prompt-v2')
         if CONSTRAINED:
             command.insert(command.index('worker'), '--constrained')
+        if VECTORIZED:
+            command.insert(command.index('worker'),'--vectorized')
         env = dict(os.environ, CUDA_VISIBLE_DEVICES=','.join(p['gpu_uuids']), HF_HUB_OFFLINE='1',
                    TRANSFORMERS_OFFLINE='1', OMP_NUM_THREADS='1')
         with (LOCAL / 'worker.log').open('xb') as log:
@@ -1486,6 +1564,7 @@ def main(argv=None):
     modes.add_argument('--supplemental', action='store_true', help='Separately authorized second allocation; original claim and costs preserved')
     modes.add_argument('--prompt-v2', action='store_true', help='New positive-output prompt experiment; original validation gates unchanged')
     modes.add_argument('--constrained', action='store_true', help='Prospective vocabulary/EOS decoder constraints, not posthoc label repair')
+    modes.add_argument('--vectorized',action='store_true',help='New expanded-budget vectorized decoder, original validation gates preserved')
     commands = parser.add_subparsers(dest='command', required=True)
     prep = commands.add_parser('prepare')
     prep.add_argument('--model-proof', required=True)
@@ -1513,6 +1592,8 @@ def main(argv=None):
         configure_prompt_v2()
     if args.constrained:
         configure_constrained()
+    if args.vectorized:
+        configure_vectorized()
     if args.command == 'run':
         canonical_launch([sys.executable, sys.argv[0], *(sys.argv[1:] if argv is None else argv)])
     if args.command == 'model-proof':

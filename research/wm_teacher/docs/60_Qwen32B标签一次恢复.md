@@ -168,3 +168,13 @@ C276原子集真实生成28.483680GPUh、评分1.100152GPUh；历史两seedALG/D
 另有CPU复制三片原Teacher DiT到新本地目录的受管任务，复制途中逐hash绑定原CACHE_PINS、输出独立SHA和safetensors头核查；目前尚在执行，不当完整模型部署证明。完成事实必须以独立base_content.proof.json和三个pin相符为准。全程未加载权重到GPU、未执行LoRA update，没有新Teacher质量或SOTA结果。当前仍等待此前已明确提出的新增预算和跨项目占卡入口协调授权。
 
 实际基座头另外CPU核验：三片原safetensors含825个F32 tensor、4,999,787,712参数元素，30个block与全部self/cross q/k/v/o投影存在，配置head_dim128。源文件F32不等于运行时F32：现有build_pipe明确torch_dtype=bfloat16加载且LoRA可训练tensor转float32；后续须按实际加载检查。头读取不等于全内容SHA或GPU模型加载，当前CPU复制未完成状态不改为true。
+
+## 14. 用户扩大预算后的新阶段冻结（2026-11-04）
+
+用户在168GPUh阶段请求后明确回复“可以扩大预算.当前一共8节点可用,资源肯定是充足的”。新增阶段硬帽168GPUh：标签/cache96、技术8、语义与精确技术准入后Teacher训练/评测64，不无限扩张、不借用、不抹掉原23.832564878标签费用或旧失败claim。每子实验另冻结timeout、卡数、单次claim、模型/runtime/输入/源码与终态费用。资源充分不保证同预算/全协议SOTA成功。
+
+首项新实验保持v2 prompt、同32病例/16帧和原精确验证门，把NoBadWords逐prefix实现换成精确等价向量化匹配/布尔scatter掩码，不改EOS最少40词规则。用独立新模式vectorized，4卡内层5300秒，资源守护总5400秒/6GPUh；为启动与compute-mode恢复留100秒，所有加载/等待/失败/清理计入资源总账。CPU有限掩码包含重复prefix/同目标/EOS、原旧模式回归已通过，不等于GPU速度或语义提升。
+
+新集群四卡临时使用EXCLUSIVE_PROCESS，已确认hold_gpu脚本按精确PIDFD/argv/设备归属暂停；守护只对这些已授权holder发SIGTERM，不杀业务任务、不改跨集群共享外部脚本。进入实验后CUDA上下文占有四卡会拒绝新增holder；既有每5秒外部PID检查保留。结束恢复原compute-mode并写独立账本；复原失败不算完成。原集群不动，非分配GPU不改。
+
+先完成此新协议的32/32结构与独立语义审核；FAIL不自动重试/放宽。正式训练仍须数据/cache语义门及独立FA2精确恢复验证后，按已批准的条件64GPUh范围冻结单候选。全基准和外部同协议对手不足时如实报告，不把工程通过当SOTA。

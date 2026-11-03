@@ -1191,3 +1191,33 @@ def test_runtime_owner_check_records_intrusion_without_foreign_signals(monkeypat
     process.query_release=lambda uuid:dict(gpu_uuid=uuid,pids=[3,77] if uuid=='GPU-1' else [3])
     assert pilot.foreign_gpu_observations(p,{'pid':1},{'pid':2},[])==[{'gpu_uuid':'GPU-1','pids':[3,77]}]
     assert not hasattr(process,'kill') and not hasattr(process,'cleanup_owned')
+
+
+
+def test_vectorized_mask_equals_native_and_caches_prefix_tensors(monkeypatch):
+    import torch
+    from transformers import NoBadWordsLogitsProcessor
+    words=[[2],[3,4],[5,4],[3,4],[7,8,9],[11]]
+    callback=pilot.vectorized_bad_words(words,[11])
+    reference=NoBadWordsLogitsProcessor(words,eos_token_id=[11])
+    torch.manual_seed(20261104)
+    for length in (1,2,3,6,12):
+        for _ in range(10):
+            tokens=torch.randint(0,12,(2,length));scores=torch.randn(2,20)
+            assert torch.equal(callback(tokens,scores.clone()),reference(tokens,scores.clone()))
+    assert len(callback.cache)==1 and not torch.cuda.is_initialized()
+
+
+def test_expanded_vectorized_scope_preserves_old_caps_and_validators(monkeypatch):
+    for k in ('VECTORIZED','CONSTRAINED','PROMPT_V2','LOCAL','STATE_DIR','RECOVERY_EVIDENCE','CAP',
+              'ALLOCATION_GPUH','PRIOR_GPUH','CUMULATIVE_CAP_GPUH','PROMPT_VERSION','STAGE_LABEL_CAP',
+              'FACTS_PROMPT','CAPTION_PROMPT'):
+        monkeypatch.setattr(pilot,k,getattr(pilot,k))
+    v=pilot.validate_facts,pilot.validate_caption
+    pilot.configure_vectorized()
+    assert pilot.STAGE_LABEL_CAP==120 and pilot.CAP==5300
+    assert pilot.PRIOR_GPUH==23.832564877520134 and pilot.ORIGINAL_PRIOR_GPUH==2.1658982108534675
+    assert pilot.CUMULATIVE_CAP_GPUH-pilot.PRIOR_GPUH<=6
+    assert (pilot.validate_facts,pilot.validate_caption)==v
+    assert pilot.fixed_config()['decoder_implementation']=='exact_vectorized_bad_words_v1'
+    assert pilot.canonical_launch([sys.executable,str(Path(pilot.__file__).resolve()),'--vectorized','run'])
