@@ -437,6 +437,7 @@ def vectorized_bad_words(words, eos):
                 if len(w)>1:groups.setdefault(len(w)-1,[]).append(w)
             self.groups=groups;self.cache={}
         def __call__(self, input_ids, scores):
+            # HF dispatch can keep token IDs on the embedding card and logits on the last card.
             input_ids=input_ids.to(scores.device)
             key=(scores.device.type,scores.device.index)
             if key not in self.cache:

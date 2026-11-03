@@ -21,6 +21,7 @@ PYTHON='/dockerdata/venv_qwen32b_20261103/bin/python3.12'
 SITE='/dockerdata/wm_a800_fa2_runtime_20261103/site'
 CAP=720
 REVISION2=False
+REVISION3=False
 
 def bound(p):
     p=Path(p);b=p.read_bytes();return dict(path=str(p),bytes=len(b),sha256=hashlib.sha256(b).hexdigest())
@@ -120,12 +121,19 @@ def run():
             assert hashlib.sha256(content).hexdigest()==file['snapshot_sha256']
         remote=subprocess.check_output(['git','-C',G,'ls-remote','origin','refs/heads/wm-teacher-experiments-20261018'],text=True,timeout=30).split()
         assert remote[0]==receipt['commit']
+        lease_dir=Path('/dockerdata/wm_gpu_exclusivity');lease_dir.mkdir(mode=0o700,exist_ok=True)
+        lease=lease_dir/(uuid+'.json');assert not lease.exists(), 'Unknown existing lease blocks admission'
+        lease.write_text(json.dumps(dict(gpu_uuid=uuid,expires_epoch=time.time()+CAP,owner_pid=os.getpid(),owner_start=start)))
+        lease.chmod(0o600)
         subprocess.run(['nvidia-smi','-i',uuid,'-c','3'],check=True,capture_output=True)
         for pid in owners(uuid):
             fd=os.pidfd_open(pid)
             try:
                 p=Path('/proc')/str(pid);argv=[x.decode() for x in (p/'cmdline').read_bytes().split(bytes([0])) if x]
-                assert argv==['/opt/venv_eval/bin/python','-u','/root/planner_two_node_tasks_20261029_v4/code/hold_gpu.py'], 'Unknown owner blocks admission'
+                allowed=[['/opt/venv_eval/bin/python','-u','/root/planner_two_node_tasks_20261029_v4/code/hold_gpu.py'],
+                    ['/srv/PRIVATE_STORAGE',
+                     '/srv/PRIVATE_STORAGE']]
+                assert argv in allowed, 'Unknown owner blocks admission'
                 assert p.stat().st_uid==os.getuid()
                 signal.pidfd_send_signal(fd,signal.SIGTERM);assert select.select([fd],[],[],20)[0]
                 signals.append(pid)
@@ -137,7 +145,7 @@ def run():
             decoder_source=bound(ROOT/'scripts/run_teacher_qwen3vl32b_recovery.py'),native_record=native))
         env=dict(os.environ,CUDA_VISIBLE_DEVICES=uuid,PYTHONPATH=SITE,CUBLAS_WORKSPACE_CONFIG=':4096:8',OMP_NUM_THREADS='1')
         with (E/'worker.log').open('xb') as log:
-            command=[PYTHON,str(Path(__file__).resolve())]+(['--revision2'] if REVISION2 else [])+['worker']
+            command=[PYTHON,str(Path(__file__).resolve())]+(['--revision3'] if REVISION3 else ['--revision2'] if REVISION2 else [])+['worker']
             child=subprocess.Popen(command,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             child.wait(timeout=max(1,CAP-50-(time.monotonic()-start)))
         assert child.returncode==0 and json.loads((E/'worker.json').read_bytes())['success']
@@ -151,6 +159,10 @@ def run():
         queries=[owners(uuid),owners(uuid)];released=not any(queries)
         subprocess.run(['nvidia-smi','-i',uuid,'-c','0' if mode=='Default' else '3'],check=True,capture_output=True)
         restored=device()[1]==mode;elapsed=time.monotonic()-start
+        lease_file=Path('/dockerdata/wm_gpu_exclusivity')/(uuid+'.json')
+        if lease_file.is_file():
+            lease_value=json.loads(lease_file.read_text())
+            if lease_value.get('owner_pid')==os.getpid() and lease_value.get('owner_start')==start:lease_file.unlink()
         write(E/'terminal.json',dict(terminal=True,success=error is None and released and restored and elapsed<=CAP,
             phase='technical_admission',elapsed_seconds=elapsed,allocated_cards=1,
             charged_upper_GPUh=max(0.2,elapsed/3600),actual_allocated_GPUh=elapsed/3600,
@@ -161,12 +173,16 @@ def run():
     assert error is None and released and restored
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--revision2',action='store_true')
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--revision2',action='store_true');p.add_argument('--revision3',action='store_true')
     p.add_argument('command',choices=['run','worker'])
     a=p.parse_args()
     if a.revision2:
         REVISION2=True
         E=ROOT/'eval/teacher_progress_campaign_20261104/technical_kernel_probe002'
         AUTH_SHA='b3a0675dd046beeac7a9ab828381a5ab720a2d4a7fa9aa92ca7f6db8a0d30bfc'
+    if a.revision3:
+        REVISION3=True
+        E=ROOT/'eval/teacher_progress_campaign_20261104/technical_kernel_probe003'
+        AUTH_SHA='d83036ae1ec59eda9e6b3031c637c019f90e6659417723e45ba4e9bba3caf3b8'
     if a.command=='worker':worker()
     else:run()
