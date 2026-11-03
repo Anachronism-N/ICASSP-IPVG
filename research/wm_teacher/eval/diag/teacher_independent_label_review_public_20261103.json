@@ -1,0 +1,627 @@
+{
+  "AR_allowed": false,
+  "GPUs_released": true,
+  "actual_allocated_GPUh": 0.06477918705514943,
+  "all_source_records_denominator": 64,
+  "charged_upper_GPUh": 1,
+  "control_count": 4,
+  "controls_passed": true,
+  "cumulative_label_upper_GPUh": 21.165898210853467,
+  "date": "2026-11-03",
+  "elapsed_seconds": 233.20507339853793,
+  "formal_training_allowed": false,
+  "groups": {
+    "0": {
+      "adequate": 10,
+      "cases": 32,
+      "error": 0,
+      "needs_edit": 3,
+      "structured_labels": 13,
+      "uncertain": 0,
+      "unlabelled": 19
+    },
+    "1": {
+      "adequate": 19,
+      "cases": 32,
+      "error": 0,
+      "needs_edit": 4,
+      "structured_labels": 23,
+      "uncertain": 0,
+      "unlabelled": 9
+    }
+  },
+  "limitations": [
+    "16-source-frame sparse review, not full-video review",
+    "Same-model-family systematic errors remain possible",
+    "Programmatic controls do not calibrate real-domain false positives",
+    "Both reviewed candidate sets come from repeatedly inspected developer cases",
+    "Conditional retained-label verdicts and all-32 source denominators must not be mixed"
+  ],
+  "quality_claim": false,
+  "real_labels_reviewed": 36,
+  "records": [
+    {
+      "assessment": {
+        "action_match": "no",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.748315569013357,
+      "evidence_group": 0,
+      "index": 0,
+      "source_index": 0,
+      "verdict": "needs_edit"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.4773300336673856,
+      "evidence_group": 0,
+      "index": 1,
+      "source_index": 6,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "no",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.754222315736115,
+      "evidence_group": 0,
+      "index": 2,
+      "source_index": 10,
+      "verdict": "needs_edit"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.5299509214237332,
+      "evidence_group": 0,
+      "index": 3,
+      "source_index": 11,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.642939110286534,
+      "evidence_group": 0,
+      "index": 4,
+      "source_index": 15,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "no",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.735922582447529,
+      "evidence_group": 0,
+      "index": 5,
+      "source_index": 16,
+      "verdict": "needs_edit"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.584961449727416,
+      "evidence_group": 0,
+      "index": 6,
+      "source_index": 18,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.810786840505898,
+      "evidence_group": 0,
+      "index": 7,
+      "source_index": 19,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.6753971856087446,
+      "evidence_group": 0,
+      "index": 8,
+      "source_index": 20,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.5304711051285267,
+      "evidence_group": 0,
+      "index": 9,
+      "source_index": 22,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.5996983805671334,
+      "evidence_group": 0,
+      "index": 10,
+      "source_index": 23,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.8744640732184052,
+      "evidence_group": 0,
+      "index": 11,
+      "source_index": 26,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 4.256112775765359,
+      "evidence_group": 0,
+      "index": 12,
+      "source_index": 27,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.450897621922195,
+      "evidence_group": 1,
+      "index": 13,
+      "source_index": 1,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.755015063099563,
+      "evidence_group": 1,
+      "index": 14,
+      "source_index": 2,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.9111510682851076,
+      "evidence_group": 1,
+      "index": 15,
+      "source_index": 4,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "no"
+      },
+      "duration_seconds": 3.8339366978034377,
+      "evidence_group": 1,
+      "index": 16,
+      "source_index": 5,
+      "verdict": "needs_edit"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.558443491347134,
+      "evidence_group": 1,
+      "index": 17,
+      "source_index": 6,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.889823713339865,
+      "evidence_group": 1,
+      "index": 18,
+      "source_index": 7,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "no",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.9527804888784885,
+      "evidence_group": 1,
+      "index": 19,
+      "source_index": 10,
+      "verdict": "needs_edit"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.629447073675692,
+      "evidence_group": 1,
+      "index": 20,
+      "source_index": 11,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 4.341914927586913,
+      "evidence_group": 1,
+      "index": 21,
+      "source_index": 13,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.9182009315118194,
+      "evidence_group": 1,
+      "index": 22,
+      "source_index": 14,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "no",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "no"
+      },
+      "duration_seconds": 3.8242192780599,
+      "evidence_group": 1,
+      "index": 23,
+      "source_index": 15,
+      "verdict": "needs_edit"
+    },
+    {
+      "assessment": {
+        "action_match": "no",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.918792163953185,
+      "evidence_group": 1,
+      "index": 24,
+      "source_index": 16,
+      "verdict": "needs_edit"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.607251991517842,
+      "evidence_group": 1,
+      "index": 25,
+      "source_index": 17,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.818880728445947,
+      "evidence_group": 1,
+      "index": 26,
+      "source_index": 18,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.8978269901126623,
+      "evidence_group": 1,
+      "index": 27,
+      "source_index": 19,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.6245009545236826,
+      "evidence_group": 1,
+      "index": 28,
+      "source_index": 21,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.702331678941846,
+      "evidence_group": 1,
+      "index": 29,
+      "source_index": 23,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.9630732918158174,
+      "evidence_group": 1,
+      "index": 30,
+      "source_index": 24,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.8969045588746667,
+      "evidence_group": 1,
+      "index": 31,
+      "source_index": 25,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 4.189430557191372,
+      "evidence_group": 1,
+      "index": 32,
+      "source_index": 26,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 4.09023972786963,
+      "evidence_group": 1,
+      "index": 33,
+      "source_index": 27,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.7720358734950423,
+      "evidence_group": 1,
+      "index": 34,
+      "source_index": 28,
+      "verdict": "adequate"
+    },
+    {
+      "assessment": {
+        "action_match": "yes",
+        "end_state_match": "yes",
+        "entity_match": "yes",
+        "no_actor_transfer": "yes",
+        "no_hallucination": "yes",
+        "no_major_omission": "yes",
+        "no_motion_erasure": "yes"
+      },
+      "duration_seconds": 3.372856446541846,
+      "evidence_group": 1,
+      "index": 35,
+      "source_index": 29,
+      "verdict": "adequate"
+    }
+  ],
+  "reviewer": "Qwen3-VL-8B-Instruct",
+  "reviewer_kind": "independent_model_same_Qwen_family_AI_diagnostic",
+  "schema": "teacher_independent_label_review_public_v1",
+  "semantic_gold_claim": false,
+  "semantic_training_approval": false,
+  "sota_proven": false,
+  "student_distillation_allowed": false
+}

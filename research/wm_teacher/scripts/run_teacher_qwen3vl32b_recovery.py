@@ -57,6 +57,9 @@ ORIGINAL_PRIOR_GPUH = PRIOR_GPUH
 ORIGINAL_CUMULATIVE_CAP_GPUH = CUMULATIVE_CAP_GPUH
 SUPPLEMENTAL = False
 PROMPT_V2 = False
+CONSTRAINED = False
+CONSTRAINED_AUTH = ROOT / 'eval/teacher_label_constrained_decode_20261103/constrained.authorization.json'
+CONSTRAINED_AUTH_SHA = 'a1f093dd1e9b3dbf65be26b300dca4788f5a7c39b24f175b6a29690ddc71198c'
 PROMPT_V2_AUTH = ROOT / 'eval/teacher_label_prompt_v2_20261103/prompt_v2.authorization.json'
 PROMPT_V2_AUTH_SHA = '5a70b129fb053dce7c3dde62542adcc064e47543b84ef844de88079c13d4111c'
 SUPPLEMENTAL_AUTH = ROOT / 'eval/teacher_label_supplemental_20261103/supplemental.authorization.json'
@@ -283,7 +286,7 @@ def pinned(path, digest, end=None):
 
 
 def fixed_config():
-    return dict(model='Qwen3-VL-32B-Instruct', model_root=str(MODEL_ROOT), dtype='bfloat16',
+    config = dict(model='Qwen3-VL-32B-Instruct', model_root=str(MODEL_ROOT), dtype='bfloat16',
         quantization=False, device_map='balanced', max_memory={str(i): '34GiB' for i in range(4)},
         attn_implementation='sdpa', local_files_only=True, CPU_disk_weight_offload_allowed=False,
         frames=16, source_frames=121, source_fps=24, source_size=[1280, 704], resize=[640, 352],
@@ -292,6 +295,62 @@ def fixed_config():
         facts_prompt_sha256=hashlib.sha256(FACTS_PROMPT.encode()).hexdigest(),
         caption_prompt_sha256=hashlib.sha256(CAPTION_PROMPT.encode()).hexdigest(),
         stage2_same_images=True, automatic_retry_allowed=False)
+    if CONSTRAINED:
+        config['decoder_constraints'] = dict(deny_words=list(DENY_DECODE_WORDS),caption_deny_words=list(CAPTION_DECODE_WORDS),caption_eos_min_words=40)
+    return config
+
+
+DENY_DECODE_WORDS = ('name','named','identity','brand','logo','ocr','intends','wants',
+    'hopes','probably','perhaps','apparently','seems','likely','invisible','unseen',
+    'off-screen','imagines','feels','thinks','camera operator')
+CAPTION_DECODE_WORDS = ('frame','frames','sampled','sampling','timestamp','timestamps','fps','resolution','pixels','seconds')
+
+
+def configure_constrained():
+    global CONSTRAINED, PROMPT_V2, LOCAL, STATE_DIR, RECOVERY_EVIDENCE, CAP, ALLOCATION_GPUH
+    global PRIOR_GPUH, CUMULATIVE_CAP_GPUH, PROMPT_VERSION
+    configure_prompt_v2()
+    PROMPT_V2, CONSTRAINED = False, True
+    LOCAL = Path('/dockerdata/wm_tmp/teacher_qwen32b_constrained_20261103_run01')
+    STATE_DIR = Path('/dockerdata/wm_logs/teacher_qwen32b_constrained_20261103')
+    RECOVERY_EVIDENCE = CONSTRAINED_AUTH.parent
+    CAP, ALLOCATION_GPUH = 2400, 4*2400/3600
+    PRIOR_GPUH = 21.165898210853467
+    CUMULATIVE_CAP_GPUH = PRIOR_GPUH + ALLOCATION_GPUH
+    PROMPT_VERSION = 'qwen3vl32b-positive-policy-constrained-v3'
+
+
+def constrained_authorization(end=None):
+    row = pinned(CONSTRAINED_AUTH, CONSTRAINED_AUTH_SHA, end)
+    a = read(row, end)
+    expected = dict(allocation_ordinal=4, new_allocation_GPUh_cap=ALLOCATION_GPUH,
+        wall_cap_seconds=CAP, allocated_cards=4, frames_per_case=16, cases=32,
+        fixed_groups=[16,16], dtype='bfloat16', prior_charged_upper_GPUh=PRIOR_GPUH,
+        cumulative_label_upper_GPUh_cap=CUMULATIVE_CAP_GPUH, label_stage_cap_GPUh=24,
+        automatic_retry_allowed=False, original_cases_preserved=True, original_validation_gates_preserved=True,
+        semantic_review_followup_cap_GPUh=0.15, formal_training_allowed=False,AR_allowed=False,student_distillation_allowed=False)
+    require(a.get('schema')=='teacher_qwen32b_constrained_decode_scope_v1'
+        and all(type(a.get(k)) is type(v) and a[k]==v for k,v in expected.items()),
+        'New prospective decoder protocol and exact remaining budget required')
+    review, failed = read(a['review_terminal'],end), read(a['v2_failure'],end)
+    require(review['terminal'] is True and review['success'] is True and review['charged_upper_GPUh']==1
+        and review['cumulative_label_upper_GPUh']==PRIOR_GPUH and review['GPUs_released'] is True
+        and failed['terminal'] is True and failed['success'] is False and failed['allocated_GPUh']==6,
+        'Previous original failure and independent review costs must remain charged')
+    require(CUMULATIVE_CAP_GPUH+0.15<=24, 'Decoder and review must fit the unborrowed remaining label budget')
+    return row
+
+
+def minimum_caption_words(prompt_length, processor, eos):
+    from transformers import LogitsProcessor
+    class MinimumWords(LogitsProcessor):
+        def __call__(self, input_ids, scores):
+            text = processor.batch_decode(input_ids[:,prompt_length:],skip_special_tokens=True,
+                clean_up_tokenization_spaces=False)[0]
+            if len(re.findall(r"\b[\w]+(?:[-'][\w]+)*\b",text))<40:
+                scores[:,eos]=float('-inf')
+            return scores
+    return MinimumWords()
 
 
 def configure_supplemental():
@@ -308,7 +367,8 @@ def canonical_launch(argv):
     require(type(argv) is list and len(argv) >= 2 and argv[1] == str(Path(__file__).resolve()),
             'Launch the parent with the absolute canonical runner path before any allocation')
     require(argv.count('--supplemental') == int(SUPPLEMENTAL)
-        and argv.count('--prompt-v2') == int(PROMPT_V2), 'Exact experimental launch scope required')
+        and argv.count('--prompt-v2') == int(PROMPT_V2) and argv.count('--constrained') == int(CONSTRAINED),
+        'Exact experimental launch scope required')
     return True
 
 
@@ -395,7 +455,7 @@ def authorization_rows(end=None):
         and cluster.get('original_recovery_authorization') == {'path': str(RECOVERY_AUTH), 'sha256': RECOVERY_AUTH_SHA}
         and cluster.get('first_pilot_plan') == {'path': str(FIRST_PLAN), 'sha256': FIRST_PLAN_SHA}
         and all(type(cluster.get(k)) is int and cluster[k] == v for k, v in (('nodes', 1), ('allocated_cards', CARDS),
-            ('cases', 32), ('frames_per_case', 16), ('wall_cap_seconds', CAP), ('new_allocation_GPUh_cap', ALLOCATION_GPUH),
+            ('cases', 32), ('frames_per_case', 16), ('wall_cap_seconds', 5400), ('new_allocation_GPUh_cap', 6),
             ('stage_cap_GPUh', 24), ('recovery_attempts_before_migration', 0)))
         and cluster.get('all_previous_label_charged_upper_GPUh') == ORIGINAL_PRIOR_GPUH
         and cluster.get('cumulative_label_upper_GPUh_cap') == ORIGINAL_CUMULATIVE_CAP_GPUH
@@ -408,10 +468,10 @@ def authorization_rows(end=None):
             'frame_reduction_allowed', 'foreign_gpu_workloads_may_be_killed', 'full_rebuild_allowed',
             'formal_training_allowed', 'AR_allowed', 'student_distillation_allowed')),
         'New-cluster recovery freeze drift')
-    require(CAP == 5400 and TAIL == 120 and CARDS == 4 and ALLOCATION_GPUH == CARDS * CAP / 3600
+    require(CAP == (2400 if CONSTRAINED else 5400) and TAIL == 120 and CARDS == 4 and ALLOCATION_GPUH == CARDS * CAP / 3600
             and abs(PRIOR_GPUH + ALLOCATION_GPUH - CUMULATIVE_CAP_GPUH) < 1e-12
             and CUMULATIVE_CAP_GPUH <= 24, 'No phase borrowing')
-    return rows + [recovery_row, cluster_row] + ([supplemental_authorization(end)] if SUPPLEMENTAL else []) + ([prompt_v2_authorization(end)] if PROMPT_V2 else [])
+    return rows + [recovery_row, cluster_row] + ([supplemental_authorization(end)] if SUPPLEMENTAL else []) + ([prompt_v2_authorization(end)] if PROMPT_V2 else []) + ([constrained_authorization(end)] if CONSTRAINED else [])
 
 
 def runtime(end=None):
@@ -534,8 +594,8 @@ def first_pilot_identity(jobs, end=None):
     keys = ('index', 'group', 'sample_id', 'video', 'original_prompt_sha256')
     require(first.get('schema') == 'teacher_qwen3vl32b_pilot_plan_v1' and len(first['jobs']) == 32
         and [{k: j[k] for k in keys} for j in jobs] == [{k: j[k] for k in keys} for j in first['jobs']]
-        and first['config']['facts_prompt_sha256'] == (ORIGINAL_FACTS_PROMPT_SHA if PROMPT_V2 else fixed_config()['facts_prompt_sha256'])
-        and first['config']['caption_prompt_sha256'] == (ORIGINAL_CAPTION_PROMPT_SHA if PROMPT_V2 else fixed_config()['caption_prompt_sha256']),
+        and first['config']['facts_prompt_sha256'] == (ORIGINAL_FACTS_PROMPT_SHA if (PROMPT_V2 or CONSTRAINED) else fixed_config()['facts_prompt_sha256'])
+        and first['config']['caption_prompt_sha256'] == (ORIGINAL_CAPTION_PROMPT_SHA if (PROMPT_V2 or CONSTRAINED) else fixed_config()['caption_prompt_sha256']),
         'Recovery must use the same 32 cases, bytes and prompts as the first pilot')
     return True
 
@@ -788,8 +848,20 @@ def generate_text(model, processor, images, device, max_tokens, facts=None, trac
     messages = stage_messages(images, facts)
     inputs = processor.apply_chat_template(messages, tokenize=True, add_generation_prompt=True,
         return_dict=True, return_tensors='pt').to(device)
+    constraints = {}
+    if CONSTRAINED:
+        words = DENY_DECODE_WORDS + (CAPTION_DECODE_WORDS if facts is not None else ())
+        forms = {prefix+form for word in words for form in (word,word.title(),word.upper()) for prefix in ('',' ')}
+        ids = [processor.tokenizer.encode(form,add_special_tokens=False) for form in sorted(forms)]
+        constraints['bad_words_ids'] = [tokens for tokens in ids if tokens]
+        if facts is not None:
+            from transformers import LogitsProcessorList
+            eos_ids = model.generation_config.eos_token_id
+            eos_ids = [eos_ids] if type(eos_ids) is int else eos_ids
+            require(type(eos_ids) is list and eos_ids and all(type(t) is int for t in eos_ids), 'Strict configured decoder EOS required')
+            constraints['logits_processor'] = LogitsProcessorList([minimum_caption_words(inputs['input_ids'].shape[1],processor,eos_ids)])
     with torch.inference_mode():
-        output = model.generate(**inputs, max_new_tokens=max_tokens, do_sample=False)
+        output = model.generate(**inputs, max_new_tokens=max_tokens, do_sample=False, **constraints)
     new_tokens = output[:, inputs['input_ids'].shape[1]:]
     require(new_tokens.ndim == 2 and new_tokens.shape[0] == 1 and new_tokens.shape[1] > 0,
             'Generation produced no new tokens')
@@ -971,7 +1043,7 @@ def verify_worker_ancestry(launch, p, bound, ancestors, supervised):
     parent = launch['parent']
     require(any(same_identity(a, parent) for a in ancestors), 'Actual approved parent ancestor required')
     args = parent['argv']
-    require(args.count('--supplemental') == int(SUPPLEMENTAL) and args.count('--prompt-v2') == int(PROMPT_V2),
+    require(args.count('--supplemental') == int(SUPPLEMENTAL) and args.count('--prompt-v2') == int(PROMPT_V2) and args.count('--constrained') == int(CONSTRAINED),
         'Actual experimental parent command binding differs')
     require(str(Path(__file__).resolve()) in args and 'run' in args and args.count('--gpu-authorized') == 1
         and exact_flags(args, (('--plan', bound['path']), ('--approved-plan-sha256', bound['sha256']),
@@ -1266,6 +1338,8 @@ def run(path, digest, approval_path, approval_digest, gpu_authorized=False):
             command.insert(command.index('worker'), '--supplemental')
         if PROMPT_V2:
             command.insert(command.index('worker'), '--prompt-v2')
+        if CONSTRAINED:
+            command.insert(command.index('worker'), '--constrained')
         env = dict(os.environ, CUDA_VISIBLE_DEVICES=','.join(p['gpu_uuids']), HF_HUB_OFFLINE='1',
                    TRANSFORMERS_OFFLINE='1', OMP_NUM_THREADS='1')
         with (LOCAL / 'worker.log').open('xb') as log:
@@ -1391,6 +1465,7 @@ def main(argv=None):
     modes = parser.add_mutually_exclusive_group()
     modes.add_argument('--supplemental', action='store_true', help='Separately authorized second allocation; original claim and costs preserved')
     modes.add_argument('--prompt-v2', action='store_true', help='New positive-output prompt experiment; original validation gates unchanged')
+    modes.add_argument('--constrained', action='store_true', help='Prospective vocabulary/EOS decoder constraints, not posthoc label repair')
     commands = parser.add_subparsers(dest='command', required=True)
     prep = commands.add_parser('prepare')
     prep.add_argument('--model-proof', required=True)
@@ -1416,6 +1491,8 @@ def main(argv=None):
         configure_supplemental()
     if args.prompt_v2:
         configure_prompt_v2()
+    if args.constrained:
+        configure_constrained()
     if args.command == 'run':
         canonical_launch([sys.executable, sys.argv[0], *(sys.argv[1:] if argv is None else argv)])
     if args.command == 'model-proof':

@@ -1123,3 +1123,58 @@ def test_protocol_modes_are_mutually_exclusive():
     with pytest.raises(SystemExit):
         pilot.main(['--supplemental', '--prompt-v2', 'verify', '--plan', 'missing',
                     '--approved-plan-sha256', 'a'*64])
+
+
+@pytest.mark.parametrize('words',[39,40,60])
+def test_caption_minimum_words_only_masks_eos_before_40(words):
+    import torch
+    class Processor:
+        def batch_decode(self,tokens,**kw):return [' '.join(['visible']*words)]
+    callback=pilot.minimum_caption_words(2,Processor(),[2,3])
+    scores=torch.ones((1,5));out=callback(torch.tensor([[8,9,10]]),scores)
+    assert out[0,0].item()==1 and out[0,1].item()==1 and out[0,4].item()==1
+    assert torch.isneginf(out[0,2]).item()==(words<40)
+    assert torch.isneginf(out[0,3]).item()==(words<40)
+    assert not torch.cuda.is_initialized()
+
+
+def test_constrained_budget_prompt_invariance_and_old_exact_gates(monkeypatch):
+    keys=('CONSTRAINED','PROMPT_V2','LOCAL','STATE_DIR','RECOVERY_EVIDENCE','CAP',
+        'ALLOCATION_GPUH','PRIOR_GPUH','CUMULATIVE_CAP_GPUH','FACTS_PROMPT','CAPTION_PROMPT','PROMPT_VERSION')
+    for k in keys:monkeypatch.setattr(pilot,k,getattr(pilot,k))
+    pilot.configure_prompt_v2();v2=pilot.fixed_config()
+    validators=pilot.validate_facts,pilot.validate_caption
+    pilot.configure_constrained();v3=pilot.fixed_config()
+    assert v3['facts_prompt_sha256']==v2['facts_prompt_sha256'] and v3['caption_prompt_sha256']==v2['caption_prompt_sha256']
+    assert (pilot.validate_facts,pilot.validate_caption)==validators
+    assert pilot.CAP==2400 and pilot.ALLOCATION_GPUH==4*2400/3600
+    assert pilot.CUMULATIVE_CAP_GPUH+0.15<=24 and pilot.PRIOR_GPUH==21.165898210853467
+    assert v3['decoder_constraints']['caption_eos_min_words']==40
+    assert 'frame' not in pilot.DENY_DECODE_WORDS and 'frame' in pilot.CAPTION_DECODE_WORDS
+    assert pilot.canonical_launch([sys.executable,str(Path(pilot.__file__).resolve()),'--constrained','run'])
+    for bad in (' '.join(['visible']*121),CAPTION+' The frame shows a table.'):
+        with pytest.raises(ValueError):pilot.validate_caption(bad)
+
+
+@pytest.mark.parametrize('facts,max_tokens',[(None,1024),(FACTS,384)])
+def test_constrained_decode_passes_native_tokenizer_ids_and_stage_specific_eos(monkeypatch,facts,max_tokens):
+    import torch
+    from PIL import Image
+    from types import SimpleNamespace
+    monkeypatch.setattr(pilot,'CONSTRAINED',True)
+    class Inputs(dict):
+        def to(self,device):return self
+    class Tokenizer:
+        def encode(self,text,**kwargs):assert kwargs=={'add_special_tokens':False};return [30,31]
+    class Processor:
+        tokenizer=Tokenizer()
+        def apply_chat_template(self,*a,**kw):return Inputs(input_ids=torch.tensor([[10,11]]))
+        def batch_decode(self,*a,**kw):return [json.dumps(FACTS) if facts is None else CAPTION]
+    class Model:
+        generation_config=SimpleNamespace(eos_token_id=[151645,151643])
+        def generate(self,**kw):
+            assert kw['do_sample'] is False and kw['max_new_tokens']==max_tokens and kw['bad_words_ids']
+            assert ('logits_processor' in kw)==(facts is not None)
+            return torch.tensor([[10,11,100,151645]])
+    out=pilot.generate_text(Model(),Processor(),[Image.new('RGB',(640,352)) for _ in range(16)],'cpu',max_tokens,facts)
+    assert out==(json.dumps(FACTS) if facts is None else CAPTION)

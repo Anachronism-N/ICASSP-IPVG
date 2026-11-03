@@ -81,3 +81,16 @@ def test_unauthorized_allocation_rejected_without_claim(tmp_path):
     args=SimpleNamespace(gpu_authorized=False)
     with pytest.raises(ValueError):review.run(args)
     assert not list(tmp_path.iterdir())
+
+
+
+def test_followup_scope_fits_remaining_budget_without_semantic_gate_change(monkeypatch):
+    for k in ('CAP','TAIL','ALLOCATION_GPUH','PRIOR_GPUH','AUTH','AUTH_SHA','FOLLOWUP'):
+        monkeypatch.setattr(review,k,getattr(review,k))
+    prompt=review.PROMPT;fields=review.FIELDS
+    review.configure_followup()
+    assert review.CAP==540 and review.TAIL==60 and review.ALLOCATION_GPUH==0.15
+    assert review.PRIOR_GPUH+review.ALLOCATION_GPUH<=24
+    assert review.PROMPT==prompt and review.FIELDS==fields and review.FOLLOWUP
+    assert review.verdict(good())=='adequate'
+    assert review.AUTH.parent.name=='teacher_label_review_followup_20261103'

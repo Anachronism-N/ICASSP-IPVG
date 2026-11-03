@@ -15,6 +15,8 @@ ROOT = Path(__file__).resolve().parents[1]
 PYTHON = '/dockerdata/venv_qwen32b_20261103/bin/python3.12'
 MODEL = Path('/dockerdata/wm_models_qwen8b_review_20261103')
 CAP, TAIL = 3600, 120
+ALLOCATION_GPUH = 1
+FOLLOWUP = False
 PRIOR_GPUH = 20.165898210853467
 AUTH = ROOT / 'eval/teacher_label_semantic_review_20261103/review.authorization.json'
 AUTH_SHA = '8eac69afd4a42f3966bae70bad1d0947a9e44c41fe0eabb673e28cb5dbbc3154'
@@ -32,6 +34,15 @@ these images do not resolve it. Do not automatically trust a confident caption. 
 motion evidence is uncertain, not proof that any action happened. No reasoning or other text.
 Candidate paragraph:
 """
+
+
+def configure_followup():
+    global CAP, TAIL, ALLOCATION_GPUH, PRIOR_GPUH, AUTH, AUTH_SHA, FOLLOWUP
+    FOLLOWUP = True
+    CAP, TAIL, ALLOCATION_GPUH = 540, 60, 0.15
+    PRIOR_GPUH = 21.165898210853467 + 4*2400/3600
+    AUTH = ROOT / 'eval/teacher_label_review_followup_20261103/review.authorization.json'
+    AUTH_SHA = '142e74234d32884bcc5fdbafd2ff6278a7ac75a4b14a91e9c16219e115dde590'
 
 
 def helpers():
@@ -105,7 +116,7 @@ def prepare(evidence_roots, model_proof, output):
     require(Path(output).is_absolute() and not Path(output).exists(), 'New review plan required')
     authorization = r.pinned(AUTH, AUTH_SHA)
     scope = read(authorization)
-    require(scope['schema']=='teacher_independent_label_review_scope_v1' and scope['allocated_GPUh_cap']==1
+    require(scope['schema']=='teacher_independent_label_review_scope_v1' and scope['allocated_GPUh_cap']==ALLOCATION_GPUH
         and scope['wall_cap_seconds']==CAP and scope['allocated_cards']==1
         and scope['prior_charged_upper_GPUh']==PRIOR_GPUH and scope['automatic_retry_allowed'] is False
         and scope['formal_training_allowed'] is False, 'Explicit finite review authorization required')
@@ -148,8 +159,8 @@ def prepare(evidence_roots, model_proof, output):
     uuid = gpu_hold.query_gpus()[0]['uuid']
     plan = dict(schema='teacher_label_independent_review_plan_v1', private=True,
         hostname=os.uname().nodename, node_ip=os.environ.get('NODE_IP'), gpu_uuid=uuid, allocated_cards=1,
-        cap_seconds=CAP, tail_seconds=TAIL, prior_charged_label_GPUh=PRIOR_GPUH, upper_GPUh=1,
-        cumulative_label_upper_GPUh=PRIOR_GPUH+1, stage_cap_GPUh=24,
+        cap_seconds=CAP, tail_seconds=TAIL, prior_charged_label_GPUh=PRIOR_GPUH, upper_GPUh=ALLOCATION_GPUH,
+        cumulative_label_upper_GPUh=PRIOR_GPUH+ALLOCATION_GPUH, stage_cap_GPUh=24,
         output_root=str(Path(output).parent / 'review_run01'), inputs=inputs, previous_costs=prior,
         jobs=jobs, all_cases_denominator=64, model=model, runtime=r.runtime(),
         source={n: record(ROOT/n) for n in ('scripts/run_teacher_label_semantic_review.py',
@@ -166,8 +177,8 @@ def verify(plan_path, digest, end=None):
     p = read(bound, end)
     require(p['schema'] == 'teacher_label_independent_review_plan_v1' and p['private'] is True
         and p['hostname'] == os.uname().nodename and p['node_ip'] == os.environ.get('NODE_IP')
-        and p['cap_seconds'] == CAP and p['allocated_cards'] == 1 and p['upper_GPUh'] == 1
-        and p['prior_charged_label_GPUh'] == PRIOR_GPUH and p['cumulative_label_upper_GPUh'] == PRIOR_GPUH+1
+        and p['cap_seconds'] == CAP and p['allocated_cards'] == 1 and p['upper_GPUh'] == ALLOCATION_GPUH
+        and p['prior_charged_label_GPUh'] == PRIOR_GPUH and p['cumulative_label_upper_GPUh'] == PRIOR_GPUH+ALLOCATION_GPUH
         and p['prompt_sha256'] == hashlib.sha256(PROMPT.encode()).hexdigest() and p['controls'] == controls()
         and all(p[k] is False for k in ('automatic_retry_allowed','semantic_review_pass',
             'formal_training_allowed','AR_allowed','student_distillation_allowed')),
@@ -287,6 +298,7 @@ def run(args):
         seconds=int(end-time.monotonic());require(seconds>0,'No bounded review window remains')
         command=['timeout','--signal=TERM','--kill-after=20s',f'{seconds}s',PYTHON,str(Path(__file__).resolve()),
                  'worker','--plan',bound['path'],'--sha',bound['sha256'],'--launch',launch['path']]
+        if FOLLOWUP:command.insert(command.index('worker'),'--followup')
         env=dict(os.environ,CUDA_VISIBLE_DEVICES=p['gpu_uuid'],HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',OMP_NUM_THREADS='1')
         with (output/'worker.log').open('xb') as log:
             child=subprocess.Popen(command,stdout=log,stderr=subprocess.STDOUT,env=env,start_new_session=True)
@@ -314,8 +326,8 @@ def run(args):
         result=dict(schema='teacher_label_review_terminal_v1',terminal=True,plan=bound,
             success=error is None and released and elapsed<CAP,review_semantic_pass=False,error_type=error,
             start_monotonic=start,elapsed_seconds=elapsed,allocated_cards=1,cap_seconds=CAP,
-            actual_allocated_GPUh=elapsed/3600,charged_upper_GPUh=max(1,elapsed/3600),
-            cumulative_label_upper_GPUh=PRIOR_GPUH+max(1,elapsed/3600),GPUs_released=released,release_queries=queries,
+            actual_allocated_GPUh=elapsed/3600,charged_upper_GPUh=max(ALLOCATION_GPUH,elapsed/3600),
+            cumulative_label_upper_GPUh=PRIOR_GPUH+max(ALLOCATION_GPUH,elapsed/3600),GPUs_released=released,release_queries=queries,
             formal_training_allowed=False,AR_allowed=False,student_distillation_allowed=False)
         write(output/'terminal.json',result)
         for sig,old in old_handlers.items(): signal.signal(sig,old)
@@ -324,11 +336,13 @@ def run(args):
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('command',choices=['prepare','run','worker'])
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--followup',action='store_true')
+    parser.add_argument('command',choices=['prepare','run','worker'])
     parser.add_argument('--plan');parser.add_argument('--sha');parser.add_argument('--launch')
     parser.add_argument('--evidence',nargs=2);parser.add_argument('--model-proof');parser.add_argument('--output')
     parser.add_argument('--commit');parser.add_argument('--receipt');parser.add_argument('--gpu-authorized',action='store_true')
     a=parser.parse_args()
+    if a.followup:configure_followup()
     if a.command=='prepare': result=prepare(a.evidence,a.model_proof,a.output)
     elif a.command=='worker': result=worker(a.plan,a.sha,a.launch)
     else: result=run(a)
