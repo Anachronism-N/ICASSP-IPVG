@@ -1,3 +1,27 @@
+# 跨集群本地资产复制完成（2026-11-03）
+
+四节点及评测源码迁移全部SHA验收完成，迁移根目录下MANIFEST_SUMMARY.json.success=true：7786个直接文件+7056个历史snapshot归档成员，合计18,367,768,530bytes（约18.37GB原内容）。源文件保留，原占卡不停止，不自动恢复实验。新agent先读迁移根README_RESTORE.md与汇总；以下“验收进行中”是上一快照。
+
+---
+
+# 跨集群本地资产复制（2026-11-03，复制验收进行中）
+
+用户明确/srv/PRIVATE_STORAGE
+
+最新main44f4079可读代码位于迁移根/code/ipvg_main_44f4079（176files归档字节核验），完整公开代码Gitbundle在code/ICASSP-IPVG_public_history.bundle（包含Teacher分支e5404ca及origin/main44f4079）。Teacher原开发目录wm_dataset本身已共享无需再重复拷。原训练所得LoRA/optimizer/RNG和真实实验失败收据属于成果被保留，完整基座/VLM模型权重、conda/venv与大型cache不在本次范围；账号/凭据材料和运行锁不迁移。历史重复源码snapshot在rank0打包完整tar并逐memberSHA验证。私有原视频/标签/log不公开。
+
+当前四节点占卡继续正常32/32，每卡31257MiB；迁移不重启暂停的实验。新集群必须重新部署缺失环境/模型、映射路径和freeze，不把旧PID/inode/mtime/预算执行sidecar当新集群许可证。原10月18日264GB迁移备份保持不变，本次是增量新目录。
+
+---
+
+# 当前资源占卡状态（2026-11-03，用户明确要求）
+
+四节点32×A10040GB已现场核验全部占卡：每卡PyTorch目标30GiB，驱动显存31257MiB，低频矩阵计算interval1秒；没有其他CUDA进程，不终止其他业务。4个管理器各24小时硬期限，期满正常释放；state_dir各节点本地/dockerdata/wm_logs/gpu_hold_user_20261103_0456，实际凭据eval/diag/user_four_node_gpu_hold_20261103.json。占卡与实验进展/费用分开，不算模型收益。
+
+当前用户暂停了持续实验目标，此次仅授权占卡，不自动重启旧失败实验或新训练。跨集群agent先核现场与最新Git分支，再按明确实验范围授权工作；实验初始化前必须pause占卡并确认显存释放，不凭空复制旧PID/锁/预算审批。最新公开提交e5404ca，origin/main已fetch至44f4079，新计划审阅上轮取消未完成，不能当已交付。下方运行状态属于历史快照。
+
+---
+
 # 实机技术验收失败已留证；更强标注与确定性修复继续（2026-11-02）
 
 原单卡真实4reference+2prefix+2freshresume共8updates全部completed/save，三个自有CUDA进程退出并GPU释放；prefixadapter加载恢复exact、base和RNGexact，但首个freshprefix backwardgradnorm已异、最终600adapter与AdamWstates不exact，因此整体FAIL，无cost.closure。原已观测611.482715秒、费用保守上界2GPUh保留，不退款/重试/放宽allclose。根因最强定位FA3native默认非确定backward：同forwardloss首step1.0140422583但grad1.846334934vs1.850419402，旧runtime未冻结实际FA3资产，不能冒称某个kernel唯一因果已实证。LoRA B最终relativeL2差8.3918%，Adam一/二阶moments差52.3/74.2%，不是只序列化字节差。

@@ -22,7 +22,7 @@ import time
 import traceback
 import uuid
 
-P1_DEFAULT = Path('/srv/wm_tmp/teacher_p1_cfg_20261019_run01')
+P1_DEFAULT = Path('/dockerdata/wm_tmp/teacher_p1_cfg_20261019_run01')
 MODELS_DEFAULT = Path('/dockerdata/models')
 CASE_ORDER = tuple(s + '_dev01' for s in
                    ('direct', 'robomind', 'hoigen1m', 'matrix', 'charades', 'easycom'))

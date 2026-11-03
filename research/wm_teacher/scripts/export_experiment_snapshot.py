@@ -62,6 +62,8 @@ FILES = [
     "eval/diag/teacher_label_v3_semantic_public_20261102.json",
     "eval/diag/teacher_gpu_resume_root_cause_public_20261102.json",
     "scripts/run_teacher_qwen3vl32b_pilot.py", "tests/test_teacher_qwen3vl32b_pilot.py",
+    "scripts/run_teacher_qwen3vl32b_recovery.py", "tests/test_teacher_qwen3vl32b_recovery.py",
+    "docs/60_Qwen32B标签一次恢复.md",
     "scripts/prepare_teacher_label_admission.py", "tests/test_prepare_teacher_label_admission.py",
     "scripts/run_teacher_label_admission.py", "tests/test_run_teacher_label_admission.py",
     "scripts/run_teacher_label_pilot.py", "tests/test_teacher_label_pilot.py",

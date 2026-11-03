@@ -1,9 +1,6 @@
 {
-  "created_at": "2026-11-03 00:21:05 CST",
+  "created_at": "2026-11-03 17:35:12 CST",
   "files": [
-    {"path":"DiffSynth-Studio/diffsynth/models/wan_video_camera_controller.py","source_sha256":"2bad958eb9893105cc7215a4bb91b2c039bde5eb6af8ddf0f02c09e6f7883d61","snapshot_sha256":"2bad958eb9893105cc7215a4bb91b2c039bde5eb6af8ddf0f02c09e6f7883d61"},
-    {"path":"DiffSynth-Studio/diffsynth/models/wantodance.py","source_sha256":"6e8c0b4eefb3cc771654b25e9e9f3578f72654be2d7cf0f771300c55990c1749","snapshot_sha256":"6e8c0b4eefb3cc771654b25e9e9f3578f72654be2d7cf0f771300c55990c1749"},
-    {"path":"DiffSynth-Studio/diffsynth/core/gradient/__init__.py","source_sha256":"e8db9f67a95741bcb4619b0cf8392152b9204ba16308b4dc7af943d8b7f22999","snapshot_sha256":"e8db9f67a95741bcb4619b0cf8392152b9204ba16308b4dc7af943d8b7f22999"},
     {
       "path": "README.md",
       "source_sha256": "ceb68424bfc7bc407badcaa0f02db75c5825f4fe30245bbcb015bd52bdd1f691",
@@ -51,8 +48,8 @@
     },
     {
       "path": "docs/31_服务器迁移与CodingAgent交接.md",
-      "source_sha256": "9daa3561040d664c369aef8b05f129ee653aaaaac252c051daa0f4b12c9aa639",
-      "snapshot_sha256": "a58911d058cf0de5573d7bc6c745151d6f129cd180c6efde86d55327cdb721b1"
+      "source_sha256": "42c6110dde09c568d8717e6a6f6e6ad782bb9d8cae48747e9272963adb8510df",
+      "snapshot_sha256": "04f16ec209e42576b5c2fa0d465ee7cd63447cbba50944587dbf2d2878255530"
     },
     {
       "path": "patches/diffsynth_studio_fb337fb.patch",
@@ -295,6 +292,21 @@
       "snapshot_sha256": "db6d14016b4c144912a01054260764dfadbbf30a697879c6c04fe73e94690468"
     },
     {
+      "path": "scripts/run_teacher_qwen3vl32b_recovery.py",
+      "source_sha256": "6fda015008d19a89bc694282e89e16667672a3b1d81c047199ea47506241bac6",
+      "snapshot_sha256": "6fda015008d19a89bc694282e89e16667672a3b1d81c047199ea47506241bac6"
+    },
+    {
+      "path": "tests/test_teacher_qwen3vl32b_recovery.py",
+      "source_sha256": "47c1b0e72ccd4c064390a15a0edfe361d89f14054c1db986796f2ffee314cea7",
+      "snapshot_sha256": "47c1b0e72ccd4c064390a15a0edfe361d89f14054c1db986796f2ffee314cea7"
+    },
+    {
+      "path": "docs/60_Qwen32B标签一次恢复.md",
+      "source_sha256": "1ce7f08e494c2fed99b4d12efb76d74f2d19338a9579b994e4630bdbf7b038fb",
+      "snapshot_sha256": "1ce7f08e494c2fed99b4d12efb76d74f2d19338a9579b994e4630bdbf7b038fb"
+    },
+    {
       "path": "scripts/prepare_teacher_label_admission.py",
       "source_sha256": "1721dbf43b68d289a15145f86bd16a5815ce729eaf282072c536f7b00a91f350",
       "snapshot_sha256": "1721dbf43b68d289a15145f86bd16a5815ce729eaf282072c536f7b00a91f350"
@@ -341,8 +353,8 @@
     },
     {
       "path": "tests/test_teacher_single_gpu_admission.py",
-      "source_sha256": "19534516404c5fb1aabf54c5e2712dc8c981f13f8d45f8b0444528930ea1af50",
-      "snapshot_sha256": "19534516404c5fb1aabf54c5e2712dc8c981f13f8d45f8b0444528930ea1af50"
+      "source_sha256": "39a56ea9cad42ab9a48bcc39814dbaae9efa85c13d4de601d9412426da995568",
+      "snapshot_sha256": "39a56ea9cad42ab9a48bcc39814dbaae9efa85c13d4de601d9412426da995568"
     },
     {
       "path": "eval/diag/teacher_training_admission_public_20261102.json",
@@ -625,6 +637,21 @@
       "snapshot_sha256": "034f3133efff44b7a144f1e4824df92448e46196a011e88d60b9f989243143f4"
     },
     {
+      "path": "DiffSynth-Studio/diffsynth/models/wan_video_camera_controller.py",
+      "source_sha256": "2bad958eb9893105cc7215a4bb91b2c039bde5eb6af8ddf0f02c09e6f7883d61",
+      "snapshot_sha256": "2bad958eb9893105cc7215a4bb91b2c039bde5eb6af8ddf0f02c09e6f7883d61"
+    },
+    {
+      "path": "DiffSynth-Studio/diffsynth/models/wantodance.py",
+      "source_sha256": "6e8c0b4eefb3cc771654b25e9e9f3578f72654be2d7cf0f771300c55990c1749",
+      "snapshot_sha256": "6e8c0b4eefb3cc771654b25e9e9f3578f72654be2d7cf0f771300c55990c1749"
+    },
+    {
+      "path": "DiffSynth-Studio/diffsynth/core/gradient/__init__.py",
+      "source_sha256": "e8db9f67a95741bcb4619b0cf8392152b9204ba16308b4dc7af943d8b7f22999",
+      "snapshot_sha256": "e8db9f67a95741bcb4619b0cf8392152b9204ba16308b4dc7af943d8b7f22999"
+    },
+    {
       "path": "DiffSynth-Studio/diffsynth/configs/model_configs.py",
       "source_sha256": "76faf5bda287254a831ce31d3d794a4dd03273e4282b1f52937ecd0b3e9f9b8a",
       "snapshot_sha256": "76faf5bda287254a831ce31d3d794a4dd03273e4282b1f52937ecd0b3e9f9b8a"
@@ -711,8 +738,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "d90ee040b8185189f234669273e5da04d84dd55e8e7e4f5799761fecb3c23789",
-      "snapshot_sha256": "d90ee040b8185189f234669273e5da04d84dd55e8e7e4f5799761fecb3c23789"
+      "source_sha256": "4bc3698ad3530fdf3810114e01b61493b943d3725b10526ba01ef6042a4fafcd",
+      "snapshot_sha256": "4bc3698ad3530fdf3810114e01b61493b943d3725b10526ba01ef6042a4fafcd"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -762,7 +789,7 @@
     {
       "path": "scripts/run_teacher_mechanism_probe.py",
       "source_sha256": "67c9824dba615b93b0c55c740ed8f3205851f201ebde54cc9d605f6d54faabe3",
-      "snapshot_sha256": "b083aa3d75891dbf4ab2b5e8f410315302796498c36815a30812d932498db688"
+      "snapshot_sha256": "67c9824dba615b93b0c55c740ed8f3205851f201ebde54cc9d605f6d54faabe3"
     },
     {
       "path": "scripts/run_teacher_caption_probe.py",
@@ -1161,8 +1188,8 @@
     },
     {
       "path": "tests/test_e3_train.py",
-      "source_sha256": "d9bac523cac7335708010665e7213d7c765d7166395c01480d2dac7763de7830",
-      "snapshot_sha256": "d9bac523cac7335708010665e7213d7c765d7166395c01480d2dac7763de7830"
+      "source_sha256": "8f8323eebc571465aaebac6fb027ebd0927540a3f4676cc618a4493b331a4688",
+      "snapshot_sha256": "8f8323eebc571465aaebac6fb027ebd0927540a3f4676cc618a4493b331a4688"
     },
     {
       "path": "tests/test_recaption_e3.py",
@@ -1260,9 +1287,6 @@
       "snapshot_sha256": "7bb687c2ede84c24edb8f70379137925a045bb930f2e50dce3081a78adab6f80"
     }
   ],
-  "carried_forward_from_commit": "c46875d53ed3d7ed5f2bb3620bfb6f2ed036ca27",
-  "carried_forward_paths": ["README.md", "PROGRESS.md", "docs/24_Wan2.2首轮训练执行计划.md", "docs/38_标签语义校准与C1推理条件实验.md", "DiffSynth-Studio/diffsynth/diffusion/flow_match.py", "DiffSynth-Studio/diffsynth/pipelines/wan_video.py", "scripts/audit_teacher_labels.py", "scripts/run_teacher_mechanism_probe.py", "scripts/run_teacher_caption_probe.py", "tests/test_teacher_caption_probe.py"],
-  "carried_forward_reason": "Task-external assets retain their previous public placeholders, whitespace and source records; not new attestations of changed private assets.",
   "experiment_progress": {
     "at": "2026-10-18 23:13:00 CST",
     "complete_nonempty": 3033,
@@ -1274,5 +1298,35 @@
     }
   },
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
-  "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes."
+  "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
+  "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
+  "preserved_public_base_commit": "e5404ca4ec90ce2b12de7313d7b13bdee1db5a03",
+  "current_source_paths": [
+    "docs/31_服务器迁移与CodingAgent交接.md",
+    "docs/60_Qwen32B标签一次恢复.md",
+    "scripts/export_experiment_snapshot.py",
+    "scripts/gpu_hold.py",
+    "scripts/measure_teacher_throughput.py",
+    "scripts/prepare_teacher_comparison.py",
+    "scripts/prepare_teacher_label_admission.py",
+    "scripts/prepare_teacher_recovery.py",
+    "scripts/prepare_teacher_training_admission.py",
+    "scripts/recaption_e3.py",
+    "scripts/run_teacher_base.py",
+    "scripts/run_teacher_devset.py",
+    "scripts/run_teacher_generation.py",
+    "scripts/run_teacher_inference_smoke.py",
+    "scripts/run_teacher_label_pilot.py",
+    "scripts/run_teacher_mechanism_probe.py",
+    "scripts/run_teacher_qwen3vl32b_pilot.py",
+    "scripts/run_teacher_qwen3vl32b_recovery.py",
+    "scripts/run_teacher_single_gpu_admission.py",
+    "scripts/run_teacher_training_smoke.py",
+    "scripts/train_e3_lora.py",
+    "scripts/verify_teacher_history.py",
+    "tests/test_e3_train.py",
+    "tests/test_teacher_qwen3vl32b_pilot.py",
+    "tests/test_teacher_qwen3vl32b_recovery.py",
+    "tests/test_teacher_single_gpu_admission.py"
+  ]
 }

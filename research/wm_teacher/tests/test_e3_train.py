@@ -1349,6 +1349,10 @@ class DeterministicFa3Tests(Base):
 
     def test_real_native_signature_import_cpu_only(self):
         # This checks the installed interface signature, not GPU kernel capability.
+        import importlib.util
+        if importlib.util.find_spec('flash_attn_interface') is None:
+            self.skipTest('Native FA3 interface is not installed; synthetic contract tests still run')
+
         code = '''import inspect,os,sys,torch
 from unittest.mock import patch
 sys.path.insert(0,sys.argv[1])
