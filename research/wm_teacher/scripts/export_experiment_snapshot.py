@@ -66,6 +66,7 @@ FILES = [
     "scripts/teacher_gpu_exclusive.py", "tests/test_teacher_gpu_exclusive.py",
     "scripts/run_teacher_fa2_kernel_probe.py", "tests/test_teacher_fa2_kernel_probe.py",
     "scripts/run_teacher_a800_exact_resume.py", "tests/test_teacher_a800_exact_resume.py",
+    "scripts/run_teacher_temporal_labels.py", "tests/test_teacher_temporal_labels.py",
     "docs/60_Qwen32B标签一次恢复.md",
     "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
     "eval/diag/teacher_qwen32b_supplemental_public_20261103.json",
