@@ -60,6 +60,7 @@ PROMPT_V2 = False
 CONSTRAINED = False
 VECTORIZED = False
 VECTORIZED_REPAIRED = False
+EXECUTION3 = False
 STAGE_LABEL_CAP = 24
 CAMPAIGN_AUTH = ROOT / 'eval/teacher_progress_campaign_20261104/campaign.authorization.json'
 CAMPAIGN_AUTH_SHA = 'ffa19129fb3256e482553bb1b90a7f09edd95eed4391687e6b45426d0706b8fe'
@@ -373,6 +374,17 @@ def configure_vectorized_repaired():
     CUMULATIVE_CAP_GPUH=PRIOR_GPUH+ALLOCATION_GPUH
 
 
+def configure_execution3():
+    global EXECUTION3,LOCAL,STATE_DIR,RECOVERY_EVIDENCE,PRIOR_GPUH,CUMULATIVE_CAP_GPUH
+    configure_vectorized_repaired()
+    EXECUTION3=True
+    LOCAL=Path('/dockerdata/wm_tmp/teacher_vectorized_lease_20261104_run01')
+    STATE_DIR=Path('/dockerdata/wm_logs/teacher_vectorized_lease_20261104')
+    RECOVERY_EVIDENCE=CAMPAIGN_AUTH.parent/'allocation003'
+    PRIOR_GPUH=35.832564877520134
+    CUMULATIVE_CAP_GPUH=PRIOR_GPUH+ALLOCATION_GPUH
+
+
 def vectorized_authorization(end=None):
     row = pinned(CAMPAIGN_AUTH, CAMPAIGN_AUTH_SHA, end)
     a = read(row,end)
@@ -400,9 +412,16 @@ def vectorized_authorization(end=None):
         prior=read(record(CAMPAIGN_AUTH.parent/'allocation001.audit.json',end),end)
         require(a2['parent_authorization_sha256']==CAMPAIGN_AUTH_SHA and a2['upper_GPUh']==6
             and a2['prior_campaign_used_upper_GPUh']==prior['charged_upper_GPUh']==6
-            and a2['prior_label_total_upper_GPUh']==PRIOR_GPUH==prior['total_historical_and_new_label_upper_GPUh']
-            and a2['output_root']==str(LOCAL) and a2['automatic_retry_allowed'] is False,
+            and a2['prior_label_total_upper_GPUh']==29.832564877520134==prior['total_historical_and_new_label_upper_GPUh']
+            and a2['output_root']=='/dockerdata/wm_tmp/teacher_vectorized_32b_repaired_20261104_run01' and a2['automatic_retry_allowed'] is False,
             'Specific new implementation allocation and prior full failure costs required')
+    if EXECUTION3:
+        a3=read(pinned(CAMPAIGN_AUTH.parent/'allocation003/authorization.json','b2b8ce2dd2ecd1c4de1485cc53b62f213b52593163afbc1d474338b9537cd4dc',end),end)
+        previous=read(record(CAMPAIGN_AUTH.parent/'allocation002/completion.audit.json',end),end)
+        require(a3['parent_campaign_sha256']==CAMPAIGN_AUTH_SHA and a3['upper_GPUh']==6
+            and a3['prior_label_total_GPUh']==PRIOR_GPUH==previous['historical_plus_new_label_upper_GPUh']
+            and a3['prior_campaign_upper_GPUh']==12 and a3['output_root']==str(LOCAL)
+            and a3['automatic_retry_allowed'] is False, 'Exact independent lease-aware allocation required')
     return row
 
 
@@ -460,7 +479,7 @@ def canonical_launch(argv):
     require(type(argv) is list and len(argv) >= 2 and argv[1] == str(Path(__file__).resolve()),
             'Launch the parent with the absolute canonical runner path before any allocation')
     require(argv.count('--supplemental') == int(SUPPLEMENTAL)
-        and argv.count('--prompt-v2') == int(PROMPT_V2) and argv.count('--constrained') == int(CONSTRAINED) and argv.count('--vectorized') == int(VECTORIZED) and argv.count('--vectorized-repaired')==int(VECTORIZED_REPAIRED),
+        and argv.count('--prompt-v2') == int(PROMPT_V2) and argv.count('--constrained') == int(CONSTRAINED) and argv.count('--vectorized') == int(VECTORIZED) and argv.count('--vectorized-repaired')==int(VECTORIZED_REPAIRED and not EXECUTION3) and argv.count('--execution3')==int(EXECUTION3),
         'Exact experimental launch scope required')
     return True
 
@@ -1142,7 +1161,7 @@ def verify_worker_ancestry(launch, p, bound, ancestors, supervised):
     parent = launch['parent']
     require(any(same_identity(a, parent) for a in ancestors), 'Actual approved parent ancestor required')
     args = parent['argv']
-    require(args.count('--supplemental') == int(SUPPLEMENTAL) and args.count('--prompt-v2') == int(PROMPT_V2) and args.count('--constrained') == int(CONSTRAINED) and args.count('--vectorized') == int(VECTORIZED) and args.count('--vectorized-repaired')==int(VECTORIZED_REPAIRED),
+    require(args.count('--supplemental') == int(SUPPLEMENTAL) and args.count('--prompt-v2') == int(PROMPT_V2) and args.count('--constrained') == int(CONSTRAINED) and args.count('--vectorized') == int(VECTORIZED) and args.count('--vectorized-repaired')==int(VECTORIZED_REPAIRED and not EXECUTION3) and args.count('--execution3')==int(EXECUTION3),
         'Actual experimental parent command binding differs')
     require(str(Path(__file__).resolve()) in args and 'run' in args and args.count('--gpu-authorized') == 1
         and exact_flags(args, (('--plan', bound['path']), ('--approved-plan-sha256', bound['sha256']),
@@ -1454,8 +1473,10 @@ def run(path, digest, approval_path, approval_digest, gpu_authorized=False):
             command.insert(command.index('worker'), '--constrained')
         if VECTORIZED:
             command.insert(command.index('worker'),'--vectorized')
-        if VECTORIZED_REPAIRED:
+        if VECTORIZED_REPAIRED and not EXECUTION3:
             command.insert(command.index('worker'),'--vectorized-repaired')
+        if EXECUTION3:
+            command.insert(command.index('worker'),'--execution3')
         env = dict(os.environ, CUDA_VISIBLE_DEVICES=','.join(p['gpu_uuids']), HF_HUB_OFFLINE='1',
                    TRANSFORMERS_OFFLINE='1', OMP_NUM_THREADS='1')
         with (LOCAL / 'worker.log').open('xb') as log:
@@ -1591,6 +1612,7 @@ def main(argv=None):
     modes.add_argument('--constrained', action='store_true', help='Prospective vocabulary/EOS decoder constraints, not posthoc label repair')
     modes.add_argument('--vectorized',action='store_true',help='New expanded-budget vectorized decoder, original validation gates preserved')
     modes.add_argument('--vectorized-repaired',action='store_true',help='Separate corrected output-device implementation allocation')
+    modes.add_argument('--execution3',action='store_true',help='Separate lease-aware allocation with prior costs preserved')
     commands = parser.add_subparsers(dest='command', required=True)
     prep = commands.add_parser('prepare')
     prep.add_argument('--model-proof', required=True)
@@ -1622,6 +1644,8 @@ def main(argv=None):
         configure_vectorized()
     if args.vectorized_repaired:
         configure_vectorized_repaired()
+    if args.execution3:
+        configure_execution3()
     if args.command == 'run':
         canonical_launch([sys.executable, sys.argv[0], *(sys.argv[1:] if argv is None else argv)])
     if args.command == 'model-proof':

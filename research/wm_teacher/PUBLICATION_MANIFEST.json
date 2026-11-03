@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-04 01:12:11 CST",
+  "created_at": "2026-11-04 01:27:29 CST",
   "files": [
     {
       "path": "README.md",
@@ -293,8 +293,8 @@
     },
     {
       "path": "scripts/run_teacher_qwen3vl32b_recovery.py",
-      "source_sha256": "1ba7ba215b0c4e485d487563dd1ed8ea323043c298f5bf95a29f34c81a829402",
-      "snapshot_sha256": "1ba7ba215b0c4e485d487563dd1ed8ea323043c298f5bf95a29f34c81a829402"
+      "source_sha256": "0817330d8441db3b3093f3084696063be7a8a19664358ccc64ad5f88b7478014",
+      "snapshot_sha256": "0817330d8441db3b3093f3084696063be7a8a19664358ccc64ad5f88b7478014"
     },
     {
       "path": "tests/test_teacher_qwen3vl32b_recovery.py",
@@ -303,18 +303,28 @@
     },
     {
       "path": "scripts/teacher_gpu_exclusive.py",
-      "source_sha256": "7b0ce07e82e4096eea90567ef8e4c8d78b9b1a4dd8c3a16c85e9251ffb75b8c2",
-      "snapshot_sha256": "dddb2aac34313372cdef0bed5407f5cf92ce787dc57ded93c69473293be38503"
+      "source_sha256": "2b93578b4b173a65f88dbe7e1f0fd85b59952ae25bd5bfbca4121f32b13f10c6",
+      "snapshot_sha256": "08ccc01e10ca57e9c57aa40d70d9e91fd7083654afa7d8b4fc5abc3d1c29d381"
     },
     {
       "path": "tests/test_teacher_gpu_exclusive.py",
-      "source_sha256": "6892cfb845f0ecd8e63cd00935806c796159b8054c721b7dbbdfa6eb2a62044b",
-      "snapshot_sha256": "6892cfb845f0ecd8e63cd00935806c796159b8054c721b7dbbdfa6eb2a62044b"
+      "source_sha256": "6c9b995c2cc66b7fe09ade0c5d14e6938e831c1d56c936d1f2140d56e4117f4d",
+      "snapshot_sha256": "6c9b995c2cc66b7fe09ade0c5d14e6938e831c1d56c936d1f2140d56e4117f4d"
+    },
+    {
+      "path": "scripts/run_teacher_fa2_kernel_probe.py",
+      "source_sha256": "499ef252e3946d0f9dd62219528374e8eb1a3d358f2f1f413959d0066776283d",
+      "snapshot_sha256": "499ef252e3946d0f9dd62219528374e8eb1a3d358f2f1f413959d0066776283d"
+    },
+    {
+      "path": "tests/test_teacher_fa2_kernel_probe.py",
+      "source_sha256": "deecd914e19f5c5b661e733a2551ce39c37f06e10a6ac089c1c0754496902736",
+      "snapshot_sha256": "deecd914e19f5c5b661e733a2551ce39c37f06e10a6ac089c1c0754496902736"
     },
     {
       "path": "docs/60_Qwen32B标签一次恢复.md",
-      "source_sha256": "4ac3c14eada4fcee9efc7081bb233d577dc23aadf1e01f8003525db66dc0e723",
-      "snapshot_sha256": "4ac3c14eada4fcee9efc7081bb233d577dc23aadf1e01f8003525db66dc0e723"
+      "source_sha256": "72c5d06eb32bdf97b6459bf91e4c2e07a54b63020bc2e6f51682a276c19bc754",
+      "snapshot_sha256": "72c5d06eb32bdf97b6459bf91e4c2e07a54b63020bc2e6f51682a276c19bc754"
     },
     {
       "path": "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
@@ -788,8 +798,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "08463fa21ed3a157ec862d29ffc0eafdd1a1d7c322ce85456a78c866583ae296",
-      "snapshot_sha256": "08463fa21ed3a157ec862d29ffc0eafdd1a1d7c322ce85456a78c866583ae296"
+      "source_sha256": "8eee9af42669641dc468b8da7cc3fc6490d76530a58340a826cb0e55e14192f9",
+      "snapshot_sha256": "8eee9af42669641dc468b8da7cc3fc6490d76530a58340a826cb0e55e14192f9"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -1350,7 +1360,7 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "db5f9cde783921370f8ddffa6bdc85c2acec81be",
+  "preserved_public_base_commit": "85e52e834acf7794e8a7e2963b454adb2a4dfd3e",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
     "docs/60_Qwen32B标签一次恢复.md",
@@ -1370,6 +1380,7 @@
     "scripts/recaption_e3.py",
     "scripts/run_teacher_base.py",
     "scripts/run_teacher_devset.py",
+    "scripts/run_teacher_fa2_kernel_probe.py",
     "scripts/run_teacher_generation.py",
     "scripts/run_teacher_inference_smoke.py",
     "scripts/run_teacher_label_pilot.py",
@@ -1383,6 +1394,7 @@
     "scripts/train_e3_lora.py",
     "scripts/verify_teacher_history.py",
     "tests/test_e3_train.py",
+    "tests/test_teacher_fa2_kernel_probe.py",
     "tests/test_teacher_gpu_exclusive.py",
     "tests/test_teacher_label_semantic_review.py",
     "tests/test_teacher_qwen3vl32b_pilot.py",

@@ -61,6 +61,13 @@ def run(a):
     mapping=query_modes();initial={u:mapping[u] for u in uuids};assert all(initial[u]['index'] in range(4) for u in uuids)
     assert all(x['mode'] in ('Default','Exclusive_Process') for x in initial.values())
     signals=[];start=time.monotonic();stop=False;error=None;restored=False
+    lease_dir=Path('/dockerdata/wm_gpu_exclusivity');lease_dir.mkdir(mode=0o700,exist_ok=True)
+    leases=[]
+    for u in uuids:
+        lease=lease_dir/(u+'.json')
+        assert not lease.exists(), 'Existing lease owner must be investigated, never overwritten'
+        lease.write_text(json.dumps(dict(gpu_uuid=u,expires_epoch=time.time()+5400,owner_pid=os.getpid(),owner_start=start)))
+        lease.chmod(0o600);leases.append(lease)
     def interrupted(*_):
         nonlocal stop
         stop=True
@@ -87,6 +94,10 @@ def run(a):
             mode='0' if row['mode']=='Default' else '3'
             subprocess.run(['nvidia-smi','-i',u,'-c',mode],check=True,capture_output=True,timeout=10)
         restored=all(query_modes()[u]['mode']==initial[u]['mode'] for u in uuids)
+        for lease in leases:
+            value=json.loads(lease.read_text())
+            assert value['owner_pid']==os.getpid() and value['owner_start']==start
+            lease.unlink()
         save(out/'terminal.json',dict(running=False,initial=initial,signals=signals,error_type=error,
             elapsed_seconds=time.monotonic()-start,modes_restored=restored,unknown_processes_signaled=False,
             source_files_modified=False,old_cluster_touched=False))

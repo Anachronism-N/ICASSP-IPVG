@@ -186,3 +186,11 @@ C276原子集真实生成28.483680GPUh、评分1.100152GPUh；历史两seedALG/D
 CPU代码复核发现HF分片模型input_ids位于embedding卡，而输出scores位于lm_head卡；首次向量化掩码沿input_ids.device建prefix却向scores设备scatter，构成明确跨设备代码错误。新实现将prefix token与cache显式对齐scores.device；补单设备to调用及meta异设备回归，原掩码与原生CPU等价验证仍通过。此修复为新独立allocation002的实现版本，原failure/claim/实际源码快照保持不变，不删除claim自动重跑。新002单独从已批96内预留6GPUh，旧失败全额保留，53xx内层工作/5400s总资源窗、同32病例和16帧、原精确门不放宽；先实机证实代码路径，再谈结构/语义。
 
 四卡原compute_mode已正常恢复Default，已知holder仅精确PIDFD TERM，无共享外部源码改写/旧集群信号。资源独占这次实际生效，不把实现错误归因于卡不足。
+
+### 分配002资源门拒绝与分配003的启动前lease方案
+
+分配002在模型加载前遇到holder重入，5秒外部PID门正确停止自有工作，0病例/32未执行，不可说GPU设备修复已证实。原released=false/actualGPUh=null保持，另有资源guard正常复原与随后无GPU进程事实。分配002保守计6GPUh；新阶段用12/168、标签用12/96，旧费用保持，总标签历史35.832564878。原始argv、查询、执行源码及错误全部私有留证。
+
+EXCLUSIVE_PROCESS只有CUDA上下文占有后才排斥新holder，CPU预检窗仍存在竞争。现在在已确认纯占卡入口添加**节点本地、指定UUID、最长5400s**的lease等待，导入torch前查询；没有lease的节点保持原程序行为，旧集群没有写lease。原共享纯holder文件私有原字节备份，最小等待分支不改任何业务训练/生成入口；资源guard只创建自有限时lease、结束身份核验后移除，不覆盖别的锁/lease。已CPU验证等待发生在torch导入前且expiry后返回。新独立分配003用同v4解码与旧精确标签门，另冻结6GPUh/新目录/claim，不删除002claim。
+
+另在已批技术8GPUh内先行固定0.2GPUh、GPU4单卡720s原生FA2合成前后向探针：seq128/1024、24head×128、BF16、dropout0/explicit deterministic=True，各重复2次forward/backward精确torch.equal。真实native文件SHA/官方wheel/源码/publication绑定，单卡原compute模式复原，旧FA3失败费用不动。此探针不加载Teacher权重或更新参数，不是模型精确resume或质量门。正式恢复仍须完整4reference+2prefix+2fresh模型/AdamW/RNG精确验收后才能发技术准入。
