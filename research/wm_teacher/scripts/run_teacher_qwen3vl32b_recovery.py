@@ -442,14 +442,14 @@ def vectorized_bad_words(words, eos):
             if key not in self.cache:
                 self.cache[key]={length:(torch.tensor([w[:-1] for w in rows],device=input_ids.device),
                     torch.tensor([w[-1] for w in rows],device=input_ids.device)) for length,rows in self.groups.items()}
-            blocked=torch.zeros_like(scores,dtype=torch.bool)
-            if self.singles:blocked[:,self.singles]=True
+            blocked=torch.zeros_like(scores,dtype=torch.int32)
+            if self.singles:blocked[:,self.singles]=1
             for length,(prefix,targets) in self.cache[key].items():
                 if length>=input_ids.shape[1]:continue
                 matches=input_ids[:,-length:].unsqueeze(1).eq(prefix.unsqueeze(0)).all(dim=-1)
-                blocked.scatter_reduce_(1,targets.unsqueeze(0).expand(input_ids.shape[0],-1),matches,
+                blocked.scatter_reduce_(1,targets.unsqueeze(0).expand(input_ids.shape[0],-1),matches.to(torch.int32),
                     reduce='amax',include_self=True)
-            return scores.masked_fill(blocked,float('-inf'))
+            return scores.masked_fill(blocked.bool(),float('-inf'))
     return WordMask()
 
 

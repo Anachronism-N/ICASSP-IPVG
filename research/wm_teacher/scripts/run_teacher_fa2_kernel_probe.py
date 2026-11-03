@@ -20,6 +20,7 @@ CAMPAIGN_SHA='ffa19129fb3256e482553bb1b90a7f09edd95eed4391687e6b45426d0706b8fe'
 PYTHON='/dockerdata/venv_qwen32b_20261103/bin/python3.12'
 SITE='/dockerdata/wm_a800_fa2_runtime_20261103/site'
 CAP=720
+REVISION2=False
 
 def bound(p):
     p=Path(p);b=p.read_bytes();return dict(path=str(p),bytes=len(b),sha256=hashlib.sha256(b).hexdigest())
@@ -136,7 +137,8 @@ def run():
             decoder_source=bound(ROOT/'scripts/run_teacher_qwen3vl32b_recovery.py'),native_record=native))
         env=dict(os.environ,CUDA_VISIBLE_DEVICES=uuid,PYTHONPATH=SITE,CUBLAS_WORKSPACE_CONFIG=':4096:8',OMP_NUM_THREADS='1')
         with (E/'worker.log').open('xb') as log:
-            child=subprocess.Popen([PYTHON,str(Path(__file__).resolve()),'worker'],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+            command=[PYTHON,str(Path(__file__).resolve())]+(['--revision2'] if REVISION2 else [])+['worker']
+            child=subprocess.Popen(command,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             child.wait(timeout=max(1,CAP-50-(time.monotonic()-start)))
         assert child.returncode==0 and json.loads((E/'worker.json').read_bytes())['success']
     except BaseException as exc:error=type(exc).__name__
@@ -152,13 +154,19 @@ def run():
         write(E/'terminal.json',dict(terminal=True,success=error is None and released and restored and elapsed<=CAP,
             phase='technical_admission',elapsed_seconds=elapsed,allocated_cards=1,
             charged_upper_GPUh=max(0.2,elapsed/3600),actual_allocated_GPUh=elapsed/3600,
+            cumulative_technical_upper_GPUh=a['prior_phase_used_GPUh']+max(0.2,elapsed/3600),
             released=released,modes_restored=restored,holder_pids_signaled=signals,error_type=error,
             model_exact_resume_verified=False,formal_training_allowed=False,goal_complete=False))
         for s,h in old.items():signal.signal(s,h)
     assert error is None and released and restored
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('command',choices=['run','worker'])
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--revision2',action='store_true')
+    p.add_argument('command',choices=['run','worker'])
     a=p.parse_args()
+    if a.revision2:
+        REVISION2=True
+        E=ROOT/'eval/teacher_progress_campaign_20261104/technical_kernel_probe002'
+        AUTH_SHA='b3a0675dd046beeac7a9ab828381a5ab720a2d4a7fa9aa92ca7f6db8a0d30bfc'
     if a.command=='worker':worker()
     else:run()

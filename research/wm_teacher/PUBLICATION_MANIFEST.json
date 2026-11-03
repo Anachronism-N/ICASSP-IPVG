@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-04 01:27:29 CST",
+  "created_at": "2026-11-04 01:33:37 CST",
   "files": [
     {
       "path": "README.md",
@@ -293,8 +293,8 @@
     },
     {
       "path": "scripts/run_teacher_qwen3vl32b_recovery.py",
-      "source_sha256": "0817330d8441db3b3093f3084696063be7a8a19664358ccc64ad5f88b7478014",
-      "snapshot_sha256": "0817330d8441db3b3093f3084696063be7a8a19664358ccc64ad5f88b7478014"
+      "source_sha256": "8de2b2be39e3dff92e5ce9d022f6ebe09d2dae265bada2495b1913413af0f522",
+      "snapshot_sha256": "8de2b2be39e3dff92e5ce9d022f6ebe09d2dae265bada2495b1913413af0f522"
     },
     {
       "path": "tests/test_teacher_qwen3vl32b_recovery.py",
@@ -313,8 +313,8 @@
     },
     {
       "path": "scripts/run_teacher_fa2_kernel_probe.py",
-      "source_sha256": "499ef252e3946d0f9dd62219528374e8eb1a3d358f2f1f413959d0066776283d",
-      "snapshot_sha256": "499ef252e3946d0f9dd62219528374e8eb1a3d358f2f1f413959d0066776283d"
+      "source_sha256": "7b32ea89f38c6ed7f34348dacc428eb7fd5eff5e181d1cf1c6660cb40d7c2cd1",
+      "snapshot_sha256": "7b32ea89f38c6ed7f34348dacc428eb7fd5eff5e181d1cf1c6660cb40d7c2cd1"
     },
     {
       "path": "tests/test_teacher_fa2_kernel_probe.py",
@@ -323,8 +323,8 @@
     },
     {
       "path": "docs/60_Qwen32B标签一次恢复.md",
-      "source_sha256": "72c5d06eb32bdf97b6459bf91e4c2e07a54b63020bc2e6f51682a276c19bc754",
-      "snapshot_sha256": "72c5d06eb32bdf97b6459bf91e4c2e07a54b63020bc2e6f51682a276c19bc754"
+      "source_sha256": "c4fc2fd2c41fb03c66907a4f9f4a8dea2b17fed6f17a271b4c56393843f60de8",
+      "snapshot_sha256": "c4fc2fd2c41fb03c66907a4f9f4a8dea2b17fed6f17a271b4c56393843f60de8"
     },
     {
       "path": "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
@@ -1360,7 +1360,7 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "85e52e834acf7794e8a7e2963b454adb2a4dfd3e",
+  "preserved_public_base_commit": "f0126c80173b390a55306549ede83163c7d60380",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
     "docs/60_Qwen32B标签一次恢复.md",

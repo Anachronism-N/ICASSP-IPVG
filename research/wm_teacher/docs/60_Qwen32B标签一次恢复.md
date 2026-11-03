@@ -194,3 +194,7 @@ CPU代码复核发现HF分片模型input_ids位于embedding卡，而输出scores
 EXCLUSIVE_PROCESS只有CUDA上下文占有后才排斥新holder，CPU预检窗仍存在竞争。现在在已确认纯占卡入口添加**节点本地、指定UUID、最长5400s**的lease等待，导入torch前查询；没有lease的节点保持原程序行为，旧集群没有写lease。原共享纯holder文件私有原字节备份，最小等待分支不改任何业务训练/生成入口；资源guard只创建自有限时lease、结束身份核验后移除，不覆盖别的锁/lease。已CPU验证等待发生在torch导入前且expiry后返回。新独立分配003用同v4解码与旧精确标签门，另冻结6GPUh/新目录/claim，不删除002claim。
 
 另在已批技术8GPUh内先行固定0.2GPUh、GPU4单卡720s原生FA2合成前后向探针：seq128/1024、24head×128、BF16、dropout0/explicit deterministic=True，各重复2次forward/backward精确torch.equal。真实native文件SHA/官方wheel/源码/publication绑定，单卡原compute模式复原，旧FA3失败费用不动。此探针不加载Teacher权重或更新参数，不是模型精确resume或质量门。正式恢复仍须完整4reference+2prefix+2fresh模型/AdamW/RNG精确验收后才能发技术准入。
+
+原生技术探针001先做CUDA掩码即明确报错：torch2.7的Bool scatter_reduce amax CUDA kernel不支持，未进入FA2前后向；退出7.802832s、保守0.2GPUh，GPU4释放及原compute_mode恢复。此8秒独立诊断避免再次用完整32B找同错误。现在改int32 0/1原子max再bool.masked_fill，重复prefix/目标冲突/EOS掩码与原生CPU精确回归仍通过；独立探针revision2另从已批8内预留0.2GPUh、旧001费用与claim不改。
+
+allocation003尚无GPU claim，原32视频CPU准备已保存旧freeze副本，再用当前int32源码重新SHA冻结同媒体，不生成新标签或覆盖实验结果。revision2真实CUDA掩码与FA2确定性内核通过后才加载32B；不把CPU回归再称GPU通过。技术探针尚不证明完整模型精确恢复，也不开放正式训练门。
