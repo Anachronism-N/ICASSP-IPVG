@@ -200,3 +200,9 @@ EXCLUSIVE_PROCESS只有CUDA上下文占有后才排斥新holder，CPU预检窗�
 allocation003尚无GPU claim，原32视频CPU准备已保存旧freeze副本，再用当前int32源码重新SHA冻结同媒体，不生成新标签或覆盖实验结果。revision2真实CUDA掩码与FA2确定性内核通过后才加载32B；不把CPU回归再称GPU通过。技术探针尚不证明完整模型精确恢复，也不开放正式训练门。
 
 技术探针revision2被GPU4另一已确认纯holder占用阻止，未启动worker，退出约2.389s/保守0.2GPUh，原released=false不改；技术累计0.4/8。已核argv为相同共享纯holder另root，故独立revision3识别两类明确已授权holder，并先写GPU4本地UUID限时lease再启动原生probe。不是杀未知任务，不复用revision2claim。revision3另0.2GPUh，必须原生CUDA int32掩码与FA2重复前后向真实通过后才运行未启动003。与大模型执行冻结源码一致的CUDA兼容修复和资源拒绝都留账，不因预算扩大隐藏工程失败。
+
+### 已取得实际原生A800验证，完整模型恢复另行冻结
+
+native3实机GPU4在lease下成功：CUDA掩码3个长度与原生NoBadWords精确等价，CPU输入token与GPU输出scores对齐通过；BF16/24heads/head_dim128/seq128与1024各重复两次，4forward/4backward exact全部通过。实际9.979866s、按0.2GPUh计费，含两次旧失败技术累计0.6/8，GPU4与原mode释放恢复。这不是完整Wan模型精确resume，不能自动改正式训练门。大模型003已以同已核int32实现和同32源病例启动，保持原精确门，结果另审计。
+
+新增full-DiT FA2技术准入范围：5040s单卡=1.4GPUh，技术累计上界2.0/8，留6给后续multinode技术。使用三片原20GB本地base SHA、原train_step/checkpoint/load/FixedOrder/synthetic_sample；FA2 explicit deterministic=True/dropout0、torch确定性flags与CUBLAS工作空间、600adapter/AdamW/Python+CPU+CUDA RNG精确门。物理4reference+2prefix+2freshresume，逻辑horizon4，seed20261104，offload on、lambda.5。每segment真实fresh子进程，旧FA3失败不重跑、lambda/样本/状态门不临时放宽。模型forward不是标签语义验收，full-MoDel probe不消费真实标签，不是候选训练或SOTA质量成绩。源码/模型/runtime/授权/公开字节验收后才启动。
