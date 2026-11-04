@@ -153,3 +153,67 @@ def test_campaign004_controller_drift_never_creates_allocation(tmp_path,monkeypa
     monkeypatch.setattr(guard,'control_runtime',lambda:{'pinned':False})
     with patch.object(review.subprocess,'Popen') as spawn,pytest.raises(ValueError):review.run(args)
     spawn.assert_not_called();assert not output.exists()
+
+
+def test_temporal_scope_keeps_review_rules_and_historical_costs(monkeypatch):
+    for k in ('CAP','TAIL','ALLOCATION_GPUH','PRIOR_GPUH','AUTH','AUTH_SHA','CAMPAIGN003','CAMPAIGN004','TEMPORAL'):
+        monkeypatch.setattr(review,k,getattr(review,k))
+    prompt=review.PROMPT;fields=review.FIELDS
+    review.configure_temporal()
+    assert review.PRIOR_GPUH==49.832564877520134 and review.AUTH.parent.name=='semantic_review005'
+    assert review.CAP==3600 and review.ALLOCATION_GPUH==1
+    assert review.PROMPT==prompt and review.FIELDS==fields and review.TEMPORAL
+
+
+@pytest.fixture
+def temporal_evidence(tmp_path,monkeypatch):
+    r,_=review.helpers()
+    monkeypatch.setattr(review,'PRIOR_GPUH',49.832564877520134)
+    monkeypatch.setattr(review,'ALLOCATION_GPUH',1)
+    monkeypatch.setattr(r,'validate_facts',lambda value:value)
+    monkeypatch.setattr(r,'validate_caption',lambda value:value)
+    root=tmp_path/'source';root.mkdir();raw=root/'run01';raw.mkdir()
+    jobs=[]
+    for i in range(32):
+        video=tmp_path/('video'+str(i)+'.mp4');video.write_bytes(b'synthetic video')
+        source=dict(index=i,group='diagnostic' if i<16 else 'blind',video=review.record(video));jobs.append(source)
+        label=dict(source,success=i not in (22,30))
+        if label['success']:label.update(facts_json={},caption='synthetic candidate')
+        else:label.update(error_type='ValueError',failure_stage='caption_validate')
+        review.write(raw/('label'+str(i)+'.json'),label)
+    plan=review.write(root/'plan.ready.json',dict(jobs=jobs))
+    review.write(raw/'terminal.json',dict(terminal=True,released=True,modes_restored=True,
+        charged_upper_GPUh=6,cases_denominator=32,labels=30))
+    review.write(root/'completion.independent_audit.json',dict(cases_attempted=32,all_cases_denominator=32,
+        released=True,modes_restored=True,labels=30,errors=2,historical_label_upper_GPUh=review.PRIOR_GPUH))
+    scope=dict(source_root=str(root),source_plan_sha256=plan['sha256'],prior_new_label_GPUh=26,
+        new_label_cap_GPUh=96,all_cases_denominator=32,source_cases_attempted_required=32)
+    return root,scope
+
+
+def test_temporal_all_retained30_reviewed_with_original32_denominator(temporal_evidence):
+    root,scope=temporal_evidence
+    jobs,inputs,previous=review.temporal_inputs(root,scope)
+    assert len(jobs)==30 and {j['source_index'] for j in jobs}==set(range(32))-{22,30}
+    assert sum(j['evidence_group']==0 for j in jobs)==16 and sum(j['evidence_group']==1 for j in jobs)==14
+    assert len(inputs)==2 and len(previous)==1
+
+
+@pytest.mark.parametrize('corruption',['partial_attempts','release','count','cost','failed_caption','source_video','source_plan','budget'])
+def test_temporal_input_gate_does_not_repair_or_select_partial_evidence(temporal_evidence,corruption):
+    root,scope=temporal_evidence
+    if corruption=='budget':scope['prior_new_label_GPUh']=0
+    elif corruption=='source_plan':scope['source_plan_sha256']='0'*64
+    else:
+        if corruption in ('partial_attempts','count'):path=root/'completion.independent_audit.json'
+        elif corruption in ('release','cost'):path=root/'run01/terminal.json'
+        else:path=root/'run01/label22.json' if corruption=='failed_caption' else root/'run01/label0.json'
+        v=json.loads(path.read_bytes())
+        if corruption=='partial_attempts':v['cases_attempted']=31
+        elif corruption=='release':v['released']=False
+        elif corruption=='count':v['labels']=29;v['errors']=3
+        elif corruption=='cost':v['charged_upper_GPUh']=0
+        elif corruption=='failed_caption':v['caption']='fabricated repair'
+        else:v['video']['sha256']='0'*64
+        path.write_text(json.dumps(v))
+    with pytest.raises(ValueError):review.temporal_inputs(root,scope)

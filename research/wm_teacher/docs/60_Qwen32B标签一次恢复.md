@@ -266,3 +266,11 @@ vbench_eval.py新增显式--official-five：使用独立videos_official5、stagi
 ### 完整生成计划构建（CPU，不是模型实验）
 
 原build_eval_jobs.py仅有355×seed0的legacy作业构建。新增--official-five-plan显式CPU模式，读取已核完整5590项覆盖清单，核对官方metadata的prompt/图像/五采样行和本地图像SHA，模型由独立JSON映射显式指定checkpoint并绑定文件SHA，禁止从旧MODELS中的mtime最新权重自动选臂。多模型使用同图文和相同五个seed，输出分离到videos_official5；CPU计划及逐作业execution_allowed=false，不运行gen_jobs、不创建视频或GPU claim。旧cases/jobs不覆盖，prompt优化与旧tag选项禁止混用。正式候选checkpoint、sampler预算/backend、输入裁剪来源、语义/监督cache及远端源码门仍须另行通过，不把此准备当完整评测或SOTA证据。
+
+## 19. Git认证恢复与原生视频标签后续评审（2026-11-04）
+
+用户提供新增Git授权后，现有待推送正常提交a825e3f已push；独立新克隆逐字节核验275白名单文件和1542完整公开测试凭据通过。原认证阻断已解除，不再称凭据缺失。使用临时askpass/子进程环境，不把凭据存仓库、Git配置或长期记忆。
+
+原生视频标签allocation004按冻结20d6cc7计划执行，一次4卡5400秒/6GPUh，原32病例和16帧、所有结构与安全门保持不变。case循环仍运行，任何部分成功均不是全量通过；错误不自动重试、旧失败与预算不退款。终态及独立审计完成后才启动新评审。
+
+semantic_review005预注册单卡3600秒/1GPUh，使用同独立8B、七字段、四控制和16源帧。源实验必须有32/32实际尝试、完整终态成本与资源恢复；仅评审全部原始success标签，原失败保留完整32分母，不挑选高分标签、不重写错误caption。原native输入改变与四句JSON效果只能在全体原病例分母上报告，不能当新盲泛化证据。AI评审不自行生成semantic_training_approval，正式训练/AR/Student/蒸馏仍需原门禁通过。
