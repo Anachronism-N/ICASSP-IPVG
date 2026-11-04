@@ -20,6 +20,7 @@ FOLLOWUP = False
 CAMPAIGN003 = False
 CAMPAIGN004 = False
 TEMPORAL = False
+SCHEMA_REVIEW = False
 PRIOR_GPUH = 20.165898210853467
 AUTH = ROOT / 'eval/teacher_label_semantic_review_20261103/review.authorization.json'
 AUTH_SHA = '8eac69afd4a42f3966bae70bad1d0947a9e44c41fe0eabb673e28cb5dbbc3154'
@@ -73,11 +74,21 @@ def configure_temporal():
     AUTH_SHA='f98b82018458acb7737b90a8eb29498ec5391e179069772c726bd4b82cae1402'
 
 
+def configure_schema_review():
+    global AUTH,AUTH_SHA,PRIOR_GPUH,SCHEMA_REVIEW
+    configure_temporal()
+    SCHEMA_REVIEW=True
+    AUTH=ROOT/'eval/teacher_progress_campaign_20261104/semantic_review006/review.authorization.json'
+    AUTH_SHA='12035c3897448bd975b1581efc62b205e1beff4b97996ebe205e349cf458c700'
+    PRIOR_GPUH=56.832564877520134
+
+
 def temporal_inputs(root, scope):
     r,_=helpers()
     root=Path(root)
     require(root.is_absolute() and root.resolve()==root and str(root)==scope['source_root'], 'Exact temporal source root required')
-    require(scope['prior_new_label_GPUh']==26 and scope['new_label_cap_GPUh']==96 and 26+ALLOCATION_GPUH<=96,
+    require(scope['prior_new_label_GPUh']==(33 if SCHEMA_REVIEW else 26) and scope['new_label_cap_GPUh']==96
+            and scope['prior_new_label_GPUh']+ALLOCATION_GPUH<=96,
             'Separate temporal review phase budget required')
     require(scope['all_cases_denominator']==32 and scope['source_cases_attempted_required']==32,
             'Full temporal denominator required')
@@ -118,7 +129,7 @@ def prepare_temporal(evidence_roots, model, output, authorization, scope):
         hostname=os.uname().nodename,node_ip=os.environ.get('NODE_IP'),gpu_uuid=gpu_hold.query_gpus()[0]['uuid'],
         allocated_cards=1,cap_seconds=CAP,tail_seconds=TAIL,prior_charged_label_GPUh=PRIOR_GPUH,
         upper_GPUh=ALLOCATION_GPUH,cumulative_label_upper_GPUh=PRIOR_GPUH+ALLOCATION_GPUH,
-        stage_cap_GPUh=96,new_label_stage_prior_GPUh=26,output_root=str(Path(output).parent/'review_run01'),
+        stage_cap_GPUh=96,new_label_stage_prior_GPUh=scope['prior_new_label_GPUh'],output_root=str(Path(output).parent/'review_run01'),
         inputs=inputs,previous_costs=previous,jobs=jobs,all_cases_denominator=32,model=model,runtime=r.runtime(),
         source={n:record(ROOT/n) for n in ('scripts/run_teacher_label_semantic_review.py','tests/test_teacher_label_semantic_review.py',*r.SOURCE_NAMES)},
         authorization=authorization,prompt_sha256=hashlib.sha256(PROMPT.encode()).hexdigest(),controls=controls(),
@@ -292,7 +303,7 @@ def verify(plan_path, digest, end=None):
         jobs,inputs,previous=temporal_inputs(scope['source_root'],scope)
         require(p['jobs']==jobs and p['inputs']==inputs and p['previous_costs']==previous
                 and p['all_cases_denominator']==32 and p['stage_cap_GPUh']==96
-                and p['new_label_stage_prior_GPUh']==26, 'Original temporal review scope drift')
+                and p['new_label_stage_prior_GPUh']==scope['prior_new_label_GPUh'], 'Original temporal review scope drift')
     elif CAMPAIGN003:
         scope=read(p['authorization'],end)
         require(p['all_cases_denominator']==32 and len(p['jobs'])==30 and p['new_label_stage_prior_GPUh']==(19 if CAMPAIGN004 else 18)
@@ -433,7 +444,7 @@ def run(args):
         command=['timeout','--signal=TERM','--kill-after=20s',f'{seconds}s',PYTHON,str(Path(__file__).resolve()),
                  'worker','--plan',bound['path'],'--sha',bound['sha256'],'--launch',launch['path']]
         if FOLLOWUP:command.insert(command.index('worker'),'--followup')
-        if CAMPAIGN003:command.insert(command.index('worker'),'--temporal' if TEMPORAL else '--campaign004' if CAMPAIGN004 else '--campaign003')
+        if CAMPAIGN003:command.insert(command.index('worker'),'--schema-labels' if SCHEMA_REVIEW else '--temporal' if TEMPORAL else '--campaign004' if CAMPAIGN004 else '--campaign003')
         env=dict(os.environ,CUDA_VISIBLE_DEVICES=p['gpu_uuid'],HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',OMP_NUM_THREADS='1')
         with (output/'worker.log').open('xb') as log:
             child=subprocess.Popen(command,stdout=log,stderr=subprocess.STDOUT,env=env,start_new_session=True)
@@ -482,7 +493,7 @@ def run(args):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    modes=parser.add_mutually_exclusive_group();modes.add_argument('--followup',action='store_true');modes.add_argument('--campaign003',action='store_true');modes.add_argument('--campaign004',action='store_true');modes.add_argument('--temporal',action='store_true')
+    modes=parser.add_mutually_exclusive_group();modes.add_argument('--followup',action='store_true');modes.add_argument('--campaign003',action='store_true');modes.add_argument('--campaign004',action='store_true');modes.add_argument('--temporal',action='store_true');modes.add_argument('--schema-labels',action='store_true')
     parser.add_argument('command',choices=['prepare','run','worker'])
     parser.add_argument('--plan');parser.add_argument('--sha');parser.add_argument('--launch')
     parser.add_argument('--evidence',nargs='+');parser.add_argument('--model-proof');parser.add_argument('--output')
@@ -492,6 +503,7 @@ def main():
     if a.campaign003:configure_campaign003()
     if a.campaign004:configure_campaign004()
     if a.temporal:configure_temporal()
+    if a.schema_labels:configure_schema_review()
     if a.command=='prepare': result=prepare(a.evidence,a.model_proof,a.output)
     elif a.command=='worker': result=worker(a.plan,a.sha,a.launch)
     else: result=run(a)

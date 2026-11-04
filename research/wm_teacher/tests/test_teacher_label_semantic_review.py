@@ -217,3 +217,23 @@ def test_temporal_input_gate_does_not_repair_or_select_partial_evidence(temporal
         else:v['video']['sha256']='0'*64
         path.write_text(json.dumps(v))
     with pytest.raises(ValueError):review.temporal_inputs(root,scope)
+
+
+def test_schema_review_is_separate_and_retains_original_AI_rubric(monkeypatch):
+    for k in ('CAP','TAIL','ALLOCATION_GPUH','PRIOR_GPUH','AUTH','AUTH_SHA','CAMPAIGN003','CAMPAIGN004','TEMPORAL','SCHEMA_REVIEW'):
+        monkeypatch.setattr(review,k,getattr(review,k))
+    prompt=review.PROMPT;fields=review.FIELDS
+    review.configure_schema_review()
+    assert review.SCHEMA_REVIEW and review.PRIOR_GPUH==56.832564877520134
+    assert review.AUTH.parent.name=='semantic_review006' and review.ALLOCATION_GPUH==1
+    assert review.PROMPT==prompt and review.FIELDS==fields
+
+
+def test_schema_review_scope_keeps_failed_interface_cases_in_32_denominator(temporal_evidence,monkeypatch):
+    root,scope=temporal_evidence
+    monkeypatch.setattr(review,'SCHEMA_REVIEW',True)
+    scope['prior_new_label_GPUh']=33
+    jobs,inputs,previous=review.temporal_inputs(root,scope)
+    assert len(jobs)==30 and {j['source_index'] for j in jobs}==set(range(32))-{22,30}
+    scope['prior_new_label_GPUh']=26
+    with pytest.raises(ValueError):review.temporal_inputs(root,scope)

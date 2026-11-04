@@ -292,3 +292,7 @@ encoder_cache_probe001独立冻结单卡GPU4、720秒/0.2GPUh，计入技术8阶
 LM-format-enforcer0.11.3、interegular0.3.3和纯Python pydantic1.10.24只放新隔离site，官方wheel和成员SHA留证；未改运行中venv或旧环境。真实Qwen tokenizer四字符串合法/非法字符与token路径CPU探针通过，EOS与完整数组边界对应；不会据CPU测试宣称实际模型输出通过。新worker须先在真实CUDA3 BF16 logits与CPU input_ids上执行短语法/拒绝词掩码准入，通过后才加载32B，避免再用完整模型查掩码设备错误。任何失败整体保留，不自动重试、不复用004claim。
 
 旧004独立审计曾误用系统Python3.11导致PEP701源码解析失败；改用已冻结Python3.12仅做CPU审计后通过，没有重跑GPU或篡改原结果。
+
+### schema输出的独立review006前瞻门
+
+另冻结1GPUh/3600秒，在schema005费用上界33之后计入标签阶段34/96。与review005同8B模型、七字段、四合成控制和原16源帧；原schema源必须实际32/32尝试、完整终态费用与资源恢复，评审全部保留success标签、失败不补写、不从高分子集选样。每例原图文/label字节和源计划SHA重新绑定，语义训练批准始终另行检查，AI adequate不自行变成人工gold。
