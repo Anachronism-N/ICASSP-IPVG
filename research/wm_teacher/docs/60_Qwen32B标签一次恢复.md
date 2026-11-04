@@ -274,3 +274,7 @@ vbench_eval.py新增显式--official-five：使用独立videos_official5、stagi
 原生视频标签allocation004按冻结20d6cc7计划执行，一次4卡5400秒/6GPUh，原32病例和16帧、所有结构与安全门保持不变。case循环仍运行，任何部分成功均不是全量通过；错误不自动重试、旧失败与预算不退款。终态及独立审计完成后才启动新评审。
 
 semantic_review005预注册单卡3600秒/1GPUh，使用同独立8B、七字段、四控制和16源帧。源实验必须有32/32实际尝试、完整终态成本与资源恢复；仅评审全部原始success标签，原失败保留完整32分母，不挑选高分标签、不重写错误caption。原native输入改变与四句JSON效果只能在全体原病例分母上报告，不能当新盲泛化证据。AI评审不自行生成semantic_training_approval，正式训练/AR/Student/蒸馏仍需原门禁通过。
+
+### Encoder/cache实际API技术准入（非监督缓存）
+
+encoder_cache_probe001独立冻结单卡GPU4、720秒/0.2GPUh，计入技术8阶段，先前4.8保留，新预留5.0/8。只使用程序化完整121帧1280×704常色视频与固定合成描述，不用任何未准入真实标签。复用实际cache_e3_inputs的T5/VAE加载、原tiled尺寸和encode函数；要求BF16 CPU输出x0[1,48,31,44,80]、first[1,48,1,44,80]、context[1,512,4096]有限，重复T5 context精确一致。输出仅是私有合成技术张量，不生成监督cache_index或训练样本清单、不执行DiT update，semantic_training_approval与formal_training_allowed仍false。原encoder六pin、环境、源码、资源身份、完整公开回归与远端字节门通过后才运行，不自动重试。
