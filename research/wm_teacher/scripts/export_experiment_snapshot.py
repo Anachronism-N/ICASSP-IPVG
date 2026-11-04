@@ -149,7 +149,7 @@ FILES = [
     "finalize_5s.py", "inventory_5s.py", "slice_new_sources.py", "caption_5s_extra.py",
 )] + ["tests/" + name for name in (
     "test_score_merge_cpu.py", "test_monitor_val_orchestration.py", "test_wmb_final_orchestration.py", "test_analyze_merge_metrics.py",
-    "test_export_experiment_snapshot.py", "test_report_merge_results.py", "test_score_pool.py", "test_vbench_eval.py",
+    "test_export_experiment_snapshot.py", "test_report_merge_results.py", "test_score_pool.py", "test_vbench_eval.py", "test_build_eval_jobs.py",
     "test_run_teacher_probe.py", "test_score_teacher_probe.py",
     "test_audit_teacher_labels.py", "test_teacher_mechanism_probe.py", "test_teacher_caption_probe.py",
     "test_reslice_namespace.py", "test_prepare_teacher_eligibility.py", "test_teacher_training_smoke.py", "test_serve_label_review.py",

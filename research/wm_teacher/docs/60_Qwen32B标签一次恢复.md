@@ -262,3 +262,7 @@ vbench_eval.py新增显式--official-five：使用独立videos_official5、stagi
 实际camera后端的现有官方代码使用浮动torch.hub co-tracker/cotracker2并包含TLS失败后的关闭证书验证分支。正式执行前仍必须冻结适配backend源码、原权重和正常TLS/离线加载路径，不能直接运行该浮动网络分支。未加载该camera模型或下载权重；未宣称外部榜单checkpoint或采样对齐完成。完整质量评测仍受候选/语义/监督cache/远端源码与有限预算门约束。
 
 官方五采样模式另补评分输入按模型字节绑定：同名staging视频必须与源SHA一致；每模型score_inputs绑定视频、官方metadata和评分脚本SHA。已有评分没有绑定、metadata或视频字节变化均保留原评分并拒绝复用，不能用旧同名结果污染新候选。CPU测试覆盖跨模型独立绑定及旧默认结果契约，未GPU评分。
+
+### 完整生成计划构建（CPU，不是模型实验）
+
+原build_eval_jobs.py仅有355×seed0的legacy作业构建。新增--official-five-plan显式CPU模式，读取已核完整5590项覆盖清单，核对官方metadata的prompt/图像/五采样行和本地图像SHA，模型由独立JSON映射显式指定checkpoint并绑定文件SHA，禁止从旧MODELS中的mtime最新权重自动选臂。多模型使用同图文和相同五个seed，输出分离到videos_official5；CPU计划及逐作业execution_allowed=false，不运行gen_jobs、不创建视频或GPU claim。旧cases/jobs不覆盖，prompt优化与旧tag选项禁止混用。正式候选checkpoint、sampler预算/backend、输入裁剪来源、语义/监督cache及远端源码门仍须另行通过，不把此准备当完整评测或SOTA证据。

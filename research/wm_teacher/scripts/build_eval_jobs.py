@@ -15,6 +15,8 @@ Usage: python build_eval_jobs.py [--suites wm,vbench] [--models base,round1,roun
 import argparse
 import csv
 import glob
+import hashlib
+from pathlib import Path
 import json
 import os
 import random
@@ -94,6 +96,84 @@ def vbench_cases():
     return cases
 
 
+def file_hash(path):
+    with open(path, 'rb') as source:
+        return hashlib.file_digest(source, 'sha256').hexdigest()
+
+
+def official_generation_plan(preflight_path, frozen_models):
+    raw = Path(preflight_path).read_bytes()
+    preflight = json.loads(raw)
+    if preflight.get('schema') != 'official_vbench_i2v_complete_coverage_CPU_preflight_v1':
+        raise ValueError('Official complete-coverage preflight required')
+    if preflight.get('execution_allowed') is not False or preflight.get('samples_per_pair') != 5:
+        raise ValueError('CPU-only five-sample preflight required')
+    rows = preflight['coverage_records']
+    if len(rows) != 5590 or len({row['filename'] for row in rows}) != 5590:
+        raise ValueError('Complete 5590-video coverage required')
+    groups = defaultdict(set)
+    for row in rows:
+        groups[row['pair_key']].add(row['sample_index'])
+        if row['execution_allowed'] is not False or Path(row['filename']).name != row['filename']:
+            raise ValueError('Non-dispatchable safe output names required')
+    if len(groups) != 1118 or any(indices != set(range(5)) for indices in groups.values()):
+        raise ValueError('Every official pair requires all five sample indices')
+    metadata = preflight['metadata']
+    if file_hash(metadata['path']) != metadata['sha256']:
+        raise ValueError('Official metadata changed')
+    info = json.loads(Path(metadata['path']).read_bytes())
+    expected = {(case['prompt_en'].replace('/', '_') + '-' + str(i) + '.mp4', i, case['prompt_en'], case['image_name']) for case in info for i in range(5)}
+    observed = {(row['filename'], row['sample_index'], row['raw_prompt'], row['image_key']) for row in rows}
+    if len(info) != 1118 or observed != expected:
+        raise ValueError('Plan rows differ from official metadata')
+    if any(type(row['proposed_seed']) is not int or not 0 <= row['proposed_seed'] < (1 << 63) for row in rows):
+        raise ValueError('Explicit finite integer seeds required')
+    for image in preflight['image_files'].values():
+        if Path(image['path']).stat().st_size != image['bytes'] or file_hash(image['path']) != image['sha256']:
+            raise ValueError('Official input image bytes changed')
+    if type(frozen_models) is not dict or not frozen_models:
+        raise ValueError('Explicit model names and checkpoints required')
+    checkpoints, jobs = {}, []
+    for name, checkpoint in frozen_models.items():
+        if type(name) is not str or not name or Path(name).name != name or name in ('.', '..'):
+            raise ValueError('Safe explicit model name required')
+        if checkpoint == 'NONE':
+            checkpoints[name] = {'kind': 'base_checkpoint', 'base_asset_admission_required': True}
+        else:
+            if type(checkpoint) is not str or not Path(checkpoint).is_absolute():
+                raise ValueError('Explicit absolute checkpoint path required')
+            path = Path(checkpoint)
+            before = path.stat()
+            if not path.is_file() or before.st_size == 0:
+                raise ValueError('Nonempty frozen checkpoint required')
+            digest = file_hash(path)
+            after = path.stat()
+            if (before.st_ino, before.st_size, before.st_mtime_ns) != (after.st_ino, after.st_size, after.st_mtime_ns):
+                raise ValueError('Checkpoint changed while freezing')
+            checkpoints[name] = {'path': str(path), 'bytes': after.st_size, 'sha256': digest}
+        for row in rows:
+            jobs.append({
+                'id': row['pair_key'] + '-' + str(row['sample_index']),
+                'model': name, 'ckpt': checkpoint,
+                'image': preflight['image_files'][row['image_key']]['path'],
+                'prompt': row['raw_prompt'], 'seed': row['proposed_seed'],
+                'sample_index': row['sample_index'], 'dimensions': row['dimensions'],
+                'out': str(Path(EV) / 'vbench_i2v/videos_official5' / name / row['filename']),
+                'execution_allowed': False,
+            })
+    return {
+        'schema': 'official_vbench_generation_CPU_plan_v1',
+        'preflight': {'path': str(Path(preflight_path).resolve()), 'sha256': hashlib.sha256(raw).hexdigest()},
+        'builder_source_sha256': file_hash(__file__), 'frozen_checkpoints': checkpoints, 'jobs': jobs,
+        'videos_per_model': 5590, 'samples_per_pair': 5,
+        'seed_policy': preflight['seed_policy'], 'prompt_protocol': 'raw',
+        'execution_allowed': False, 'GPU_used': False, 'generation_performed': False,
+        'sampler_budget_and_backend_admission_required': True,
+        'crop_provenance_admission_required': True, 'semantic_and_supervised_cache_gates_required': True,
+        'remote_source_byte_gate_required': True, 'sota_proven': False,
+    }
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--suites", default="wm,vbench")
@@ -101,7 +181,26 @@ def main():
     ap.add_argument("--tag", default="", help="suffix for the jobs file, e.g. _round3")
     ap.add_argument("--prompt-map", default="", help="json {case_id: prompt} overriding the case prompt")
     ap.add_argument("--name-suffix", default="", help="appended to the model's output dir, e.g. _po")
+    ap.add_argument("--official-five-plan", help="CPU-only complete-coverage preflight path; never dispatches gen_jobs.py")
+    ap.add_argument("--frozen-models", help="JSON mapping explicit model names to absolute checkpoints or NONE")
+    ap.add_argument("--output", help="New JSON plan path, never a legacy jobs/cases file")
     a = ap.parse_args()
+    if not a.official_five_plan and (a.frozen_models or a.output):
+        ap.error("Frozen models and output require --official-five-plan")
+    if a.official_five_plan:
+        if not a.frozen_models or not a.output or a.prompt_map or a.name_suffix or a.tag:
+            ap.error("Official mode requires frozen models and a new output; prompt overrides and legacy tags are forbidden")
+        output = Path(a.output)
+        if not output.is_absolute() or output.exists():
+            ap.error("Official CPU plan output must be a new absolute path")
+        frozen_models = json.loads(Path(a.frozen_models).read_bytes())
+        plan = official_generation_plan(a.official_five_plan, frozen_models)
+        with output.open("x", encoding="utf-8") as target:
+            json.dump(plan, target, ensure_ascii=False, sort_keys=True)
+            target.write(chr(10))
+        output.chmod(0o600)
+        print(f"CPU official plan: {len(plan['jobs'])} jobs; execution remains blocked")
+        return
     for suite in a.suites.split(","):
         cases = wm_cases() if suite == "wm" else vbench_cases()
         d = f"{EV}/{'wm_bench' if suite == 'wm' else 'vbench_i2v'}"
