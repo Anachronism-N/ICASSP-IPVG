@@ -296,3 +296,22 @@ LM-format-enforcer0.11.3、interegular0.3.3和纯Python pydantic1.10.24只放新
 ### schema输出的独立review006前瞻门
 
 另冻结1GPUh/3600秒，在schema005费用上界33之后计入标签阶段34/96。与review005同8B模型、七字段、四合成控制和原16源帧；原schema源必须实际32/32尝试、完整终态费用与资源恢复，评审全部保留success标签、失败不补写、不从高分子集选样。每例原图文/label字节和源计划SHA重新绑定，语义训练批准始终另行检查，AI adequate不自行变成人工gold。
+
+
+## 29. schema005完整失败与boundary006前置修复（2026-11-04）
+
+- schema005固定32例均实际执行，0有效标签/32错误；每例facts均到1024 token且未EOS。两组分别0/16。不能凭未保留的原文猜测具体循环内容。
+- 实测完整生命周期3.617963761 GPUh，保守记6；新增标签阶段累计33/96，旧23.832564878 GPUh不退款。释放与模式恢复、独立审计通过。
+- review006源码已完整1566测试通过、279文件独立远端字节核验；该发布不是实际评审。零标签不分配review GPU，不生成任何质量或语义批准。
+- 纯CPU真实Qwen tokenizer发现LMFE自由字符串快捷路径遗漏合法跨闭合引号token，例如句号+引号+逗号；新增小型边界trie只补入逐字符通过原JSON语法的token，原拒绝词掩码和输出验证器不变。
+- 修复后facts 87-token和caption 9-token完整路径/原EOS门纯CPU BF16验证通过，CUDA未初始化；26项针对性回归通过。尚不代表模型实际生成能够完成或语义正确。
+- boundary006为独立新协议，绑定schema005原claim/审计，原32例/native16帧/prompt/greedy/1024+384 token及40..120词门保持不变。模型加载前同时核验facts/caption路径；首次未EOS或AssertionError即停止剩余病例，不重试，剩余按未执行错误保留完整32分母。
+- 预留独立6GPUh后新增标签阶段39/96，技术5/8，正式训练评测0/64。完整测试、白名单脱敏发布和独立远端验证前不开新GPU任务。正式Teacher训练仍未启动，SOTA未证明。
+
+
+## 20. schema005失败与boundary006候选修复（2026-11-04）
+
+- schema005完整32例实际尝试，0标签、32错误；每例facts生成1024 token后未EOS。独立审计确认诊断/盲来源各0/16，实际3.617964 GPUh，保守6 GPUh，四卡释放和模式恢复通过。原失败、claim与费用不改。无有效标签，不启动review006 GPU评审。
+- CPU合成完整facts路径发现lm-format-enforcer自由文本快捷路径拒绝合法跨闭合引号token；候选修复仅为小型边界token树，逐字符沿原JSON语法检查，不后处理文本、不放宽原词数/实体/EOS门。该发现不是实机失败唯一根因或语义质量证据。
+- boundary006独立协议绑定schema005审计/claim与旧review，保留同32病例、16源帧、prompt、greedy和1024/384 token。模型加载前验收完整合成facts及四句caption的CPU输入/GPU BF16 logits路径。首个未EOS或AssertionError即停止后续病例，32分母与未尝试记录保留，不自动重试。
+- 新分配最多6 GPUh，标签阶段已耗33，新预留39/96；技术5/8，正式训练评测0/64。完整测试、正常push与独立远端字节门通过前不开新GPU任务。语义批准、监督cache、正式训练和对齐SOTA证据仍缺失，不将CPU回归称为模型成绩。

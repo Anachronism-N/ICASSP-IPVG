@@ -15,6 +15,7 @@ E=ROOT/'eval/teacher_progress_campaign_20261104/allocation004_temporal'
 AUTH_SHA='e911d18de9140b202fc3e31e0ebefe447804f7dadf907e121c701a15caf0c0bb'
 CAP=5400
 SCHEMA_DECODE=False
+BOUNDARY_DECODE=False
 DECODER_SITE=Path('/dockerdata/wm_json_decoder_CPU_20261104/site')
 STRUCTURED_INSTANCE=None
 PYTHON='/dockerdata/venv_qwen32b_20261103/bin/python3.12'
@@ -36,6 +37,14 @@ def configure_schema():
     sys.path.insert(0,str(DECODER_SITE))
 
 
+def configure_boundary():
+    global E,AUTH_SHA,BOUNDARY_DECODE
+    configure_schema()
+    E=ROOT/'eval/teacher_progress_campaign_20261104/allocation006_boundary'
+    AUTH_SHA='ea579ae76a13ff28675bb25d25d59664199a865dab59caba802707da0cfa3646'
+    BOUNDARY_DECODE=True
+
+
 def helpers():
     sys.path.insert(0,str(ROOT/'scripts'))
     import run_teacher_qwen3vl32b_recovery as r
@@ -52,22 +61,28 @@ def save(path,value):
     return helpers()[0].write_new(path,value)
 
 def authorization():
-    row=record(E/'authorization.json');assert row['sha256']==AUTH_SHA
+    row=record(E/('authorization.final.json' if BOUNDARY_DECODE else 'authorization.json'));assert row['sha256']==AUTH_SHA
     a=read(row)
     assert record(E.parent/'campaign.authorization.json')['sha256']==a['parent_campaign_sha256']
     assert a['allocated_cards']==4 and a['wall_cap_seconds']==CAP and a['upper_GPUh']==6
-    assert a['prior_new_label_GPUh']==(27 if SCHEMA_DECODE else 20)
-    assert a['prior_historical_label_GPUh']==(50.832564877520134 if SCHEMA_DECODE else 43.832564877520134)
+    assert a['prior_new_label_GPUh']==(33 if BOUNDARY_DECODE else 27 if SCHEMA_DECODE else 20)
+    assert a['prior_historical_label_GPUh']==(56.832564877520134 if BOUNDARY_DECODE else 50.832564877520134 if SCHEMA_DECODE else 43.832564877520134)
     assert a['prior_new_label_GPUh']+6<=a['stage_label_cap_GPUh']==96
     assert a['cases']==32 and a['source_frames']==16 and a['source_indices']==list(range(0,121,8))
     assert a['caption_words']==[40,120] and a['automatic_retry_allowed'] is False
     assert not a['formal_training_allowed'] and not a['semantic_approval']
     if SCHEMA_DECODE:
-        previous=E.parent/'allocation004_temporal'
+        previous=E.parent/('allocation005_schema' if BOUNDARY_DECODE else 'allocation004_temporal')
         assert record(previous/'completion.independent_audit.json')['sha256']==a['previous_native_audit_sha256']
         assert record(previous/'run01/attempt.claim')['sha256']==a['previous_claim_sha256']
         assert record(E.parent/'semantic_review005/completion.independent_audit.json')['sha256']==a['previous_review_sha256']
-        assert record(DECODER_SITE.parent/'actual_CPU_probe.json')['sha256']==a['decoder_CPU_probe_sha256']
+        probe=record(E/'actual_CPU_probe.final.json' if BOUNDARY_DECODE else DECODER_SITE.parent/'actual_CPU_probe.json')
+        assert probe['sha256']==a['decoder_CPU_probe_sha256']
+        if BOUNDARY_DECODE:
+            proof=read(probe);assert proof['success'] and not proof['CUDA_initialized']
+            assert proof['source_sha256']==record(ROOT/'scripts/teacher_structured_decoder.py')['sha256']
+            prior=read(record(previous/'completion.independent_audit.json'))
+            assert prior['cases_attempted']==32 and prior['labels']==0 and prior['released'] and prior['modes_restored']
     return a,row
 
 def config():
@@ -83,13 +98,16 @@ def config():
         value['decoding']='JSON_schema_and_original_deny_vocabulary'
         value['facts_schema']=structured.FACTS_SCHEMA;value['caption_schema']=structured.CAPTION_SCHEMA
         value['denied_facts_words']=list(r.DENY_DECODE_WORDS);value['denied_caption_words']=list(r.DENY_DECODE_WORDS+r.CAPTION_DECODE_WORDS)
+    if BOUNDARY_DECODE:
+        value['decoder_boundary_tokens']='character_validated_quote_crossing_trie_v1'
+        value['stop_on_generation_without_EOS_or_AssertionError']=True
     return value
 
 def prepare(output=None):
     r,g=helpers();a,auth=authorization()
-    original=record(E.parent/('allocation004_temporal/plan.ready.json' if SCHEMA_DECODE else 'allocation003/plan.execution003.ready.json'))
+    original=record(E.parent/('allocation005_schema/plan.ready.json' if BOUNDARY_DECODE else 'allocation004_temporal/plan.ready.json' if SCHEMA_DECODE else 'allocation003/plan.execution003.ready.json'))
     assert original['sha256']==a['original_plan_sha256'];p=read(original)
-    audit=record(E.parent/('allocation004_temporal/completion.independent_audit.json' if SCHEMA_DECODE else 'allocation003/completion.audit.json'))
+    audit=record(E.parent/('allocation005_schema/completion.independent_audit.json' if BOUNDARY_DECODE else 'allocation004_temporal/completion.independent_audit.json' if SCHEMA_DECODE else 'allocation003/completion.audit.json'))
     review=record(E.parent/('semantic_review005/completion.independent_audit.json' if SCHEMA_DECODE else 'semantic_review004/completion.independent_audit.json'))
     if not SCHEMA_DECODE:
         assert audit['sha256']==a['original_audit_sha256'] and review['sha256']==a['previous_review_sha256']
@@ -156,6 +174,15 @@ def generate(model,processor,images,prompt,limit,trace):
     with torch.inference_mode():out=model.generate(**inputs,max_new_tokens=limit,do_sample=False,**constraints)
     tokens=out[:,inputs['input_ids'].shape[1]:];trace['new_tokens']=int(tokens.shape[1])
     eos=model.generation_config.eos_token_id;eos=[eos] if type(eos) is int else eos
+    if BOUNDARY_DECODE:
+        trace['ended_with_EOS']=bool(tokens.shape[1] and tokens[0,-1].item() in eos)
+        sent=out[0,:-1] if trace['ended_with_EOS'] else out[0]
+        fn=constraints['prefix_allowed_tokens_fn'];allowed=fn(0,sent)
+        state=fn.token_enforcer.prefix_states[tuple(sent.tolist())].parser
+        trace['grammar_can_end']=state.can_end()
+        trace['grammar_EOS_allowed']=processor.tokenizer.eos_token_id in allowed
+        trace['grammar_allowed_token_count']=len(allowed)
+        trace['grammar_inside_freetext']=bool(state.shortcut_key())
     assert tokens.shape[0]==1 and tokens.shape[1]>0 and tokens[0,-1].item() in eos
     return processor.batch_decode(tokens,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
 
@@ -181,6 +208,7 @@ def worker(args):
     assert {v.device.index for v in model.parameters()}==set(range(4))
     assert all(v.device.type=='cuda' and v.dtype==torch.bfloat16 for v in model.parameters())
     processor=AutoProcessor.from_pretrained(MODEL,local_files_only=True);load_seconds=time.monotonic()-started
+    decoder_stop=False
     for j in p['jobs']:
         if end-time.monotonic()<=worst*(32-j['index'])+10:stop='projected_budget_insufficient';break
         began=time.monotonic();stage='frame_decode';trace={};counts={}
@@ -198,9 +226,13 @@ def worker(args):
             value=dict(index=j['index'],group=j['group'],video=j['video'],success=False,
                        error_type=type(exc).__name__,failure_stage=stage,duration_seconds=time.monotonic()-began,new_tokens=counts)
             if SCHEMA_DECODE:value.update(r.case_failure(exc,stage,time.monotonic()-began,counts))
+            if BOUNDARY_DECODE:
+                value['decoder_diagnostic']=dict(trace)
+                decoder_stop=trace.get('ended_with_EOS') is False or isinstance(exc,AssertionError)
         raw=None;row=save(E/'run01'/('label'+str(j['index'])+'.json'),value);rows.append(row)
         worst=max(worst,time.monotonic()-began)
         print(json.dumps(dict(case=j['index'],success=value['success'],stage=None if value['success'] else stage)),flush=True)
+        if decoder_stop:stop='decoder_admission_failed_stop_without_retry';break
     attempted=len(rows)
     for j in p['jobs'][attempted:]:
         rows.append(save(E/'run01'/('label'+str(j['index'])+'.json'),dict(index=j['index'],group=j['group'],
@@ -245,7 +277,8 @@ def run(args):
         env=dict(os.environ,CUDA_VISIBLE_DEVICES=','.join(p['gpu_uuids']),HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',OMP_NUM_THREADS='1')
         with (output/'worker.log').open('xb') as log:
             command=[PYTHON,str(Path(__file__).resolve()),'worker','--plan',args.plan,'--sha',args.sha]
-            if SCHEMA_DECODE:command.insert(2,'--schema-decode')
+            if BOUNDARY_DECODE:command.insert(2,'--boundary-decode')
+            elif SCHEMA_DECODE:command.insert(2,'--schema-decode')
             child=subprocess.Popen(command,stdout=log,stderr=subprocess.STDOUT,env=env,start_new_session=True)
             child.wait(timeout=max(1,CAP-120-(time.monotonic()-started)))
         assert child.returncode==0,'Worker failed; no retry'
@@ -279,9 +312,11 @@ def run(args):
     assert result['success']
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--schema-decode',action='store_true');parser.add_argument('command',choices=['prepare','verify','run','worker'])
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--schema-decode',action='store_true');parser.add_argument('--boundary-decode',action='store_true');parser.add_argument('command',choices=['prepare','verify','run','worker'])
     parser.add_argument('--output');parser.add_argument('--plan');parser.add_argument('--sha');parser.add_argument('--gpu-authorized',action='store_true');args=parser.parse_args()
-    if args.schema_decode:configure_schema()
+    assert not (args.schema_decode and args.boundary_decode)
+    if args.boundary_decode:configure_boundary()
+    elif args.schema_decode:configure_schema()
     if args.command=='prepare':print(json.dumps(prepare(args.output),sort_keys=True))
     elif args.command=='verify':verify(args.plan,args.sha);print('CPU protocol verified; no GPU allocation')
     elif args.command=='worker':worker(args)

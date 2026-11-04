@@ -49,16 +49,17 @@ def test_actual_JSON_grammar_keeps_fixed4_and_typed16_frame_facts():
 
 
 def test_constraints_use_existing_vocabulary_and_fresh_JSON_parsers():
+    import transformers
     from types import SimpleNamespace
     import run_teacher_qwen3vl32b_recovery as original
     tok=SimpleNamespace(eos_token_id=7,encode=lambda text,**kw:[len(text)])
     lm=SimpleNamespace(JsonSchemaParser=lambda schema:schema)
-    integration=SimpleNamespace(build_token_enforcer_tokenizer_data=lambda tok:object(),
-        build_transformers_prefix_allowed_tokens_fn=lambda data,schema:SimpleNamespace(schema=schema))
+    integration=SimpleNamespace(build_token_enforcer_tokenizer_data=lambda tok:SimpleNamespace(regular_tokens=[]),
+        build_transformers_prefix_allowed_tokens_fn=lambda data,schema:SimpleNamespace(schema=schema,token_enforcer=object()))
     with patch.dict(sys.modules,{'lmformatenforcer':lm,'lmformatenforcer.integrations.transformers':integration}),patch.object(original,'vectorized_bad_words',return_value=lambda ids,scores:scores) as mask:
         model=decoder.StructuredDecoder(tok,[7,8]);facts=model.constraints(True);caption=model.constraints(False)
-        assert facts['prefix_allowed_tokens_fn'].schema==decoder.FACTS_SCHEMA
-        assert caption['prefix_allowed_tokens_fn'].schema==decoder.CAPTION_SCHEMA
+        assert callable(facts['prefix_allowed_tokens_fn'])
+        assert callable(caption['prefix_allowed_tokens_fn'])
         assert mask.call_count==2 and mask.call_args.args[1]==[7,8]
         with pytest.raises(ValueError):decoder.StructuredDecoder(tok,[8])
 
@@ -71,3 +72,51 @@ def test_model_loading_follows_actual_CUDA_admission_in_new_mode():
     gate=next(n.lineno for n in calls if n.func.attr=='cuda_admission')
     load=next(n.lineno for n in calls if n.func.attr=='from_pretrained' and isinstance(n.func.value,ast.Name) and n.func.value.id=='Qwen3VLForConditionalGeneration')
     assert gate<load
+
+
+@pytest.mark.parametrize('facts_stage', [True, False])
+def test_real_Qwen_boundary_tokens_keep_complete_JSON_and_original_denials(facts_stage):
+    pytest.importorskip('lmformatenforcer')
+    model = Path('/opt/models/Qwen3-VL-32B-Instruct')
+    if not (model/'tokenizer.json').exists():
+        pytest.skip('Frozen local tokenizer is required for actual CPU contract')
+    import torch
+    from transformers import AutoTokenizer, PrefixConstrainedLogitsProcessor
+    tokenizer = AutoTokenizer.from_pretrained(model, local_files_only=True)
+    eos = json.loads((model/'generation_config.json').read_bytes())['eos_token_id']
+    instance = decoder.StructuredDecoder(tokenizer, eos)
+    facts = dict(scene='A red disk.', rendered_or_screen=False,
+        entities=[dict(id='E1', description='A red disk', held_object=None)],
+        events=[dict(entity_id='E1', frame_start=0, frame_end=15, action='Stays in place.')],
+        start_end_difference='No visible change.')
+    text = json.dumps(facts) if facts_stage else json.dumps(['one.', 'two.', 'three.', 'four.'])
+    constraints = instance.constraints(facts_stage)
+    prefix = constraints['prefix_allowed_tokens_fn']
+    mask = PrefixConstrainedLogitsProcessor(prefix, 1)
+    sent = tokenizer.encode('Synthetic JSON:', add_special_tokens=False)
+    prefix(0, torch.tensor(sent))
+    for token in tokenizer.encode(text, add_special_tokens=False):
+        inputs = torch.tensor([sent])
+        scores = torch.zeros((1, len(tokenizer)), dtype=torch.bfloat16)
+        values = constraints['logits_processor'](inputs, mask(inputs, scores))
+        assert torch.isfinite(values[0, token])
+        assert all(torch.isneginf(values[0, stop]) for stop in eos)
+        sent.append(token)
+    assert tokenizer.eos_token_id in prefix(0, torch.tensor(sent))
+    assert not torch.cuda.is_initialized()
+
+
+def test_boundary_trie_uses_character_grammar_not_unfiltered_quote_allowlist():
+    pytest.importorskip('lmformatenforcer')
+    import torch
+    from types import SimpleNamespace
+    from lmformatenforcer import JsonSchemaParser
+    instance = object.__new__(decoder.StructuredDecoder)
+    instance.boundary_tree = {'.': {'"': {',': {None: [10]}, '}': {None: [11]}}}}
+    parser = JsonSchemaParser(decoder.FACTS_SCHEMA)
+    for char in '{"scene":"disk':
+        parser = parser.add_character(char)
+    class Prefix:
+        token_enforcer = SimpleNamespace(prefix_states={(3,): SimpleNamespace(parser=parser)})
+        def __call__(self, batch, sent): return [7]
+    assert instance.boundary_prefix(Prefix())(0, torch.tensor([3])) == [7, 10]

@@ -101,3 +101,18 @@ def test_original_caption_validator_not_relaxed_in_schema_mode(monkeypatch):
     monkeypatch.setattr(a,'SCHEMA_DECODE',True)
     assert a.parse_caption(json.dumps(SENTENCES))==' '.join(SENTENCES)
     with pytest.raises(ValueError):a.parse_caption(json.dumps(['short.']*4))
+
+
+def test_boundary_mode_is_independent_preserves_budget_and_stops_decoder_failures(monkeypatch):
+    for k in ('E','AUTH_SHA','SCHEMA_DECODE','BOUNDARY_DECODE'):
+        monkeypatch.setattr(a,k,getattr(a,k))
+    monkeypatch.setattr(sys,'path',list(sys.path))
+    a.configure_boundary()
+    cfg=a.config()
+    assert a.E.name=='allocation006_boundary'
+    assert cfg['source_frames']==16 and cfg['caption_words']==[40,120]
+    assert cfg['facts_max_tokens']==1024 and cfg['caption_max_tokens']==384
+    assert cfg['stop_on_generation_without_EOS_or_AssertionError'] is True
+    assert cfg['decoder_boundary_tokens']=='character_validated_quote_crossing_trie_v1'
+    assert 'decoder_admission_failed_stop_without_retry' in S.read_text()
+    assert 'if decoder_stop:stop=' in S.read_text()
