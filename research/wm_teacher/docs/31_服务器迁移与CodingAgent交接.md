@@ -1,4 +1,21 @@
-# 当前持续目标与新集群独占冲突（2026-11-03）
+# 当前接手状态与真实阻断（2026-11-04）
+
+持续SOTA目标未完成。以下为当前已验收事实；后面的2026-11-03章节是历史记录，不能当当前授权或运行状态。
+
+- 新增168GPUh已获授权，阶段独立帽：标签/cache96、技术8、受门控Teacher训练/评测64；旧23.832564878标签费用及所有失败claim保留。
+- 完整Wan5B A800/FA2合成单卡精确恢复003通过：4reference vs 2prefix+新进程2resume，adapter/AdamW/Python/CPU/CUDA RNG及后两步轨迹精确相等。审计 `eval/teacher_progress_campaign_20261104/a800_exact_resume003/completion.independent_audit.json`。这是本冻结配置技术证据，不是多节点准入或模型质量。
+- 固定32例标注003已完整执行：30结构合格、2词数失败；独立AI评审004：23 adequate、7 needs_edit，完整分母32。不是人工gold；结构32/32与语义批准仍未通过。原视频、caption、失败和费用不改。
+- T5/VAE+4项tokenizer六项原SHA独立验收及真实CPU BF16加载通过，512 tokenizer契约通过。缓存真实121帧CPU预处理与首帧精确一致通过，但尚无latent/context缓存生成或监督cache准入。
+- 新原生视频四句JSON协议保持原32例、同16源帧/真实时戳；完整公开1507 passed/3 skipped，本地正常提交 `5cdbedb5b66799e21d0fe56857e602f7edaba0f6`，GitHub写入失败，未形成远端字节收据，未启动新GPU claim。本地commit或CPU通过不等于远端发布成功。
+- Git HTTPS凭据入口失效，已检查helper/env/netrc；现有SSH经用户授权代理及官方主机公钥验证到达GitHub后Permission denied。已一次请求用户恢复本机Git登录/credential helper，勿索要或回显聊天token，勿从历史会话恢复秘密或绕过发布门。
+- 原30条全121帧人工盲审包已准备；本机限时服务 `127.0.0.1:8792`，上限7200秒，后续接手时必须重新核验在线状态。访问令牌仅在私有包 `human_verdicts/access_token`，不公开。当前没有人工判定，不由AI填写reviewer_type=human或替代用户批准。
+- 最新费用账本 `eval/teacher_progress_campaign_20261104/budget.live.json`：新标签已耗20GPUh、含未启动协议预留26/96；技术已耗4.8/8；正式训练/评测0/64。阶段不互借、不自动重试，AR/Student/蒸馏继续关闭。
+
+恢复凭据后先正常push现有提交并独立新克隆核验273白名单文件远端字节，再核对新协议冻结SHA与真实资源入口后执行有限6GPUh分配。任何标签失败或语义不足均不能通过删claim、换病例、放宽精确门救结果。语义及监督cache门通过后才冻结正式候选训练与同协议完整质量评测。当前未提供接近或超过SOTA的直接证据。
+
+---
+
+# 历史持续目标与新集群独占冲突（2026-11-03）
 
 SOTA目标仍在，未完成。两阶段v2已32/32实跑、23结构标签/9失败；独立8B四控制通过，原策略13保留标签中10adequate、v2的23中19adequate，分别换算完整32源分母10/32与19/32，不当人工gold或SOTA质量成绩。
 

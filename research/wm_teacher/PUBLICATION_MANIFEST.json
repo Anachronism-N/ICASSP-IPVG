@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-04 07:46:42 CST",
+  "created_at": "2026-11-04 13:20:22 CST",
   "files": [
     {
       "path": "README.md",
@@ -48,8 +48,8 @@
     },
     {
       "path": "docs/31_服务器迁移与CodingAgent交接.md",
-      "source_sha256": "c9a044dd1d85faeeacb9627fc2656e9cdcd98f3de033a0345f3f6d47feedc497",
-      "snapshot_sha256": "7cb1e0087fbf2b5612e3ce928e9dc406796fbae16e264288471e211c05890e3c"
+      "source_sha256": "55e44a946f0f1b234893ce1f0914ea12f5f6f2fe2dae733aaf6682f8a7b30eac",
+      "snapshot_sha256": "b701574b58cc1f7f6d49563799067aa298269a9f592594dcf1c1d9a88fb701c4"
     },
     {
       "path": "patches/diffsynth_studio_fb337fb.patch",
@@ -343,8 +343,8 @@
     },
     {
       "path": "docs/60_Qwen32B标签一次恢复.md",
-      "source_sha256": "2a3b1f678ceb2beebd830e26b2df2185788fe3f5d14ce3fb2c433a04eac23827",
-      "snapshot_sha256": "2a3b1f678ceb2beebd830e26b2df2185788fe3f5d14ce3fb2c433a04eac23827"
+      "source_sha256": "e782d583aa0d3ba1ff4fd660d06a41cc185731bd929b1eeb2d0a3659ad43d7b8",
+      "snapshot_sha256": "e782d583aa0d3ba1ff4fd660d06a41cc185731bd929b1eeb2d0a3659ad43d7b8"
     },
     {
       "path": "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
@@ -818,8 +818,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "89af642771622872a39eca8f5b8ec76c8b2199680861117a2dae3f21ac172d68",
-      "snapshot_sha256": "89af642771622872a39eca8f5b8ec76c8b2199680861117a2dae3f21ac172d68"
+      "source_sha256": "5f6af5e086df4cc29a86250a5132e6473e02fe2693811e52027cc346da13539a",
+      "snapshot_sha256": "5f6af5e086df4cc29a86250a5132e6473e02fe2693811e52027cc346da13539a"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -838,8 +838,8 @@
     },
     {
       "path": "scripts/vbench_eval.py",
-      "source_sha256": "b9c5b5b6971b836b1234ecf71b46b38f8744646da9a66437b3dfc78be1766873",
-      "snapshot_sha256": "8b5d78f1b8ea36b4ee75db6a6f55f58eb7f18b5020254be33b0ab226300b4927"
+      "source_sha256": "afd5be9f21526effd7944d1ec0faca574afe398145d7418cdb2465a072ee4062",
+      "snapshot_sha256": "9605bd8c8acd351fb1119e13f8c3e9b8767e8be36101adf27df5c386dc329015"
     },
     {
       "path": "scripts/score_pool.py",
@@ -1137,6 +1137,11 @@
       "snapshot_sha256": "f7c24925c0252419f7d06a9b7ad745e9b676e4177ef99f3c032ed34c9c8f261c"
     },
     {
+      "path": "tests/test_vbench_eval.py",
+      "source_sha256": "1c57e6ccd603c90baf4b97faa211f5627bc10709269929b2691382610d13021e",
+      "snapshot_sha256": "1c57e6ccd603c90baf4b97faa211f5627bc10709269929b2691382610d13021e"
+    },
+    {
       "path": "tests/test_run_teacher_probe.py",
       "source_sha256": "adc6b60e5db7f9de04ed456ebff8146bedbec17009995c2d1a362be4bc03eb11",
       "snapshot_sha256": "adc6b60e5db7f9de04ed456ebff8146bedbec17009995c2d1a362be4bc03eb11"
@@ -1380,7 +1385,7 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "80a28a5aff4b0f4a5859c44b5aa347bae4eff643",
+  "preserved_public_base_commit": "5cdbedb5b66799e21d0fe56857e602f7edaba0f6",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
     "docs/60_Qwen32B标签一次恢复.md",
@@ -1414,6 +1419,7 @@
     "scripts/run_teacher_training_smoke.py",
     "scripts/teacher_gpu_exclusive.py",
     "scripts/train_e3_lora.py",
+    "scripts/vbench_eval.py",
     "scripts/verify_teacher_history.py",
     "tests/test_e3_train.py",
     "tests/test_teacher_a800_exact_resume.py",
@@ -1423,6 +1429,7 @@
     "tests/test_teacher_qwen3vl32b_pilot.py",
     "tests/test_teacher_qwen3vl32b_recovery.py",
     "tests/test_teacher_single_gpu_admission.py",
-    "tests/test_teacher_temporal_labels.py"
+    "tests/test_teacher_temporal_labels.py",
+    "tests/test_vbench_eval.py"
   ]
 }

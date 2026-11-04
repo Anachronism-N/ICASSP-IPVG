@@ -249,3 +249,16 @@ allocation004_temporal独立冻结4卡5400秒/6GPUh，先前20/96全部保留；
 facts仍使用原v2提示、1024 token与exact实体/events验证器。caption改为exact JSON四字符串，提示每句12–22词、共48–88词；仅以单空格连接原字符串，禁止裁剪、补词、重写，之后原40..120词/grounding/元数据拒绝门仍执行。greedy、384 token、EOS完整要求不变；任一失败整体32/32 FAIL，所有病例/失败费用保留。不使用AI判断作为自动修订指令，不事后把旧caption改成功。
 
 新独立入口复用原媒体、模型、运行时和精确验证工具；创建GPU claim前检查原病例与原冻结视频/model/UUID完全相同、控制器真实PIDFD能力和公开远端字节。所有卡的自有限时lease、精确已确认holder TERM、未知任务拒绝、终态原模式恢复和预算包括完整资源生命周期。CPU协议回归和完整公开测试及远端独立核验后才可执行。本协议不保证语义改善，实机结果及随后独立review另记；正式训练/AR/Student/蒸馏保持关闭。
+
+
+## 18. 官方完整评测协议接线（2026-11-04，仅CPU开发）
+
+原build_eval_jobs.py只生成355非camera、seed0作业；原vbench_eval.py只期待8维的-0.mp4，并把每维结果解释为[mean,rows]。官方camera真实返回[mean,type_means,rows]，不能直接复用该解析器或把已有355视频当官方完整评测。
+
+官方metadata现有1118图文对＝355core＋763camera，camera涵盖109图像×7指令；每对5视频，共5590/冻结模型（core1775、camera3815）。当前355张本地16:9输入均存在，文件名归一化无冲突。完整CPU覆盖清单在eval/teacher_progress_campaign_20261104/vbench_official_complete_coverage.preflight.json准备，逐图像hash仅绑定当前本地字节，不自行证明官方裁剪来源或分辨率对齐；五个seed是独立、非按结果选择的前瞻提案，不是实际执行注册。
+
+vbench_eval.py新增显式--official-five：使用独立videos_official5、staging与scores_official5目录，官方全部九维/5590集合严格检查，不能借用旧355或旧八维结果。camera按三项结构验证逐视频集合、七类型均值、总体均值和分类对应0/1分数一致性；dynamic原bool格式保持，其它结果必须是有限数值。已有无效官方结果保留并拒绝自动重评分；原默认legacy流程与原结果目录不改。15项CPU回归通过，包括camera缺项/重复/不一致、全量五次集合、视频不足时评分前停止、无效原结果不覆盖。没有GPU评分或新质量收益证据。
+
+实际camera后端的现有官方代码使用浮动torch.hub co-tracker/cotracker2并包含TLS失败后的关闭证书验证分支。正式执行前仍必须冻结适配backend源码、原权重和正常TLS/离线加载路径，不能直接运行该浮动网络分支。未加载该camera模型或下载权重；未宣称外部榜单checkpoint或采样对齐完成。完整质量评测仍受候选/语义/监督cache/远端源码与有限预算门约束。
+
+官方五采样模式另补评分输入按模型字节绑定：同名staging视频必须与源SHA一致；每模型score_inputs绑定视频、官方metadata和评分脚本SHA。已有评分没有绑定、metadata或视频字节变化均保留原评分并拒绝复用，不能用旧同名结果污染新候选。CPU测试覆盖跨模型独立绑定及旧默认结果契约，未GPU评分。
