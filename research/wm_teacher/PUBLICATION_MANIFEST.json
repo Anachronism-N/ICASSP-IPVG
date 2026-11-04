@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-04 14:17:08 CST",
+  "created_at": "2026-11-04 14:33:46 CST",
   "files": [
     {
       "path": "README.md",
@@ -333,13 +333,23 @@
     },
     {
       "path": "scripts/run_teacher_temporal_labels.py",
-      "source_sha256": "6e5f60ad594c2ff218d1d352379f2d238a28ca008af75a10bc2523ff5987b653",
-      "snapshot_sha256": "6e5f60ad594c2ff218d1d352379f2d238a28ca008af75a10bc2523ff5987b653"
+      "source_sha256": "5f3d31ddbd68f352ed1dd04eaf327a9f888adeca543432b41132fc72d6583277",
+      "snapshot_sha256": "5f3d31ddbd68f352ed1dd04eaf327a9f888adeca543432b41132fc72d6583277"
     },
     {
       "path": "tests/test_teacher_temporal_labels.py",
-      "source_sha256": "9344c619bb06fab4b08cbe16a07e65a22a06d536a63017fe271e4a302b0b6d78",
-      "snapshot_sha256": "9344c619bb06fab4b08cbe16a07e65a22a06d536a63017fe271e4a302b0b6d78"
+      "source_sha256": "ba4cf4e5dc01e33e2a28a5baa00d9d23bbf0e065c0b75fbe888932448b2791b5",
+      "snapshot_sha256": "ba4cf4e5dc01e33e2a28a5baa00d9d23bbf0e065c0b75fbe888932448b2791b5"
+    },
+    {
+      "path": "scripts/teacher_structured_decoder.py",
+      "source_sha256": "841f87ae32ec6a0ca6625d8cb323c54d08ccc120fa15c7160d7199ebdfb0725c",
+      "snapshot_sha256": "841f87ae32ec6a0ca6625d8cb323c54d08ccc120fa15c7160d7199ebdfb0725c"
+    },
+    {
+      "path": "tests/test_teacher_structured_decoder.py",
+      "source_sha256": "ec73a70ac408e3275146a30481b7740d9c86c6c2b3c8b1e60b550934d0e4b85b",
+      "snapshot_sha256": "ec73a70ac408e3275146a30481b7740d9c86c6c2b3c8b1e60b550934d0e4b85b"
     },
     {
       "path": "scripts/run_teacher_encoder_cache_probe.py",
@@ -353,8 +363,8 @@
     },
     {
       "path": "docs/60_Qwen32B标签一次恢复.md",
-      "source_sha256": "09a54aa8ff1a49741697cedf123cd0875754f36cfa20140f2868aa685a103a16",
-      "snapshot_sha256": "09a54aa8ff1a49741697cedf123cd0875754f36cfa20140f2868aa685a103a16"
+      "source_sha256": "6522026fc1cdb50dfcb88a6d44d554b964459c73195cee9d48f17e65f4df0511",
+      "snapshot_sha256": "6522026fc1cdb50dfcb88a6d44d554b964459c73195cee9d48f17e65f4df0511"
     },
     {
       "path": "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
@@ -828,8 +838,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "a92e8a205da452bfff56b98f3fca3653751f1349da0f4a16cfcaa4e8aa6a435b",
-      "snapshot_sha256": "a92e8a205da452bfff56b98f3fca3653751f1349da0f4a16cfcaa4e8aa6a435b"
+      "source_sha256": "5dafeeccd4ab68241a4d0f94cb95779a4ed39e8309852124fd78f8d6ddb4c454",
+      "snapshot_sha256": "5dafeeccd4ab68241a4d0f94cb95779a4ed39e8309852124fd78f8d6ddb4c454"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -1400,7 +1410,7 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "9e701e3e3d58c8450c3f88bb66975e3fc0eeb31a",
+  "preserved_public_base_commit": "ccfd787647f2d25ef5e8b4e25ad55ba1a390b965",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
     "docs/60_Qwen32B标签一次恢复.md",
@@ -1436,6 +1446,7 @@
     "scripts/run_teacher_temporal_labels.py",
     "scripts/run_teacher_training_smoke.py",
     "scripts/teacher_gpu_exclusive.py",
+    "scripts/teacher_structured_decoder.py",
     "scripts/train_e3_lora.py",
     "scripts/vbench_eval.py",
     "scripts/verify_teacher_history.py",
@@ -1449,6 +1460,7 @@
     "tests/test_teacher_qwen3vl32b_pilot.py",
     "tests/test_teacher_qwen3vl32b_recovery.py",
     "tests/test_teacher_single_gpu_admission.py",
+    "tests/test_teacher_structured_decoder.py",
     "tests/test_teacher_temporal_labels.py",
     "tests/test_vbench_eval.py"
   ]

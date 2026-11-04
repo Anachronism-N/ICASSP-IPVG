@@ -278,3 +278,17 @@ semantic_review005预注册单卡3600秒/1GPUh，使用同独立8B、七字段�
 ### Encoder/cache实际API技术准入（非监督缓存）
 
 encoder_cache_probe001独立冻结单卡GPU4、720秒/0.2GPUh，计入技术8阶段，先前4.8保留，新预留5.0/8。只使用程序化完整121帧1280×704常色视频与固定合成描述，不用任何未准入真实标签。复用实际cache_e3_inputs的T5/VAE加载、原tiled尺寸和encode函数；要求BF16 CPU输出x0[1,48,31,44,80]、first[1,48,1,44,80]、context[1,512,4096]有限，重复T5 context精确一致。输出仅是私有合成技术张量，不生成监督cache_index或训练样本清单、不执行DiT update，semantic_training_approval与formal_training_allowed仍false。原encoder六pin、环境、源码、资源身份、完整公开回归与远端字节门通过后才运行，不自动重试。
+
+## 20. 原生视频004失败结案与新解码预注册（2026-11-04）
+
+004同32病例全部实跑，14成功/18接口失败（8 JSONDecodeError、9 DenyMatch、1 ValueError；caption_validate12、facts_parse6），整体FAIL。1466.188847秒/实际1.629098719GPUh，保守6GPUh；释放和原模式复原通过，原claim、错误与执行源码已逐SHA私有保留。没有据此启动训练，旧失败不退款、不重跑原设置。独立review005四控制通过、14段全部实际评分：13 adequate/1需改，完整来源覆盖13/32；旧策略23/32，新策略13/32，不能用13/14条件率声称泛化更好或SOTA收益。
+
+真实encoder/cache技术探针001另已成功：合成完整121帧、原VAE/T5 API产生x0/first/context原形状的CPU BF16有限张量，重复T5 context精确相等，文件与张量SHA独立CPU复核。实际0.030331711GPUh、保守0.2，技术累计5.0/8。它不使用真实未准入caption、不写监督cache_index、不执行DiT update，不替代监督缓存准入。
+
+### 独立allocation005_schema，不是原失败自动重试
+
+从已批准96标签阶段另冻结6GPUh，先前27全部保留，新上界33/96。同32病例、原16帧时戳、相同两阶段prompt/greedy/1024+384token/原40..120词与实体关联、安全、EOS门；唯一解码协议改动是实际JSON schema约束＋已验证的固定拒绝词掩码。四字符串JSON仅单空格连接、不剪裁补词重写。facts语法明确五个原键、实体与事件类型、显示索引0–15整数枚举；顺序实体ID与跨实体事件关联仍由原验证器核验，不靠schema假装语义正确。库数值minimum/maximum在真实CPU测试中未生效，已改明确整数enum而非放宽范围；实际库回归22项通过。
+
+LM-format-enforcer0.11.3、interegular0.3.3和纯Python pydantic1.10.24只放新隔离site，官方wheel和成员SHA留证；未改运行中venv或旧环境。真实Qwen tokenizer四字符串合法/非法字符与token路径CPU探针通过，EOS与完整数组边界对应；不会据CPU测试宣称实际模型输出通过。新worker须先在真实CUDA3 BF16 logits与CPU input_ids上执行短语法/拒绝词掩码准入，通过后才加载32B，避免再用完整模型查掩码设备错误。任何失败整体保留，不自动重试、不复用004claim。
+
+旧004独立审计曾误用系统Python3.11导致PEP701源码解析失败；改用已冻结Python3.12仅做CPU审计后通过，没有重跑GPU或篡改原结果。

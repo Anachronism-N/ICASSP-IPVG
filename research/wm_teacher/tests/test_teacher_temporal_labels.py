@@ -82,3 +82,22 @@ def test_cost_clock_precedes_prelaunch_hashes_and_claim():
     claim=next(n for n in ast.walk(run) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id=='save')
     assert started.lineno<verify.lineno<claim.lineno
     assert 'CAP-60-(time.monotonic()-started)' in S.read_text()
+
+
+def test_schema_allocation_is_separate_and_preserves_original32_and_word_gates(monkeypatch):
+    for k in ('E','AUTH_SHA','SCHEMA_DECODE'):
+        monkeypatch.setattr(a,k,getattr(a,k))
+    monkeypatch.setattr(sys,'path',list(sys.path))
+    a.configure_schema()
+    cfg=a.config()
+    assert a.E.name=='allocation005_schema' and cfg['source_frames']==16
+    assert cfg['source_indices']==list(range(0,121,8)) and cfg['caption_words']==[40,120]
+    assert cfg['facts_max_tokens']==1024 and cfg['caption_max_tokens']==384
+    assert cfg['do_sample'] is False and cfg['formal_training_allowed'] is False
+    assert cfg['decoding']=='JSON_schema_and_original_deny_vocabulary'
+
+
+def test_original_caption_validator_not_relaxed_in_schema_mode(monkeypatch):
+    monkeypatch.setattr(a,'SCHEMA_DECODE',True)
+    assert a.parse_caption(json.dumps(SENTENCES))==' '.join(SENTENCES)
+    with pytest.raises(ValueError):a.parse_caption(json.dumps(['short.']*4))
