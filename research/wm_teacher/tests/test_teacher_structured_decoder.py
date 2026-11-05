@@ -120,3 +120,65 @@ def test_boundary_trie_uses_character_grammar_not_unfiltered_quote_allowlist():
         token_enforcer = SimpleNamespace(prefix_states={(3,): SimpleNamespace(parser=parser)})
         def __call__(self, batch, sent): return [7]
     assert instance.boundary_prefix(Prefix())(0, torch.tensor([3])) == [7, 10]
+
+
+def test_bounded_facts_is_separate_keeps_original_structure_and_caption_gate():
+    schema = decoder.bounded_facts_schema()
+    assert 'maxLength' not in decoder.FACTS_SCHEMA['properties']['scene']
+    assert schema['required'] == decoder.FACTS_SCHEMA['required']
+    assert schema['properties']['entities']['maxItems'] == 32
+    assert schema['properties']['events']['maxItems'] == 128
+    assert schema['properties']['scene']['maxLength'] == 160
+    assert schema['properties']['events']['items']['properties']['action']['maxLength'] == 120
+    assert decoder.CAPTION_SCHEMA['minItems'] == decoder.CAPTION_SCHEMA['maxItems'] == 4
+    lm = pytest.importorskip('lmformatenforcer')
+    prefix = '{"scene":"' + 'a' * 160
+    parser = lm.JsonSchemaParser(schema)
+    for char in prefix:
+        assert char in parser.get_allowed_characters()
+        parser = parser.add_character(char)
+    assert parser.get_allowed_characters() == '"'
+    assert not parser.can_end()
+
+
+def test_actual_Qwen_bounded_string_forbids_adversarial_continuation_without_EOS_repair():
+    pytest.importorskip('lmformatenforcer')
+    model = Path('/opt/models/Qwen3-VL-32B-Instruct')
+    if not (model/'tokenizer.json').exists():
+        pytest.skip('Frozen local tokenizer is required for actual CPU contract')
+    import torch
+    from transformers import AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained(model, local_files_only=True)
+    eos = json.loads((model/'generation_config.json').read_bytes())['eos_token_id']
+    sample = dict(scene='a' * 160, rendered_or_screen=False,
+        entities=[dict(id='E1', description='A red disk', held_object=None)], events=[],
+        start_end_difference='No visible change.')
+    import run_teacher_qwen3vl32b_recovery as original
+    assert original.validate_facts(sample) == sample
+    for bounded in (False, True):
+        instance = decoder.StructuredDecoder(tokenizer, eos, bounded=bounded)
+        constraints = instance.constraints(True)
+        fn = constraints['prefix_allowed_tokens_fn']
+        prompt = tokenizer.encode('Synthetic facts:', add_special_tokens=False)
+        sent = list(prompt)
+        fn(0, torch.tensor(sent))
+        for token in tokenizer.encode('{"scene":"', add_special_tokens=False):
+            assert token in fn(0, torch.tensor(sent))
+            sent.append(token)
+        token = tokenizer.encode('a', add_special_tokens=False)
+        assert len(token) == 1
+        for _ in range(160):
+            assert token[0] in fn(0, torch.tensor(sent))
+            sent.append(token[0])
+        choices = fn(0, torch.tensor(sent))
+        assert (token[0] in choices) is (not bounded)
+        assert tokenizer.eos_token_id not in choices
+        assert tokenizer.encode('"', add_special_tokens=False)[0] in choices
+    fn = decoder.StructuredDecoder(tokenizer, eos, bounded=True).constraints(True)['prefix_allowed_tokens_fn']
+    sent = list(prompt)
+    fn(0, torch.tensor(sent))
+    for token in tokenizer.encode(json.dumps(sample), add_special_tokens=False):
+        assert token in fn(0, torch.tensor(sent))
+        sent.append(token)
+    assert tokenizer.eos_token_id in fn(0, torch.tensor(sent))
+    assert not torch.cuda.is_initialized()

@@ -315,3 +315,12 @@ LM-format-enforcer0.11.3、interegular0.3.3和纯Python pydantic1.10.24只放新
 - CPU合成完整facts路径发现lm-format-enforcer自由文本快捷路径拒绝合法跨闭合引号token；候选修复仅为小型边界token树，逐字符沿原JSON语法检查，不后处理文本、不放宽原词数/实体/EOS门。该发现不是实机失败唯一根因或语义质量证据。
 - boundary006独立协议绑定schema005审计/claim与旧review，保留同32病例、16源帧、prompt、greedy和1024/384 token。模型加载前验收完整合成facts及四句caption的CPU输入/GPU BF16 logits路径。首个未EOS或AssertionError即停止后续病例，32分母与未尝试记录保留，不自动重试。
 - 新分配最多6 GPUh，标签阶段已耗33，新预留39/96；技术5/8，正式训练评测0/64。完整测试、正常push与独立远端字节门通过前不开新GPU任务。语义批准、监督cache、正式训练和对齐SOTA证据仍缺失，不将CPU回归称为模型成绩。
+
+
+## 30. boundary006早停失败与有界facts后续（2026-11-05）
+
+- boundary006已通过1570完整测试、279文件远端独立字节核验并实际加载四卡BF16。首例facts耗尽1024 token、grammar_can_end=false、inside_freetext=true；不能从未保留原文推断具体循环内容或宣布唯一根因。
+- 早停执行：1例尝试失败、31未尝试、0/32标签。实际0.352718508GPUh；保守记6，标签累计39/96，技术5/8，正式训练评测0/64。原时点释放和模式恢复通过；后续新占卡不算本实验泄漏。
+- 原独立审计因未尝试记录缺failure_reason，None与字符串键混合排序失败；不完整原件保留，另存v2完整CPU审计并绑定原执行源码归档与原释放凭证。未重复GPU。
+- 新有界facts仅在独立后续协议使用：scene/description160字符，held_object80，event action120，net difference200，合法实体E1..E32；仍保持32实体/128事件、原16源帧/32病例/prompt/greedy/1024+384token/40..120词及原实体与EOS验证。不是事后裁剪/补写或语义批准。
+- CPU adversarial160字符继续token被拒、闭合引号允许但EOS仍拒，完整合法facts路径EOS通过；模型加载前需同掩码真实CUDA复核。初稿6GPUh未执行；核对当前GPU0/1新占卡身份不符合原准入后，改为仅原物理GPU2/3的两卡BF16方案，新的上限3GPUh，预留计42/96；原初稿文件保留、未消耗费用不作为退款。首例未EOS或断言仍立即停止。所有标签/监督cache/正式训练与SOTA门仍未通过。

@@ -16,6 +16,9 @@ AUTH_SHA='e911d18de9140b202fc3e31e0ebefe447804f7dadf907e121c701a15caf0c0bb'
 CAP=5400
 SCHEMA_DECODE=False
 BOUNDARY_DECODE=False
+BOUNDED_DECODE=False
+CARDS=4
+UPPER_GPUH=6
 DECODER_SITE=Path('/dockerdata/wm_json_decoder_CPU_20261104/site')
 STRUCTURED_INSTANCE=None
 PYTHON='/dockerdata/venv_qwen32b_20261103/bin/python3.12'
@@ -45,6 +48,16 @@ def configure_boundary():
     BOUNDARY_DECODE=True
 
 
+def configure_bounded():
+    global E,AUTH_SHA,BOUNDED_DECODE,CARDS,UPPER_GPUH
+    configure_boundary()
+    E=ROOT/'eval/teacher_progress_campaign_20261104/allocation007_bounded'
+    AUTH_SHA='312240ef08313c754ccc6c1ff313eaa1dae435e18049ff78496958d5609121c1'
+    BOUNDED_DECODE=True
+    CARDS=2
+    UPPER_GPUH=3
+
+
 def helpers():
     sys.path.insert(0,str(ROOT/'scripts'))
     import run_teacher_qwen3vl32b_recovery as r
@@ -61,19 +74,19 @@ def save(path,value):
     return helpers()[0].write_new(path,value)
 
 def authorization():
-    row=record(E/('authorization.final.json' if BOUNDARY_DECODE else 'authorization.json'));assert row['sha256']==AUTH_SHA
+    row=record(E/('authorization.twocard.json' if BOUNDED_DECODE else 'authorization.final.json' if BOUNDARY_DECODE else 'authorization.json'));assert row['sha256']==AUTH_SHA
     a=read(row)
     assert record(E.parent/'campaign.authorization.json')['sha256']==a['parent_campaign_sha256']
-    assert a['allocated_cards']==4 and a['wall_cap_seconds']==CAP and a['upper_GPUh']==6
-    assert a['prior_new_label_GPUh']==(33 if BOUNDARY_DECODE else 27 if SCHEMA_DECODE else 20)
-    assert a['prior_historical_label_GPUh']==(56.832564877520134 if BOUNDARY_DECODE else 50.832564877520134 if SCHEMA_DECODE else 43.832564877520134)
-    assert a['prior_new_label_GPUh']+6<=a['stage_label_cap_GPUh']==96
+    assert a['allocated_cards']==CARDS and a['wall_cap_seconds']==CAP and a['upper_GPUh']==UPPER_GPUH
+    assert a['prior_new_label_GPUh']==(39 if BOUNDED_DECODE else 33 if BOUNDARY_DECODE else 27 if SCHEMA_DECODE else 20)
+    assert a['prior_historical_label_GPUh']==(62.832564877520134 if BOUNDED_DECODE else 56.832564877520134 if BOUNDARY_DECODE else 50.832564877520134 if SCHEMA_DECODE else 43.832564877520134)
+    assert a['prior_new_label_GPUh']+UPPER_GPUH<=a['stage_label_cap_GPUh']==96
     assert a['cases']==32 and a['source_frames']==16 and a['source_indices']==list(range(0,121,8))
     assert a['caption_words']==[40,120] and a['automatic_retry_allowed'] is False
     assert not a['formal_training_allowed'] and not a['semantic_approval']
     if SCHEMA_DECODE:
-        previous=E.parent/('allocation005_schema' if BOUNDARY_DECODE else 'allocation004_temporal')
-        assert record(previous/'completion.independent_audit.json')['sha256']==a['previous_native_audit_sha256']
+        previous=E.parent/('allocation006_boundary' if BOUNDED_DECODE else 'allocation005_schema' if BOUNDARY_DECODE else 'allocation004_temporal')
+        assert record(previous/('completion.independent_audit.v2.json' if BOUNDED_DECODE else 'completion.independent_audit.json'))['sha256']==a['previous_native_audit_sha256']
         assert record(previous/'run01/attempt.claim')['sha256']==a['previous_claim_sha256']
         assert record(E.parent/'semantic_review005/completion.independent_audit.json')['sha256']==a['previous_review_sha256']
         probe=record(E/'actual_CPU_probe.final.json' if BOUNDARY_DECODE else DECODER_SITE.parent/'actual_CPU_probe.json')
@@ -81,13 +94,13 @@ def authorization():
         if BOUNDARY_DECODE:
             proof=read(probe);assert proof['success'] and not proof['CUDA_initialized']
             assert proof['source_sha256']==record(ROOT/'scripts/teacher_structured_decoder.py')['sha256']
-            prior=read(record(previous/'completion.independent_audit.json'))
-            assert prior['cases_attempted']==32 and prior['labels']==0 and prior['released'] and prior['modes_restored']
+            prior=read(record(previous/('completion.independent_audit.v2.json' if BOUNDED_DECODE else 'completion.independent_audit.json')))
+            assert prior['cases_attempted']==(1 if BOUNDED_DECODE else 32) and prior['labels']==0 and prior['released'] and prior['modes_restored']
     return a,row
 
 def config():
     r,_=helpers();r.configure_prompt_v2()
-    value=dict(model=MODEL,dtype='bfloat16',cards=4,do_sample=False,source_frames=16,
+    value=dict(model=MODEL,dtype='bfloat16',cards=CARDS,do_sample=False,source_frames=16,
         source_fps=24,source_indices=list(range(0,121,8)),resize=[640,352],
         do_sample_frames=False,temporal_patch_size=2,facts_max_tokens=1024,caption_max_tokens=384,
         caption_words=[40,120],facts_prompt_sha256=hashlib.sha256(r.FACTS_PROMPT.encode()).hexdigest(),
@@ -101,17 +114,20 @@ def config():
     if BOUNDARY_DECODE:
         value['decoder_boundary_tokens']='character_validated_quote_crossing_trie_v1'
         value['stop_on_generation_without_EOS_or_AssertionError']=True
+    if BOUNDED_DECODE:
+        value['facts_schema']=structured.bounded_facts_schema()
+        value['bounded_facts_strings']=True
     return value
 
 def prepare(output=None):
     r,g=helpers();a,auth=authorization()
-    original=record(E.parent/('allocation005_schema/plan.ready.json' if BOUNDARY_DECODE else 'allocation004_temporal/plan.ready.json' if SCHEMA_DECODE else 'allocation003/plan.execution003.ready.json'))
+    original=record(E.parent/('allocation006_boundary/plan.final.json' if BOUNDED_DECODE else 'allocation005_schema/plan.ready.json' if BOUNDARY_DECODE else 'allocation004_temporal/plan.ready.json' if SCHEMA_DECODE else 'allocation003/plan.execution003.ready.json'))
     assert original['sha256']==a['original_plan_sha256'];p=read(original)
-    audit=record(E.parent/('allocation005_schema/completion.independent_audit.json' if BOUNDARY_DECODE else 'allocation004_temporal/completion.independent_audit.json' if SCHEMA_DECODE else 'allocation003/completion.audit.json'))
+    audit=record(E.parent/('allocation006_boundary/completion.independent_audit.v2.json' if BOUNDED_DECODE else 'allocation005_schema/completion.independent_audit.json' if BOUNDARY_DECODE else 'allocation004_temporal/completion.independent_audit.json' if SCHEMA_DECODE else 'allocation003/completion.audit.json'))
     review=record(E.parent/('semantic_review005/completion.independent_audit.json' if SCHEMA_DECODE else 'semantic_review004/completion.independent_audit.json'))
     if not SCHEMA_DECODE:
         assert audit['sha256']==a['original_audit_sha256'] and review['sha256']==a['previous_review_sha256']
-    assert read(audit)['cases_attempted']==32 and read(review)['all_cases_denominator']==32
+    assert read(audit)['cases_attempted']==(1 if BOUNDED_DECODE else 32) and read(review)['all_cases_denominator']==32
     jobs=[dict(index=j['index'],group=j['group'],video=j['video']) for j in p['jobs']]
     assert [j['index'] for j in jobs]==list(range(32))
     for j in jobs:r.check(j['video'])
@@ -120,7 +136,7 @@ def prepare(output=None):
     if SCHEMA_DECODE:names+=('scripts/teacher_structured_decoder.py','tests/test_teacher_structured_decoder.py')
     plan=dict(schema='teacher_temporal_json_plan_v1',authorization=auth,original=original,
         original_audit=audit,previous_review=review,jobs=jobs,model=p['model'],runtime=r.runtime(),
-        source={n:record(ROOT/n) for n in names},gpu_uuids=p['gpu_uuids'],hostname=os.uname().nodename,
+        source={n:record(ROOT/n) for n in names},gpu_uuids=p['gpu_uuids'][-2:] if BOUNDED_DECODE else p['gpu_uuids'],hostname=os.uname().nodename,
         resource_control_runtime=g.control_runtime(),config=config(),output_root=a['output_root'],
         automatic_retry_allowed=False,semantic_approval=False,formal_training_allowed=False)
     if SCHEMA_DECODE:
@@ -137,11 +153,11 @@ def verify(path,digest):
     assert [j['group'] for j in p['jobs']]==['diagnostic']*16+['blind']*16
     original=read(p['original'])
     assert p['jobs']==[dict(index=j['index'],group=j['group'],video=j['video']) for j in original['jobs']]
-    assert p['model']==original['model'] and p['gpu_uuids']==original['gpu_uuids']
+    assert p['model']==original['model'] and p['gpu_uuids']==(original['gpu_uuids'][-2:] if BOUNDED_DECODE else original['gpu_uuids'])
     for row in [p['original'],p['original_audit'],p['previous_review'],*p['source'].values()]:r.check(row)
     for m in p['model']['models']:r.check({k:m[k] for k in ('path','bytes','sha256')})
     for j in p['jobs']:r.check(j['video'])
-    assert len(p['gpu_uuids'])==len(set(p['gpu_uuids']))==4
+    assert len(p['gpu_uuids'])==len(set(p['gpu_uuids']))==CARDS
     if SCHEMA_DECODE:
         assert p['decoder_runtime_files']
         for row in p['decoder_runtime_files']:r.check(row)
@@ -194,18 +210,19 @@ def worker(args):
     assert os.environ['HF_HUB_OFFLINE']==os.environ['TRANSFORMERS_OFFLINE']=='1'
     import torch
     from transformers import AutoProcessor,Qwen3VLForConditionalGeneration
-    assert torch.cuda.device_count()==4
+    assert torch.cuda.device_count()==CARDS
     started=time.monotonic();end=launch['started_monotonic']+CAP-120;rows=[];worst=0.;stop='completed'
     if SCHEMA_DECODE:
         from teacher_structured_decoder import StructuredDecoder
         processor=AutoProcessor.from_pretrained(MODEL,local_files_only=True)
         eos=json.loads(Path(MODEL,'generation_config.json').read_bytes())['eos_token_id']
-        STRUCTURED_INSTANCE=StructuredDecoder(processor.tokenizer,eos)
-        save(E/'run01/decoder_cuda_admission.json',STRUCTURED_INSTANCE.cuda_admission('cuda:3'))
+        STRUCTURED_INSTANCE=StructuredDecoder(processor.tokenizer,eos,bounded=BOUNDED_DECODE)
+        save(E/'run01/decoder_cuda_admission.json',STRUCTURED_INSTANCE.cuda_admission('cuda:'+str(CARDS-1)))
     model=Qwen3VLForConditionalGeneration.from_pretrained(MODEL,local_files_only=True,
-        torch_dtype=torch.bfloat16,device_map='balanced',max_memory={i:'34GiB' for i in range(4)},attn_implementation='sdpa')
-    r.validate_device_map(model.hf_device_map)
-    assert {v.device.index for v in model.parameters()}==set(range(4))
+        torch_dtype=torch.bfloat16,device_map='balanced',max_memory={i:('70GiB' if BOUNDED_DECODE else '34GiB') for i in range(CARDS)},attn_implementation='sdpa')
+    if BOUNDED_DECODE:assert set(model.hf_device_map.values())==set(range(CARDS))
+    else:r.validate_device_map(model.hf_device_map)
+    assert {v.device.index for v in model.parameters()}==set(range(CARDS))
     assert all(v.device.type=='cuda' and v.dtype==torch.bfloat16 for v in model.parameters())
     processor=AutoProcessor.from_pretrained(MODEL,local_files_only=True);load_seconds=time.monotonic()-started
     decoder_stop=False
@@ -251,7 +268,7 @@ def run(args):
     import run_teacher_label_semantic_review as review
     review.publication(p,receipt['commit'],str(E/'publication.remote_bytes.json'),time.monotonic()+120)
     initial={u:g.query_modes()[u] for u in p['gpu_uuids']}
-    assert sorted(v['index'] for v in initial.values())==list(range(4))
+    assert sorted(v['index'] for v in initial.values())==([2,3] if BOUNDED_DECODE else list(range(4)))
     assert all(v['mode'] in ('Default','Exclusive_Process') for v in initial.values())
     assert time.monotonic()-started<CAP-120, 'Prelaunch checks must fit full lifecycle cap'
     output=E/'run01';output.mkdir(mode=0o700)
@@ -277,7 +294,8 @@ def run(args):
         env=dict(os.environ,CUDA_VISIBLE_DEVICES=','.join(p['gpu_uuids']),HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',OMP_NUM_THREADS='1')
         with (output/'worker.log').open('xb') as log:
             command=[PYTHON,str(Path(__file__).resolve()),'worker','--plan',args.plan,'--sha',args.sha]
-            if BOUNDARY_DECODE:command.insert(2,'--boundary-decode')
+            if BOUNDED_DECODE:command.insert(2,'--bounded-decode')
+            elif BOUNDARY_DECODE:command.insert(2,'--boundary-decode')
             elif SCHEMA_DECODE:command.insert(2,'--schema-decode')
             child=subprocess.Popen(command,stdout=log,stderr=subprocess.STDOUT,env=env,start_new_session=True)
             child.wait(timeout=max(1,CAP-120-(time.monotonic()-started)))
@@ -303,19 +321,20 @@ def run(args):
         elapsed=time.monotonic()-started
         result=dict(success=error is None and released and restored and elapsed<=CAP,
             cases_denominator=32,labels=sum(v['success'] for v in labels),errors=sum(not v['success'] for v in labels),
-            terminal=True,error_type=error,elapsed_seconds=elapsed,actual_GPUh=4*elapsed/3600,
-            charged_upper_GPUh=max(6,4*elapsed/3600),prior_new_label_GPUh=prior_label,
-            cumulative_new_label_upper_GPUh=prior_label+max(6,4*elapsed/3600),released=released,modes_restored=restored,
+            terminal=True,error_type=error,elapsed_seconds=elapsed,actual_GPUh=CARDS*elapsed/3600,
+            charged_upper_GPUh=max(UPPER_GPUH,CARDS*elapsed/3600),prior_new_label_GPUh=prior_label,
+            cumulative_new_label_upper_GPUh=prior_label+max(UPPER_GPUH,CARDS*elapsed/3600),released=released,modes_restored=restored,
             holder_signals=signals,semantic_approval=False,formal_training_allowed=False,sota_proven=False)
         save(output/'terminal.json',result)
         for s,h in old.items():signal.signal(s,h)
     assert result['success']
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--schema-decode',action='store_true');parser.add_argument('--boundary-decode',action='store_true');parser.add_argument('command',choices=['prepare','verify','run','worker'])
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--schema-decode',action='store_true');parser.add_argument('--boundary-decode',action='store_true');parser.add_argument('--bounded-decode',action='store_true');parser.add_argument('command',choices=['prepare','verify','run','worker'])
     parser.add_argument('--output');parser.add_argument('--plan');parser.add_argument('--sha');parser.add_argument('--gpu-authorized',action='store_true');args=parser.parse_args()
-    assert not (args.schema_decode and args.boundary_decode)
-    if args.boundary_decode:configure_boundary()
+    assert sum((args.schema_decode,args.boundary_decode,args.bounded_decode))<=1
+    if args.bounded_decode:configure_bounded()
+    elif args.boundary_decode:configure_boundary()
     elif args.schema_decode:configure_schema()
     if args.command=='prepare':print(json.dumps(prepare(args.output),sort_keys=True))
     elif args.command=='verify':verify(args.plan,args.sha);print('CPU protocol verified; no GPU allocation')

@@ -116,3 +116,18 @@ def test_boundary_mode_is_independent_preserves_budget_and_stops_decoder_failure
     assert cfg['decoder_boundary_tokens']=='character_validated_quote_crossing_trie_v1'
     assert 'decoder_admission_failed_stop_without_retry' in S.read_text()
     assert 'if decoder_stop:stop=' in S.read_text()
+
+
+def test_bounded_mode_is_new_scope_preserves_original_caps_and_early_stop(monkeypatch):
+    for key in ('E','AUTH_SHA','SCHEMA_DECODE','BOUNDARY_DECODE','BOUNDED_DECODE','CARDS','UPPER_GPUH'):
+        monkeypatch.setattr(a,key,getattr(a,key))
+    monkeypatch.setattr(sys,'path',list(sys.path))
+    a.configure_bounded()
+    cfg=a.config()
+    assert a.E.name=='allocation007_bounded' and cfg['bounded_facts_strings'] is True
+    assert cfg['caption_words']==[40,120] and cfg['source_frames']==16
+    assert cfg['facts_max_tokens']==1024 and cfg['caption_max_tokens']==384
+    assert cfg['facts_schema']['properties']['scene']['maxLength']==160
+    assert cfg['facts_schema']['properties']['events']['maxItems']==128
+    assert cfg['stop_on_generation_without_EOS_or_AssertionError'] is True
+    assert cfg['do_sample'] is False and cfg['formal_training_allowed'] is False

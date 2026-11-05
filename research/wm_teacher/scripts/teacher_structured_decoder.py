@@ -28,10 +28,27 @@ FACTS_SCHEMA = {
 CAPTION_SCHEMA = {'type': 'array', 'items': {'type': 'string'}, 'minItems': 4, 'maxItems': 4}
 
 
+def bounded_facts_schema():
+    from copy import deepcopy
+    schema = deepcopy(FACTS_SCHEMA)
+    props = schema['properties']
+    props['scene']['maxLength'] = 160
+    props['start_end_difference']['maxLength'] = 200
+    entity = props['entities']['items']['properties']
+    entity['id'] = {'type': 'string', 'enum': ['E' + str(i) for i in range(1, 33)]}
+    entity['description']['maxLength'] = 160
+    entity['held_object']['anyOf'][0]['maxLength'] = 80
+    event = props['events']['items']['properties']
+    event['entity_id'] = deepcopy(entity['id'])
+    event['action']['maxLength'] = 120
+    return schema
+
+
 class StructuredDecoder:
-    def __init__(self, tokenizer, eos_ids):
+    def __init__(self, tokenizer, eos_ids, *, bounded=False):
         from lmformatenforcer.integrations.transformers import build_token_enforcer_tokenizer_data
         self.tokenizer = tokenizer
+        self.bounded = bounded
         self.eos_ids = [eos_ids] if type(eos_ids) is int else eos_ids
         if type(self.eos_ids) is not list or not self.eos_ids or tokenizer.eos_token_id not in self.eos_ids:
             raise ValueError('Frozen tokenizer EOS must be an actual configured generation EOS')
@@ -74,7 +91,8 @@ class StructuredDecoder:
         words = original.DENY_DECODE_WORDS + (() if facts_stage else original.CAPTION_DECODE_WORDS)
         forms = {prefix + form for word in words for form in (word, word.title(), word.upper()) for prefix in ('', ' ')}
         ids = [self.tokenizer.encode(form, add_special_tokens=False) for form in sorted(forms)]
-        grammar = JsonSchemaParser(FACTS_SCHEMA if facts_stage else CAPTION_SCHEMA)
+        schema = bounded_facts_schema() if self.bounded and facts_stage else FACTS_SCHEMA if facts_stage else CAPTION_SCHEMA
+        grammar = JsonSchemaParser(schema)
         return {
             'prefix_allowed_tokens_fn': self.boundary_prefix(build_transformers_prefix_allowed_tokens_fn(self.tokenizer_data, grammar)),
             'logits_processor': LogitsProcessorList([original.vectorized_bad_words(ids, self.eos_ids)]),
@@ -97,11 +115,31 @@ class StructuredDecoder:
             tokens = self.tokenizer.encode(text, add_special_tokens=False)
             self.check_token_path(prompt, tokens, constraints, mask, device)
             lengths.append(len(tokens))
+        if self.bounded:
+            constraints = self.constraints(True)
+            fn = constraints['prefix_allowed_tokens_fn']
+            mask = PrefixConstrainedLogitsProcessor(fn, 1)
+            sent = list(prompt)
+            fn(0, torch.tensor(sent, dtype=torch.long))
+            repeated = self.tokenizer.encode('a', add_special_tokens=False)
+            assert len(repeated) == 1
+            path = self.tokenizer.encode('{"scene":"', add_special_tokens=False) + repeated * 160
+            for token in path:
+                assert token in fn(0, torch.tensor(sent, dtype=torch.long))
+                sent.append(token)
+            ids = torch.tensor([sent], dtype=torch.long, device='cpu')
+            scores = torch.zeros((1, len(self.tokenizer)), device=device, dtype=torch.bfloat16)
+            values = constraints['logits_processor'](ids, mask(ids, scores))
+            quote = self.tokenizer.encode('"', add_special_tokens=False)
+            assert len(quote) == 1 and bool(torch.isfinite(values[0, quote[0]]))
+            assert bool(torch.isneginf(values[0, repeated[0]]))
+            assert all(bool(torch.isneginf(values[0, stop])) for stop in self.eos_ids)
         if str(device) != 'cpu':
             torch.cuda.synchronize(device)
         return dict(CPU_input_GPU_score_path_pass=str(device) != 'cpu',
                     synthetic_facts_tokens=lengths[0], synthetic_caption_tokens=lengths[1],
-                    dtype='bfloat16', scores_device=str(device), model_loaded=False)
+                    dtype='bfloat16', scores_device=str(device), model_loaded=False,
+                    bounded_string_CPU_input_score_path_pass=self.bounded)
 
     def check_token_path(self, prompt, tokens, constraints, mask, device):
         import torch
