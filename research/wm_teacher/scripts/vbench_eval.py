@@ -16,6 +16,8 @@ import fcntl
 import hashlib
 import json
 import math
+import importlib
+from pathlib import Path
 import os
 import shutil
 import sys
@@ -28,6 +30,8 @@ VBREPO = "/dockerdata/wm_eval/VBench"
 WORK = "/dockerdata/wm_eval/work"
 DIMS = ["i2v_subject", "i2v_background", "subject_consistency", "background_consistency",
         "motion_smoothness", "dynamic_degree", "aesthetic_quality", "imaging_quality"]
+
+COTRACKER2_WEIGHT_SHA256 = '362f5274376d610dc987b6daf2c2fefe63e06e1835f4ec1a10d0a15c5a4eef4f'
 
 CAMERA_TYPES = {
     'camera pans left': 'pan_left', 'camera pans right': 'pan_right',
@@ -94,6 +98,46 @@ def valid_official_result(result, expected, dimension):
         return False
 
 
+def install_frozen_camera_backend(proof_path):
+    proof = json.loads(Path(proof_path).read_bytes())
+    if proof.get('schema') != 'vbench_camera_offline_backend_v1':
+        raise ValueError('Pinned offline camera backend proof required')
+    if proof['weight']['sha256'] != COTRACKER2_WEIGHT_SHA256:
+        raise ValueError('Exact official CoTracker2 weight SHA required')
+    files = [proof['weight'], proof['camera_source'], *proof['cotracker_sources']]
+    if len({row['path'] for row in files}) != len(files):
+        raise ValueError('Duplicate offline camera source records')
+    for row in files:
+        path = Path(row['path'])
+        if not path.is_file() or path.stat().st_size != row['bytes'] or file_sha256(path) != row['sha256']:
+            raise ValueError('Offline camera source or weight bytes changed')
+    root = Path(proof['cotracker_root']).resolve()
+    if {str(path.resolve()) for path in root.rglob('*.py')} != {str(Path(row['path']).resolve()) for row in proof['cotracker_sources']}:
+        raise ValueError('Complete pinned CoTracker source tree required')
+    expected_camera = Path(VBREPO, 'vbench2_beta_i2v/camera_motion.py').resolve()
+    if Path(proof['camera_source']['path']).resolve() != expected_camera:
+        raise ValueError('Offline backend does not bind the selected official scorer')
+    loaded = sys.modules.get('cotracker')
+    if loaded is not None and Path(loaded.__file__).resolve() != root / '__init__.py':
+        raise ValueError('Previously imported CoTracker source differs')
+    sys.path.insert(0, str(root.parent))
+    predictor = importlib.import_module('cotracker.predictor')
+    if Path(predictor.__file__).resolve() != root / 'predictor.py':
+        raise ValueError('Imported CoTracker predictor differs from the frozen source')
+    camera = importlib.import_module('vbench2_beta_i2v.camera_motion')
+    if Path(camera.__file__).resolve() != expected_camera:
+        raise ValueError('Imported camera scorer differs from frozen source')
+    def offline_init(self, device, submodules_list):
+        if submodules_list != {'repo': 'facebookresearch/co-tracker', 'model': 'cotracker2'}:
+            raise ValueError('Official CoTracker2 camera configuration required')
+        self.device = device
+        self.grid_size = 10
+        self.number_points = 1
+        self.model = predictor.CoTrackerPredictor(checkpoint=proof['weight']['path']).to(device)
+    camera.CameraPredict.__init__ = offline_init
+    return file_sha256(proof_path)
+
+
 def prepare_wm(model):
     """Custom full_info + local copies (VBench decodes every frame; avoid the fuse mount)."""
     cases = [json.loads(l) for l in open(f"{EV}/wm_bench/cases.jsonl")]
@@ -127,13 +171,15 @@ def file_sha256(path):
         return hashlib.file_digest(source, 'sha256').hexdigest()
 
 
-def bind_official_score_inputs(out, model, vdir, full_info, names):
+def bind_official_score_inputs(out, model, vdir, full_info, names, camera_backend=None):
     binding = {
         'protocol': 'vbench_i2v_official_five_v1',
         'metadata_sha256': file_sha256(full_info),
         'scoring_source_sha256': file_sha256(__file__),
         'video_sha256': {name: file_sha256(os.path.join(vdir, name)) for name in sorted(names)},
     }
+    if camera_backend is not None:
+        binding['camera_backend_sha256'] = camera_backend
     path = os.path.join(out, model + '__score_inputs.json')
     if os.path.exists(path):
         if json.load(open(path)) != binding:
@@ -174,12 +220,16 @@ def valid_result(result, expected):
 
 
 def main():
+    global VBREPO
     ap = argparse.ArgumentParser()
     ap.add_argument("--suite", choices=["vbench", "wm"], required=True)
     ap.add_argument("--model", required=True)
     ap.add_argument("--dims", default=None)
     ap.add_argument("--official-five", action="store_true", help="Separate nine-dimension, five-samples-per-pair protocol; no legacy result reuse")
+    ap.add_argument("--vbench-repo", default=VBREPO, help="Explicit frozen local VBench source root")
+    ap.add_argument("--camera-backend", help="Pinned local camera source and official CoTracker2 weight proof")
     a = ap.parse_args()
+    VBREPO = a.vbench_repo
     if a.official_five and a.suite != "vbench":
         ap.error("--official-five applies only to the official vbench suite")
     if a.official_five and (os.path.basename(a.model) != a.model or a.model in (".", "..")):
@@ -227,8 +277,13 @@ def main():
     print(f"[{a.suite}/{a.model}] {n} videos, full_info={full_info}", flush=True)
     if a.dims == "none":
         return
+    camera_binding = None
+    if a.official_five and "camera_motion" in a.dims.split(","):
+        if a.camera_backend is None:
+            raise RuntimeError("Official camera scoring requires a pinned offline backend; floating torch.hub and disabled TLS are forbidden")
+        camera_binding = install_frozen_camera_backend(a.camera_backend)
     if a.official_five:
-        bind_official_score_inputs(out, a.model, vdir, full_info, all_names)
+        bind_official_score_inputs(out, a.model, vdir, full_info, all_names, camera_binding)
     vb = VBenchI2V(torch.device("cuda"), full_info, out)
     for dim in a.dims.split(","):
         result_path = f"{out}/{a.model}__{dim}_eval_results.json"

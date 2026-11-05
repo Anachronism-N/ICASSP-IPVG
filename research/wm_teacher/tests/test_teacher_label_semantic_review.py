@@ -237,3 +237,37 @@ def test_schema_review_scope_keeps_failed_interface_cases_in_32_denominator(temp
     assert len(jobs)==30 and {j['source_index'] for j in jobs}==set(range(32))-{22,30}
     scope['prior_new_label_GPUh']=26
     with pytest.raises(ValueError):review.temporal_inputs(root,scope)
+
+
+def test_bounded_review_keeps_original_rubric_and_is_not_training_approval(monkeypatch):
+    for key in ('CAP','TAIL','ALLOCATION_GPUH','PRIOR_GPUH','AUTH','AUTH_SHA',
+                'CAMPAIGN003','CAMPAIGN004','TEMPORAL','SCHEMA_REVIEW','BOUNDED_REVIEW'):
+        monkeypatch.setattr(review,key,getattr(review,key))
+    prompt=review.PROMPT;fields=review.FIELDS;controls=review.controls()
+    review.configure_bounded_review()
+    assert review.BOUNDED_REVIEW and review.AUTH.parent.name=='semantic_review007'
+    assert review.PRIOR_GPUH==23.832564877520134+42
+    assert review.CAP==3600 and review.ALLOCATION_GPUH==1
+    assert review.PROMPT==prompt and review.FIELDS==fields and review.controls()==controls
+
+
+def test_bounded_review_accepts_two_card_source_cost_not_old_four_card_cost(temporal_evidence,monkeypatch):
+    root,scope=temporal_evidence
+    monkeypatch.setattr(review,'BOUNDED_REVIEW',True)
+    scope['prior_new_label_GPUh']=42
+    path=root/'run01/terminal.json'
+    terminal=json.loads(path.read_bytes());terminal['charged_upper_GPUh']=3
+    path.write_text(json.dumps(terminal))
+    jobs,_,_=review.temporal_inputs(root,scope)
+    assert len(jobs)==30 and {j['source_index'] for j in jobs}==set(range(32))-{22,30}
+    terminal['charged_upper_GPUh']=6;path.write_text(json.dumps(terminal))
+    with pytest.raises(ValueError):review.temporal_inputs(root,scope)
+
+
+def test_bounded_review_rejects_incomplete_source_attempts(temporal_evidence,monkeypatch):
+    root,scope=temporal_evidence
+    monkeypatch.setattr(review,'BOUNDED_REVIEW',True)
+    scope['prior_new_label_GPUh']=42
+    path=root/'run01/terminal.json';v=json.loads(path.read_bytes());v['charged_upper_GPUh']=3;path.write_text(json.dumps(v))
+    path=root/'completion.independent_audit.json';v=json.loads(path.read_bytes());v['cases_attempted']=1;path.write_text(json.dumps(v))
+    with pytest.raises(ValueError):review.temporal_inputs(root,scope)

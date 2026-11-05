@@ -88,8 +88,8 @@ def test_official_mode_does_not_overwrite_existing_invalid_scores(tmp_path,monke
     monkeypatch.setattr(v,'VBREPO',str(repo));monkeypatch.setattr(v,'EV',str(tmp_path/'eval'))
     monkeypatch.setitem(sys.modules,'vbench2_beta_i2v',scorer)
     monkeypatch.setattr(v,'prepare_vbench',lambda *args,**kw:(str(staged),'metadata',5590))
-    monkeypatch.setattr(sys,'argv',[str(S),'--suite','vbench','--model','candidate','--dims','camera_motion','--official-five'])
-    with patch.object(v.os,'chdir'),patch.object(v.os,'listdir',return_value=list(names)),patch.object(v.os.path,'getsize',return_value=1),patch.object(v,'bind_official_score_inputs'),pytest.raises(RuntimeError,match='no automatic retry'):
+    monkeypatch.setattr(sys,'argv',[str(S),'--suite','vbench','--model','candidate','--dims','camera_motion','--official-five','--camera-backend','synthetic_proof'])
+    with patch.object(v.os,'chdir'),patch.object(v.os,'listdir',return_value=list(names)),patch.object(v.os.path,'getsize',return_value=1),patch.object(v,'bind_official_score_inputs'),patch.object(v,'install_frozen_camera_backend',return_value='pinned'),pytest.raises(RuntimeError,match='no automatic retry'):
         v.main()
     assert result_path.read_text()==original
     assert not (tmp_path/'eval/vbench_i2v/scores').exists()
@@ -145,3 +145,58 @@ def test_legacy_result_contract_unchanged():
     result=[0.5,[dict(video_path='scene-0.mp4',video_results=0.5)]]
     assert v.valid_result(result,{'scene-0.mp4'})
     assert not v.valid_result(result,{'scene-1.mp4'})
+
+
+@pytest.fixture
+def offline_camera(tmp_path,monkeypatch):
+    import hashlib
+    root=tmp_path/'third_party/cotracker';root.mkdir(parents=True)
+    camera=tmp_path/'vbench/vbench2_beta_i2v/camera_motion.py';camera.parent.mkdir(parents=True)
+    for p in (root/'__init__.py',root/'predictor.py',camera):p.write_text('synthetic pinned source')
+    weight=tmp_path/'cotracker2.pth';weight.write_bytes(b'synthetic pinned weight')
+    def record(p):return dict(path=str(p),bytes=p.stat().st_size,sha256=hashlib.sha256(p.read_bytes()).hexdigest())
+    proof=dict(schema='vbench_camera_offline_backend_v1',cotracker_root=str(root),weight=record(weight),camera_source=record(camera),cotracker_sources=[record(root/'__init__.py'),record(root/'predictor.py')])
+    path=tmp_path/'backend.json';path.write_text(json.dumps(proof))
+    monkeypatch.setattr(v,'COTRACKER2_WEIGHT_SHA256',proof['weight']['sha256'])
+    calls=[]
+    class Model:
+        def __init__(self,checkpoint):calls.append(checkpoint)
+        def to(self,device):calls.append(device);return self
+    class Camera:
+        def __init__(self,*args):raise AssertionError('Unsafe upstream loader was called')
+    monkeypatch.setitem(sys.modules,'cotracker',SimpleNamespace(__file__=str(root/'__init__.py')))
+    monkeypatch.setitem(sys.modules,'cotracker.predictor',SimpleNamespace(__file__=str(root/'predictor.py'),CoTrackerPredictor=Model))
+    monkeypatch.setitem(sys.modules,'vbench2_beta_i2v.camera_motion',SimpleNamespace(__file__=str(camera),CameraPredict=Camera))
+    monkeypatch.setattr(v,'VBREPO',str(camera.parents[1]))
+    return path,proof,Camera,calls
+
+
+def test_offline_camera_only_loads_pinned_local_weight_without_network_or_TLS_change(offline_camera):
+    import ssl
+    path,proof,Camera,calls=offline_camera;original=ssl._create_default_https_context
+    with patch.object(v.torch.hub,'load',side_effect=AssertionError('No floating hub load')):
+        assert v.install_frozen_camera_backend(path)==v.file_sha256(path)
+        camera=Camera('cpu',{'repo':'facebookresearch/co-tracker','model':'cotracker2'})
+    assert calls==[proof['weight']['path'],'cpu']
+    assert camera.grid_size==10 and camera.number_points==1
+    assert ssl._create_default_https_context is original
+    with pytest.raises(ValueError):Camera('cpu',{'repo':'different','model':'cotracker2'})
+
+
+@pytest.mark.parametrize('changed',['weight','source','extra_source','camera_path'])
+def test_offline_camera_rejects_source_or_weight_drift_before_loading(offline_camera,changed):
+    path,proof,_,calls=offline_camera
+    if changed=='weight':Path(proof['weight']['path']).write_bytes(b'changed')
+    elif changed=='source':Path(proof['cotracker_sources'][0]['path']).write_text('changed')
+    elif changed=='extra_source':(Path(proof['cotracker_root'])/'extra.py').write_text('unexpected')
+    else:proof['camera_source']['path']=proof['cotracker_sources'][1]['path'];path.write_text(json.dumps(proof))
+    with pytest.raises(ValueError):v.install_frozen_camera_backend(path)
+    assert not calls
+
+
+def test_official_score_binding_rejects_backend_change_without_reusing_scores(tmp_path):
+    out=tmp_path/'scores';out.mkdir();videos=tmp_path/'videos';videos.mkdir()
+    (videos/'scene-0.mp4').write_bytes(b'original');metadata=tmp_path/'metadata.json';metadata.write_text('{}')
+    args=(str(out),'candidate',str(videos),str(metadata),{'scene-0.mp4'})
+    assert v.bind_official_score_inputs(*args,camera_backend='original')['camera_backend_sha256']=='original'
+    with pytest.raises(RuntimeError):v.bind_official_score_inputs(*args,camera_backend='changed')

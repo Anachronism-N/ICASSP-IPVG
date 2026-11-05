@@ -324,3 +324,12 @@ LM-format-enforcer0.11.3、interegular0.3.3和纯Python pydantic1.10.24只放新
 - 原独立审计因未尝试记录缺failure_reason，None与字符串键混合排序失败；不完整原件保留，另存v2完整CPU审计并绑定原执行源码归档与原释放凭证。未重复GPU。
 - 新有界facts仅在独立后续协议使用：scene/description160字符，held_object80，event action120，net difference200，合法实体E1..E32；仍保持32实体/128事件、原16源帧/32病例/prompt/greedy/1024+384token/40..120词及原实体与EOS验证。不是事后裁剪/补写或语义批准。
 - CPU adversarial160字符继续token被拒、闭合引号允许但EOS仍拒，完整合法facts路径EOS通过；模型加载前需同掩码真实CUDA复核。初稿6GPUh未执行；核对当前GPU0/1新占卡身份不符合原准入后，改为仅原物理GPU2/3的两卡BF16方案，新的上限3GPUh，预留计42/96；原初稿文件保留、未消耗费用不作为退款。首例未EOS或断言仍立即停止。所有标签/监督cache/正式训练与SOTA门仍未通过。
+
+
+### 有界标签后续语义复核和安全官方评分准备（2026-11-05）
+
+独立review007前瞻模式复用原8B、七字段/四控制/native16证据，只接受有界源全32病例实际尝试、完整费用审计及释放/模式恢复，全部保留success标签进入复核；失败和未尝试仍计完整32分母，不选择高分子集、不修补caption。指定原授权GPU2、最多1GPUh，计划通过后才登记预留。AI adequate不会自行成为真人gold或semantic_training_approval；全121帧本地盲审材料和原视频入口另行准备，未启动listener或填写真人判定。
+
+正式VBench camera离线加载候选保持原CameraPredict推断/分类/评分函数不变，只替换模型构造，固定官方CoTracker2权重SHA和完整本地源码，禁止浮动torch.hub和TLS证书校验关闭；score_inputs绑定离线后端凭证SHA，变更后拒绝复用旧成绩。缺失依赖置于隔离site，不改冻结训练venv的torch/numpy。真实CPU权重、模型构造、隔离依赖文件SHA和26项评分契约测试通过；未执行GPU视频评分，也未证明完整质量/SOTA。
+
+公开DreamX-World-5B-Cam双向checkpoint清单已按不可变修订做CPU盘点，文档默认121帧/704×1280/24fps/50步/CFG3，需显式camera动作。公开5B-Cam与旧榜单DreamX-World-1.0精确checkpoint映射及官方五采样协议未证明；仅作可复现参考，不能据该映射宣称SOTA对齐。未下载参考模型权重、未运行AR。

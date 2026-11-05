@@ -21,6 +21,7 @@ CAMPAIGN003 = False
 CAMPAIGN004 = False
 TEMPORAL = False
 SCHEMA_REVIEW = False
+BOUNDED_REVIEW = False
 PRIOR_GPUH = 20.165898210853467
 AUTH = ROOT / 'eval/teacher_label_semantic_review_20261103/review.authorization.json'
 AUTH_SHA = '8eac69afd4a42f3966bae70bad1d0947a9e44c41fe0eabb673e28cb5dbbc3154'
@@ -83,11 +84,20 @@ def configure_schema_review():
     PRIOR_GPUH=56.832564877520134
 
 
+def configure_bounded_review():
+    global AUTH,AUTH_SHA,PRIOR_GPUH,BOUNDED_REVIEW
+    configure_schema_review()
+    BOUNDED_REVIEW=True
+    AUTH=ROOT/'eval/teacher_progress_campaign_20261104/semantic_review007/review.authorization.json'
+    AUTH_SHA='a3e7688e6bc27c91f6d707dbae25a3e9b1f2e087429fd5a57f0f0185e53d597d'
+    PRIOR_GPUH=65.83256487752013
+
+
 def temporal_inputs(root, scope):
     r,_=helpers()
     root=Path(root)
     require(root.is_absolute() and root.resolve()==root and str(root)==scope['source_root'], 'Exact temporal source root required')
-    require(scope['prior_new_label_GPUh']==(33 if SCHEMA_REVIEW else 26) and scope['new_label_cap_GPUh']==96
+    require(scope['prior_new_label_GPUh']==(42 if BOUNDED_REVIEW else 33 if SCHEMA_REVIEW else 26) and scope['new_label_cap_GPUh']==96
             and scope['prior_new_label_GPUh']+ALLOCATION_GPUH<=96,
             'Separate temporal review phase budget required')
     require(scope['all_cases_denominator']==32 and scope['source_cases_attempted_required']==32,
@@ -98,7 +108,7 @@ def temporal_inputs(root, scope):
     terminal_row=record(root/'run01/terminal.json');terminal=read(terminal_row)
     audit_row=record(root/'completion.independent_audit.json');audit=read(audit_row)
     require(terminal['terminal'] and terminal['released'] and terminal['modes_restored']
-            and terminal['charged_upper_GPUh']==6 and terminal['cases_denominator']==32,
+            and terminal['charged_upper_GPUh']==(3 if BOUNDED_REVIEW else 6) and terminal['cases_denominator']==32,
             'Original temporal costs and actual release required')
     require(audit['cases_attempted']==32 and audit['all_cases_denominator']==32
             and audit['released'] and audit['modes_restored'] and audit['labels']+audit['errors']==32
@@ -126,7 +136,7 @@ def prepare_temporal(evidence_roots, model, output, authorization, scope):
     jobs,inputs,previous=temporal_inputs(evidence_roots[0],scope)
     import gpu_hold,teacher_gpu_exclusive as guard
     plan=dict(schema='teacher_label_independent_review_plan_v1',private=True,
-        hostname=os.uname().nodename,node_ip=os.environ.get('NODE_IP'),gpu_uuid=gpu_hold.query_gpus()[0]['uuid'],
+        hostname=os.uname().nodename,node_ip=os.environ.get('NODE_IP'),gpu_uuid=gpu_hold.query_gpus()[2 if BOUNDED_REVIEW else 0]['uuid'],
         allocated_cards=1,cap_seconds=CAP,tail_seconds=TAIL,prior_charged_label_GPUh=PRIOR_GPUH,
         upper_GPUh=ALLOCATION_GPUH,cumulative_label_upper_GPUh=PRIOR_GPUH+ALLOCATION_GPUH,
         stage_cap_GPUh=96,new_label_stage_prior_GPUh=scope['prior_new_label_GPUh'],output_root=str(Path(output).parent/'review_run01'),
@@ -427,14 +437,14 @@ def run(args):
         if CAMPAIGN003:
             import teacher_gpu_exclusive as guard
             resource_mode=guard.query_modes()[p['gpu_uuid']]
-            require(resource_mode['index']==0 and resource_mode['mode'] in ('Default','Exclusive_Process'), 'Assigned new-cluster GPU0 only')
+            require(resource_mode['index']==(2 if BOUNDED_REVIEW else 0) and resource_mode['mode'] in ('Default','Exclusive_Process'), 'Assigned new-cluster review GPU only')
             lease_dir=Path('/dockerdata/wm_gpu_exclusivity');lease_dir.mkdir(mode=0o700,exist_ok=True)
             candidate=lease_dir/(p['gpu_uuid']+'.json')
             with candidate.open('x') as f:f.write(json.dumps(dict(gpu_uuid=p['gpu_uuid'],expires_epoch=time.time()+CAP,owner_pid=os.getpid())))
             candidate.chmod(0o600);lease=candidate
             subprocess.run(['nvidia-smi','-i',p['gpu_uuid'],'-c','3'],check=True,capture_output=True,timeout=10)
             for pid in process.query_release(p['gpu_uuid'])['pids']:
-                identity=guard.signal_holder(pid,0)
+                identity=guard.signal_holder(pid,2 if BOUNDED_REVIEW else 0)
                 require(identity is not None, 'Unknown review GPU owner blocks execution')
                 holder_signals.append(identity)
         require(process.query_release(p['gpu_uuid'])['pids']==[], 'Review GPU not idle; no foreign signals allowed')
@@ -444,7 +454,7 @@ def run(args):
         command=['timeout','--signal=TERM','--kill-after=20s',f'{seconds}s',PYTHON,str(Path(__file__).resolve()),
                  'worker','--plan',bound['path'],'--sha',bound['sha256'],'--launch',launch['path']]
         if FOLLOWUP:command.insert(command.index('worker'),'--followup')
-        if CAMPAIGN003:command.insert(command.index('worker'),'--schema-labels' if SCHEMA_REVIEW else '--temporal' if TEMPORAL else '--campaign004' if CAMPAIGN004 else '--campaign003')
+        if CAMPAIGN003:command.insert(command.index('worker'),'--bounded-labels' if BOUNDED_REVIEW else '--schema-labels' if SCHEMA_REVIEW else '--temporal' if TEMPORAL else '--campaign004' if CAMPAIGN004 else '--campaign003')
         env=dict(os.environ,CUDA_VISIBLE_DEVICES=p['gpu_uuid'],HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',OMP_NUM_THREADS='1')
         with (output/'worker.log').open('xb') as log:
             child=subprocess.Popen(command,stdout=log,stderr=subprocess.STDOUT,env=env,start_new_session=True)
@@ -493,7 +503,7 @@ def run(args):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    modes=parser.add_mutually_exclusive_group();modes.add_argument('--followup',action='store_true');modes.add_argument('--campaign003',action='store_true');modes.add_argument('--campaign004',action='store_true');modes.add_argument('--temporal',action='store_true');modes.add_argument('--schema-labels',action='store_true')
+    modes=parser.add_mutually_exclusive_group();modes.add_argument('--followup',action='store_true');modes.add_argument('--campaign003',action='store_true');modes.add_argument('--campaign004',action='store_true');modes.add_argument('--temporal',action='store_true');modes.add_argument('--schema-labels',action='store_true');modes.add_argument('--bounded-labels',action='store_true')
     parser.add_argument('command',choices=['prepare','run','worker'])
     parser.add_argument('--plan');parser.add_argument('--sha');parser.add_argument('--launch')
     parser.add_argument('--evidence',nargs='+');parser.add_argument('--model-proof');parser.add_argument('--output')
@@ -504,6 +514,7 @@ def main():
     if a.campaign004:configure_campaign004()
     if a.temporal:configure_temporal()
     if a.schema_labels:configure_schema_review()
+    if a.bounded_labels:configure_bounded_review()
     if a.command=='prepare': result=prepare(a.evidence,a.model_proof,a.output)
     elif a.command=='worker': result=worker(a.plan,a.sha,a.launch)
     else: result=run(a)
