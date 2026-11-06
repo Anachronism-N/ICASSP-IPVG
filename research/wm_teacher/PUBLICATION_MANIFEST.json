@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-05 23:58:05 CST",
+  "created_at": "2026-11-06 01:28:37 CST",
   "files": [
     {
       "path": "README.md",
@@ -333,23 +333,23 @@
     },
     {
       "path": "scripts/run_teacher_temporal_labels.py",
-      "source_sha256": "51648c70e18c6e00246959e8773180865fd495eba9e7c641f7e2174261055a73",
-      "snapshot_sha256": "51648c70e18c6e00246959e8773180865fd495eba9e7c641f7e2174261055a73"
+      "source_sha256": "a7a2e662ac643c15e2ad967c8722a2ee1a73954e1a7db2447fa23230f4978ad6",
+      "snapshot_sha256": "a7a2e662ac643c15e2ad967c8722a2ee1a73954e1a7db2447fa23230f4978ad6"
     },
     {
       "path": "tests/test_teacher_temporal_labels.py",
-      "source_sha256": "8dce5553d908a7b1cf7d8652d69c76d593522066728654043def4ad6a6ed2601",
-      "snapshot_sha256": "8dce5553d908a7b1cf7d8652d69c76d593522066728654043def4ad6a6ed2601"
+      "source_sha256": "8a9452d1219c55defeb111a71660f13b429a15e69c71eef89f2911dd937d8204",
+      "snapshot_sha256": "8a9452d1219c55defeb111a71660f13b429a15e69c71eef89f2911dd937d8204"
     },
     {
       "path": "scripts/teacher_structured_decoder.py",
-      "source_sha256": "346342541fb946eb947f14ebea7a4539fe71e2a4da4628b44bbc69c2d72e5507",
-      "snapshot_sha256": "346342541fb946eb947f14ebea7a4539fe71e2a4da4628b44bbc69c2d72e5507"
+      "source_sha256": "713eabc292fc86b844273f4206404f92b93bfb81e48c56e0c7e800d3bc6fd927",
+      "snapshot_sha256": "713eabc292fc86b844273f4206404f92b93bfb81e48c56e0c7e800d3bc6fd927"
     },
     {
       "path": "tests/test_teacher_structured_decoder.py",
-      "source_sha256": "316b1a90b6d7d790feb52b663cb87dce0dd10376cb8831df1fcde1910922deb1",
-      "snapshot_sha256": "316b1a90b6d7d790feb52b663cb87dce0dd10376cb8831df1fcde1910922deb1"
+      "source_sha256": "d4cb398c5537cfa506a6ecddf58efe458c3e6836da636863e6e13667c134c35a",
+      "snapshot_sha256": "d4cb398c5537cfa506a6ecddf58efe458c3e6836da636863e6e13667c134c35a"
     },
     {
       "path": "scripts/run_teacher_encoder_cache_probe.py",
@@ -363,8 +363,8 @@
     },
     {
       "path": "docs/60_Qwen32B标签一次恢复.md",
-      "source_sha256": "5334692b7be333ba3c3c869421ef1b79341239053a18febb5544cade0255fad0",
-      "snapshot_sha256": "5334692b7be333ba3c3c869421ef1b79341239053a18febb5544cade0255fad0"
+      "source_sha256": "61501d62e759477eaf2e09636829216004c152e440495ccef1411576bf7ace21",
+      "snapshot_sha256": "61501d62e759477eaf2e09636829216004c152e440495ccef1411576bf7ace21"
     },
     {
       "path": "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
@@ -1410,7 +1410,7 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "9712e1eafa5b6a092121c83019ec2161f1ea9f1d",
+  "preserved_public_base_commit": "01300a8f4e21c33ebb542c17a5162c77c1f1c459",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
     "docs/60_Qwen32B标签一次恢复.md",

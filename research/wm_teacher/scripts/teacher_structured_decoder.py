@@ -28,6 +28,16 @@ FACTS_SCHEMA = {
 CAPTION_SCHEMA = {'type': 'array', 'items': {'type': 'string'}, 'minItems': 4, 'maxItems': 4}
 
 
+def caption_word_schema():
+    return {
+        'type': 'array', 'minItems': 4, 'maxItems': 4,
+        'items': {
+            'type': 'string',
+            'pattern': r"[A-Za-z0-9]+(?:[-'][A-Za-z0-9]+)*(?:[ ,;:]+[A-Za-z0-9]+(?:[-'][A-Za-z0-9]+)*){11,21}[.!?]",
+        },
+    }
+
+
 def bounded_facts_schema():
     from copy import deepcopy
     schema = deepcopy(FACTS_SCHEMA)
@@ -45,10 +55,11 @@ def bounded_facts_schema():
 
 
 class StructuredDecoder:
-    def __init__(self, tokenizer, eos_ids, *, bounded=False):
+    def __init__(self, tokenizer, eos_ids, *, bounded=False, word_count=False):
         from lmformatenforcer.integrations.transformers import build_token_enforcer_tokenizer_data
         self.tokenizer = tokenizer
         self.bounded = bounded
+        self.word_count = word_count
         self.eos_ids = [eos_ids] if type(eos_ids) is int else eos_ids
         if type(self.eos_ids) is not list or not self.eos_ids or tokenizer.eos_token_id not in self.eos_ids:
             raise ValueError('Frozen tokenizer EOS must be an actual configured generation EOS')
@@ -92,6 +103,8 @@ class StructuredDecoder:
         forms = {prefix + form for word in words for form in (word, word.title(), word.upper()) for prefix in ('', ' ')}
         ids = [self.tokenizer.encode(form, add_special_tokens=False) for form in sorted(forms)]
         schema = bounded_facts_schema() if self.bounded and facts_stage else FACTS_SCHEMA if facts_stage else CAPTION_SCHEMA
+        if self.word_count and not facts_stage:
+            schema = caption_word_schema()
         grammar = JsonSchemaParser(schema)
         return {
             'prefix_allowed_tokens_fn': self.boundary_prefix(build_transformers_prefix_allowed_tokens_fn(self.tokenizer_data, grammar)),
@@ -107,7 +120,8 @@ class StructuredDecoder:
             events=[dict(entity_id='E1', frame_start=0, frame_end=15, action='Stays in place.')],
             start_end_difference='No visible change.')
         prompt = self.tokenizer.encode('Synthetic JSON:', add_special_tokens=False)
-        paths = [(True, json.dumps(facts)), (False, '["one.","two.","three.","four."]')]
+        caption = ['A red circular disk rests on a plain white table without any visible movement.'] * 4 if self.word_count else ['one.', 'two.', 'three.', 'four.']
+        paths = [(True, json.dumps(facts)), (False, json.dumps(caption))]
         lengths = []
         for facts_stage, text in paths:
             constraints = self.constraints(facts_stage)
@@ -134,12 +148,34 @@ class StructuredDecoder:
             assert len(quote) == 1 and bool(torch.isfinite(values[0, quote[0]]))
             assert bool(torch.isneginf(values[0, repeated[0]]))
             assert all(bool(torch.isneginf(values[0, stop])) for stop in self.eos_ids)
+        if self.word_count:
+            period = self.tokenizer.encode('.', add_special_tokens=False)
+            extra = self.tokenizer.encode(' visible', add_special_tokens=False)
+            assert len(period) == len(extra) == 1
+            for words in (11, 12, 22):
+                constraints = self.constraints(False)
+                fn = constraints['prefix_allowed_tokens_fn']
+                mask = PrefixConstrainedLogitsProcessor(fn, 1)
+                sent = list(prompt)
+                fn(0, torch.tensor(sent, dtype=torch.long))
+                text = '["' + ' '.join(['visible'] * words)
+                for token in self.tokenizer.encode(text, add_special_tokens=False):
+                    assert token in fn(0, torch.tensor(sent, dtype=torch.long))
+                    sent.append(token)
+                ids = torch.tensor([sent], dtype=torch.long, device='cpu')
+                scores = torch.zeros((1, len(self.tokenizer)), device=device, dtype=torch.bfloat16)
+                values = constraints['logits_processor'](ids, mask(ids, scores))
+                assert bool(torch.isfinite(values[0, period[0]])) == (words >= 12)
+                assert bool(torch.isfinite(values[0, extra[0]])) == (words < 22)
+                assert all(bool(torch.isneginf(values[0, stop])) for stop in self.eos_ids)
         if str(device) != 'cpu':
             torch.cuda.synchronize(device)
         return dict(CPU_input_GPU_score_path_pass=str(device) != 'cpu',
                     synthetic_facts_tokens=lengths[0], synthetic_caption_tokens=lengths[1],
                     dtype='bfloat16', scores_device=str(device), model_loaded=False,
-                    bounded_string_CPU_input_score_path_pass=self.bounded)
+                    bounded_string_CPU_input_score_path_pass=self.bounded,
+                    caption_word_count_path_pass=self.word_count,
+                    word_count_boundary_mask_pass=self.word_count)
 
     def check_token_path(self, prompt, tokens, constraints, mask, device):
         import torch

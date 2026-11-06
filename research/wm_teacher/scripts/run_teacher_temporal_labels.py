@@ -17,6 +17,7 @@ CAP=5400
 SCHEMA_DECODE=False
 BOUNDARY_DECODE=False
 BOUNDED_DECODE=False
+WORD_ACTOR_DECODE=False
 CARDS=4
 UPPER_GPUH=6
 DECODER_SITE=Path('/dockerdata/wm_json_decoder_CPU_20261104/site')
@@ -58,6 +59,31 @@ def configure_bounded():
     UPPER_GPUH=3
 
 
+ACTOR_PROMPT = """
+For every event, use its entity_id as the sole grammatical actor. Describe that entity's
+visible change over consecutive observations, not a different entity's hands or held object.
+When two entities act, use separate events with the corresponding IDs. Keep locations and
+held objects in the relevant entity record. For interaction, describe only the current
+actor's own visible action, never transfer another actor's action into this event.
+Compare early, middle and late observations before naming an action: visible evidence,
+not a single pose, must support it. Preserve return motion and supported final state.
+These instructions do not justify inventing an event or suppressing actual visible motion.
+"""
+
+
+def configure_word_actor():
+    global E,AUTH_SHA,WORD_ACTOR_DECODE
+    configure_bounded()
+    E=ROOT/'eval/teacher_progress_campaign_20261104/allocation008_word_actor'
+    AUTH_SHA='74770bf4f5bcbba1229f26fd8a81d75173fb2bfb7aff93c351514d54334da7e3'
+    WORD_ACTOR_DECODE=True
+
+
+def facts_prompt():
+    r,_=helpers()
+    return r.FACTS_PROMPT + (ACTOR_PROMPT if WORD_ACTOR_DECODE else '')
+
+
 def helpers():
     sys.path.insert(0,str(ROOT/'scripts'))
     import run_teacher_qwen3vl32b_recovery as r
@@ -74,28 +100,35 @@ def save(path,value):
     return helpers()[0].write_new(path,value)
 
 def authorization():
-    row=record(E/('authorization.twocard.json' if BOUNDED_DECODE else 'authorization.final.json' if BOUNDARY_DECODE else 'authorization.json'));assert row['sha256']==AUTH_SHA
+    row=record(E/('authorization.final.twocard.json' if WORD_ACTOR_DECODE else 'authorization.twocard.json' if BOUNDED_DECODE else 'authorization.final.json' if BOUNDARY_DECODE else 'authorization.json'));assert row['sha256']==AUTH_SHA
     a=read(row)
     assert record(E.parent/'campaign.authorization.json')['sha256']==a['parent_campaign_sha256']
     assert a['allocated_cards']==CARDS and a['wall_cap_seconds']==CAP and a['upper_GPUh']==UPPER_GPUH
-    assert a['prior_new_label_GPUh']==(39 if BOUNDED_DECODE else 33 if BOUNDARY_DECODE else 27 if SCHEMA_DECODE else 20)
-    assert a['prior_historical_label_GPUh']==(62.832564877520134 if BOUNDED_DECODE else 56.832564877520134 if BOUNDARY_DECODE else 50.832564877520134 if SCHEMA_DECODE else 43.832564877520134)
+    assert a['prior_new_label_GPUh']==(43 if WORD_ACTOR_DECODE else 39 if BOUNDED_DECODE else 33 if BOUNDARY_DECODE else 27 if SCHEMA_DECODE else 20)
+    assert a['prior_historical_label_GPUh']==(66.832564877520134 if WORD_ACTOR_DECODE else 62.832564877520134 if BOUNDED_DECODE else 56.832564877520134 if BOUNDARY_DECODE else 50.832564877520134 if SCHEMA_DECODE else 43.832564877520134)
     assert a['prior_new_label_GPUh']+UPPER_GPUH<=a['stage_label_cap_GPUh']==96
     assert a['cases']==32 and a['source_frames']==16 and a['source_indices']==list(range(0,121,8))
     assert a['caption_words']==[40,120] and a['automatic_retry_allowed'] is False
     assert not a['formal_training_allowed'] and not a['semantic_approval']
     if SCHEMA_DECODE:
-        previous=E.parent/('allocation006_boundary' if BOUNDED_DECODE else 'allocation005_schema' if BOUNDARY_DECODE else 'allocation004_temporal')
-        assert record(previous/('completion.independent_audit.v2.json' if BOUNDED_DECODE else 'completion.independent_audit.json'))['sha256']==a['previous_native_audit_sha256']
+        previous=E.parent/('allocation007_bounded' if WORD_ACTOR_DECODE else 'allocation006_boundary' if BOUNDED_DECODE else 'allocation005_schema' if BOUNDARY_DECODE else 'allocation004_temporal')
+        assert record(previous/('completion.independent_audit.v2.json' if BOUNDED_DECODE and not WORD_ACTOR_DECODE else 'completion.independent_audit.json'))['sha256']==a['previous_native_audit_sha256']
         assert record(previous/'run01/attempt.claim')['sha256']==a['previous_claim_sha256']
-        assert record(E.parent/'semantic_review005/completion.independent_audit.json')['sha256']==a['previous_review_sha256']
+        assert record(E.parent/('semantic_review007/completion.independent_audit.json' if WORD_ACTOR_DECODE else 'semantic_review005/completion.independent_audit.json'))['sha256']==a['previous_review_sha256']
         probe=record(E/'actual_CPU_probe.final.json' if BOUNDARY_DECODE else DECODER_SITE.parent/'actual_CPU_probe.json')
         assert probe['sha256']==a['decoder_CPU_probe_sha256']
         if BOUNDARY_DECODE:
             proof=read(probe);assert proof['success'] and not proof['CUDA_initialized']
             assert proof['source_sha256']==record(ROOT/'scripts/teacher_structured_decoder.py')['sha256']
-            prior=read(record(previous/('completion.independent_audit.v2.json' if BOUNDED_DECODE else 'completion.independent_audit.json')))
-            assert prior['cases_attempted']==(1 if BOUNDED_DECODE else 32) and prior['labels']==0 and prior['released'] and prior['modes_restored']
+            prior=read(record(previous/('completion.independent_audit.v2.json' if BOUNDED_DECODE and not WORD_ACTOR_DECODE else 'completion.independent_audit.json')))
+            assert prior['cases_attempted']==(1 if BOUNDED_DECODE and not WORD_ACTOR_DECODE else 32) and prior['labels']==(30 if WORD_ACTOR_DECODE else 0) and prior['released'] and prior['modes_restored']
+            if WORD_ACTOR_DECODE:
+                assert proof['caption_word_count_path_pass'] and proof['word_count_boundary_mask_pass']
+                assert a['caption_schema']==config()['caption_schema']
+                assert a['actor_prompt_sha256']==hashlib.sha256(ACTOR_PROMPT.encode()).hexdigest()
+                reviewed=read(record(E.parent/'semantic_review007/completion.independent_audit.json'))
+                assert reviewed['success'] and reviewed['reviewed_labels']==30
+                assert reviewed['adequate_over_original32']==21 and reviewed['released'] and reviewed['modes_restored']
     return a,row
 
 def config():
@@ -103,7 +136,7 @@ def config():
     value=dict(model=MODEL,dtype='bfloat16',cards=CARDS,do_sample=False,source_frames=16,
         source_fps=24,source_indices=list(range(0,121,8)),resize=[640,352],
         do_sample_frames=False,temporal_patch_size=2,facts_max_tokens=1024,caption_max_tokens=384,
-        caption_words=[40,120],facts_prompt_sha256=hashlib.sha256(r.FACTS_PROMPT.encode()).hexdigest(),
+        caption_words=[40,120],facts_prompt_sha256=hashlib.sha256(facts_prompt().encode()).hexdigest(),
         caption_prompt_sha256=hashlib.sha256(CAPTION_PROMPT.encode()).hexdigest(),
         caption_render='exact_json_array4_join_single_spaces_no_edit',formal_training_allowed=False)
     if SCHEMA_DECODE:
@@ -117,17 +150,21 @@ def config():
     if BOUNDED_DECODE:
         value['facts_schema']=structured.bounded_facts_schema()
         value['bounded_facts_strings']=True
+    if WORD_ACTOR_DECODE:
+        value['caption_schema']=structured.caption_word_schema()
+        value['caption_word_count_grammar']=True
+        value['entity_specific_action_prompt']=True
     return value
 
 def prepare(output=None):
     r,g=helpers();a,auth=authorization()
-    original=record(E.parent/('allocation006_boundary/plan.final.json' if BOUNDED_DECODE else 'allocation005_schema/plan.ready.json' if BOUNDARY_DECODE else 'allocation004_temporal/plan.ready.json' if SCHEMA_DECODE else 'allocation003/plan.execution003.ready.json'))
+    original=record(E.parent/('allocation007_bounded/plan.final.json' if WORD_ACTOR_DECODE else 'allocation006_boundary/plan.final.json' if BOUNDED_DECODE else 'allocation005_schema/plan.ready.json' if BOUNDARY_DECODE else 'allocation004_temporal/plan.ready.json' if SCHEMA_DECODE else 'allocation003/plan.execution003.ready.json'))
     assert original['sha256']==a['original_plan_sha256'];p=read(original)
-    audit=record(E.parent/('allocation006_boundary/completion.independent_audit.v2.json' if BOUNDED_DECODE else 'allocation005_schema/completion.independent_audit.json' if BOUNDARY_DECODE else 'allocation004_temporal/completion.independent_audit.json' if SCHEMA_DECODE else 'allocation003/completion.audit.json'))
-    review=record(E.parent/('semantic_review005/completion.independent_audit.json' if SCHEMA_DECODE else 'semantic_review004/completion.independent_audit.json'))
+    audit=record(E.parent/('allocation007_bounded/completion.independent_audit.json' if WORD_ACTOR_DECODE else 'allocation006_boundary/completion.independent_audit.v2.json' if BOUNDED_DECODE else 'allocation005_schema/completion.independent_audit.json' if BOUNDARY_DECODE else 'allocation004_temporal/completion.independent_audit.json' if SCHEMA_DECODE else 'allocation003/completion.audit.json'))
+    review=record(E.parent/('semantic_review007/completion.independent_audit.json' if WORD_ACTOR_DECODE else 'semantic_review005/completion.independent_audit.json' if SCHEMA_DECODE else 'semantic_review004/completion.independent_audit.json'))
     if not SCHEMA_DECODE:
         assert audit['sha256']==a['original_audit_sha256'] and review['sha256']==a['previous_review_sha256']
-    assert read(audit)['cases_attempted']==(1 if BOUNDED_DECODE else 32) and read(review)['all_cases_denominator']==32
+    assert read(audit)['cases_attempted']==(1 if BOUNDED_DECODE and not WORD_ACTOR_DECODE else 32) and read(review)['all_cases_denominator']==32
     jobs=[dict(index=j['index'],group=j['group'],video=j['video']) for j in p['jobs']]
     assert [j['index'] for j in jobs]==list(range(32))
     for j in jobs:r.check(j['video'])
@@ -216,7 +253,7 @@ def worker(args):
         from teacher_structured_decoder import StructuredDecoder
         processor=AutoProcessor.from_pretrained(MODEL,local_files_only=True)
         eos=json.loads(Path(MODEL,'generation_config.json').read_bytes())['eos_token_id']
-        STRUCTURED_INSTANCE=StructuredDecoder(processor.tokenizer,eos,bounded=BOUNDED_DECODE)
+        STRUCTURED_INSTANCE=StructuredDecoder(processor.tokenizer,eos,bounded=BOUNDED_DECODE,word_count=WORD_ACTOR_DECODE)
         save(E/'run01/decoder_cuda_admission.json',STRUCTURED_INSTANCE.cuda_admission('cuda:'+str(CARDS-1)))
     model=Qwen3VLForConditionalGeneration.from_pretrained(MODEL,local_files_only=True,
         torch_dtype=torch.bfloat16,device_map='balanced',max_memory={i:('70GiB' if BOUNDED_DECODE else '34GiB') for i in range(CARDS)},attn_implementation='sdpa')
@@ -232,7 +269,7 @@ def worker(args):
         try:
             r.check(j['video'],end);images,frames=r.sample_images(j['video']['path'],p['runtime']['tools'],end)
             assert frames['source_indices']==list(range(0,121,8))
-            stage='facts_generate';trace={};raw=generate(model,processor,images,r.FACTS_PROMPT,1024,trace)
+            stage='facts_generate';trace={};raw=generate(model,processor,images,facts_prompt(),1024,trace)
             counts['facts']=trace['new_tokens'];stage='facts_parse';facts=r.parse_facts(raw)
             stage='caption_generate';trace={};raw=generate(model,processor,images,CAPTION_PROMPT+json.dumps(facts,sort_keys=True),384,trace)
             counts['caption']=trace['new_tokens'];stage='caption_validate';caption=parse_caption(raw)
@@ -294,7 +331,8 @@ def run(args):
         env=dict(os.environ,CUDA_VISIBLE_DEVICES=','.join(p['gpu_uuids']),HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',OMP_NUM_THREADS='1')
         with (output/'worker.log').open('xb') as log:
             command=[PYTHON,str(Path(__file__).resolve()),'worker','--plan',args.plan,'--sha',args.sha]
-            if BOUNDED_DECODE:command.insert(2,'--bounded-decode')
+            if WORD_ACTOR_DECODE:command.insert(2,'--word-actor-decode')
+            elif BOUNDED_DECODE:command.insert(2,'--bounded-decode')
             elif BOUNDARY_DECODE:command.insert(2,'--boundary-decode')
             elif SCHEMA_DECODE:command.insert(2,'--schema-decode')
             child=subprocess.Popen(command,stdout=log,stderr=subprocess.STDOUT,env=env,start_new_session=True)
@@ -330,10 +368,11 @@ def run(args):
     assert result['success']
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--schema-decode',action='store_true');parser.add_argument('--boundary-decode',action='store_true');parser.add_argument('--bounded-decode',action='store_true');parser.add_argument('command',choices=['prepare','verify','run','worker'])
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--schema-decode',action='store_true');parser.add_argument('--boundary-decode',action='store_true');parser.add_argument('--bounded-decode',action='store_true');parser.add_argument('--word-actor-decode',action='store_true');parser.add_argument('command',choices=['prepare','verify','run','worker'])
     parser.add_argument('--output');parser.add_argument('--plan');parser.add_argument('--sha');parser.add_argument('--gpu-authorized',action='store_true');args=parser.parse_args()
-    assert sum((args.schema_decode,args.boundary_decode,args.bounded_decode))<=1
-    if args.bounded_decode:configure_bounded()
+    assert sum((args.schema_decode,args.boundary_decode,args.bounded_decode,args.word_actor_decode))<=1
+    if args.word_actor_decode:configure_word_actor()
+    elif args.bounded_decode:configure_bounded()
     elif args.boundary_decode:configure_boundary()
     elif args.schema_decode:configure_schema()
     if args.command=='prepare':print(json.dumps(prepare(args.output),sort_keys=True))

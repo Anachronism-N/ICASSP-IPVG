@@ -131,3 +131,33 @@ def test_bounded_mode_is_new_scope_preserves_original_caps_and_early_stop(monkey
     assert cfg['facts_schema']['properties']['events']['maxItems']==128
     assert cfg['stop_on_generation_without_EOS_or_AssertionError'] is True
     assert cfg['do_sample'] is False and cfg['formal_training_allowed'] is False
+
+
+def test_word_actor_scope_is_separate_and_keeps_original_cases_and_validation(monkeypatch):
+    for key in ('E','AUTH_SHA','SCHEMA_DECODE','BOUNDARY_DECODE','BOUNDED_DECODE',
+                'WORD_ACTOR_DECODE','CARDS','UPPER_GPUH'):
+        monkeypatch.setattr(a,key,getattr(a,key))
+    monkeypatch.setattr(sys,'path',list(sys.path))
+    r,_=a.helpers();r.configure_prompt_v2();original=r.FACTS_PROMPT
+    a.configure_word_actor();cfg=a.config()
+    assert a.E.name=='allocation008_word_actor' and a.CARDS==2 and a.UPPER_GPUH==3
+    assert cfg['source_frames']==16 and cfg['source_indices']==list(range(0,121,8))
+    assert cfg['facts_max_tokens']==1024 and cfg['caption_max_tokens']==384
+    assert cfg['caption_words']==[40,120] and cfg['do_sample'] is False
+    assert cfg['caption_word_count_grammar'] and cfg['entity_specific_action_prompt']
+    assert cfg['stop_on_generation_without_EOS_or_AssertionError']
+    assert cfg['caption_schema']['minItems']==cfg['caption_schema']['maxItems']==4
+    assert a.facts_prompt()==original+a.ACTOR_PROMPT and r.FACTS_PROMPT==original
+    assert a.parse_caption(json.dumps(SENTENCES))==' '.join(SENTENCES)
+    with pytest.raises(ValueError):a.parse_caption(json.dumps(['short.']*4))
+    monkeypatch.setattr(a,'WORD_ACTOR_DECODE',False)
+    assert a.facts_prompt()==original
+
+
+def test_word_actor_prompt_does_not_bypass_cross_entity_validator():
+    r,_=a.helpers()
+    facts=dict(scene='A red disk rests on a table.',rendered_or_screen=False,
+        entities=[dict(id='E1',description='A red disk',held_object=None)],
+        events=[dict(entity_id='E1',frame_start=0,frame_end=15,action='Another person moves their hands.')],
+        start_end_difference='The disk stays in place.')
+    with pytest.raises(ValueError,match='Cross-entity'):r.validate_facts(facts)

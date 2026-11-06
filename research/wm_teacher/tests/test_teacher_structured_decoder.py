@@ -182,3 +182,74 @@ def test_actual_Qwen_bounded_string_forbids_adversarial_continuation_without_EOS
         sent.append(token)
     assert tokenizer.eos_token_id in fn(0, torch.tensor(sent))
     assert not torch.cuda.is_initialized()
+
+
+@pytest.mark.parametrize('words', [1, 11, 12, 22, 23, 30])
+def test_caption_word_schema_matches_original_counter_bounds(words):
+    import re
+    lm = pytest.importorskip('lmformatenforcer')
+    sentence = ' '.join(['visible'] * words) + '.'
+    assert len(re.findall(r"\b[\w]+(?:[-'][\w]+)*\b", sentence)) == words
+    assert walk(lm.JsonSchemaParser(decoder.caption_word_schema()), json.dumps([sentence] * 4)) == (12 <= words <= 22)
+    assert walk(lm.JsonSchemaParser(decoder.CAPTION_SCHEMA), json.dumps([sentence] * 4))
+    if 12 <= words <= 22:
+        import run_teacher_qwen3vl32b_recovery as original
+        assert original.validate_caption(' '.join([sentence] * 4))
+
+
+@pytest.mark.parametrize('value', [
+    ['short.'] * 4,
+    [' '.join(['visible'] * 12) + '.'] * 3,
+    [' '.join(['visible'] * 12) + '.'] * 5,
+    [' ' + ' '.join(['visible'] * 12) + '.'] * 4,
+    [' '.join(['visible'] * 12) + '. extra.'] * 4,
+    [' '.join(['visible'] * 12) + '\n'] * 4,
+])
+def test_caption_word_schema_rejects_invalid_sentences_without_repair(value):
+    lm = pytest.importorskip('lmformatenforcer')
+    assert not walk(lm.JsonSchemaParser(decoder.caption_word_schema()), json.dumps(value))
+
+
+def test_caption_word_schema_contractions_hyphens_and_numbers_match_counter():
+    import re
+    lm = pytest.importorskip('lmformatenforcer')
+    sentence = "A red-brown disk can't leave its small table, while 2 nearby objects remain still."
+    count = len(re.findall(r"\b[\w]+(?:[-'][\w]+)*\b", sentence))
+    assert 12 <= count <= 22
+    assert walk(lm.JsonSchemaParser(decoder.caption_word_schema()), json.dumps([sentence] * 4))
+
+
+def test_real_Qwen_word_count_masks_early_close_and_extra_word_without_model_load():
+    pytest.importorskip('lmformatenforcer')
+    model = Path('/opt/models/Qwen3-VL-32B-Instruct')
+    if not (model/'tokenizer.json').exists():
+        pytest.skip('Frozen local tokenizer is required for actual CPU contract')
+    import torch
+    from transformers import AutoTokenizer, PrefixConstrainedLogitsProcessor
+    tokenizer = AutoTokenizer.from_pretrained(model, local_files_only=True)
+    eos = json.loads((model/'generation_config.json').read_bytes())['eos_token_id']
+    instance = decoder.StructuredDecoder(tokenizer, eos, bounded=True, word_count=True)
+    for words in (11, 12, 22):
+        constraints = instance.constraints(False)
+        fn = constraints['prefix_allowed_tokens_fn']
+        prompt = tokenizer.encode('Synthetic JSON:', add_special_tokens=False)
+        sent = list(prompt)
+        fn(0, torch.tensor(sent))
+        text = '["' + ' '.join(['visible'] * words)
+        for token in tokenizer.encode(text, add_special_tokens=False):
+            assert token in fn(0, torch.tensor(sent))
+            sent.append(token)
+        ids = torch.tensor([sent])
+        scores = torch.zeros((1, len(tokenizer)), dtype=torch.bfloat16)
+        mask = PrefixConstrainedLogitsProcessor(fn, 1)
+        values = constraints['logits_processor'](ids, mask(ids, scores))
+        period = tokenizer.encode('.', add_special_tokens=False)
+        extra_word = tokenizer.encode(' visible', add_special_tokens=False)
+        assert len(period) == len(extra_word) == 1
+        assert bool(torch.isfinite(values[0, period[0]])) == (words >= 12)
+        assert bool(torch.isfinite(values[0, extra_word[0]])) == (words < 22)
+        assert all(torch.isneginf(values[0, stop]) for stop in eos)
+    proof = instance.cuda_admission('cpu')
+    assert proof['caption_word_count_path_pass'] and proof['bounded_string_CPU_input_score_path_pass']
+    assert not proof['CPU_input_GPU_score_path_pass']
+    assert not torch.cuda.is_initialized()
