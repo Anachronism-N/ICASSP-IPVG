@@ -22,6 +22,7 @@ CAMPAIGN004 = False
 TEMPORAL = False
 SCHEMA_REVIEW = False
 BOUNDED_REVIEW = False
+WORD_ACTOR_REVIEW = False
 PRIOR_GPUH = 20.165898210853467
 AUTH = ROOT / 'eval/teacher_label_semantic_review_20261103/review.authorization.json'
 AUTH_SHA = '8eac69afd4a42f3966bae70bad1d0947a9e44c41fe0eabb673e28cb5dbbc3154'
@@ -93,16 +94,25 @@ def configure_bounded_review():
     PRIOR_GPUH=65.83256487752013
 
 
+def configure_word_actor_review():
+    global AUTH,AUTH_SHA,PRIOR_GPUH,WORD_ACTOR_REVIEW
+    configure_bounded_review()
+    WORD_ACTOR_REVIEW=True
+    AUTH=ROOT/'eval/teacher_progress_campaign_20261104/semantic_review008/review.authorization.json'
+    AUTH_SHA='8985cae49b7665bd5e913c9f5c66a04b1fd9a78071541962382360d60eef55ef'
+    PRIOR_GPUH=23.832564877520134+46
+
+
 def temporal_inputs(root, scope):
     r,_=helpers()
     root=Path(root)
     require(root.is_absolute() and root.resolve()==root and str(root)==scope['source_root'], 'Exact temporal source root required')
-    require(scope['prior_new_label_GPUh']==(42 if BOUNDED_REVIEW else 33 if SCHEMA_REVIEW else 26) and scope['new_label_cap_GPUh']==96
+    require(scope['prior_new_label_GPUh']==(46 if WORD_ACTOR_REVIEW else 42 if BOUNDED_REVIEW else 33 if SCHEMA_REVIEW else 26) and scope['new_label_cap_GPUh']==96
             and scope['prior_new_label_GPUh']+ALLOCATION_GPUH<=96,
             'Separate temporal review phase budget required')
     require(scope['all_cases_denominator']==32 and scope['source_cases_attempted_required']==32,
             'Full temporal denominator required')
-    plan_row=record(root/'plan.ready.json')
+    plan_row=record(root/('plan.final.json' if WORD_ACTOR_REVIEW else 'plan.ready.json'))
     require(plan_row['sha256']==scope['source_plan_sha256'], 'Original temporal execution SHA required')
     plan=read(plan_row)
     terminal_row=record(root/'run01/terminal.json');terminal=read(terminal_row)
@@ -454,7 +464,7 @@ def run(args):
         command=['timeout','--signal=TERM','--kill-after=20s',f'{seconds}s',PYTHON,str(Path(__file__).resolve()),
                  'worker','--plan',bound['path'],'--sha',bound['sha256'],'--launch',launch['path']]
         if FOLLOWUP:command.insert(command.index('worker'),'--followup')
-        if CAMPAIGN003:command.insert(command.index('worker'),'--bounded-labels' if BOUNDED_REVIEW else '--schema-labels' if SCHEMA_REVIEW else '--temporal' if TEMPORAL else '--campaign004' if CAMPAIGN004 else '--campaign003')
+        if CAMPAIGN003:command.insert(command.index('worker'),'--word-actor-labels' if WORD_ACTOR_REVIEW else '--bounded-labels' if BOUNDED_REVIEW else '--schema-labels' if SCHEMA_REVIEW else '--temporal' if TEMPORAL else '--campaign004' if CAMPAIGN004 else '--campaign003')
         env=dict(os.environ,CUDA_VISIBLE_DEVICES=p['gpu_uuid'],HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',OMP_NUM_THREADS='1')
         with (output/'worker.log').open('xb') as log:
             child=subprocess.Popen(command,stdout=log,stderr=subprocess.STDOUT,env=env,start_new_session=True)
@@ -503,7 +513,7 @@ def run(args):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    modes=parser.add_mutually_exclusive_group();modes.add_argument('--followup',action='store_true');modes.add_argument('--campaign003',action='store_true');modes.add_argument('--campaign004',action='store_true');modes.add_argument('--temporal',action='store_true');modes.add_argument('--schema-labels',action='store_true');modes.add_argument('--bounded-labels',action='store_true')
+    modes=parser.add_mutually_exclusive_group();modes.add_argument('--followup',action='store_true');modes.add_argument('--campaign003',action='store_true');modes.add_argument('--campaign004',action='store_true');modes.add_argument('--temporal',action='store_true');modes.add_argument('--schema-labels',action='store_true');modes.add_argument('--bounded-labels',action='store_true');modes.add_argument('--word-actor-labels',action='store_true')
     parser.add_argument('command',choices=['prepare','run','worker'])
     parser.add_argument('--plan');parser.add_argument('--sha');parser.add_argument('--launch')
     parser.add_argument('--evidence',nargs='+');parser.add_argument('--model-proof');parser.add_argument('--output')
@@ -515,6 +525,7 @@ def main():
     if a.temporal:configure_temporal()
     if a.schema_labels:configure_schema_review()
     if a.bounded_labels:configure_bounded_review()
+    if a.word_actor_labels:configure_word_actor_review()
     if a.command=='prepare': result=prepare(a.evidence,a.model_proof,a.output)
     elif a.command=='worker': result=worker(a.plan,a.sha,a.launch)
     else: result=run(a)
