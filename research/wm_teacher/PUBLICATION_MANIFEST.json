@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-10 00:45:20 CST",
+  "created_at": "2026-11-10 02:45:56 CST",
   "files": [
     {
       "path": "scripts/interactive_world_model.py",
@@ -223,8 +223,8 @@
     },
     {
       "path": "docs/51_免训练Teacher多维策略有限实验预注册.md",
-      "source_sha256": "d0af8512ca82f1c1dee914bcfc634568781f49cfa6b8a6ccff73d39fad1df3de",
-      "snapshot_sha256": "d0af8512ca82f1c1dee914bcfc634568781f49cfa6b8a6ccff73d39fad1df3de"
+      "source_sha256": "23d4721995c519bf1debcb9e5461508d0914504e17f4f45e19ef4557052d2c05",
+      "snapshot_sha256": "23d4721995c519bf1debcb9e5461508d0914504e17f4f45e19ef4557052d2c05"
     },
     {
       "path": "docs/52_四基准SOTA逐维对照与协议核验.md",
@@ -1440,7 +1440,7 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "68356dbb42a2338d9d105f66213cf407741a86cb",
+  "preserved_public_base_commit": "df3203896bca892f72ae99ce5449938ccd515f9a",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
     "docs/51_免训练Teacher多维策略有限实验预注册.md",
