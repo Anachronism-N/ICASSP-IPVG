@@ -14,6 +14,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 FILES = [
+    "scripts/interactive_world_model.py", "tests/test_interactive_world_model.py",
     "README.md", "PROGRESS.md", "docs/README.md", "docs/WAN22_TRAINING_PLAN.md",
     "docs/24_Wan2.2首轮训练执行计划.md", "docs/25_Wan22_Training_Infra.md",
     "docs/27_数据预处理与训练格式适配.md", "docs/28_数据总量与项目目标评估.md",

@@ -1,6 +1,16 @@
 {
-  "created_at": "2026-11-06 18:18:20 CST",
+  "created_at": "2026-11-09 15:59:07 CST",
   "files": [
+    {
+      "path": "scripts/interactive_world_model.py",
+      "source_sha256": "8349c7c026e14cd96477cc86080092194b130635ff58c0122d7b6f7f8182c0e8",
+      "snapshot_sha256": "8349c7c026e14cd96477cc86080092194b130635ff58c0122d7b6f7f8182c0e8"
+    },
+    {
+      "path": "tests/test_interactive_world_model.py",
+      "source_sha256": "7ef6a8cc3ebb556e6288bfbef14fb0428a7be849563f051038b6808dc50dfe0e",
+      "snapshot_sha256": "7ef6a8cc3ebb556e6288bfbef14fb0428a7be849563f051038b6808dc50dfe0e"
+    },
     {
       "path": "README.md",
       "source_sha256": "ceb68424bfc7bc407badcaa0f02db75c5825f4fe30245bbcb015bd52bdd1f691",
@@ -13,8 +23,8 @@
     },
     {
       "path": "docs/README.md",
-      "source_sha256": "51f13971f95fe81b068428191ffed40c18390984b4d3a15587731199d9a3986a",
-      "snapshot_sha256": "51f13971f95fe81b068428191ffed40c18390984b4d3a15587731199d9a3986a"
+      "source_sha256": "50a07711e76555cbc36bc2dfa35235257a8f4ad247747fefbf116f9651226158",
+      "snapshot_sha256": "50a07711e76555cbc36bc2dfa35235257a8f4ad247747fefbf116f9651226158"
     },
     {
       "path": "docs/WAN22_TRAINING_PLAN.md",
@@ -193,8 +203,8 @@
     },
     {
       "path": "docs/51_免训练Teacher多维策略有限实验预注册.md",
-      "source_sha256": "1f6a01889060bab1859f3dffcb955c17598f2425699697e271c63c4049e4b604",
-      "snapshot_sha256": "1f6a01889060bab1859f3dffcb955c17598f2425699697e271c63c4049e4b604"
+      "source_sha256": "4c6dcee11045deb744457eaa1ab6b8179b85a3c880a0f90cabf580c9f12260c7",
+      "snapshot_sha256": "4c6dcee11045deb744457eaa1ab6b8179b85a3c880a0f90cabf580c9f12260c7"
     },
     {
       "path": "docs/52_四基准SOTA逐维对照与协议核验.md",
@@ -363,8 +373,8 @@
     },
     {
       "path": "docs/60_Qwen32B标签一次恢复.md",
-      "source_sha256": "d9342ffee238ceaa4a345b1e84ae2925f08e38682c76fc7f4f28fa051f3aa605",
-      "snapshot_sha256": "d9342ffee238ceaa4a345b1e84ae2925f08e38682c76fc7f4f28fa051f3aa605"
+      "source_sha256": "956d6ff5d3ed79f4ba554058aa7a011ddd79caf1ba07cef8c4409b31c167bc8d",
+      "snapshot_sha256": "956d6ff5d3ed79f4ba554058aa7a011ddd79caf1ba07cef8c4409b31c167bc8d"
     },
     {
       "path": "eval/diag/teacher_qwen32b_once_recovery_public_20261103.json",
@@ -838,8 +848,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "5dafeeccd4ab68241a4d0f94cb95779a4ed39e8309852124fd78f8d6ddb4c454",
-      "snapshot_sha256": "5dafeeccd4ab68241a4d0f94cb95779a4ed39e8309852124fd78f8d6ddb4c454"
+      "source_sha256": "506ae07782ee4f3fae876316291eada195f8b09335fbc136801ba1536d3af3a0",
+      "snapshot_sha256": "506ae07782ee4f3fae876316291eada195f8b09335fbc136801ba1536d3af3a0"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -1410,10 +1420,12 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "fd6c99dbe3eb6751582320c3245ee3fa59b43fe9",
+  "preserved_public_base_commit": "d067a4281998b05b0fb5f284b660e969301f5052",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
+    "docs/51_免训练Teacher多维策略有限实验预注册.md",
     "docs/60_Qwen32B标签一次恢复.md",
+    "docs/README.md",
     "eval/diag/teacher_independent_label_review_public_20261103.json",
     "eval/diag/teacher_quality_protocol_readiness_public_20261103.json",
     "eval/diag/teacher_qwen32b_constrained_public_20261103.json",
@@ -1424,6 +1436,7 @@
     "scripts/cache_e3_inputs.py",
     "scripts/export_experiment_snapshot.py",
     "scripts/gpu_hold.py",
+    "scripts/interactive_world_model.py",
     "scripts/measure_teacher_throughput.py",
     "scripts/prepare_teacher_comparison.py",
     "scripts/prepare_teacher_label_admission.py",
@@ -1452,6 +1465,7 @@
     "scripts/verify_teacher_history.py",
     "tests/test_build_eval_jobs.py",
     "tests/test_e3_train.py",
+    "tests/test_interactive_world_model.py",
     "tests/test_teacher_a800_exact_resume.py",
     "tests/test_teacher_encoder_cache_probe.py",
     "tests/test_teacher_fa2_kernel_probe.py",
