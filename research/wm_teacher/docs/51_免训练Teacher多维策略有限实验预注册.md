@@ -96,3 +96,18 @@ CUDA_VISIBLE_DEVICES= python -m pytest -q tests/test_interactive_world_model.py
 5. 只有需要学习帧级因果结构或低延迟Student且满足质量/数据/预算准入，才实施训练；接口先行不宣称这些模型已经存在。
 
 本节替代“标签训练是所有后续工作的必经路”的错误串行安排，但不撤销原训练/质量门和外部GPU授权边界。
+
+
+### 7.6 完整媒体/评分harness与实机接口准入（2026-11-10）
+
+world_model_harness.py为CPU验收CLI；交互状态复用interactive_world_model.py，不再增加重复会话实现。协议绑定输入/模型/scorer SHA、raw/po、I2V/V2V、samples_per_pair、single/all_samples/BoN、媒体规格和采样steps/CFG/shift。完整候选必须包含每pair全部样本及分维期待集合，评分缺失/重复/NaN拒绝。
+
+审计重新校验视频文件SHA、ffmpeg -xerror全帧解码、ffprobe帧数/尺寸/fps；评分文件同时绑定协议与全部视频SHA，评分文件payload与磁盘字节一致。只是调用方声明集合的完整性，不会把complete声明当官方全集、更不会证明指标实现正确或SOTA。官方VBench仍用既有1118pair/5590视频/9维门；自定义合同不替代官方契约。
+
+命令：python scripts/world_model_harness.py validate --contract PRIVATE_CONTRACT.json；或audit --contract PRIVATE_CONTRACT.json --videos PRIVATE_VIDEO_RECEIPTS.json --scores PRIVATE_SCORE_RECEIPTS.json。全部CPU，不自动启动GPU或评分器。
+
+run_world_model_window_probe.py为独立的一次性**技术接口实验**，不是质量评测：本地合成红盘首图；原生Wan5B 50步、1280×704、121帧、24fps，先生成1窗，然后同末帧fork两条文本动作分支（固定seed0/1），共3窗。只验证首图链路/同父末帧/分支与观测不互写、真实FA2调用、完整可解码输出；不据此判断物理动作正确。复用原三DiT与六encoder/tokenizer pins，冻结框架/运行时/源码，完整测试及远端发布通过才run。
+
+费用来自已有technical_admission剩余额度：单卡、独立1 GPUh上限/3600秒生命周期，计入原8 GPUh技术阶段，**不借标签/cache96或条件质量评测64**；原5 GPUh技术费用不退款。GPU4仅精确已知holder释放，未知进程/旧lease拒绝，finally释放自有子树并恢复模式，原claim和失败不可复用。CPU prepare与资产核验本身不分配GPU；run还须显式GPU开关及独立budget行。
+
+此前281文件原型提交68356db已正常发布，1626测试通过/3skip，CPU demo4合成调用通过。新增媒体harness+probe的60项局部回归通过，包括真实CPU合成视频的正/反向解码与SHA漂移测试；这不是新增GPU视频或模型质量成绩。

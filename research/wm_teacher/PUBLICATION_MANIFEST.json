@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-09 15:59:07 CST",
+  "created_at": "2026-11-10 00:45:20 CST",
   "files": [
     {
       "path": "scripts/interactive_world_model.py",
@@ -10,6 +10,26 @@
       "path": "tests/test_interactive_world_model.py",
       "source_sha256": "7ef6a8cc3ebb556e6288bfbef14fb0428a7be849563f051038b6808dc50dfe0e",
       "snapshot_sha256": "7ef6a8cc3ebb556e6288bfbef14fb0428a7be849563f051038b6808dc50dfe0e"
+    },
+    {
+      "path": "scripts/world_model_harness.py",
+      "source_sha256": "d18e7e53252024914ab37ac675c837ec6dc900ec8eb4a99478572b50032858b5",
+      "snapshot_sha256": "d18e7e53252024914ab37ac675c837ec6dc900ec8eb4a99478572b50032858b5"
+    },
+    {
+      "path": "tests/test_world_model_harness.py",
+      "source_sha256": "fa5fb4a7c12cc48f5a5aa0e883d4d0e7ee91c028b979a7b7bb02e5fec853c5ce",
+      "snapshot_sha256": "fa5fb4a7c12cc48f5a5aa0e883d4d0e7ee91c028b979a7b7bb02e5fec853c5ce"
+    },
+    {
+      "path": "scripts/run_world_model_window_probe.py",
+      "source_sha256": "d9d76706e0745612b6b48a605154faeab915a741287577788a8d8af407ad876e",
+      "snapshot_sha256": "d9d76706e0745612b6b48a605154faeab915a741287577788a8d8af407ad876e"
+    },
+    {
+      "path": "tests/test_world_model_window_probe.py",
+      "source_sha256": "c8221e3f1d9a07c985685ebb90fe1d18277475001681913fe24348d41d3b3f42",
+      "snapshot_sha256": "c8221e3f1d9a07c985685ebb90fe1d18277475001681913fe24348d41d3b3f42"
     },
     {
       "path": "README.md",
@@ -203,8 +223,8 @@
     },
     {
       "path": "docs/51_免训练Teacher多维策略有限实验预注册.md",
-      "source_sha256": "4c6dcee11045deb744457eaa1ab6b8179b85a3c880a0f90cabf580c9f12260c7",
-      "snapshot_sha256": "4c6dcee11045deb744457eaa1ab6b8179b85a3c880a0f90cabf580c9f12260c7"
+      "source_sha256": "d0af8512ca82f1c1dee914bcfc634568781f49cfa6b8a6ccff73d39fad1df3de",
+      "snapshot_sha256": "d0af8512ca82f1c1dee914bcfc634568781f49cfa6b8a6ccff73d39fad1df3de"
     },
     {
       "path": "docs/52_四基准SOTA逐维对照与协议核验.md",
@@ -848,8 +868,8 @@
     },
     {
       "path": "scripts/export_experiment_snapshot.py",
-      "source_sha256": "506ae07782ee4f3fae876316291eada195f8b09335fbc136801ba1536d3af3a0",
-      "snapshot_sha256": "506ae07782ee4f3fae876316291eada195f8b09335fbc136801ba1536d3af3a0"
+      "source_sha256": "a3cad28ed3c3119861b71d2491647bcd3ab2370fbafa174acdf8758f0cd9e759",
+      "snapshot_sha256": "a3cad28ed3c3119861b71d2491647bcd3ab2370fbafa174acdf8758f0cd9e759"
     },
     {
       "path": "scripts/build_eval_jobs.py",
@@ -1420,7 +1440,7 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "d067a4281998b05b0fb5f284b660e969301f5052",
+  "preserved_public_base_commit": "68356dbb42a2338d9d105f66213cf407741a86cb",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
     "docs/51_免训练Teacher多维策略有限实验预注册.md",
@@ -1458,11 +1478,13 @@
     "scripts/run_teacher_single_gpu_admission.py",
     "scripts/run_teacher_temporal_labels.py",
     "scripts/run_teacher_training_smoke.py",
+    "scripts/run_world_model_window_probe.py",
     "scripts/teacher_gpu_exclusive.py",
     "scripts/teacher_structured_decoder.py",
     "scripts/train_e3_lora.py",
     "scripts/vbench_eval.py",
     "scripts/verify_teacher_history.py",
+    "scripts/world_model_harness.py",
     "tests/test_build_eval_jobs.py",
     "tests/test_e3_train.py",
     "tests/test_interactive_world_model.py",
@@ -1476,6 +1498,8 @@
     "tests/test_teacher_single_gpu_admission.py",
     "tests/test_teacher_structured_decoder.py",
     "tests/test_teacher_temporal_labels.py",
-    "tests/test_vbench_eval.py"
+    "tests/test_vbench_eval.py",
+    "tests/test_world_model_harness.py",
+    "tests/test_world_model_window_probe.py"
   ]
 }
