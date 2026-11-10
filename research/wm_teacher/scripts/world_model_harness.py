@@ -51,7 +51,8 @@ def validate_evaluation_contract(contract):
         require(type(dimension) is str and dimension, 'Dimension name required')
         require(type(members) is list and members and len(members) == len(set(members)) and set(members) <= set(ids), 'Per-dimension coverage differs')
     require(set().union(*(set(v) for v in expected.values())) == set(ids), 'Unscored jobs')
-    return digest(p)
+    # Bind jobs/seeds and expected dimensions, not just shared sampler settings.
+    return digest(dict(protocol=p, jobs=jobs, expected_scores=expected))
 
 def comparable_protocols(left, right):
     validate_evaluation_contract(left);validate_evaluation_contract(right)

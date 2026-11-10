@@ -27,6 +27,9 @@ EV = f"{ROOT}/eval"
 VB = "/dockerdata/wm_eval/VBench/vbench2_beta_i2v"
 VB_IMG = f"{EV}/vbench_i2v/images_16-9"  # copied from VB/data/crop/16-9 so both nodes can read it
 PER_DS = 10
+OFFICIAL_DIMENSIONS = frozenset(('i2v_subject', 'i2v_background', 'subject_consistency',
+    'background_consistency', 'motion_smoothness', 'dynamic_degree',
+    'aesthetic_quality', 'imaging_quality', 'camera_motion'))
 MODELS = {
     "base": "NONE",
     "round1": f"{ROOT}/models/train/round1_lora_r32/step-14921.safetensors",
@@ -112,7 +115,20 @@ def official_generation_plan(preflight_path, frozen_models):
     if len(rows) != 5590 or len({row['filename'] for row in rows}) != 5590:
         raise ValueError('Complete 5590-video coverage required')
     groups = defaultdict(set)
+    pair_inputs = {}
+    input_pairs = {}
     for row in rows:
+        if type(row['sample_index']) is not int or not 0 <= row['sample_index'] < 5:
+            raise ValueError('Strict integer sample index required')
+        if type(row['pair_key']) is not str or not row['pair_key']:
+            raise ValueError('Nonempty pair key required')
+        identity = (row['raw_prompt'], row['image_key'])
+        if row['pair_key'] in pair_inputs and pair_inputs[row['pair_key']] != identity:
+            raise ValueError('Pair key maps to different image/prompt inputs')
+        if identity in input_pairs and input_pairs[identity] != row['pair_key']:
+            raise ValueError('Image/prompt pair split across different pair keys')
+        pair_inputs[row['pair_key']] = identity
+        input_pairs[identity] = row['pair_key']
         groups[row['pair_key']].add(row['sample_index'])
         if row['execution_allowed'] is not False or Path(row['filename']).name != row['filename']:
             raise ValueError('Non-dispatchable safe output names required')
@@ -124,8 +140,16 @@ def official_generation_plan(preflight_path, frozen_models):
     info = json.loads(Path(metadata['path']).read_bytes())
     expected = {(case['prompt_en'].replace('/', '_') + '-' + str(i) + '.mp4', i, case['prompt_en'], case['image_name']) for case in info for i in range(5)}
     observed = {(row['filename'], row['sample_index'], row['raw_prompt'], row['image_key']) for row in rows}
-    if len(info) != 1118 or observed != expected:
+    if len(info) != 1118 or len(expected) != 5590 or observed != expected:
         raise ValueError('Plan rows differ from official metadata')
+    metadata_cases = {(case['prompt_en'], case['image_name']): case for case in info}
+    if len(metadata_cases) != 1118 or set(input_pairs) != set(metadata_cases):
+        raise ValueError('Pair identities differ from official metadata')
+    for row in rows:
+        dimensions = row['dimensions']
+        expected_dimensions = set(metadata_cases[(row['raw_prompt'], row['image_key'])]['dimension']) & OFFICIAL_DIMENSIONS
+        if type(dimensions) is not list or any(type(d) is not str for d in dimensions) or len(dimensions) != len(set(dimensions)) or set(dimensions) != expected_dimensions:
+            raise ValueError('Per-pair scoring dimensions differ from official metadata')
     if any(type(row['proposed_seed']) is not int or not 0 <= row['proposed_seed'] < (1 << 63) for row in rows):
         raise ValueError('Explicit finite integer seeds required')
     for image in preflight['image_files'].values():
@@ -169,7 +193,10 @@ def official_generation_plan(preflight_path, frozen_models):
         'seed_policy': preflight['seed_policy'], 'prompt_protocol': 'raw',
         'execution_allowed': False, 'GPU_used': False, 'generation_performed': False,
         'sampler_budget_and_backend_admission_required': True,
-        'crop_provenance_admission_required': True, 'semantic_and_supervised_cache_gates_required': True,
+        'crop_provenance_admission_required': True,
+        'semantic_and_supervised_cache_gates_required': False,
+        'supervised_training_data_used': False, 'formal_training_allowed': False,
+        'checkpoint_training_provenance_admission_required': any(cp != 'NONE' for cp in frozen_models.values()),
         'remote_source_byte_gate_required': True, 'sota_proven': False,
     }
 

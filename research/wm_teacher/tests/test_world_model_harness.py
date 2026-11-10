@@ -126,3 +126,26 @@ def test_CPU_import_does_not_load_torch_and_CLI_does_not_authorize_GPU(contract,
     p = tmp_path/'contract.json'; p.write_text(json.dumps(contract))
     r = subprocess.run([sys.executable, h.__file__, 'validate', '--contract', str(p)], check=True, capture_output=True)
     assert json.loads(r.stdout)['execution_authorized'] is False
+
+
+
+def test_receipt_digest_binds_job_seed_id_and_dimension_membership(contract):
+    original = h.validate_evaluation_contract(contract)
+    changed = copy.deepcopy(contract)
+    changed['jobs'][0]['seed'] = 1
+    assert h.validate_evaluation_contract(changed) != original
+    changed = copy.deepcopy(contract)
+    changed['jobs'][0]['id'] = 'other'
+    changed['expected_scores']['quality'] = ['other']
+    assert h.validate_evaluation_contract(changed) != original
+    changed = copy.deepcopy(contract)
+    changed['expected_scores'] = {'different_metric': ['x']}
+    assert h.validate_evaluation_contract(changed) != original
+
+
+def test_same_sampler_does_not_allow_reusing_score_for_changed_seed(contract, artifacts):
+    videos, scores, _ = artifacts
+    changed = copy.deepcopy(contract)
+    changed['jobs'][0]['seed'] = 1
+    with pytest.raises(ValueError, match='Unbound'):
+        h.audit_evaluation(changed, videos, scores)

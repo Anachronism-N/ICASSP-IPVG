@@ -74,3 +74,34 @@ def test_official_options_never_fall_through_to_legacy_writes(monkeypatch):
     monkeypatch.setattr(sys,'argv',[str(S),'--frozen-models','models.json','--output','new.json'])
     with patch.object(b,'wm_cases') as cases,pytest.raises(SystemExit):b.main()
     cases.assert_not_called()
+
+
+@pytest.mark.parametrize('change', ['missing_camera', 'wrong_dimension', 'duplicate_dimension', 'bool_sample', 'mixed_pair'])
+def test_official_dimension_and_pair_identity_cannot_drift(preflight, change):
+    path, value = preflight
+    value = copy.deepcopy(value)
+    if change == 'missing_camera':
+        camera = next(row for row in value['coverage_records'] if 'camera_motion' in row['dimensions'])
+        camera['dimensions'] = []
+    elif change == 'wrong_dimension':
+        value['coverage_records'][0]['dimensions'] = ['camera_motion']
+    elif change == 'duplicate_dimension':
+        value['coverage_records'][0]['dimensions'] *= 2
+    elif change == 'bool_sample':
+        value['coverage_records'][0]['sample_index'] = False
+    else:
+        left, right = value['coverage_records'][0], value['coverage_records'][5]
+        left['pair_key'], right['pair_key'] = right['pair_key'], left['pair_key']
+    path.write_text(json.dumps(value))
+    with pytest.raises(ValueError): b.official_generation_plan(path, {'base': 'NONE'})
+
+
+
+def test_inference_only_base_plan_does_not_depend_on_supervised_training_cache(preflight):
+    path, _ = preflight
+    result = b.official_generation_plan(path, {'base': 'NONE'})
+    assert not result['semantic_and_supervised_cache_gates_required']
+    assert not result['supervised_training_data_used'] and not result['formal_training_allowed']
+    assert not result['checkpoint_training_provenance_admission_required']
+    assert result['crop_provenance_admission_required'] and result['sampler_budget_and_backend_admission_required']
+    assert result['remote_source_byte_gate_required'] and not result['execution_allowed']

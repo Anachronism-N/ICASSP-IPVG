@@ -168,3 +168,17 @@ run_world_model_window_probe.py为独立的一次性**技术接口实验**，不
 执行顺序仍为：预算范围明确后，先冻结不再据公开成绩调参的候选、独立开发/确认集合和同seed对照，实测生成/评分准入；后续申请能够覆盖完整集合及对照的独立分项预算。原标签/cache47/96、技术6/8、旧失败和checkpoint原样保留。开发集或某个完整子benchmark结果可报告对应范围，但不是整体SOTA验收。当前没有新的正式质量任务在运行。
 
 机器可核验的私有凭证已留存：本轮论文评测章节源响应SHA、仓库默认分支/完整树、两个模型revision/API响应SHA、36行公开表与本地八维score摘要、6246完整范围和预算算术。仅无身份聚合结论进入本节，原媒体、caption、权重与运行凭据不公开。
+
+
+### 7.9 正式任务与评分绑定修复（2026-11-10，前瞻CPU改动）
+
+持续推进正式质量执行前置时发现两处需要修复的合同漏洞：
+
+1. 原官方任务生成器只比较文件名/sample/prompt/image集合，没有逐项比较per-pair评分维度。新版本将维度精确绑定官方metadata中选定九维的交集，拒绝遗漏camera、增加错误维度、重复维度、布尔sample，以及同pair_key对应不同image/prompt或同输入对被拆成多个pair_key。任意sample0/1等数值相等不再允许bool冒充int。
+2. 原world_model_harness凭证只对sampler/模型等protocol求SHA，没有把实际jobs（含seed/输出ID）与expected_scores一起绑定。新版本的protocol_sha256字段保存完整评测合同摘要：protocol＋jobs＋expected_scores；同一采样设置下改seed或维度，旧视频/评分凭证必然失效，不能静默复用。历史010合同/评分/失败文件不改写；新的摘要语义不会倒推旧实机结果成为新协议通过。
+
+另解除CPU免训练任务对未使用监督cache的错误依赖：base NONE的CPU计划不需要监督cache，仍要求原模型资产、输入裁剪来源、backend/sampler/预算、远端源码准入；formal_training_allowed=false、execution_allowed=false。带训练checkpoint的候选保留其训练来源核验要求。该变更不授权GPU、不取消原训练/语义门，不借旧64阶段预算。
+
+新增正反向回归后，builder＋媒体harness＋原型＋probe共83项局部CPU测试通过；真实5590任务合同的seed变动已验证会改变摘要，错误视频计数不得放行。原官方完整集合仍为1118输入对×5样本=5590，camera3815；新任务元数据验证不等新模型生成或官方评分完成。
+
+输入图像和pair/维度的真实源复核采用新独立CPU探针，输出原始私有合同和审计凭证；未经过新的模型/backend/预算执行准入前，全部jobs保持不可派发。预算范围仍待之前提出的一次性调整问题确认，没有新增GPU费用。

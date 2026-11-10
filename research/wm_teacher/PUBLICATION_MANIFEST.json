@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-11-10 12:35:25 CST",
+  "created_at": "2026-11-10 20:42:44 CST",
   "files": [
     {
       "path": "scripts/interactive_world_model.py",
@@ -13,13 +13,13 @@
     },
     {
       "path": "scripts/world_model_harness.py",
-      "source_sha256": "d18e7e53252024914ab37ac675c837ec6dc900ec8eb4a99478572b50032858b5",
-      "snapshot_sha256": "d18e7e53252024914ab37ac675c837ec6dc900ec8eb4a99478572b50032858b5"
+      "source_sha256": "59272ae51a55cc78ef2620d2e7eba7c92d413c6101654baa97b23eeb93326861",
+      "snapshot_sha256": "59272ae51a55cc78ef2620d2e7eba7c92d413c6101654baa97b23eeb93326861"
     },
     {
       "path": "tests/test_world_model_harness.py",
-      "source_sha256": "fa5fb4a7c12cc48f5a5aa0e883d4d0e7ee91c028b979a7b7bb02e5fec853c5ce",
-      "snapshot_sha256": "fa5fb4a7c12cc48f5a5aa0e883d4d0e7ee91c028b979a7b7bb02e5fec853c5ce"
+      "source_sha256": "7996b5e46d4a74f99f0fae1423710a269c1ea0010f54245d15db4b7c546f0030",
+      "snapshot_sha256": "7996b5e46d4a74f99f0fae1423710a269c1ea0010f54245d15db4b7c546f0030"
     },
     {
       "path": "scripts/run_world_model_window_probe.py",
@@ -223,8 +223,8 @@
     },
     {
       "path": "docs/51_免训练Teacher多维策略有限实验预注册.md",
-      "source_sha256": "8d33b83cc5c6f2e09e7271406a3391ad1132751b5ec405bbe10ee69d26467923",
-      "snapshot_sha256": "8d33b83cc5c6f2e09e7271406a3391ad1132751b5ec405bbe10ee69d26467923"
+      "source_sha256": "7fbd3938a94de4383a018e026eafa6e3fe7f51bcce16641894c034cafb1eaa43",
+      "snapshot_sha256": "7fbd3938a94de4383a018e026eafa6e3fe7f51bcce16641894c034cafb1eaa43"
     },
     {
       "path": "docs/52_四基准SOTA逐维对照与协议核验.md",
@@ -873,8 +873,8 @@
     },
     {
       "path": "scripts/build_eval_jobs.py",
-      "source_sha256": "161ec753f2ca4420eae731a9c6d1def19355bdceff17f7c954039a0ec5ac09ed",
-      "snapshot_sha256": "199fe148b3bd88ce70b2fd80771fff1a9be6562efbd616f2d611d687664ce1a9"
+      "source_sha256": "b873a8ede6c2eb2764abd6ccf1f905c4cf7e477d1cdb0628bf811b4e6b9da378",
+      "snapshot_sha256": "18446f1ab44917b554c4ce9e1f8b8299e728cd3e2ed31bf8756f2bc5d1639196"
     },
     {
       "path": "scripts/build_extra_bench_jobs.py",
@@ -1193,8 +1193,8 @@
     },
     {
       "path": "tests/test_build_eval_jobs.py",
-      "source_sha256": "372478636ee609767b51aad16fde37dfa6a1a9afdffdfa8b20abecd682fcea57",
-      "snapshot_sha256": "372478636ee609767b51aad16fde37dfa6a1a9afdffdfa8b20abecd682fcea57"
+      "source_sha256": "d59733d80f8cd254b128376ad5a27b20406716b6f05e987339eeac366471bdbd",
+      "snapshot_sha256": "d59733d80f8cd254b128376ad5a27b20406716b6f05e987339eeac366471bdbd"
     },
     {
       "path": "tests/test_run_teacher_probe.py",
@@ -1440,7 +1440,7 @@
   "caveat": "Selected source snapshot, not source Git history or private data. Nonempty output counts are not complete experiment/Teacher acceptance. GitHub push status is separate. Internal deployment addresses are placeholders.",
   "generated_asset_source_note": "PUBLICATION.md is generated public metadata; both hashes refer to its public bytes.",
   "publication_scope": "Current Qwen32B recovery source/dependencies and handoff; unrelated assets preserved byte-for-byte from prior public commit, not claimed to match the current private framework.",
-  "preserved_public_base_commit": "8fbbb8aaefe31f05e5a02573921f46b30ed4a2e7",
+  "preserved_public_base_commit": "8323231c5ee75c9d26779628088272f3eb2255a8",
   "current_source_paths": [
     "docs/31_服务器迁移与CodingAgent交接.md",
     "docs/51_免训练Teacher多维策略有限实验预注册.md",
