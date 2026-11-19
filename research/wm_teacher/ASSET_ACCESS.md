@@ -31,6 +31,19 @@
 - 两个公开仓库均有 eligible_shards/VERIFICATION_20261119.json，记录每个分片的固定 revision、tar SHA256、成员索引 SHA256 及验收范围。
 - **仍未上传**：257,333 个受限/待核实来源的旧 5 秒窗口、12,000 个 OpenVidgen extra 窗口、混合评测包 evalmedia_00000，以及其他原始数据和旧迁移包；许可和私有容量限制未解除。
 
+### 追加续传批次（2026-11-19）
+
+已继续启动 6 路并行，仅限核实可公开的来源，共 **934 个文件、约 115.36 GB**；本段为启动记录，不代表完成。
+
+| 内容 | 公开位置（HF dataset） | 数量及大小 | 状态 |
+|---|---|---|---|
+| 未备份评测包中核对 jobs 输出映射的模型生成视频，仅使用许可核实的 RoboMIND/UKdash 输入 | `zcoutlook/wan22-5s-remaining-public/generated_media/licensed_inputs/` | 216 个，约 0.293 GB | 上传中；不是源视频/GT |
+| 本地已下载的 Traly/RoboMIND-lerobot 原始 MP4 子集 | `zcoutlook/wan22-5s-remaining-public/original_sources/robomind/` | 718 个，约 115.07 GB | 上传中；CC BY-NC 4.0，保留出处与许可说明 |
+
+每个文件以本地计算出的 SHA256 和远端 LFS SHA256/大小一致后记为完成。两类文件不是此前已上传的 6000 个 extra 窗口，不重复传该窗口集。RoboMIND 原始文件是本地选取的子集，不宣称完整上游数据集全部备份。
+
+其余未传资产继续单独核实：257,333 个旧窗口、12,000 个 OpenVidgen 窗口、剩余混合评测媒体、绝大部分旧训练预处理数据、原始下载与旧迁移包仍未全部上传。来源明确禁止再分发、授权待核实或含凭据的内容不整体转公开。
+
 ## 1. 代码与文档
 
 | 内容 | 位置 | 状态 |
