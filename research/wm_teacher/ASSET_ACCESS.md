@@ -21,6 +21,7 @@
 | 上述数据的补充分片 | HF dataset `NZC415/wan22-5s-trainval-overflow`（公开） | 10 个分片，约 23.27 GB |
 | 已有分片覆盖 | 历史上传状态与远端分片比对 | 约 2,507,162 个窗口有对应远端分片 |
 | 大型 manifest/caption（46 个） | `NZC415/wm-dataset` `backups/20261116/large_metadata/`；`final_5s_landscape.jsonl` 与 `nzc-415/wan22-5s/metadata/` 同 SHA；`captions_5s.jsonl` 与 `mira_captions_final.jsonl` 的 gzip 在 `zcoutlook/wm-backup-private` `large_metadata/` | **46/46 已验收** |
+| 4 秒预处理片段（`wan22_training/`，Round1 用其前 49 帧训练；约 159 万段 + MIRA，含中间产物共约 10.3 TB） | 仅集群共享存储 `wm_dataset/dataset/wan22_training/` | **未上传**；HF 上 `wan22-processed-clips` 已于 2026-10-01 清空（当时认为被 5 秒数据取代）。Round1 训练清单与 caption 在私有备份 `training_metadata/` |
 | 原始数据源、处理中间产物、旧上传状态 | 团队集群共享存储的 `wm_dataset/` 项目根目录；具体挂载路径见私有备份中的 `ASSET_ACCESS_PRIVATE.md` | 仅本地，未全部上传 |
 
 下载示例（私有仓库需要已授权账号）：
@@ -70,3 +71,34 @@ huggingface-cli download NZC415/wm-dataset backups/20261118/BACKUP_RESTORE_INDEX
 - 旧集群迁移包（约 264 GB）与各数据集原始下载文件
 
 评测媒体及原始数据涉及来源许可，暂不上传；若 `zcoutlook` 也满额，继续上传需要以下任一条件：升级私有存储额度、在已有额度的另一授权账号/组织中提供写权限，或由所有者明确决定哪些内容可以公开发布、哪些旧私有仓库可以清理。
+
+## 6. 全部数据存储位置总表（2026-11-19 核查）
+
+### Hugging Face
+
+| 账号 | 仓库 | 可见性 | 大小 | 内容 |
+|---|---|---|---|---|
+| nzc-415 | `wan22-5s` | 公开 | 7.79 TB | 5 秒训练窗口 955 个 tar 分片（2,483,000 个窗口）+ `metadata/`（final manifest、caption） |
+| NZC415 | `wan22-5s-trainval-overflow` | 公开 | 23.3 GB | Round2/3 训练与验证用到但主仓库缺的 24,162 个 5 秒窗口 |
+| zcoutlook | `wan22-5s-remaining` | 私有 | 12.0 GB | `shards_extra/`：`wan22_5s_extra` 新增窗口 5/24 分片（6,000 个） |
+| zcoutlook | `wm-backup-private` | 私有 | 243 GB | 65 个训练权重、评测媒体 5/6 分片、2 份大 caption、补充源码/运行记录 |
+| NZC415 | `wm-dataset` | 私有 | 3.0 GB | 代码/文档/实验记录/元数据备份、44 份大型 manifest、恢复索引与访问说明 |
+| NZC415 | `CelebV-HQ-archives`、`VFHQ-videos`、`VFHQ-videos-sharded`、`VFHQ-videos-archives`、`direct-downloads-sharded`、`direct-downloads-archives` | 公开/私有混合 | 约 512 GB | 部分原始数据源下载包（CelebV-HQ、VFHQ、直链下载类） |
+| NZC415 | `dataset-metadata`、`action100m`、`source-json`、`url-datasets` | 私有 | 约 2.5 GB | 数据源元数据、下载 URL 清单 |
+| NZC415 / nzc-415 | `wan22-processed-clips`、`wan22-clips-public` | 公开 | 0 | 空仓库（旧 4 秒片段已清空） |
+
+账号私有存储：NZC415 与 zcoutlook 均已满（LFS 403）。nzc-415 的公开存储也曾在 2026-10-12 触发上限。
+
+### 只在集群共享存储（未上传）
+
+| 内容 | 规模 |
+|---|---|
+| 原始数据源下载（egocentric_interaction、general_action、general_video、digital_human、new_sources） | 约 27.7 TB（部分来源在上表原始数据仓库中有副本） |
+| 4 秒预处理片段及中间产物 `wan22_training/` | 约 10.3 TB（MIRA 约 6.0 TB，CelebV-HQ 约 2.7 TB） |
+| 5 秒窗口中未上传部分：旧缺失 257,333 个（MIRA 208,749、NoXi 22,399、Seamless 16,622、VFHQ 9,536、OpenVidHD 27），extra 剩余约 22,500 个 | 约 1 TB |
+| 评测媒体分片 evalmedia_00000 | 约 5 GB |
+| 上游基座模型权重、旧集群迁移包（环境/缓存/日志） | 约 0.5 TB + 264 GB |
+
+### GitHub
+
+`Anachronism-N/ICASSP-IPVG` 分支 `wm-teacher-experiments-20261018` 的 `research/wm_teacher/`：代码、测试、文档；不含数据和权重。
