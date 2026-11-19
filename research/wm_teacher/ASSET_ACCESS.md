@@ -20,7 +20,7 @@
 | Wan2.2 5 秒训练窗口（视频分片 + metadata） | HF dataset `nzc-415/wan22-5s`（公开） | 955 个分片，约 7.79 TB |
 | 上述数据的补充分片 | HF dataset `NZC415/wan22-5s-trainval-overflow`（公开） | 10 个分片，约 23.27 GB |
 | 已有分片覆盖 | 历史上传状态与远端分片比对 | 约 2,507,162 个窗口有对应远端分片 |
-| 大型 manifest/caption（46 个） | `NZC415/wm-dataset` `backups/20261116/large_metadata/`；`final_5s_landscape.jsonl` 与 `nzc-415/wan22-5s/metadata/` 同 SHA；`captions_5s.jsonl` 与 `mira_captions_final.jsonl` 的 gzip 在 `zcoutlook/wm-backup-private` `large_metadata/` | 44 个已验收；2 个上传中 |
+| 大型 manifest/caption（46 个） | `NZC415/wm-dataset` `backups/20261116/large_metadata/`；`final_5s_landscape.jsonl` 与 `nzc-415/wan22-5s/metadata/` 同 SHA；`captions_5s.jsonl` 与 `mira_captions_final.jsonl` 的 gzip 在 `zcoutlook/wm-backup-private` `large_metadata/` | **46/46 已验收** |
 | 原始数据源、处理中间产物、旧上传状态 | 团队集群共享存储的 `wm_dataset/` 项目根目录；具体挂载路径见私有备份中的 `ASSET_ACCESS_PRIVATE.md` | 仅本地，未全部上传 |
 
 下载示例（私有仓库需要已授权账号）：
@@ -40,14 +40,14 @@ huggingface-cli download NZC415/wm-dataset backups/20261118/BACKUP_RESTORE_INDEX
 | 内容 | 位置 | 状态 |
 |---|---|---|
 | 基座模型 Wan2.2-TI2V-5B 等上游权重 | 从官方发布渠道下载 | 不在本项目仓库中 |
-| 本项目训练的 checkpoint（full1_5b、ft2_5b、merge 插值、round1–4 LoRA、e3_arms、smoke 等，共 65 个 safetensors，约 217.25 GB） | HF dataset `zcoutlook/wm-backup-private`（私有）`checkpoints/models/train/...`，路径与集群 `wm_dataset/models/train/` 一致 | 上传中，小 LoRA 与各 run 最终 step 优先；完成情况以仓库内文件为准 |
+| 本项目训练的 checkpoint（full1_5b、ft2_5b、merge 插值、round1–4 LoRA、e3_arms、smoke 等，共 65 个 safetensors，约 217.25 GB） | HF dataset `zcoutlook/wm-backup-private`（私有）`checkpoints/models/train/...`，路径与集群 `wm_dataset/models/train/` 一致 | **65/65 已上传**，逐文件远端 SHA256 验收 |
 | HF 账号下的模型仓库 `NZC415/causal-forcing-stage2-ode-i2v`、`NZC415/m2d` | HF model（公开） | 不是本项目 Teacher checkpoint |
 
 ## 4. 评测媒体及其他资产
 
 | 内容 | 位置 | 状态 |
 |---|---|---|
-| 评测视频、帧图、demo 媒体（约 20,891 个文件，约 29.75 GB） | 集群共享存储 `wm_dataset/eval/`、`wm_dataset/demo/` | 未上传；含来源数据帧，需先审查许可 |
+| 评测视频、帧图、demo 媒体（约 20,891 个文件，约 29.75 GB） | `zcoutlook/wm-backup-private` `media/eval_demo/evalmedia_0000{1..5}.tar`（每个 tar 附 `.index.json` 成员 SHA256）；其余在集群 `wm_dataset/eval/`、`demo/` | 6 个分片中 5 个已上传（13,975 个文件，约 22.7 GiB）；`evalmedia_00000` 因额度满未传 |
 | 补充源码/运行脚本/旧节点文档（9296 个文件，脱敏） | HF dataset `zcoutlook/wm-backup-private`（私有）`restoration/supplemental_source_runtime.tar.gz` | 已上传并哈希验收 |
 | 运行环境、旧集群迁移包（16 个 tar，约 264.2 GB） | 集群共享存储中的迁移备份目录 | 未上传；只有本地 SHA256 验收记录 |
 | 人工审阅私密记录、凭据、cookies | 不上传 | 按设计排除 |
@@ -57,17 +57,16 @@ huggingface-cli download NZC415/wm-dataset backups/20261118/BACKUP_RESTORE_INDEX
 | 存储 | 状态 |
 |---|---|
 | HF 账号 `NZC415` **私有存储** | **已满**。LFS 上传预检返回 403 `Private storage limit reached`；该账号私有仓库合计约 128.8 GB。小型文本提交仍可成功，大文件无法再上传 |
-| HF 账号 `zcoutlook` 私有存储 | 2026-11-18 新增备份目标，单文件上限 50 GB；当前用于补充归档、2 份大 caption、训练权重 |
+| HF 账号 `zcoutlook` 私有存储 | **已满**（2026-11-19 返回 403 `Private storage limit reached`）。已存约 237.5 GiB：补充归档、2 份大 caption、65 个权重、5 个评测媒体分片、5 个 extra 视频分片 |
 | HF 公开仓库 | 可写；但公开发布涉及数据许可和模型发布决定，未擅自使用 |
 | 团队集群共享存储 | 约 87% 已用，仍有约 245 TB 可用；所有原始数据和权重仍在此 |
 | 当前节点本地盘 | 约 7% 已用 |
 
-因 `NZC415` 私有存储已满，以下内容改为上传到 `zcoutlook/wm-backup-private`（进行中），其余仍未上传：
+`NZC415`、`zcoutlook` 两个账号私有存储均已满。截至 2026-11-19 仍未上传：
 
-- `dataset/manifests/mira_captions_final.jsonl`（约 4.13 GB）
-- `dataset/wan22_5s/captions_5s.jsonl`（约 4.11 GB）
-- 本项目训练 checkpoint，约 217.25 GB
-- 评测媒体，约 29.75 GB
-- 历史上传状态中尚未上传的约 257,333 个 5 秒窗口，以及新增 `wan22_5s_extra` 的 28,510 行对应视频
+- 评测媒体分片 `evalmedia_00000`（约 5 GB）
+- 历史上传状态中尚未上传的 257,333 个 5 秒窗口（约 900 GB，计划在私有 `zcoutlook/wan22-5s-remaining` `shards_legacy/`，0/215 分片）
+- `wan22_5s_extra` 新增窗口：已上传 6,000 个（`zcoutlook/wan22-5s-remaining` `shards_extra/extra_0000{0..4}.tar`），剩余约 22,500 个（19/24 分片）
+- 旧集群迁移包（约 264 GB）与各数据集原始下载文件
 
 评测媒体及原始数据涉及来源许可，暂不上传；若 `zcoutlook` 也满额，继续上传需要以下任一条件：升级私有存储额度、在已有额度的另一授权账号/组织中提供写权限，或由所有者明确决定哪些内容可以公开发布、哪些旧私有仓库可以清理。
