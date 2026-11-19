@@ -10,9 +10,9 @@
 
 | 本轮范围 | 公开位置 | 状态 |
 |---|---|---|
-| RoboMIND 6000 个 5 秒窗口 | `zcoutlook/wan22-5s-remaining-public/eligible_shards/robomind/` | 上传中；实际来源为 Traly/RoboMIND-lerobot，CC BY-NC 4.0，附署名、许可链接和处理说明 |
-| UK-Road-DashCam 4510 个 5 秒窗口 | `zcoutlook/wan22-5s-remaining-public/eligible_shards/ukdash/` | 上传中；源数据卡声明 MIT，附源出处和许可说明 |
-| DexYCB 2400 个旧预处理片段 | `zcoutlook/wan22-4s-clips/eligible_shards/dexycb/` | 上传中；CC BY-NC 4.0，保留原始长度信息，不全部标为 4 秒 |
+| RoboMIND 6000 个 5 秒窗口 | `zcoutlook/wan22-5s-remaining-public/eligible_shards/robomind/` | **5/5 分片、6000/6000 窗口已独立验收**；实际来源为 Traly/RoboMIND-lerobot，CC BY-NC 4.0，附署名、许可链接和处理说明 |
+| UK-Road-DashCam 4510 个 5 秒窗口 | `zcoutlook/wan22-5s-remaining-public/eligible_shards/ukdash/` | **4/4 分片、4510/4510 窗口已独立验收**；源数据卡声明 MIT，附源出处和许可说明 |
+| DexYCB 2400 个旧预处理片段 | `zcoutlook/wan22-4s-clips/eligible_shards/dexycb/` | **2/2 分片、2400/2400 片段已独立验收**；CC BY-NC 4.0，保留原始长度信息，不全部标为 4 秒 |
 | 257333 个旧缺失窗口 | 集群原件保留 | 未传。MIRA、NoXi、Seamless 等在来源条款中禁止再分发；VFHQ 等仍需核实条款 |
 | OpenVidgen 12000 个 extra 窗口 | 集群原件保留 | 未传；视频版权及公开再分发授权待确认 |
 | 混合评测分片 evalmedia_00000、旧迁移包、其他原始数据 | 集群原件保留 | 未传；不能将来源视频帧、私有日志或未经审查的包整体公开 |
@@ -20,6 +20,16 @@
 更正：旧文档把 Charades 简写为 CC BY-NC 并不准确。其数据许可明确不授予公开发布修改数据或向第三方分发数据的权利，本轮不公开上传该来源。RoboMIND 的本地下载来源是 Traly 转换版（CC BY-NC），不能以另一个官方仓库的 Apache 标签替代该版本许可。
 
 分片完成以远端文件大小、SHA256 和成员索引验收为准；“上传中”不表示已经全部完成。受限来源继续备份需符合原条款的授权私有存储，或提供另外取得的公开再分发授权；仅允许将仓库公开不等于取得来源授权。
+
+### 本轮完成验收（2026-11-19）
+
+本轮 **11/11 个分片、12,910/12,910 个视频**完成上传及独立校验，tar 合计 **50.50 GB**。这仅代表本轮来源许可允许的子集完成，**不是全部数据资产已上传**。
+
+- 在每个分片固定 commit 上核对远端字节数和 LFS SHA256；实际下载 .tar.index.json 并与冻结计划逐成员比较。
+- 本地已上传 tar 的完整 SHA256 与远端一致，全部 12,910 个成员逐一核对字节数与 SHA256，无遗漏、重复或缺失源；没有再次全量下载约 50 GB 的 tar。
+- 已私有上传的 6000 个 extra 窗口与本轮成员集合无交集，未重复上传。
+- 两个公开仓库均有 eligible_shards/VERIFICATION_20261119.json，记录每个分片的固定 revision、tar SHA256、成员索引 SHA256 及验收范围。
+- **仍未上传**：257,333 个受限/待核实来源的旧 5 秒窗口、12,000 个 OpenVidgen extra 窗口、混合评测包 evalmedia_00000，以及其他原始数据和旧迁移包；许可和私有容量限制未解除。
 
 ## 1. 代码与文档
 
@@ -40,7 +50,7 @@
 | 上述数据的补充分片 | HF dataset `NZC415/wan22-5s-trainval-overflow`（公开） | 10 个分片，约 23.27 GB |
 | 已有分片覆盖 | 历史上传状态与远端分片比对 | 约 2,507,162 个窗口有对应远端分片 |
 | 大型 manifest/caption（46 个） | `NZC415/wm-dataset` `backups/20261116/large_metadata/`；`final_5s_landscape.jsonl` 与 `nzc-415/wan22-5s/metadata/` 同 SHA；`captions_5s.jsonl` 与 `mira_captions_final.jsonl` 的 gzip 在 `zcoutlook/wm-backup-private` `large_metadata/` | **46/46 已验收** |
-| 4 秒预处理片段（`wan22_training/`，Round1 用其前 49 帧训练；约 159 万段 + MIRA，含中间产物共约 10.3 TB） | 仅集群共享存储 `wm_dataset/dataset/wan22_training/` | **未上传**；HF 上 `wan22-processed-clips` 已于 2026-10-01 清空（当时认为被 5 秒数据取代）。Round1 训练清单与 caption 在私有备份 `training_metadata/` |
+| 4 秒预处理片段（`wan22_training/`，Round1 用其前 49 帧训练；约 159 万段 + MIRA，含中间产物共约 10.3 TB） | 仅集群共享存储 `wm_dataset/dataset/wan22_training/` | **整体未完成，仅 DexYCB 2400 个片段已公开备份**；HF 上 `wan22-processed-clips` 已于 2026-10-01 清空（当时认为被 5 秒数据取代）。Round1 训练清单与 caption 在私有备份 `training_metadata/` |
 | 原始数据源、处理中间产物、旧上传状态 | 团队集群共享存储的 `wm_dataset/` 项目根目录；具体挂载路径见私有备份中的 `ASSET_ACCESS_PRIVATE.md` | 仅本地，未全部上传 |
 
 下载示例（私有仓库需要已授权账号）：
@@ -86,7 +96,7 @@ huggingface-cli download NZC415/wm-dataset backups/20261118/BACKUP_RESTORE_INDEX
 
 - 评测媒体分片 `evalmedia_00000`（约 5 GB）
 - 历史上传状态中尚未上传的 257,333 个 5 秒窗口（约 900 GB，计划在私有 `zcoutlook/wan22-5s-remaining` `shards_legacy/`，0/215 分片）
-- `wan22_5s_extra` 新增窗口：已上传 6,000 个（`zcoutlook/wan22-5s-remaining` `shards_extra/extra_0000{0..4}.tar`），剩余约 22,500 个（19/24 分片）
+- `wan22_5s_extra` 新增窗口：已上传 6,000 个（`zcoutlook/wan22-5s-remaining` `shards_extra/extra_0000{0..4}.tar`），本轮另在公开仓库验收 RoboMIND 6000 个和 UKdash 4510 个，累计覆盖 16,510/28,510 个；剩余 OpenVidgen 12,000 个未传
 - 旧集群迁移包（约 264 GB）与各数据集原始下载文件
 
 评测媒体及原始数据涉及来源许可，暂不上传；若 `zcoutlook` 也满额，继续上传需要以下任一条件：升级私有存储额度、在已有额度的另一授权账号/组织中提供写权限，或由所有者明确决定哪些内容可以公开发布、哪些旧私有仓库可以清理。
@@ -99,6 +109,8 @@ huggingface-cli download NZC415/wm-dataset backups/20261118/BACKUP_RESTORE_INDEX
 |---|---|---|---|---|
 | nzc-415 | `wan22-5s` | 公开 | 7.79 TB | 5 秒训练窗口 955 个 tar 分片（2,483,000 个窗口）+ `metadata/`（final manifest、caption） |
 | NZC415 | `wan22-5s-trainval-overflow` | 公开 | 23.3 GB | Round2/3 训练与验证用到但主仓库缺的 24,162 个 5 秒窗口 |
+| zcoutlook | `wan22-5s-remaining-public` | 公开 | 本轮视频约 49.52 GB | eligible_shards/robomind/ 5 分片 + eligible_shards/ukdash/ 4 分片，共 10,510 窗口；附成员索引和验收凭证 |
+| zcoutlook | `wan22-4s-clips` | 公开 | 本轮视频约 0.98 GB | eligible_shards/dexycb/ 2 分片、2400 个 DexYCB 片段；其他来源没有在本轮公开上传 |
 | zcoutlook | `wan22-5s-remaining` | 私有 | 12.0 GB | `shards_extra/`：`wan22_5s_extra` 新增窗口 5/24 分片（6,000 个） |
 | zcoutlook | `wm-backup-private` | 私有 | 243 GB | 65 个训练权重、评测媒体 5/6 分片、2 份大 caption、补充源码/运行记录 |
 | NZC415 | `wm-dataset` | 私有 | 3.0 GB | 代码/文档/实验记录/元数据备份、44 份大型 manifest、恢复索引与访问说明 |
@@ -114,7 +126,7 @@ huggingface-cli download NZC415/wm-dataset backups/20261118/BACKUP_RESTORE_INDEX
 |---|---|
 | 原始数据源下载（egocentric_interaction、general_action、general_video、digital_human、new_sources） | 约 27.7 TB（部分来源在上表原始数据仓库中有副本） |
 | 4 秒预处理片段及中间产物 `wan22_training/` | 约 10.3 TB（MIRA 约 6.0 TB，CelebV-HQ 约 2.7 TB） |
-| 5 秒窗口中未上传部分：旧缺失 257,333 个（MIRA 208,749、NoXi 22,399、Seamless 16,622、VFHQ 9,536、OpenVidHD 27），extra 剩余约 22,500 个 | 约 1 TB |
+| 5 秒窗口中未上传部分：旧缺失 257,333 个（MIRA 208,749、NoXi 22,399、Seamless 16,622、VFHQ 9,536、OpenVidHD 27），extra 剩余 12,000 个（OpenVidgen） | 约 1 TB |
 | 评测媒体分片 evalmedia_00000 | 约 5 GB |
 | 上游基座模型权重、旧集群迁移包（环境/缓存/日志） | 约 0.5 TB + 264 GB |
 
