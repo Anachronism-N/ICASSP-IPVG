@@ -64,7 +64,7 @@ RAVDESS 来源为 Livingstone 与 Russo 的官方发布，处理子集保持非�
 
 ### DexYCB原始压缩包追加备份（2026-11-20）
 
-已继续启动 **3 个原始压缩包、36.61 GB** 的审计与上传，公开位置：
+**3/3 个原始压缩包、36.61 GB 已完成上传并独立验收**，普通文件成员共 **522,936 个**。公开位置：
 
 `zcoutlook/wan22-4s-clips/original_sources/dexycb_archives/`
 
@@ -72,11 +72,11 @@ RAVDESS 来源为 Livingstone 与 Russo 的官方发布，处理子集保持非�
 
 | 本地保留文件名 | 压缩包实际内部根目录 | 状态 |
 |---|---|---|
-| 20200709-subject-01.tar.gz | 20200709-subject-01 | 全量审计/上传中 |
-| 20200709-subject-02.tar.gz | 20200813-subject-02 | 全量审计/上传中 |
-| 20200709-subject-03.tar.gz | 20200820-subject-03 | 全量审计/上传中 |
+| 20200709-subject-01.tar.gz | 20200709-subject-01 | **已完整审计、上传并独立SHA验收** |
+| 20200709-subject-02.tar.gz | 20200813-subject-02 | **已完整审计、上传并独立SHA验收** |
+| 20200709-subject-03.tar.gz | 20200820-subject-03 | **已完整审计、上传并独立SHA验收** |
 
-每个包先完整解码gzip并校验所有普通成员路径、大小及SHA256，再核对远端压缩包SHA256；附 .members.jsonl.gz 成员索引与 .audit.json 审计记录。拒绝路径穿越、链接/设备成员、凭据内容或损坏包，不把目录名称或上传进程存活当完成证据。三个包只代表本地下载的部分subject，不是完整DexYCB数据集。
+每个包已完整解码gzip并校验所有普通成员路径、大小及SHA256，远端压缩包大小及LFS SHA256与审计缓存一致；实际下载 .members.jsonl.gz 成员索引和 .audit.json 审计记录，核对522,936个成员计数、总字节量与真实subject根无遗漏。独立验收证据：`original_sources/dexycb_archives/VERIFICATION_20261120.json`。拒绝路径穿越、链接/设备成员、凭据内容或损坏包，不把目录名称或上传进程存活当完成证据。三个包只代表本地下载的部分subject，不是完整DexYCB数据集。
 
 已传的UK原始视频、RoboMIND、DexYCB/RAVDESS处理片段与65权重不重传。其余受限来源与未安全审阅的旧迁移包仍需适用授权和足够的私有存储；当前全部资产完成标记保持false。
 
@@ -164,6 +164,7 @@ huggingface-cli download NZC415/wm-dataset backups/20261118/BACKUP_RESTORE_INDEX
 | zcoutlook | `wm-backup-private` | 私有 | 243 GB | 65 个训练权重、评测媒体 5/6 分片、2 份大 caption、补充源码/运行记录 |
 | NZC415 | `wm-dataset` | 私有 | 3.0 GB | 代码/文档/实验记录/元数据备份、44 份大型 manifest、恢复索引与访问说明 |
 | NZC415 | `CelebV-HQ-archives`、`VFHQ-videos`、`VFHQ-videos-sharded`、`VFHQ-videos-archives`、`direct-downloads-sharded`、`direct-downloads-archives` | 公开/私有混合 | 约 512 GB | 部分原始数据源下载包（CelebV-HQ、VFHQ、直链下载类） |
+| zcoutlook | `wan22-4s-clips` | 公开 | 新增原始包36.61 GB | `original_sources/dexycb_archives/`：3个DexYCB原始压缩包（原始RGB/深度/标签），522,936普通文件成员已审计；另有4个RAVDESS处理分片，共2880视频 |
 | NZC415 | `dataset-metadata`、`action100m`、`source-json`、`url-datasets` | 私有 | 约 2.5 GB | 数据源元数据、下载 URL 清单 |
 | NZC415 / nzc-415 | `wan22-processed-clips`、`wan22-clips-public` | 公开 | 0 | 空仓库（旧 4 秒片段已清空） |
 
