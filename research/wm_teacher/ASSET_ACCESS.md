@@ -117,6 +117,14 @@ RAVDESS 来源为 Livingstone 与 Russo 的官方发布，处理子集保持非�
 
 本批去重后，混合评测残余为**3993个文件、3.8099 GB**。257333个旧窗口、12000个OpenVidgen及其他原始数据、迁移包仍未完成；许可和私有容量阻塞不因此解除。
 
+### 补齐E1b许可来源漏项（2026-11-20）
+
+又补齐了27个文件（18个既有E1b生成输出、9张条件输入帧），共29.60 MB。来源只含已核实可公开的RoboMIND/UKdash；输入帧SHA与cases记录一致，生成输出配置与E1b汇总和cases对应，未猜测或复原未保存的生成参数，没有新模型执行。
+
+公开位置：`zcoutlook/wan22-5s-remaining-public/generated_media/e1b_licensed_residual/`；固定revision `b8d250b0771078053d25eac5b1a5811eb8749a9f`。27个对象已实际从HF下载并验算SHA，INDEX.json提供每个对象路径、来源case和SHA，原文件保持不变。
+
+最新混合评测残余为3966个文件、3.7803GB。257333个旧窗口、12000个OpenVidgen及其他原始数据、迁移包仍未全部备份；当前没有活动传输，私有大对象容量和来源授权是剩余阻塞，监控仅检查就绪条件，不冒称上传进度。
+
 ## 1. 代码与文档
 
 | 内容 | 位置 | 状态 |
@@ -126,7 +134,7 @@ RAVDESS 来源为 Livingstone 与 Russo 的官方发布，处理子集保持非�
 | 项目脚本、测试、文档、训练元数据（脱敏） | `NZC415/wm-dataset` `backups/20261116/project/` | 已验收；凭据被替换为 `<REDACTED_CREDENTIAL>` |
 | DiffSynth-Studio 改动、数据脚本、demo 源码（1203 个文件） | `NZC415/wm-dataset` `backups/20261116/restoration/source_remainder.tar.gz` | 已实际下载并逐成员验收 |
 | 实验文本记录（3513 份：评测结果、配置、报告） | `NZC415/wm-dataset` `backups/20261116/experiment_records/` | 已实际下载并逐成员验收 |
-| 统一恢复索引（每个文件的固定 revision、路径、SHA256） | `NZC415/wm-dataset` `backups/20261120/CHECKED_CROSS_ACCOUNT_INDEX_V3.json`；旧文本恢复说明仍在 `backups/20261118/RESTORE_BACKUP.md` | 最新跨账号索引已上传并重新下载验证，固定 revision `80cd6fb97e208b155ccee0d32b1e3fd2bf644591`；包括新增Physics资产、EgoDex第三方引用与未传阻塞，**不表示全量已完成** |
+| 统一恢复索引（每个文件的固定 revision、路径、SHA256） | `NZC415/wm-dataset` `backups/20261120/CHECKED_CROSS_ACCOUNT_INDEX_V5.json`；旧文本恢复说明仍在 `backups/20261118/RESTORE_BACKUP.md` | 最新跨账号索引V5已上传并实际下载验证，固定 revision `b96a958691fe72caf4b303d5bda51aa4520cc14f`；包括已传子集与剩余阻塞，**不表示全量已完成** |
 
 ## 2. 训练数据
 
