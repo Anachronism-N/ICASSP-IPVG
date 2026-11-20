@@ -107,6 +107,16 @@ RAVDESS 来源为 Livingstone 与 Russo 的官方发布，处理子集保持非�
 
 先前混合评测包剩余6637个文件中，本批补齐2248个；该包仍剩4389个文件，约3.995GB（以最新差集清单为准），不能视为整个evalmedia_00000已完成。受限旧窗口、OpenVidgen、其他原始数据及迁移包仍未形成全量备份。
 
+### Physics-IQ E2输出重复副本去重（2026-11-20）
+
+继续从未传混合评测包中核实198个E2模型输出及198个相同内容的本地副本：生成任务、原版Physics-IQ输入帧、模型base_s12c5、seed/CFG/shift映射已核对，两套文件的SHA256和大小逐一相同。
+
+现已只上传**198个规范视频（tar约92.78 MB）**，成员索引记录相同本地别名，能够恢复**396条本地文件路径**，没有重复传输185.26 MB两份相同视频，也没有删除或修改本地副本。
+
+公开位置：`zcoutlook/wan22-5s-remaining-public/generated_media/physics_original_e2/`；包含canonical_outputs.tar、.index.json、NOTICE.md、VERIFICATION_20261120.json。198个成员SHA及固定revision远端tar SHA通过，成员索引实际下载与冻结计划完全一致。这些是模型生成输出，不是源拍摄视频或GT，也没有重新执行GPU实验或提交榜单。
+
+本批去重后，混合评测残余为**3993个文件、3.8099 GB**。257333个旧窗口、12000个OpenVidgen及其他原始数据、迁移包仍未完成；许可和私有容量阻塞不因此解除。
+
 ## 1. 代码与文档
 
 | 内容 | 位置 | 状态 |
