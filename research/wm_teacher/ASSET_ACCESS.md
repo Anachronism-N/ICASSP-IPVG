@@ -86,6 +86,17 @@ RAVDESS 来源为 Livingstone 与 Russo 的官方发布，处理子集保持非�
 
 位置：`NZC415/wm-dataset/backups/20261120/excluded_node_manifest/`；包含manifest.sanitized.jsonl.gz与RESTORE_INDEX.json。固定revision：b6f80f67abbfff0d47215f831aac8ce69bbc4b70。原始文件未修改，备份说明包含源SHA、存储SHA与4个节点的相同内容引用；这不代表其引用的视频或50000条训练任务均已备份/运行。
 
+### EgoDex既有上游副本身份核验（2026-11-20）
+
+本地下载根目录 `dataset/new_sources/egodex/` 下的 **989 个文件、约91.41 GB** 已逐一确认与既有公开上游副本字节一致：731个LFS对象以本地SHA256对照上游LFS SHA256，258个普通Git元数据以本地Git blob SHA1对照上游对象；无缺失或不一致。
+
+- 上游公开位置：`griffinlabs/EgoDex-LeRobot-v3.0`；固定revision：41d60b449629b2181ff5b735d31c2a2cf8b3cad8。
+- 身份及恢复引用证据（私有）：`NZC415/wm-dataset/backups/20261120/EGODEX_EXISTING_REMOTE_REFERENCE.json`；固定revision：1af35218de934dc45d5abf872b037bb60ee13525。
+- **这是确认第三方现有副本可用于恢复，不是将91GB原始数据重新上传到本人账号，也不是独立自有备份。** 上游仓库的可访问性由其所有者决定。
+- 本地来源为声明CC BY-NC-ND 4.0的转换版；本次不改变视频、重新裁切或公开再发布。先前6000个私有EgoDex窗口不因此计为完整原始数据备份。
+
+全项目仍未备份完成：剩余257333旧窗口、12000个OpenVidgen、6637个混合评测文件及其余原始数据/迁移包仍未形成完整自有远端覆盖。两个私有账号5GiB容量预检仍返回403，现无可用的其他私有对象存储配置。已有公开副本或重新处理不能替代受限来源的再分发授权；需要所有者提供适用许可允许的私有存储或额外来源授权。
+
 ## 1. 代码与文档
 
 | 内容 | 位置 | 状态 |
