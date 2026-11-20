@@ -1,6 +1,6 @@
 # 数据、训练权重及其他资产访问说明
 
-更新时间：2026-11-19。本文只说明访问位置和当前备份状态，不包含任何凭据、cookies、内部节点地址或私有日志。私有仓库需由仓库所有者授予读取权限后，用自己的 Hugging Face 登录访问。
+更新时间：2026-11-20。本文只说明访问位置和当前备份状态，不包含任何凭据、cookies、内部节点地址或私有日志。私有仓库需由仓库所有者授予读取权限后，用自己的 Hugging Face 登录访问。
 
 ## 当前续传范围（2026-11-19）
 
@@ -33,14 +33,14 @@
 
 ### 追加续传批次（2026-11-19）
 
-已继续启动 6 路并行，仅限核实可公开的来源，共 **934 个文件、约 115.36 GB**；本段为启动记录，不代表完成。
+本批 **934/934 个文件、115.36 GB 已完成上传**；2026-11-20 已按冻结计划独立核对全部远端文件大小与 LFS SHA256，并下载 17 份批次索引验证无遗漏或重复。此前逐文件提交触发的 429 限流已通过冷却后每 50 个文件批量提交解决，旧错误记录保留；本批后续无新错误。
 
 | 内容 | 公开位置（HF dataset） | 数量及大小 | 状态 |
 |---|---|---|---|
-| 未备份评测包中核对 jobs 输出映射的模型生成视频，仅使用许可核实的 RoboMIND/UKdash 输入 | `zcoutlook/wan22-5s-remaining-public/generated_media/licensed_inputs/` | 216 个，约 0.293 GB | 上传中；不是源视频/GT |
-| 本地已下载的 Traly/RoboMIND-lerobot 原始 MP4 子集 | `zcoutlook/wan22-5s-remaining-public/original_sources/robomind/` | 718 个，约 115.07 GB | 上传中；CC BY-NC 4.0，保留出处与许可说明 |
+| 未备份评测包中核对 jobs 输出映射的模型生成视频，仅使用许可核实的 RoboMIND/UKdash 输入 | `zcoutlook/wan22-5s-remaining-public/generated_media/licensed_inputs/` | 216 个，约 0.293 GB | **216/216 已完成并独立验收**；不是源视频/GT |
+| 本地已下载的 Traly/RoboMIND-lerobot 原始 MP4 子集 | `zcoutlook/wan22-5s-remaining-public/original_sources/robomind/` | 718 个，约 115.07 GB | **718/718 已完成并独立验收**；CC BY-NC 4.0，保留出处与许可说明 |
 
-每个文件以本地计算出的 SHA256 和远端 LFS SHA256/大小一致后记为完成。两类文件不是此前已上传的 6000 个 extra 窗口，不重复传该窗口集。RoboMIND 原始文件是本地选取的子集，不宣称完整上游数据集全部备份。
+每个文件以本地计算出的 SHA256 和远端 LFS SHA256/大小一致后记为完成。全部 934 个文件的远端快照验收通过；没有再次下载 115 GB 视频。验收清单位于 `zcoutlook/wan22-5s-remaining-public/original_sources/robomind/ADDITIONAL_ASSETS_VERIFICATION_20261120.json`，包含固定 revision、逐文件路径、SHA256 与批次索引证据。两类文件不是此前已上传的 6000 个 extra 窗口，不重复传该窗口集。RoboMIND 原始文件是本地选取的子集，不宣称完整上游数据集全部备份。
 
 其余未传资产继续单独核实：257,333 个旧窗口、12,000 个 OpenVidgen 窗口、剩余混合评测媒体、绝大部分旧训练预处理数据、原始下载与旧迁移包仍未全部上传。来源明确禁止再分发、授权待核实或含凭据的内容不整体转公开。
 
