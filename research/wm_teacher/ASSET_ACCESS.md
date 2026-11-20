@@ -116,7 +116,7 @@ RAVDESS 来源为 Livingstone 与 Russo 的官方发布，处理子集保持非�
 | 项目脚本、测试、文档、训练元数据（脱敏） | `NZC415/wm-dataset` `backups/20261116/project/` | 已验收；凭据被替换为 `<REDACTED_CREDENTIAL>` |
 | DiffSynth-Studio 改动、数据脚本、demo 源码（1203 个文件） | `NZC415/wm-dataset` `backups/20261116/restoration/source_remainder.tar.gz` | 已实际下载并逐成员验收 |
 | 实验文本记录（3513 份：评测结果、配置、报告） | `NZC415/wm-dataset` `backups/20261116/experiment_records/` | 已实际下载并逐成员验收 |
-| 统一恢复索引（每个文件的固定 revision、路径、SHA256） | `NZC415/wm-dataset` `backups/20261118/BACKUP_RESTORE_INDEX.json`、`RESTORE_BACKUP.md` | 已验收 |
+| 统一恢复索引（每个文件的固定 revision、路径、SHA256） | `NZC415/wm-dataset` `backups/20261120/CHECKED_CROSS_ACCOUNT_INDEX_V3.json`；旧文本恢复说明仍在 `backups/20261118/RESTORE_BACKUP.md` | 最新跨账号索引已上传并重新下载验证，固定 revision `80cd6fb97e208b155ccee0d32b1e3fd2bf644591`；包括新增Physics资产、EgoDex第三方引用与未传阻塞，**不表示全量已完成** |
 
 ## 2. 训练数据
 
