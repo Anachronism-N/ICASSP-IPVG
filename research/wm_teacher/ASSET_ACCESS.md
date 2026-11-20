@@ -46,19 +46,19 @@
 
 ### 继续补齐原始视频与旧预处理片段（2026-11-20）
 
-继续批次已启动，以下状态是**上传中，不是全部完成**：
+以下两批均已独立验收完成；**不代表所有数据资产全部完成**：
 
 | 内容 | 公开仓库/目录 | 范围 | 状态 |
 |---|---|---|---|
-| 本地 UK-Road-DashCam 原始 MP4 | `zcoutlook/wan22-5s-remaining-public/original_sources/ukdash/` | 274 个、174.67 GB | 6 路预上传，20 文件一提交 |
-| RoboMIND 元数据、DexYCB 训练 manifest 与源许可说明 | `zcoutlook/wan22-5s-remaining-public/original_sources/{robomind,dexycb}/` | 23 个元数据文件、3 个许可说明；约 91.03 MB | 与视频同批验收；文本快照移除集群绝对路径和凭据，不修改源文件 |
+| 本地 UK-Road-DashCam 原始 MP4 | `zcoutlook/wan22-5s-remaining-public/original_sources/ukdash/` | 274 个、174.67 GB | **274/274 原始视频已上传并独立SHA验收**；20 文件一提交 |
+| RoboMIND 元数据、DexYCB 训练 manifest 与源许可说明 | `zcoutlook/wan22-5s-remaining-public/original_sources/{robomind,dexycb}/` | 23 个元数据文件、3 个许可说明；约 91.03 MB | **26/26 已上传并独立SHA验收**；文本快照移除集群绝对路径和凭据，不修改源文件 |
 | RAVDESS 本地预处理 MP4 | `zcoutlook/wan22-4s-clips/eligible_shards/ravdess/` | 2880 个、约 1.04 GB，4 个分片 | **4/4 已上传并独立验收，2880/2880 成员SHA通过**；保留 CC BY-NC-SA 4.0、署名和相同许可要求 |
 
 更正早前遗漏：UK-Road-DashCam 的本地原始文件后缀是大写 .MP4，此前只检查小写 .mp4 导致错误判断为无原始视频；本批使用大小写无关的文件类型检查。已完成的 4510 个 UKdash 5 秒窗口与这 274 个原始文件是不同资产，不把原始视频备份记为窗口重复传输。
 
 RAVDESS 来源为 Livingstone 与 Russo 的官方发布，处理子集保持非商业、署名、相同许可条件。只上传本地2880个预处理视频，不把其数量外推为完整上游音频/歌曲数据集覆盖。
 
-300个单文件条目（274视频、23元数据、3许可说明）仍在上传，完成后独立验证固定远端revision、大小、SHA256。4个RAVDESS分片已经按远端固定revision、tar SHA256、实际下载的成员索引及全部2880个本地tar成员SHA256独立验收通过。遇额度、限流或校验错误停止，不改公开性、不删除源文件、不启动GPU。
+**300/300 个文件、174.76 GB 已全部上传并独立验收**：冻结计划与远端路径、大小及SHA256一一匹配，实际下载15份批次索引验证无遗漏或重复，未再次下载174GB视频。验收证据为 zcoutlook/wan22-5s-remaining-public/original_sources/NEXT_ASSETS_20261120/VERIFICATION.json。4个RAVDESS分片已经按远端固定revision、tar SHA256、实际下载的成员索引及全部2880个本地tar成员SHA256独立验收通过。遇额度、限流或校验错误停止，不改公开性、不删除源文件、不启动GPU。
 
 其余受限旧窗口、OpenVidgen、混合评测残余、其他原始数据和旧迁移包仍未全部上传，原件保留。重新处理不解除已知来源许可；全量备份完成标记仍为false。
 
@@ -81,7 +81,7 @@ RAVDESS 来源为 Livingstone 与 Russo 的官方发布，处理子集保持非�
 | 上述数据的补充分片 | HF dataset `NZC415/wan22-5s-trainval-overflow`（公开） | 10 个分片，约 23.27 GB |
 | 已有分片覆盖 | 历史上传状态与远端分片比对 | 约 2,507,162 个窗口有对应远端分片 |
 | 大型 manifest/caption（46 个） | `NZC415/wm-dataset` `backups/20261116/large_metadata/`；`final_5s_landscape.jsonl` 与 `nzc-415/wan22-5s/metadata/` 同 SHA；`captions_5s.jsonl` 与 `mira_captions_final.jsonl` 的 gzip 在 `zcoutlook/wm-backup-private` `large_metadata/` | **46/46 已验收** |
-| 4 秒预处理片段（`wan22_training/`，Round1 用其前 49 帧训练；约 159 万段 + MIRA，含中间产物共约 10.3 TB） | 仅集群共享存储 `wm_dataset/dataset/wan22_training/` | **整体未完成，仅 DexYCB 2400 个片段已公开备份**；HF 上 `wan22-processed-clips` 已于 2026-10-01 清空（当时认为被 5 秒数据取代）。Round1 训练清单与 caption 在私有备份 `training_metadata/` |
+| 4 秒预处理片段（`wan22_training/`，Round1 用其前 49 帧训练；约 159 万段 + MIRA，含中间产物共约 10.3 TB） | 仅集群共享存储 `wm_dataset/dataset/wan22_training/` | **整体未完成；DexYCB 2400 个片段和 RAVDESS 2880 个片段已公开备份**；HF 上 `wan22-processed-clips` 已于 2026-10-01 清空（当时认为被 5 秒数据取代）。Round1 训练清单与 caption 在私有备份 `training_metadata/` |
 | 原始数据源、处理中间产物、旧上传状态 | 团队集群共享存储的 `wm_dataset/` 项目根目录；具体挂载路径见私有备份中的 `ASSET_ACCESS_PRIVATE.md` | 仅本地，未全部上传 |
 
 下载示例（私有仓库需要已授权账号）：
