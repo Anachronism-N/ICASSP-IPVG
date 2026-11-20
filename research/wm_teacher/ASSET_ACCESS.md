@@ -52,13 +52,13 @@
 |---|---|---|---|
 | 本地 UK-Road-DashCam 原始 MP4 | `zcoutlook/wan22-5s-remaining-public/original_sources/ukdash/` | 274 个、174.67 GB | 6 路预上传，20 文件一提交 |
 | RoboMIND 元数据、DexYCB 训练 manifest 与源许可说明 | `zcoutlook/wan22-5s-remaining-public/original_sources/{robomind,dexycb}/` | 23 个元数据文件、3 个许可说明；约 91.03 MB | 与视频同批验收；文本快照移除集群绝对路径和凭据，不修改源文件 |
-| RAVDESS 本地预处理 MP4 | `zcoutlook/wan22-4s-clips/eligible_shards/ravdess/` | 2880 个、约 1.04 GB，4 个分片 | 4 路打包上传；保留 CC BY-NC-SA 4.0、署名和相同许可要求 |
+| RAVDESS 本地预处理 MP4 | `zcoutlook/wan22-4s-clips/eligible_shards/ravdess/` | 2880 个、约 1.04 GB，4 个分片 | **4/4 已上传并独立验收，2880/2880 成员SHA通过**；保留 CC BY-NC-SA 4.0、署名和相同许可要求 |
 
 更正早前遗漏：UK-Road-DashCam 的本地原始文件后缀是大写 .MP4，此前只检查小写 .mp4 导致错误判断为无原始视频；本批使用大小写无关的文件类型检查。已完成的 4510 个 UKdash 5 秒窗口与这 274 个原始文件是不同资产，不把原始视频备份记为窗口重复传输。
 
 RAVDESS 来源为 Livingstone 与 Russo 的官方发布，处理子集保持非商业、署名、相同许可条件。只上传本地2880个预处理视频，不把其数量外推为完整上游音频/歌曲数据集覆盖。
 
-上述300个单文件条目（274视频、23元数据、3许可说明）及4个RAVDESS分片完成后，将独立验证固定远端revision、大小、SHA256和成员索引。遇额度、限流或校验错误停止，不改公开性、不删除源文件、不启动GPU。
+300个单文件条目（274视频、23元数据、3许可说明）仍在上传，完成后独立验证固定远端revision、大小、SHA256。4个RAVDESS分片已经按远端固定revision、tar SHA256、实际下载的成员索引及全部2880个本地tar成员SHA256独立验收通过。遇额度、限流或校验错误停止，不改公开性、不删除源文件、不启动GPU。
 
 其余受限旧窗口、OpenVidgen、混合评测残余、其他原始数据和旧迁移包仍未全部上传，原件保留。重新处理不解除已知来源许可；全量备份完成标记仍为false。
 
