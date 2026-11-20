@@ -80,6 +80,12 @@ RAVDESS 来源为 Livingstone 与 Russo 的官方发布，处理子集保持非�
 
 已传的UK原始视频、RoboMIND、DexYCB/RAVDESS处理片段与65权重不重传。其余受限来源与未安全审阅的旧迁移包仍需适用授权和足够的私有存储；当前全部资产完成标记保持false。
 
+### 补齐此前大小门排除的节点manifest（2026-11-20）
+
+旧节点源码/运行记录归档中有4份manifest因单文件约48.61 MB超过文本大小门而未包含。现已确认4份源文件SHA256完全相同，去重为一个**50000行、压缩约6.56 MB的脱敏私有快照**，上传并实际下载解压校验通过。
+
+位置：`NZC415/wm-dataset/backups/20261120/excluded_node_manifest/`；包含manifest.sanitized.jsonl.gz与RESTORE_INDEX.json。固定revision：b6f80f67abbfff0d47215f831aac8ce69bbc4b70。原始文件未修改，备份说明包含源SHA、存储SHA与4个节点的相同内容引用；这不代表其引用的视频或50000条训练任务均已备份/运行。
+
 ## 1. 代码与文档
 
 | 内容 | 位置 | 状态 |
