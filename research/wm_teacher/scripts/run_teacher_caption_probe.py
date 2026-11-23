@@ -25,8 +25,8 @@ import run_teacher_probe as generation
 import score_teacher_probe as score
 
 ROOT = Path(os.environ.get("TEACHER_PROBE_ROOT", str(Path(__file__).resolve().parents[1])))
-P1 = Path("/srv/wm_tmp/teacher_p1_cfg_20261019_run01")
-PROVENANCE = Path("/srv/wm_tmp/teacher_opt_review_20261019/p1_provenance.json")
+P1 = Path("/dockerdata/wm_tmp/teacher_p1_cfg_20261019_run01")
+PROVENANCE = Path("/dockerdata/wm_tmp/teacher_opt_review_20261019/p1_provenance.json")
 PROVENANCE_SHA256 = "e5acbdb3694dda35d08b92ca46fad0d7eebd65def9b0255fb7277b0c7e5ead75"
 CASE_ORDER, MODELS = m1.CASE_ORDER, m1.MODELS
 require, sha256, read_json = m1.require, m1.sha256, score.read_json
@@ -187,8 +187,8 @@ def make_jobs(control_rows, originals, run):
 
 def preflight(run, deadline=None):
     run = Path(run).absolute()
-    require(run == run.resolve() and run.is_relative_to(Path("/srv/wm_tmp"))
-            and not run.exists() and not run.is_symlink(), "Run must be a new real local private /srv/wm_tmp directory")
+    require(run == run.resolve() and run.is_relative_to(Path("/dockerdata/wm_tmp"))
+            and not run.exists() and not run.is_symlink(), "Run must be a new real local private /dockerdata/wm_tmp directory")
     audit = m1.preflight(P1, run, m1.MODELS_DEFAULT, deadline)
     p1_jobs, generation_actual, hashes = score.validate_run(P1, decode=False)
     require(generation_actual <= 4, "P1 generation budget differs")

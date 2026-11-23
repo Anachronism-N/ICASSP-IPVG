@@ -32,19 +32,19 @@ mkdir restored && tar -xf ./shards/<archive> -C restored     # .tar.gz 用 tar -
 
 | 数据源（本地目录） | 上游获取方式 | 许可 / 再分发 | 本项目处理后数据与副本位置 |
 |---|---|---|---|
-| MIRA / Rocket Science（`general_action/mira_rocket`，5 秒窗口 `mira_5s`） | HF `kyutai/rocket-science`（门控，需勾选非商业使用条款）；代码 github.com/mira-wm/mira | CC BY-NC-SA 4.0；Rocket League 内容 © Psyonix/Epic Games，商用需 Epic 另行许可，不授予商标权 | 5 秒窗口：大部分在 `nzc-415/wan22-5s`（公开）；其余 208,749 个在私有备份（见 0.3）。原始数据与 4 秒预处理片段未上传，请从上游重新获取 |
-| NoXi（`egocentric_interaction/noxi`，`noxi_5s`） | https://www.idiap.ch/dataset/noxi ，签署 EULA 后获取 | EULA 研究许可，禁止再分发 | 窗口在 `nzc-415/wan22-5s` 与私有备份（0.3）；原始数据仅从上游获取 |
-| Seamless Interaction（`egocentric_interaction/seamless_interaction`，`seamless_5s`） | HF `facebook/seamless-interaction`（直接下载）；github.com/facebookresearch/seamless_interaction | CC BY-NC 4.0（允许非商业再分发，须署名、附许可链接并说明改动） | 16,622 个窗口：**公开** `zcoutlook/wan22-5s-seamless-public`（附署名与改动说明）；其余窗口在 `nzc-415/wan22-5s` |
-| VFHQ（`digital_human/vfhq*`，`vfhq_5s`） | https://liangbinxie.github.io/projects/vfhq/ ，同意其非商业研究协议后下载 | 协议写明不得再复制、发布或分发任何部分 | 窗口在私有备份（0.3）与 `nzc-415/wan22-5s`；原始包在 `NZC415/VFHQ-videos*` 系列仓库（其中部分为公开状态，见 0.6） |
+| MIRA / Rocket Science（`general_action/mira_rocket`，5 秒窗口 `mira_5s`） | HF `kyutai/rocket-science`（门控，需勾选非商业使用条款）；代码 github.com/mira-wm/mira | CC BY-NC-SA 4.0；Rocket League 内容 © Psyonix/Epic Games，商用需 Epic 另行许可，不授予商标权 | 5 秒窗口：1,396,092 个在 `nzc-415/wan22-5s`（公开），2,086 个在 `NZC415/wan22-5s-trainval-overflow`（公开），208,749 个在私有备份（见 0.3）。原始数据与 4 秒预处理片段未上传，请从上游重新获取 |
+| NoXi（`egocentric_interaction/noxi`，`noxi_5s`） | https://www.idiap.ch/dataset/noxi ，签署 EULA 后获取 | EULA 研究许可，禁止再分发 | 窗口：10,602 个在 `NZC415/wan22-5s-trainval-overflow`（公开状态，见 0.6），22,399 个在私有 `NZC415/wm-dataset`；**不在** `nzc-415/wan22-5s`；原始数据仅从上游获取 |
+| Seamless Interaction（`egocentric_interaction/seamless_interaction`，`seamless_5s`） | HF `facebook/seamless-interaction`（直接下载）；github.com/facebookresearch/seamless_interaction | CC BY-NC 4.0（允许非商业再分发，须署名、附许可链接并说明改动） | 16,622 个窗口：**公开** `zcoutlook/wan22-5s-seamless-public`（附署名与改动说明）；另 3,231 个在 `NZC415/wan22-5s-trainval-overflow`（公开）；**不在** `nzc-415/wan22-5s` |
+| VFHQ（`digital_human/vfhq*`，`vfhq_5s`） | https://liangbinxie.github.io/projects/vfhq/ ，同意其非商业研究协议后下载 | 协议写明不得再复制、发布或分发任何部分 | 窗口：7,951 个在 `NZC415/wan22-5s-trainval-overflow`（公开状态），9,536 个在私有 `NZC415/wm-dataset`；**不在** `nzc-415/wan22-5s`；原始包在 `NZC415/VFHQ-videos*` 系列仓库（其中部分为公开状态，见 0.6） |
 | CelebV-HQ（`digital_human/celebv*`，`celebvhq_5s`） | https://celebv-hq.github.io ，按官方提供的 YouTube ID 与脚本下载 | 视频版权归原作者；不可再分发 | 窗口在 `nzc-415/wan22-5s`；原始下载包在 `NZC415/CelebV-HQ-archives`（公开状态，见 0.6） |
 | Project Aria 系列：Aria Everyday Activities、ADT、HOT3D、Nymeria（`direct_downloads*`、`project_aria_downloads`，`direct_5s`） | https://www.projectaria.com/datasets/ ，签署许可后获取带期限的下载链接 | 研究许可，禁止再分发 | 窗口在 `nzc-415/wan22-5s`；原始下载包在 `NZC415/direct-downloads-sharded`（私有）与 `NZC415/direct-downloads-archives`（公开状态，见 0.6） |
-| OpenVid-1M / OpenVidHD（`general_video/openvidhd`，`openvidhd_5s`、`openvidgen_5s`） | github.com/NJU-PCALab/OpenVid-1M（Hugging Face 发布） | 数据卡声明 CC BY 4.0，用途为研究/非商业，且须遵守其底层来源许可 | `openvidgen_5s` 12,000 个窗口在私有 `NZC415/wm-dataset`；`openvidhd_5s` 在私有备份与 `nzc-415/wan22-5s` |
+| OpenVid-1M / OpenVidHD（`general_video/openvidhd`，`openvidhd_5s`、`openvidgen_5s`） | github.com/NJU-PCALab/OpenVid-1M（Hugging Face 发布） | 数据卡声明 CC BY 4.0，用途为研究/非商业，且须遵守其底层来源许可 | `openvidgen_5s` 12,000 个在私有 `NZC415/wm-dataset`；`openvidhd_5s` 292 个在 `NZC415/wan22-5s-trainval-overflow`、27 个在私有 `NZC415/wm-dataset` |
 | Ego-Exo4D（`egocentric_interaction/egoexo4d`，`egoexo4d_5s`） | https://ego-exo4d-data.org ，签署许可后用官方下载工具 | 研究许可，禁止再分发 | 窗口在 `nzc-415/wan22-5s`；原始数据仅从上游获取 |
 | HoloAssist（`egocentric_interaction/holoassist`） | https://holoassist.github.io/ ；github.com/Ember-HoloAssist/holoassist-release | 项目记录为禁止再分发 | 未上传，从上游获取 |
 | EasyCom（`egocentric_interaction/easycom`，`easycom_5s`） | github.com/facebookresearch/EasyComDataset | 按上游条款；项目记录为禁止再分发 | 窗口在 `nzc-415/wan22-5s` |
 | Charades（`egocentric_interaction/charades`，`charades_5s`） | Allen Institute for AI 官方 Charades 项目页 | 不授予公开发布修改后数据或向第三方分发的权利 | 窗口在 `nzc-415/wan22-5s` |
 | H2O（`egocentric_interaction/h2o`，`h2o_5s`） | https://taeinkwon.com/projects/h2o ，申请后下载 | 需按上游条款核实 | 窗口在 `nzc-415/wan22-5s` |
-| HOIGen-1M（`general_video/hoigen1m`，`hoigen1m_5s`） | 通过 Hugging Face 下载（上游仓库名未在项目文档中记录，请以论文/官方发布为准） | 源视频版权归原作者；caption 许可需核实 | 窗口在 `nzc-415/wan22-5s` |
+| HOIGen-1M（`general_video/hoigen1m`，`hoigen1m_5s`） | Hugging Face `HOIGen/HOIGen-1M`（项目文档记录的下载来源） | 源视频版权归原作者；caption 许可需核实 | 窗口在 `nzc-415/wan22-5s` |
 | The Matrix（`general_action/matrix_dataset`，`matrix_5s`） | ModelScope `TheMatrixDataset/the_matrix_dataset_8M_1920_1080` | 需按上游条款核实 | 窗口在 `nzc-415/wan22-5s` |
 | EgoDex（`new_sources/egodex`，`egodex_5s`） | HF `griffinlabs/EgoDex-LeRobot-v3.0` | CC BY-NC-ND 4.0（不得发布改编作品） | 本地原始文件与上游逐字节一致（凭证 `NZC415/wm-dataset` `backups/20261120/EGODEX_EXISTING_REMOTE_REFERENCE.json`）；6,000 个窗口在私有 `zcoutlook/wan22-5s-remaining` |
 | RoboMIND（`new_sources/robomind`，`robomind_5s`） | HF `Traly/RoboMIND-lerobot` | CC BY-NC 4.0 | 公开 `zcoutlook/wan22-5s-remaining-public`：`eligible_shards/robomind/`（6,000 窗口）与 `original_sources/robomind/` |
@@ -53,9 +53,33 @@ mkdir restored && tar -xf ./shards/<archive> -C restored     # .tar.gz 用 tar -
 | RAVDESS（`wan22_training/ravdess_processed`） | https://zenodo.org/records/1188976 | CC BY-NC-SA 4.0 | 公开 `zcoutlook/wan22-4s-clips/eligible_shards/ravdess/`（2,880 片段） |
 | Action100M（`egocentric_interaction/action100m`） | HF `facebook/action100m-preview`；github.com/facebookresearch/Action100M | FAIR 非商业研究许可 | 部分元数据在私有 `NZC415/action100m`、`NZC415/dataset-metadata` |
 | EPIC-KITCHENS、HOI4D、Inter-X、InterHuman、Assembly101（本地少量或未完成下载） | https://epic-kitchens.github.io/ ；https://hoi4d.github.io ；https://liangxuy.github.io/inter-x/ ；https://tr3e.github.io/intergen-page/ ；https://assembly-101.github.io | 均按各自上游条款 | 未上传，从上游获取 |
+| 本地目录存在但为空或未完成下载：MAFW、DFEW、AIST++、BEAT2、How2Sign、ViCo、CMU-MOSEI、EgoVid、YouCook2、FineGym、EgoExoLearn | 各自官方项目页（申请或下载方式见 `docs/05_下载申请清单.md`、`docs/13_访问状态审计.md`） | 按各自上游条款 | 无本地数据，未上传 |
 | Physics-IQ（评测基准） | Physics-IQ 官方基准发布（Original 部分为 CC BY 4.0；Verified 为门控版本） | 按官方条款 | 模型输出与 Original 输入帧：公开 `zcoutlook/wan22-5s-remaining-public/generated_media/physics_original*`；Verified 相关评测文件在私有 `nzc-415/wm-backup-overflow` |
 
 ### 0.3 5 秒训练窗口在哪个仓库
+
+逐来源窗口数（窗口→分片对应表 `coverage.sqlite3` 与 `restore/FILES_20261123.jsonl.gz` 统计，2026-11-23 核对）：
+
+| 来源目录 | `nzc-415/wan22-5s`（公开） | `NZC415/wan22-5s-trainval-overflow`（公开） | 2026-11-21～23 备份 |
+|---|---:|---:|---|
+| `celebvhq_5s` | 880,423 | – | – |
+| `charades_5s` | 52,997 | – | – |
+| `direct_5s`（Project Aria 系列） | 19,337 | – | – |
+| `easycom_5s` | 2,835 | – | – |
+| `egoexo4d_5s` | 12,623 | – | – |
+| `h2o_5s` | 196 | – | – |
+| `hoigen1m_5s` | 109,768 | – | – |
+| `matrix_5s` | 8,729 | – | – |
+| `mira_5s` | 1,396,092 | 2,086 | 208,749（私有：`NZC415/wm-dataset` 194,925，`zcoutlook/wm-backup-private` 13,776，`nzc-415/wm-backup-overflow` 48） |
+| `noxi_5s` | – | 10,602 | 22,399（私有 `NZC415/wm-dataset`） |
+| `vfhq_5s` | – | 7,951 | 9,536（私有 `NZC415/wm-dataset`） |
+| `seamless_5s` | – | 3,231 | 16,622（公开 `zcoutlook/wan22-5s-seamless-public`） |
+| `openvidhd_5s` | – | 292 | 27（私有 `NZC415/wm-dataset`） |
+| `openvidgen_5s` | – | – | 12,000（私有 `NZC415/wm-dataset`） |
+| **合计** | **2,483,000** | **24,162** | **276,186** |
+
+另：`egodex_5s` 6,000 个在私有 `zcoutlook/wan22-5s-remaining`；`robomind_5s` 6,000 个、`ukdash_5s` 4,510 个在公开 `zcoutlook/wan22-5s-remaining-public/eligible_shards/`。
+
 
 | 范围 | 位置 | 查找方法 |
 |---|---|---|
@@ -88,9 +112,26 @@ mkdir restored && tar -xf ./shards/<archive> -C restored     # .tar.gz 用 tar -
 - Seamless Interaction 此前被列为“禁止再分发”，不准确：上游数据卡与代码仓库写明 CC BY-NC 4.0。
 - 2026-11-21 起 65 个训练权重已从私有 `zcoutlook/wm-backup-private` 迁移到公开 `zcoutlook/wm-checkpoints`，第 3 节中的旧位置不再有效。
 
+- 2026-11-23 上午版本本文误写 NoXi、VFHQ、Seamless、OpenVidHD 的窗口在 `nzc-415/wan22-5s`；已按窗口→分片对应表更正（见 0.3）。
+- `docs/26_数据集收集与许可.md` 中的许可分类写于 2026-07，与上述更正冲突处以本文为准。
+
 ### 0.6 需要所有者决定的现有公开仓库
 
 以下仓库目前为公开状态，内容来自上游禁止再分发或版权归原作者的数据：`NZC415/VFHQ-videos`、`NZC415/VFHQ-videos-archives`、`NZC415/CelebV-HQ-archives`、`NZC415/direct-downloads-archives`；`nzc-415/wan22-5s` 与 `NZC415/wan22-5s-trainval-overflow` 中也包含多种受限来源的窗口。是否改为私有或删除由所有者决定；在此之前请不要把这些公开副本当作再分发授权。
+
+### 0.7 数据相关文档与脚本（本分支 `research/wm_teacher/`）
+
+| 主题 | 文件 |
+|---|---|
+| 数据源调研、评分与字段 | `docs/00_整合说明.md`～`docs/12_字段映射.md`、`docs/RAW_*.md`、`docs/20_补充数据集调研.md` |
+| 下载申请、访问状态与下载进度 | `docs/05_下载申请清单.md`、`docs/13_访问状态审计.md`、`docs/22_十二小时数据推进.md`、`docs/23_Project_Aria下载日志.md`、`docs/下载清单_完整版.md`、`docs/下载进度.md` |
+| 许可 | `docs/10_风险与许可.md`、`docs/26_数据集收集与许可.md`（以本文 0.2、0.5 为准） |
+| 预处理、切窗、caption 与训练格式 | `docs/21_数据集整理与Caption.md`、`docs/24_MIRA_Caption_Fix_Report.md`、`docs/27_数据预处理与训练格式适配.md`、`docs/28_*`、`docs/29_*`、`docs/41_窗口标注链与命名歧义验收.md` |
+| 数据总量与状态 | `docs/28_数据总量与项目目标评估.md`、`docs/90数据集完整状态.md` |
+| 存储、上传与备份 | 本文、`docs/61_资产访问与存储位置.md`（与本文同内容）、`docs/ASSET_UPLOADER.md`、`docs/65_集群迁移交接_进展与资源.md` |
+| 脚本 | `scripts/`（下载 `download_*`、处理 `process_*`/`convert_*`、切窗 `reslice_5s.py`/`slice_new_sources.py`、manifest `build_unified_manifest.py`/`generate_wan22_manifest.py`、caption、上传与备份 `upload_*`/`upload_asset_backup.py`）、`dataset_tools/` |
+
+训练用 manifest、caption 与 metadata 文件本身体积大，不放在 Git 中，位置见 0.3、0.4。
 
 ## 历史记录：当前续传范围（2026-11-19）
 

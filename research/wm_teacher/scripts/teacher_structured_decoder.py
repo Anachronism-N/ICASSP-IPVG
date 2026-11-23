@@ -38,6 +38,23 @@ def caption_word_schema():
     }
 
 
+CAMERA_MOTION_VALUES = ('static', 'pan_left', 'pan_right', 'tilt_up', 'tilt_down', 'zoom_in_or_push_in',
+                        'zoom_out_or_pull_back', 'tracking_or_orbit', 'handheld_shake', 'mixed_or_other')
+
+
+def bounded_camera_facts_schema(compact=False):
+    """Protocol 009: bounded facts plus one required camera_motion enum (no free text).
+
+    009b (compact=True) also caps arrays at 8 entities / 12 events so facts end within 1024 tokens."""
+    schema = bounded_facts_schema()
+    schema['properties']['camera_motion'] = {'type': 'string', 'enum': list(CAMERA_MOTION_VALUES)}
+    schema['required'] = schema['required'] + ['camera_motion']
+    if compact:
+        schema['properties']['entities']['maxItems'] = 8
+        schema['properties']['events']['maxItems'] = 12
+    return schema
+
+
 def bounded_facts_schema():
     from copy import deepcopy
     schema = deepcopy(FACTS_SCHEMA)
@@ -55,11 +72,17 @@ def bounded_facts_schema():
 
 
 class StructuredDecoder:
-    def __init__(self, tokenizer, eos_ids, *, bounded=False, word_count=False):
+    def __init__(self, tokenizer, eos_ids, *, bounded=False, word_count=False, camera=False, compact=False):
         from lmformatenforcer.integrations.transformers import build_token_enforcer_tokenizer_data
+        if camera and (not bounded or word_count):
+            raise ValueError('Camera facts are defined only for bounded facts without caption word grammar')
         self.tokenizer = tokenizer
         self.bounded = bounded
         self.word_count = word_count
+        self.camera = camera
+        self.compact = compact
+        if compact and not camera:
+            raise ValueError('Compact arrays are defined only for camera facts')
         self.eos_ids = [eos_ids] if type(eos_ids) is int else eos_ids
         if type(self.eos_ids) is not list or not self.eos_ids or tokenizer.eos_token_id not in self.eos_ids:
             raise ValueError('Frozen tokenizer EOS must be an actual configured generation EOS')
@@ -103,6 +126,8 @@ class StructuredDecoder:
         forms = {prefix + form for word in words for form in (word, word.title(), word.upper()) for prefix in ('', ' ')}
         ids = [self.tokenizer.encode(form, add_special_tokens=False) for form in sorted(forms)]
         schema = bounded_facts_schema() if self.bounded and facts_stage else FACTS_SCHEMA if facts_stage else CAPTION_SCHEMA
+        if self.camera and facts_stage:
+            schema = bounded_camera_facts_schema(self.compact)
         if self.word_count and not facts_stage:
             schema = caption_word_schema()
         grammar = JsonSchemaParser(schema)
@@ -119,6 +144,8 @@ class StructuredDecoder:
             entities=[dict(id='E1', description='A red disk', held_object=None)],
             events=[dict(entity_id='E1', frame_start=0, frame_end=15, action='Stays in place.')],
             start_end_difference='No visible change.')
+        if self.camera:
+            facts['camera_motion'] = 'zoom_in_or_push_in'
         prompt = self.tokenizer.encode('Synthetic JSON:', add_special_tokens=False)
         caption = ['A red circular disk rests on a plain white table without any visible movement.'] * 4 if self.word_count else ['one.', 'two.', 'three.', 'four.']
         paths = [(True, json.dumps(facts)), (False, json.dumps(caption))]
@@ -175,6 +202,7 @@ class StructuredDecoder:
                     dtype='bfloat16', scores_device=str(device), model_loaded=False,
                     bounded_string_CPU_input_score_path_pass=self.bounded,
                     caption_word_count_path_pass=self.word_count,
+                    camera_facts_path_pass=self.camera,
                     word_count_boundary_mask_pass=self.word_count)
 
     def check_token_path(self, prompt, tokens, constraints, mask, device):

@@ -16,7 +16,7 @@ import sys
 import time
 import uuid
 
-ROOT = Path("/srv/wm_dataset")
+ROOT = Path("/srv/wm_teacher")
 MANIFEST_REL = "eval/diag/teacher_label_audit_L1_20261019.json"
 CSV_REL = "training_metadata/ft2/ft2_train.csv"
 MANIFEST_SHA = "267a9ff4c1f318c25758e2ffd97d70e49b8ec2cfe314668501cfa8d7f41391ab"

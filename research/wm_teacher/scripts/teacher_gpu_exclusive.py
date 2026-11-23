@@ -13,6 +13,19 @@ import time
 
 HOLDER='/srv/PRIVATE_STORAGE'
 HOLDER_PYTHON='/srv/PRIVATE_STORAGE'
+# Same holder script under a second interpreter; user-confirmed own holder (2026-11-21, GPU3).
+HOLDER_PYTHONS=(HOLDER_PYTHON,'/opt/venv_vllm/bin/python')
+# omnidance resource-manager restore variant (user-approved 2026-11-22, nodes 3..8): python -u hold_gpu.py
+HOLDER_UNBUFFERED_PYTHONS=('/opt/venv_eval/bin/python',)
+# Node-local copies of the original pure matmul holder (no lease wait), pinned by content (nodes 5/6 planner copy).
+PINNED_LOCAL_HOLDERS={'/root/planner_two_node_tasks_20261029_v4/code/hold_gpu.py':
+                      '814d796dec843d9a3e255fd7085d9ab6d105275905cfa604e03b474c922f1c66'}
+
+def pinned_local_holder(path):
+    import hashlib
+    want=PINNED_LOCAL_HOLDERS.get(path)
+    try:return want is not None and hashlib.sha256(Path(path).read_bytes()).hexdigest()==want
+    except OSError:return False
 CONTROL_PYTHON='/usr/bin/python3'
 
 def control_runtime():
@@ -40,7 +53,9 @@ def apps():
 def holder_identity(pid,gpu):
     p=Path('/proc')/str(pid)
     args=[x.decode() for x in (p/'cmdline').read_bytes().split(bytes([0])) if x]
-    if args!=[HOLDER_PYTHON,HOLDER]:return None
+    plain=len(args)==2 and args[0] in HOLDER_PYTHONS and args[1]==HOLDER
+    unbuffered=len(args)==3 and args[0] in HOLDER_UNBUFFERED_PYTHONS and args[1]=='-u' and (args[2]==HOLDER or pinned_local_holder(args[2]))
+    if not (plain or unbuffered):return None
     env=dict(s.split(b'=',1) for s in (p/'environ').read_bytes().split(bytes([0])) if b'=' in s)
     placement=env.get(b'CUDA_VISIBLE_DEVICES',env.get(b'OCCUPY_GPU'))
     if placement!=str(gpu).encode() or p.stat().st_uid!=os.getuid():return None

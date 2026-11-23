@@ -52,7 +52,9 @@ FRAMEWORK_FILES = ('diffsynth/diffusion/loss.py', 'diffsynth/diffusion/training_
                    'diffsynth/utils/lora/general.py')
 SHARD_RELS = tuple(sorted(k for k in m1.CACHE_PINS if '/diffusion_pytorch_model-' in k))
 MAX_GPU_HOURS_CAP = 256.0
+MAX_MULTI_NODES = 4
 EXPORT_NAME = 'e3_lora.safetensors'
+PARTIAL_EXPORT_NAME = 'e3_lora.partial_budget_stop.safetensors'
 CKPT_NAME = 'adapters_optimizer_rng.pt'
 require = m1.require
 
@@ -111,10 +113,13 @@ def lr_factor(update, warmup, horizon):
 
 # ----------------------------------------------------------------------------- budget
 
-def budget(max_gpu_hours, world, grace, save_reserve, first_step_estimate, *, teacher_four_node_admission=False):
+def budget(max_gpu_hours, world, grace, save_reserve, first_step_estimate, *, teacher_four_node_admission=False,
+           multi_nodes=1):
     vals = (max_gpu_hours, grace, save_reserve, first_step_estimate)
     require(all(type(v) in (int, float) and math.isfinite(v) and v > 0 for v in vals), 'Finite positive budget values required')
-    allowed = type(world) is int and (1 <= world <= 8 or (teacher_four_node_admission and world == 32))
+    require(type(multi_nodes) is int and 1 <= multi_nodes <= MAX_MULTI_NODES, 'multi_nodes must be 1..%d' % MAX_MULTI_NODES)
+    allowed = type(world) is int and (1 <= world <= 8 or (teacher_four_node_admission and world == 32)
+                                      or (multi_nodes > 1 and world == 8 * multi_nodes))
     require(allowed, 'Single node: world size 1..8; explicit Teacher admission permits 4x8 only')
     require(max_gpu_hours <= MAX_GPU_HOURS_CAP, 'max-gpu-hours exceeds hard cap')
     wall = max_gpu_hours * 3600.0 / world
@@ -138,7 +143,8 @@ def recommend_steps(t_step, overhead_seconds, target_gpu_hours, target_world, sa
 
 # ----------------------------------------------------------------------------- cache index
 
-def load_cache_index(path, version, verify_files=False):
+def load_cache_index(path, version, verify_files=False, check_shard=None):
+    """check_shard=(rank, world): this rank stats/hashes only entries i % world == rank (all ranks together cover all)."""
     path = Path(path).resolve()
     index = m1.read_json(path)
     require(index.get('protocol') == CACHE_PROTOCOL and index.get('complete') is True, 'Not a complete E3 cache index')
@@ -147,12 +153,14 @@ def load_cache_index(path, version, verify_files=False):
     samples = index['samples']
     require(samples and len({s['sample_id'] for s in samples}) == len(samples), 'Empty/duplicate cache samples')
     out = []
-    for s in samples:
+    shard_rank, shard_world = check_shard if check_shard is not None else (0, 1)
+    require(0 <= shard_rank < shard_world, 'Bad check shard')
+    for i, s in enumerate(samples):
         require(set(s['contexts']) == set(index['versions']), 'Sample lacks a caption version: ' + s['sample_id'])
         entry = {'sample_id': s['sample_id'],
                  'x0': dict(s['x0'], path=str(m1.private_path(root, s['x0']['path']))),
                  'context': dict(s['contexts'][version], path=str(m1.private_path(root, s['contexts'][version]['path'])))}
-        for key in ('x0', 'context'):
+        for key in ('x0', 'context') if i % shard_world == shard_rank else ():
             p = Path(entry[key]['path'])
             require(p.is_file() and p.stat().st_size == entry[key]['bytes'], 'Cache file missing/size differs: ' + str(p))
             if verify_files:
@@ -325,6 +333,26 @@ class Comm:
     def barrier(self):
         if self.world > 1:
             self.dist.barrier()
+
+
+def hash_prefix_float(hex_digest):
+    """First 52 bits of a hex digest as an exactly representable float (for float-only gathers); -1 for None."""
+    return -1.0 if hex_digest is None else float(int(hex_digest[:13], 16))
+
+
+def require_same_frozen_base_across_nodes(comm, pipe, rank0_hash):
+    """Each node's local rank 0 hashes its own frozen base; all node hashes must equal global rank 0's."""
+    local0 = int(os.environ.get('LOCAL_RANK', '0')) == 0
+    own = rank0_hash if comm.rank == 0 else (ts.frozen_state_hash(pipe.dit) if local0 else None)
+    values = {row[0] for row in comm.gather([hash_prefix_float(own)])} - {-1.0}
+    require(len(values) == 1, 'Frozen base differs across nodes')
+
+
+def adapter_checksum(params):
+    """Exact FP64 sum of all trainable adapter values; equal on every rank iff updates stayed in sync."""
+    import torch
+    with torch.no_grad():
+        return float(sum(p.detach().double().sum() for p in params).item())
 
 
 def adapter_list(model):
@@ -601,7 +629,7 @@ def run_loop(pipe, optimizer, params, samples_fn, order, cfg, comm, allocation, 
     return len([r for r in records if r['status'] == 'ok']), records, stop
 
 
-def validate_topology(env=None, *, teacher_four_node_admission=False, visible_devices=None):
+def validate_topology(env=None, *, teacher_four_node_admission=False, visible_devices=None, multi_nodes=1):
     env = os.environ if env is None else env
     world = int(env.get('WORLD_SIZE', '1'))
     rank = int(env.get('RANK', '0'))
@@ -610,8 +638,10 @@ def validate_topology(env=None, *, teacher_four_node_admission=False, visible_de
     require(1 <= local_world <= 8 and world > 0 and world % local_world == 0, 'Invalid local/global world size')
     nnodes = world // local_world
     require((nnodes == 1 and 1 <= world <= 8) or
-            (teacher_four_node_admission and nnodes == 4 and local_world == 8 and world == 32),
-            'Allowed topology: one node 1..8 ranks, or explicit Teacher admission four nodes x eight ranks')
+            (teacher_four_node_admission and nnodes == 4 and local_world == 8 and world == 32) or
+            (2 <= multi_nodes <= MAX_MULTI_NODES and nnodes == multi_nodes and local_world == 8),
+            'Allowed topology: one node 1..8 ranks, explicit --multi-nodes N x eight ranks, '
+            'or explicit Teacher admission four nodes x eight ranks')
     require(int(env.get('NNODES', str(nnodes))) == nnodes, 'NNODES differs from world/local world')
     require(0 <= rank < world and 0 <= local < local_world, 'Rank out of range')
     if nnodes > 1:
@@ -633,13 +663,15 @@ def local_duration(started_monotonic, now_monotonic):
     return elapsed
 
 
-def setup_distributed(*, teacher_four_node_admission=False):
-    topology = validate_topology(teacher_four_node_admission=teacher_four_node_admission)
-    require(topology['nnodes'] == 1, 'BLOCKED: four-node runtime needs real NCCL/all-rank resume/allocation proofs')
+def setup_distributed(*, teacher_four_node_admission=False, multi_nodes=1):
+    topology = validate_topology(teacher_four_node_admission=teacher_four_node_admission, multi_nodes=multi_nodes)
+    require(topology['nnodes'] == 1 or (multi_nodes > 1 and topology['nnodes'] == multi_nodes),
+            'BLOCKED: four-node runtime needs real NCCL/all-rank resume/allocation proofs')
     import torch
     world, rank, local = topology['world_size'], topology['rank'], topology['local_rank']
     require(torch.cuda.is_available(), 'CUDA required')
-    validate_topology(teacher_four_node_admission=teacher_four_node_admission, visible_devices=torch.cuda.device_count())
+    validate_topology(teacher_four_node_admission=teacher_four_node_admission, visible_devices=torch.cuda.device_count(),
+                      multi_nodes=multi_nodes)
     torch.cuda.set_device(local)
     device = torch.device('cuda', local)
     if world == 1:
@@ -656,6 +688,8 @@ def validate_args(args):
     require(math.isfinite(args.anchor_lambda) and args.anchor_lambda >= 0, 'anchor-lambda must be finite >=0')
     require(args.lr > 0 and args.weight_decay >= 0 and args.clip > 0 and args.warmup >= 0, 'Bad optimizer settings')
     require(args.log_every >= 1 and args.component_grad_every >= 1 and args.load_concurrency >= 1, 'Bad cadence settings')
+    require(1 <= args.multi_nodes <= MAX_MULTI_NODES and (args.multi_nodes == 1 or not args.smoke),
+            '--multi-nodes 1..%d, training only' % MAX_MULTI_NODES)
     if args.smoke:
         require(1 <= args.smoke_steps <= 20, 'smoke-steps 1..20')
         require(args.smoke_offload and set(args.smoke_offload) <= {'on', 'off'}, 'smoke-offload must be subset of on,off')
@@ -1062,15 +1096,15 @@ def _execute(args, deterministic_runtime=None, approved_resume=None):
     if args.smoke and args.synthetic_inputs:
         random.seed(derive_seed('smoke_python', args.seed))
     identity = trainer_identity()
-    comm = setup_distributed()
+    comm = setup_distributed(multi_nodes=args.multi_nodes)
     allocation = budget(args.max_gpu_hours, comm.world, args.cleanup_grace_seconds, args.save_reserve_seconds,
-                        args.first_step_estimate_seconds)
+                        args.first_step_estimate_seconds, multi_nodes=args.multi_nodes)
     # Absolute monotonic timestamps are never comparable across hosts.
     clock = lambda: local_duration(t_start, time.monotonic())  # noqa: E731
     out = Path(args.out_dir).absolute()
     summary = {'protocol': PROTOCOL, 'status': 'failed', 'mode': 'smoke' if args.smoke else 'train',
                'allocation': allocation, 'started_unix': started, 'trainer_identity': identity}
-    log_file, pipe, created = None, None, False
+    log_file, pipe, created, partial_stop = None, None, False, None
 
     def on_signal(signum, frame):
         raise TimeoutError('E3 hard wall budget reached or terminated (signal %d)' % signum)
@@ -1094,7 +1128,7 @@ def _execute(args, deterministic_runtime=None, approved_resume=None):
             data = dict(synthetic_data_identity(), samples=list(range(64)))
             samples_fn = synthetic_sample
         else:
-            data = load_cache_index(args.cache_index, args.caption_version)
+            data = load_cache_index(args.cache_index, args.caption_version, check_shard=(comm.rank, comm.world))
             samples_fn = lambda i: load_sample(data['samples'][i])  # noqa: E731
         order = DataOrder(args.seed, len(data['samples']))
         total_steps = args.smoke_steps * len(args.smoke_offload) if args.smoke else args.max_steps
@@ -1134,6 +1168,8 @@ def _execute(args, deterministic_runtime=None, approved_resume=None):
         params = adapter_list(pipe.dit)
         comm.broadcast_(params)  # init is already seed-identical; broadcast makes it exact by construction
         frozen_before = ts.frozen_state_hash(pipe.dit) if comm.rank == 0 and not args.skip_frozen_hash else None
+        if args.multi_nodes > 1 and not args.skip_frozen_hash:
+            require_same_frozen_base_across_nodes(comm, pipe, frozen_before)
         optimizer = torch.optim.AdamW(params, lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, 0.999), eps=1e-8)
         cuda = device_type(comm) == 'cuda'
         if resume:
@@ -1164,8 +1200,16 @@ def _execute(args, deterministic_runtime=None, approved_resume=None):
             summary['stop_reason'] = stop
             summary['last_step'] = records[-1] if records else None
             summary['peak_allocated_bytes_max'] = max([r.get('peak_allocated_bytes_max', 0) for r in records] or [0])
-            require(stop is None and completed_steps == args.max_steps, 'Stopped before --max-steps: ' + str(stop))
+            if not (stop is None and completed_steps == args.max_steps):
+                require(args.save_partial_on_budget_stop and stop == 'budget_exhausted_before_max_steps'
+                        and completed_steps > 0, 'Stopped before --max-steps: ' + str(stop))
+                partial_stop = 'Stopped before --max-steps: %s (partial checkpoint/export saved at %d updates)' % (
+                    stop, completed_steps)
+                summary['partial'] = True
         summary['completed_steps'] = completed_steps
+        rank_checksums = [row[0] for row in comm.gather([adapter_checksum(params)])]
+        require(len(set(rank_checksums)) == 1, 'Adapters differ across DDP ranks')
+        summary['adapter_checksum_all_ranks'] = rank_checksums
         comm.barrier()
         if comm.rank == 0:
             t_save = time.perf_counter()
@@ -1177,7 +1221,8 @@ def _execute(args, deterministic_runtime=None, approved_resume=None):
             del reread
             summary['checkpoint'] = record
             summary['adapter_final_sha256'] = ts.state_hash(state['adapters'])
-            summary['export'] = export_lora(out / 'export' / EXPORT_NAME, state['adapters'])
+            summary['export'] = export_lora(out / 'export' / (PARTIAL_EXPORT_NAME if partial_stop else EXPORT_NAME),
+                                            state['adapters'])
             if frozen_before is not None:
                 frozen_after = ts.frozen_state_hash(pipe.dit)
                 require(frozen_after == frozen_before, 'Frozen base changed')
@@ -1193,6 +1238,7 @@ def _execute(args, deterministic_runtime=None, approved_resume=None):
                            'formula': 'floor((target_gpu_hours*3600/target_world*0.95 - overhead)/t_step)'}
                     for mode, v in summary['smoke'].items() if v['t_step_median_excluding_first']}
         comm.barrier()
+        require(partial_stop is None, str(partial_stop))
         summary['status'] = 'completed'
     except BaseException as error:
         summary['error'] = type(error).__name__ + ': ' + str(error)
@@ -1257,6 +1303,10 @@ def parser():
     p.add_argument('--approved-smoke-resume-sha256', help='explicitly approved full SHA256 of smoke resume proof')
     p.add_argument('--target-gpu-hours', type=float, default=24.0)
     p.add_argument('--target-world', type=int, default=8)
+    p.add_argument('--save-partial-on-budget-stop', action='store_true',
+                   help='if the wall budget ends before --max-steps, still save checkpoint + partial export; run fails')
+    p.add_argument('--multi-nodes', type=int, default=1,
+                   help='user-authorized data-parallel training over N nodes x 8 ranks (2..%d)' % MAX_MULTI_NODES)
     p.add_argument('--teacher-four-node-admission', action='store_true',
                    help='reserved explicit 4x8 topology; CPU prepare only, CUDA execution remains BLOCKED')
     return p
@@ -1265,10 +1315,10 @@ def parser():
 def main(argv=None):
     args = parser().parse_args(argv)
     try:
-        validate_topology(teacher_four_node_admission=args.teacher_four_node_admission)
+        validate_topology(teacher_four_node_admission=args.teacher_four_node_admission, multi_nodes=args.multi_nodes)
         validate_args(args)
         budget(args.max_gpu_hours, int(os.environ.get('WORLD_SIZE', '1')), args.cleanup_grace_seconds,
-               args.save_reserve_seconds, args.first_step_estimate_seconds)
+               args.save_reserve_seconds, args.first_step_estimate_seconds, multi_nodes=args.multi_nodes)
         return execute(args)
     except Exception as error:
         print(type(error).__name__ + ': ' + str(error), file=sys.stderr)

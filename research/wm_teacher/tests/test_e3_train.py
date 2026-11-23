@@ -180,6 +180,32 @@ class TopologyTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             tr.budget(6, 32, 60, 240, 120)
 
+    def test_user_authorized_multi_node_topology(self):
+        for nodes in (2, 3):
+            world = 8 * nodes
+            for rank in range(world):
+                env = {'WORLD_SIZE': str(world), 'LOCAL_WORLD_SIZE': '8', 'RANK': str(rank),
+                       'LOCAL_RANK': str(rank % 8), 'GROUP_RANK': str(rank // 8)}
+                with self.assertRaises(ValueError):
+                    tr.validate_topology(env)
+                with self.assertRaises(ValueError):
+                    tr.validate_topology(env, multi_nodes=5 - nodes)  # declared node count must match
+                topo = tr.validate_topology(env, multi_nodes=nodes, visible_devices=8)
+                self.assertEqual((topo['nnodes'], topo['node_rank'], topo['world_size']), (nodes, rank // 8, world))
+            with self.assertRaises(ValueError):  # fewer than 8 local ranks per node is not admitted
+                tr.validate_topology({'WORLD_SIZE': str(4 * nodes), 'LOCAL_WORLD_SIZE': '4', 'RANK': '0',
+                                      'LOCAL_RANK': '0', 'GROUP_RANK': '0'}, multi_nodes=nodes)
+            self.assertEqual(tr.budget(64, world, 60, 240, 120, multi_nodes=nodes)['wall_seconds'], 64 * 3600 / world)
+            with self.assertRaises(ValueError):
+                tr.budget(64, world, 60, 240, 120)
+        with self.assertRaises(ValueError):
+            tr.budget(64, 16, 60, 240, 120, multi_nodes=3)
+        for bad in (0, 5):
+            with self.assertRaises(ValueError):
+                tr.budget(8, 8, 60, 240, 120, multi_nodes=bad)
+        self.assertEqual(tr.hash_prefix_float(None), -1.0)
+        self.assertEqual(tr.hash_prefix_float('f' * 64), float(2 ** 52 - 1))
+
     def test_rank_node_mapping_world_and_local_visibility_are_strict(self):
         good = {'WORLD_SIZE': '32', 'LOCAL_WORLD_SIZE': '8', 'RANK': '17',
                 'LOCAL_RANK': '1', 'GROUP_RANK': '2', 'NNODES': '4'}
@@ -583,6 +609,20 @@ class CacheTests(Base):
                 self.assertTrue(torch.equal(sa['x0'], sb['x0']) and not torch.equal(sa['context'], sb['context']))
                 with self.assertRaises(ValueError):
                     tr.load_cache_index(cache / 'cache_index.json', 'nope')
+                # sharded size/existence checks: each rank checks i % world == rank; together they cover all
+                ids = [s['sample_id'] for s in json.loads((cache / 'cache_index.json').read_text())['samples']]
+                owner = ids.index('s1') % 2
+                moved = cache / 'x0/s1.pt.moved'
+                os.rename(cache / 'x0/s1.pt', moved)
+                try:
+                    self.assertEqual(len(tr.load_cache_index(cache / 'cache_index.json', 'orig',
+                                                             check_shard=(1 - owner, 2))['samples']), 3)
+                    with self.assertRaises(ValueError):
+                        tr.load_cache_index(cache / 'cache_index.json', 'orig', check_shard=(owner, 2))
+                    with self.assertRaises(ValueError):
+                        tr.load_cache_index(cache / 'cache_index.json', 'orig', check_shard=(2, 2))
+                finally:
+                    os.rename(moved, cache / 'x0/s1.pt')
             # tamper -> finalize/load refuse
             ctx = cache / 'ctx/orig/s2.pt'
             os.chmod(ctx, 0o600)
@@ -766,6 +806,30 @@ class EndToEndTests(Base):
             summary = json.loads((out / 'summary.json').read_text())
             self.assertEqual((rc, summary['status'], summary['stop_reason']), (1, 'failed', 'budget_exhausted_before_max_steps'))
             self.assertFalse((out / 'private' / tr.CKPT_NAME).exists())
+
+    def test_execute_budget_stop_saves_partial_only_when_requested(self):
+        torch = self.torch
+        for flag in (False, True):
+            with self.subTest(flag=flag), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                index = self.cache(root)
+                out = root / 'run'
+                calls = {'n': 0}
+                def stop_after_two(*_a):
+                    calls['n'] += 1
+                    return calls['n'] > 2
+                argv = ['--cache-index', str(index), '--caption-version', 'orig', '--out-dir', str(out),
+                        '--max-steps', '4', '--warmup', '1', '--max-gpu-hours', '1', '--seed', '9']
+                with patch.object(tr, 'should_stop', side_effect=stop_after_two):
+                    rc = self.run_main(root, argv + (['--save-partial-on-budget-stop'] if flag else []))
+                summary = json.loads((out / 'summary.json').read_text())
+                self.assertEqual((rc, summary['status'], summary['stop_reason']), (1, 'failed', 'budget_exhausted_before_max_steps'))
+                self.assertEqual((out / 'private' / tr.CKPT_NAME).exists(), flag)
+                self.assertFalse((out / 'export' / tr.EXPORT_NAME).exists())  # never looks like a completed run
+                self.assertEqual((out / 'export' / tr.PARTIAL_EXPORT_NAME).exists(), flag)
+                if flag:
+                    self.assertTrue(summary['partial'])
+                    self.assertEqual(torch.load(out / 'private' / tr.CKPT_NAME, weights_only=True)['steps'], 2)
 
     def test_execute_hard_wall_alarm_is_failed(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1389,7 +1453,7 @@ assert not torch.cuda.is_initialized()
             original = interface.flash_attn_func
             before = tr.deterministic_flags()
             with self.modules_patch(wan, interface, native):
-                def setup():
+                def setup(**_kwargs):
                     self.assertEqual(tr.deterministic_flags(), tr.DET_FA3_FLAGS)
                     self.assertEqual(os.environ['CUBLAS_WORKSPACE_CONFIG'], ':4096:8')
                     self.assertIsNot(interface.flash_attn_func, original)
@@ -1550,3 +1614,17 @@ def tearDownModule():
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class AdapterChecksumTest(unittest.TestCase):
+    def test_checksum_equal_for_identical_and_differs_after_any_update(self):
+        import torch
+        a = [torch.arange(6, dtype=torch.float32).reshape(2, 3), torch.ones(4)]
+        b = [x.clone() for x in a]
+        self.assertEqual(tr.adapter_checksum(a), tr.adapter_checksum(b))
+        b[1][2] += 1e-3
+        self.assertNotEqual(tr.adapter_checksum(a), tr.adapter_checksum(b))
+
+    def test_finalization_requires_rank_equal_checksums(self):
+        src = (SCRIPTS / 'train_e3_lora.py').read_text()
+        self.assertIn("require(len(set(rank_checksums)) == 1, 'Adapters differ across DDP ranks')", src)

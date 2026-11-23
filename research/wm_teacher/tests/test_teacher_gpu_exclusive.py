@@ -54,3 +54,33 @@ def test_invalid_pid_or_gpu_never_dispatched():
         with patch.object(guard.subprocess,'check_output') as call,pytest.raises(AssertionError):
             guard.signal_holder(pid,gpu)
         call.assert_not_called()
+
+
+def test_holder_identity_accepts_only_listed_interpreters_with_exact_script(tmp_path):
+    real=guard.Path
+    def identity(args,gpu=3,placement=b'3'):
+        proc=tmp_path/'proc';pid=proc/'1234';pid.mkdir(parents=True,exist_ok=True)
+        (pid/'cmdline').write_bytes(bytes(0).join(a.encode()+bytes(1) for a in args))
+        (pid/'environ').write_bytes(b'CUDA_VISIBLE_DEVICES='+placement+bytes(1)+b'OCCUPY_GPU=0'+bytes(1))
+        (pid/'stat').write_text('1234 (python) S '+' '.join(['0']*18)+' 4242 0 0')
+        with patch.object(guard,'Path',side_effect=lambda *a: proc if a==('/proc',) else real(*a)):
+            return guard.holder_identity(1234,gpu)
+    assert identity(['/opt/venv_vllm/bin/python',guard.HOLDER])['start_ticks']==4242
+    assert identity([guard.HOLDER_PYTHON,guard.HOLDER])['gpu']==3
+    assert identity(['/usr/bin/python3',guard.HOLDER]) is None
+    assert identity(['/opt/venv_vllm/bin/python','/tmp/other.py']) is None
+    assert identity(['/opt/venv_vllm/bin/python',guard.HOLDER,'--x']) is None
+    assert identity(['/opt/venv_vllm/bin/python',guard.HOLDER],placement=b'2') is None
+    assert identity(['/opt/venv_eval/bin/python','-u',guard.HOLDER])['gpu']==3
+    assert identity(['/opt/venv_eval/bin/python',guard.HOLDER]) is None
+    assert identity(['/opt/venv_vllm/bin/python','-u',guard.HOLDER]) is None
+    assert identity(['/opt/venv_eval/bin/python','-u',guard.HOLDER,'x']) is None
+
+
+def test_pinned_local_holder_requires_exact_content(tmp_path, monkeypatch):
+    import hashlib
+    f=tmp_path/'hold_gpu.py'; f.write_text('pure holder')
+    monkeypatch.setattr(guard,'PINNED_LOCAL_HOLDERS',{str(f):hashlib.sha256(b'pure holder').hexdigest()})
+    assert guard.pinned_local_holder(str(f))
+    f.write_text('changed')
+    assert not guard.pinned_local_holder(str(f)) and not guard.pinned_local_holder('/nonexistent/hold_gpu.py')

@@ -310,8 +310,8 @@
 详见 `docs/29_VLM_Caption_全量打标指南.md`
 
 #### 双节点并行部署
-- **Node B (29.127.33.93)**：Qwen3-VL-235B-A22B-Instruct-FP8，TP=8 单副本，vLLM 0.16.1
-- **Node A (29.191.211.184)**：Qwen2.5-VL-7B-Instruct，8 副本 × TP=1，--enforce-eager（235B 因 FlashInfer AllReduce 硬件问题无法部署，改用 7B dense 模型）
+- **Node B (PRIVATE_NODE_ADDRESS)**：Qwen3-VL-235B-A22B-Instruct-FP8，TP=8 单副本，vLLM 0.16.1
+- **Node A (PRIVATE_NODE_ADDRESS)**：Qwen2.5-VL-7B-Instruct，8 副本 × TP=1，--enforce-eager（235B 因 FlashInfer AllReduce 硬件问题无法部署，改用 7B dense 模型）
 
 #### Caption 进度（2026-07-26 17:00 更新）
 | 数据集 | 总视频数 | 已完成 | 失败 | 状态 |

@@ -235,7 +235,7 @@ class CaptionProbeTests(unittest.TestCase):
             c1.merge_score_reports(self.run,self.jobs,{'cpu':cpu,'gpu':gpu})
 
     def test_preflight_rejects_existing_directory_before_assets_or_gpu(self):
-        path=Path('/srv/wm_tmp/c1_test_existing_'+str(os.getpid()))
+        path=Path('/dockerdata/wm_tmp/c1_test_existing_'+str(os.getpid()))
         with mock.patch.object(Path,'exists',return_value=True), mock.patch.object(c1.m1,'preflight') as assets:
             with self.assertRaises(ValueError):
                 c1.preflight(path)

@@ -371,7 +371,7 @@ WM22四项容忍护栏通过，但raw主体一致性/平滑、po成像、WMB形�
 
 # 最新交接说明（2026-10-25，本轮接管更新，以下为上一快照）
 
-**先读**：docs/48（背景/全景/结论）、docs/47（idea与差距）、docs/43-46（各实验预注册与结论）、本文件下方历史段。会话记忆在 /root/.codebuddy/projects/srv/PRIVATE_STORAGE
+**先读**：docs/48（背景/全景/结论）、docs/47（idea与差距）、docs/43-46（各实验预注册与结论）、本文件下方历史段。会话记忆在 /srv/PRIVATE_STORAGE
 
 ## 正在进行（唯一活任务）
 E3 seed0三臂282条生成、24维评分及GTref三份各94、全帧解码/hash/配对独立复算均通过：A DreamSim FAIL，B/C PASS，按冻结规则选C；C Total*比base低0.135646pp、dynamic差0，**只是候选资格，非质量晋级**。seed3 188条完整解码/16维评分/GT已完成，四seeddynamic均值差−0.265957pp，样本std2.193141pp；旧三seedstd3.29错误已修正为2.214538。
@@ -722,7 +722,7 @@ caption词数审计：最少61、中位145、最大403，训练视频无重复�
 |---|---|---|
 | 训练/生成 `/opt/conda/envs/torch-base` | 3.12.11 | torch2.7.1，transformers4.57.1，accelerate1.10.1，deepspeed0.18.1，flash-attn2.8.1，diffusers0.31.0，numpy1.26.4，triton3.3.1，av19.0.1 |
 | VBench/GT-ref `/dockerdata/venv_vbench` | 3.12.11 | torch2.4.1，transformers4.45.2，numpy1.26.4，triton3.0.0，accelerate1.15.0 |
-| Physics `/dockerdata/venv_piq` | 3.12.11 | numpy2.5.4，opencv5.0.0.93；其他依赖需导出实际环境 |
+| Physics `/dockerdata/venv_piq` | 3.12.11 | numpy2.5.4，opencvPRIVATE_NODE_ADDRESS；其他依赖需导出实际环境 |
 | WMB `/dockerdata/conda_vila` | 3.10.14 | torch2.3.0+cu121，transformers4.46.0，flash-attn2.5.8，numpy1.26.4，triton3.1.0，accelerate0.34.2 |
 | caption `/dockerdata/venv_vllm` | 3.12.11 | vllm0.31.0，torch2.13.0，transformers5.17.0，numpy2.3.5，triton3.7.1 |
 
