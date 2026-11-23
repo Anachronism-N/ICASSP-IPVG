@@ -1,6 +1,6 @@
 # 数据、训练权重及其他资产访问说明
 
-更新时间：2026-11-23。本文只说明访问位置、获取方式和许可条件，不包含任何凭据、cookies、内部节点地址或私有日志。私有仓库需由仓库所有者授予读取权限后，用你自己的 Hugging Face 账号登录访问。
+更新时间：2026-11-23（晚）。本文只说明访问位置、获取方式和许可条件，不包含任何凭据、cookies、内部节点地址或私有日志。私有仓库需由仓库所有者授予读取权限后，用你自己的 Hugging Face 账号登录访问。
 
 **第 0 节是当前权威说明**；第 1 节之后保留 2026-11-20 及更早的逐批记录，与第 0 节冲突时以第 0 节为准。
 
@@ -73,9 +73,12 @@ mkdir restored && tar -xf ./shards/<archive> -C restored     # .tar.gz 用 tar -
 |---|---|---|
 | 65 个自训练 checkpoint（full1_5b、ft2_5b、merge、round1–4 LoRA、e3_arms、smoke，约 217 GB） | **公开** `zcoutlook/wm-checkpoints`（model 仓库，路径同项目 `models/train/...`）；迁移说明 `zcoutlook/wm-backup-private` `restoration/CHECKPOINTS_MOVED_20261121.json` | 直接下载；训练数据含非商业来源，权重请按非商业研究用途使用 |
 | 基座模型 Wan2.2-TI2V-5B、Qwen 系列等 | 各自官方发布渠道 | 不在本项目仓库 |
-| 评测输出与报告（11-21 之后新增部分）、训练元数据、manifest、代码/文档快照 | 私有 `nzc-415/wm-backup-overflow` `assets-20261123/` | 见 `restore/` 索引；上传进行中时以索引中已列出的分片为准 |
+| 评测输出与报告（此前未备份的部分，16,313 个文件，约 27.9 GB：`physiq_verified`、`official_reeval_20261122`、`teacher_T1_paired_dev_20261122`、`teacher_progress_campaign_20261104` 等） | 私有 `nzc-415/wm-backup-overflow` `assets-20261123/`（65 个 tar 分片） | **65/65 已上传并校验**；见 `restore/` 索引 |
+| 训练元数据、manifest、URL 清单、下载日志/队列、项目代码与文档快照（6,592 个文件，约 21.9 GB） | 私有 `nzc-415/wm-backup-overflow-meta` `assets-20261123/`（42 个 tar.gz 分片） | **42/42 已上传并校验**；见 `restore/` 索引 |
+| 因含疑似凭据而**未上传**的文件（Project Aria/Nymeria 带签名的下载链接清单、一个含硬编码令牌的旧上传脚本、一份人工审阅服务日志等，共 11 个） | 仅本地 | 文件名列在 `restore/SHARDS_20261123.json` 的 `skipped_credential_like_not_uploaded`；需要时请从上游重新申请链接 |
 | 更早的代码/文档/实验记录、评测媒体 1–5 号分片 | 私有 `NZC415/wm-dataset` `backups/2026111*/`、私有 `zcoutlook/wm-backup-private` `media/eval_demo/` | 见第 1、4 节 |
 | 本备份流程的记录：上传回执、冻结计划、覆盖核对 | 私有 `nzc-415/wm-backup-overflow` `records-20261123/` | 其中 `approved_backup/v4/COVERAGE_20261123.json` 记录 276,186/276,186 已存 |
+| 统一恢复索引（383 个分片的固定 revision/SHA256；299,392 条“文件 → 仓库/分片/成员”记录） | 私有 `nzc-415/wm-backup-overflow` `restore/SHARDS_20261123.json`、`restore/FILES_20261123.jsonl.gz` | 覆盖 2026-11-21 至 11-23 的全部批次；更早批次见第 1 节中的 `CHECKED_CROSS_ACCOUNT_INDEX_V5.json` |
 | 合成生成数据（Wan2.1-T2V-14B 生成视频） | 公开 `NZC415/Wan2.1-T2V-14B-6k`、`NZC415/wan2.1_t2v_14b_2k` | 直接下载 |
 | RSI 数据管线工作区 | 公开 `NZC415/rsi-workspace-public`、`NZC415/rsi-workspace` | 直接下载 |
 
